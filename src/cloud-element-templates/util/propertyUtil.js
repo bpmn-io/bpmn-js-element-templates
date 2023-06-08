@@ -20,7 +20,7 @@ import {
   ZEEBE_OUTPUT_TYPE,
   ZEEBE_PROPERTY_TYPE,
   ZEEBE_TASK_HEADER_TYPE
-} from '../util/bindingTypes';
+} from './bindingTypes';
 
 import {
   findExtension,
@@ -42,7 +42,7 @@ import {
   shouldUpdate
 } from '../CreateHelper';
 
-import { createElement } from '../../../utils/ElementUtil';
+import { createElement } from '../../utils/ElementUtil';
 
 const PRIMITIVE_MODDLE_TYPES = [
   'Boolean',

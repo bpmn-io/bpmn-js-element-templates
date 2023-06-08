@@ -1,7 +1,7 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import { findExtension } from './Helper';
-import { createElement } from '../../utils/ElementUtil';
+import { createElement } from '../utils/ElementUtil';
 
 
 /**
