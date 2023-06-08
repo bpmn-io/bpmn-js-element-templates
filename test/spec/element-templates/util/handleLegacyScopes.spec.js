@@ -1,6 +1,6 @@
 import { isArray } from 'min-dash';
 
-import handleLegacyScopes from 'src/provider/element-templates/util/handleLegacyScopes';
+import handleLegacyScopes from 'src/element-templates/util/handleLegacyScopes';
 
 
 describe('provider/element-template - handleLegacyScopes', function() {

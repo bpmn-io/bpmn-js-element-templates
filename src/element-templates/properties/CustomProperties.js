@@ -9,7 +9,7 @@ import {
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
-import { useService } from '../../../hooks';
+import { useService } from 'bpmn-js-properties-panel';
 
 import {
   Group,
@@ -34,7 +34,7 @@ import {
 import {
   createElement,
   getRoot
-} from '../../../utils/ElementUtil';
+} from '../../utils/ElementUtil';
 
 import {
   createCamundaErrorEventDefinition,

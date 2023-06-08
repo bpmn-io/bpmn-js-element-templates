@@ -1,5 +1,5 @@
 import BPMNModdle from 'bpmn-moddle';
-import validate from 'src/provider/element-templates/util/validate';
+import validate from 'src/element-templates/util/validate';
 
 
 describe('provider/element-template - validate', function() {

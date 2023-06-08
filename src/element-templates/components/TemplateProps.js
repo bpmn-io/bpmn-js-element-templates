@@ -1,4 +1,4 @@
-import { useService } from '../../../hooks';
+import { useService } from 'bpmn-js-properties-panel';
 
 import { getVersionOrDateFromTemplate } from '../util/templateUtil';
 

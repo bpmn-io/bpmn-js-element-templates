@@ -4,22 +4,20 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import { TextFieldEntry } from '@bpmn-io/properties-panel';
 
-import Error from '../../camunda-platform/properties/Error';
-import { getErrorLabel } from '../../camunda-platform/properties/ErrorsProps';
-
 import {
   findCamundaErrorEventDefinition,
   findExtensions
 } from '../Helper';
 
-import { useService } from '../../../hooks';
+import { useService } from 'bpmn-js-properties-panel';
 
 
 export function ErrorProperties(props) {
   const {
     element,
     index,
-    property
+    property,
+    groups
   } = props;
 
   const {
@@ -40,15 +38,13 @@ export function ErrorProperties(props) {
 
   const errorEventDefinition = findCamundaErrorEventDefinition(element, errorRef);
 
-  const id = `${ element.id }-errorEventDefinition-${ index }`;
+  const id = `${ element.id }-error-${ index }`;
 
   let entries = [];
 
-  entries = Error({
-    idPrefix: id,
-    element,
-    errorEventDefinition
-  });
+  const errorGroup = groups.find(({ id }) => id === 'CamundaPlatform__Errors');
+  const originalItem = errorGroup.items.find(({ entries }) => entries[0].errorEventDefinition === errorEventDefinition);
+  entries = originalItem.entries;
 
   // (1) remove global error referenced entry
   // entries.shift();
@@ -105,4 +101,21 @@ function removeEntry(entries, suffix) {
   const entry = entries.find(({ id }) => id.endsWith(suffix));
 
   return without(entries, entry);
+}
+
+function getErrorLabel(errorEventDefinition) {
+  const error = errorEventDefinition.get('errorRef');
+
+  if (!error) {
+    return '<no reference>';
+  }
+
+  const errorCode = error.get('errorCode'),
+        name = error.get('name') || '<unnamed>';
+
+  if (errorCode) {
+    return `${ name } (code = ${ errorCode })`;
+  }
+
+  return name;
 }

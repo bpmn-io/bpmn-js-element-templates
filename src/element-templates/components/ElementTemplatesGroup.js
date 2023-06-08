@@ -10,7 +10,7 @@ import classnames from 'classnames';
 
 import {
   useService
-} from '../../../hooks';
+} from 'bpmn-js-properties-panel';
 
 import { getTemplateId as defaultGetTemplateId } from '../Helper';
 

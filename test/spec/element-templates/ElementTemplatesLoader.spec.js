@@ -3,9 +3,9 @@ import TestContainer from 'mocha-test-container-support';
 import { bootstrapModeler, inject } from 'test/TestHelper';
 
 import coreModule from 'bpmn-js/lib/core';
-import elementTemplatesModule from 'src/provider/element-templates';
+import elementTemplatesModule from 'src/element-templates';
 import modelingModule from 'bpmn-js/lib/features/modeling';
-import propertiesPanelCommandsModule from 'src/cmd';
+import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
 
 import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
 
@@ -17,7 +17,7 @@ import templateDescriptors from './fixtures/misc';
 const modules = [
   coreModule,
   modelingModule,
-  propertiesPanelCommandsModule,
+  BpmnPropertiesPanelModule,
   elementTemplatesModule,
   {
     propertiesPanel: [ 'value', { registerProvider() {} } ]

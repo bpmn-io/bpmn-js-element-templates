@@ -1,11 +1,10 @@
 import {
   bootstrapModeler,
   inject
-} from '../../../TestHelper';
+} from '../../TestHelper';
 
-import BpmnPropertiesPanel from 'src/render';
-import BpmnPropertiesProvider from 'src/provider/bpmn';
-import ElementTemplatesModule from 'src/provider/cloud-element-templates';
+import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
+import ElementTemplatesModule from 'src/cloud-element-templates';
 import CoreModule from 'bpmn-js/lib/core';
 import ModelingModule from 'bpmn-js/lib/features/modeling';
 import ReplaceModule from 'bpmn-js/lib/features/replace';

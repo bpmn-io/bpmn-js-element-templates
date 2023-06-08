@@ -6,13 +6,13 @@ import ReplaceBehavior from './ReplaceBehavior';
 import commandsModule from './cmd';
 import ElementTemplatesPropertiesProvider from './ElementTemplatesPropertiesProvider';
 
-import camundaPlatformPropertiesProviderModule from '../camunda-platform';
+import { CamundaPlatformPropertiesProviderModule } from 'bpmn-js-properties-panel';
 
 export default {
   __depends__: [
     commandsModule,
     translateModule,
-    camundaPlatformPropertiesProviderModule
+    CamundaPlatformPropertiesProviderModule
   ],
   __init__: [
     'elementTemplatesLoader',

@@ -16,14 +16,13 @@ import { query as domQuery } from 'min-dom';
 import {
   findExtension,
   findOutputParameter
-} from '../../../../../src/provider/element-templates/Helper';
+} from 'src/element-templates/Helper';
 
 import coreModule from 'bpmn-js/lib/core';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
 
-import BpmnPropertiesPanel from 'src/render';
-import elementTemplatesModule from 'src/provider/element-templates';
+import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import elementTemplatesModule from 'src/element-templates';
 
 import diagramXML from './OutputProperties.bpmn';
 import elementTemplates from './OutputProperties.json';

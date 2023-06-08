@@ -3,7 +3,7 @@ import {
   removeTemplate,
   unlinkTemplate,
   updateTemplate
-} from 'src/provider/element-templates/util/templateUtil';
+} from 'src/element-templates/util/templateUtil';
 
 import TestContainer from 'mocha-test-container-support';
 
@@ -12,7 +12,7 @@ import { bootstrapModeler, inject } from 'test/TestHelper';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import coreModule from 'bpmn-js/lib/core';
-import elementTemplatesModule from 'src/provider/element-templates';
+import elementTemplatesModule from 'src/element-templates';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 
 import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';

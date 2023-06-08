@@ -1,6 +1,6 @@
 import { assign } from 'min-dash';
 
-import { nextId } from '../../utils/ElementUtil';
+import { nextId } from '../utils/ElementUtil';
 
 
 /**

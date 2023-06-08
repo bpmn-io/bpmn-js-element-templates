@@ -26,9 +26,9 @@ import {
   createError
 } from '../CreateHelper';
 
-import { getSignalEventDefinition } from '../../bpmn/utils/EventDefinitionUtil';
+import { getSignalEventDefinition } from '../../utils/EventDefinitionUtil';
 
-import { getRoot } from '../../../utils/ElementUtil';
+import { getRoot } from '../../utils/ElementUtil';
 
 import {
   find,

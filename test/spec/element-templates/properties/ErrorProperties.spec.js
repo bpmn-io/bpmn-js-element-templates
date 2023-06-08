@@ -18,8 +18,7 @@ import coreModule from 'bpmn-js/lib/core';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
 
-import BpmnPropertiesPanel from 'src/render';
-import elementTemplatesModule from 'src/provider/element-templates';
+import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import elementTemplatesModule from 'src/element-templates';
 
 import diagramXML from './ErrorProperties.bpmn';
 import elementTemplates from './ErrorProperties.json';
@@ -128,7 +127,7 @@ describe('provider/element-templates - ErrorProperties', function() {
       await expectSelected('ServiceTask_1');
 
       // then
-      const entry = findEntry('ServiceTask_1-errorEventDefinition-0-errorRef', container);
+      const entry = findEntry('ServiceTask_1-error-0-errorRef', container);
 
       expect(entry).not.to.exist;
     });
@@ -144,7 +143,7 @@ describe('provider/element-templates - ErrorProperties', function() {
       await expectSelected('ServiceTask_1');
 
       // then
-      const entry = findEntry('ServiceTask_1-errorEventDefinition-0-expression', container),
+      const entry = findEntry('ServiceTask_1-error-0-expression', container),
             input = findInput('text', entry);
 
       expect(input).to.exist;
@@ -162,9 +161,9 @@ describe('provider/element-templates - ErrorProperties', function() {
       await expectSelected('ServiceTask_1');
 
       // then
-      const errorNameEntry = findEntry('ServiceTask_1-errorEventDefinition-0-errorName', container),
-            errorCodeEntry = findEntry('ServiceTask_1-errorEventDefinition-0-errorCode', container),
-            errorMessageEntry = findEntry('ServiceTask_1-errorEventDefinition-0-errorMessage', container);
+      const errorNameEntry = findEntry('ServiceTask_1-error-0-errorName', container),
+            errorCodeEntry = findEntry('ServiceTask_1-error-0-errorCode', container),
+            errorMessageEntry = findEntry('ServiceTask_1-error-0-errorMessage', container);
 
       expect(errorNameEntry).to.exist;
       expect(errorCodeEntry).to.exist;

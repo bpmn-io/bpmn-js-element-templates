@@ -23,9 +23,9 @@ import {
   inject
 } from 'test/TestHelper';
 
-import BpmnPropertiesPanel from 'src/render';
-import elementTemplatesModule from 'src/provider/cloud-element-templates';
-import bpmnPropertiesProvider from 'src/provider/bpmn';
+import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
+import elementTemplatesModule from 'src/cloud-element-templates';
+import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
 
 import diagramXML from './ElementTemplatesPropertiesProvider.bpmn';
 import templates from './ElementTemplatesPropertiesProvider.templates.json';
@@ -35,7 +35,7 @@ import entriesVisibleTemplates from './fixtures/entries-visible.json';
 import conditionTemplate from './fixtures/condition.json';
 import multipleConditionTemplate from './fixtures/multiple-conditions.json';
 import conditionXML from './fixtures/condition.bpmn';
-import { changeInput } from '../../../TestHelper';
+import { changeInput } from '../../TestHelper';
 
 
 describe('provider/cloud-element-templates - ElementTemplates', function() {
@@ -51,7 +51,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     modules: [
       BpmnPropertiesPanel,
       coreModule,
-      bpmnPropertiesProvider,
+      BpmnPropertiesProvider,
       elementTemplatesModule,
       modelingModule
     ],
@@ -187,7 +187,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       modules: [
         BpmnPropertiesPanel,
         coreModule,
-        bpmnPropertiesProvider,
+        BpmnPropertiesProvider,
         elementTemplatesModule,
         modelingModule
       ],
