@@ -22,7 +22,7 @@ import {
   createError,
   createInputParameter,
   createOutputParameter
-} from 'src/provider/element-templates/CreateHelper';
+} from 'src/element-templates/CreateHelper';
 
 const testModules = [
   coreModule,

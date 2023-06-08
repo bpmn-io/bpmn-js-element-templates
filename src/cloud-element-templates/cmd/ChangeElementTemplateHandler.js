@@ -31,7 +31,7 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE
 } from '../util/bindingTypes';
-import { createElement } from '../../../utils/ElementUtil';
+import { createElement } from '../../utils/ElementUtil';
 
 /**
  * Applies an element template to an element. Sets `zeebe:modelerTemplate` and

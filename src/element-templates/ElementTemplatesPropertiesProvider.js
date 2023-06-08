@@ -56,9 +56,9 @@ export default class ElementTemplatesPropertiesProvider {
 
       if (elementTemplate) {
         const templateSpecificGroups = [].concat(
-          createInputGroup(element, elementTemplate, injector) || [],
-          createOutputGroup(element, elementTemplate, injector) || [],
-          createErrorGroup(element, elementTemplate, injector) || [],
+          createInputGroup(element, elementTemplate, injector, groups) || [],
+          createOutputGroup(element, elementTemplate, injector, groups) || [],
+          createErrorGroup(element, elementTemplate, injector, groups) || [],
           CustomProperties({ element, elementTemplate })
         );
 
@@ -89,7 +89,7 @@ ElementTemplatesPropertiesProvider.$inject = [
 
 // helper /////////////////////
 
-function createInputGroup(element, elementTemplate, injector) {
+function createInputGroup(element, elementTemplate, injector, groups) {
   const translate = injector.get('translate');
 
   const group = {
@@ -104,7 +104,7 @@ function createInputGroup(element, elementTemplate, injector) {
   });
 
   properties.forEach((property, index) => {
-    const item = InputProperties({ element, index, property });
+    const item = InputProperties({ element, index, property, groups });
 
     if (item) {
       group.items.push(item);
@@ -119,7 +119,7 @@ function createInputGroup(element, elementTemplate, injector) {
   return group;
 }
 
-function createOutputGroup(element, elementTemplate, injector) {
+function createOutputGroup(element, elementTemplate, injector, groups) {
   const translate = injector.get('translate');
 
   const group = {
@@ -149,7 +149,7 @@ function createOutputGroup(element, elementTemplate, injector) {
   return group;
 }
 
-function createErrorGroup(element, elementTemplate, injector) {
+function createErrorGroup(element, elementTemplate, injector, groups) {
   const translate = injector.get('translate');
 
   const group = {
@@ -164,7 +164,7 @@ function createErrorGroup(element, elementTemplate, injector) {
   });
 
   properties.forEach((property, index) => {
-    const item = ErrorProperties({ element, index, property });
+    const item = ErrorProperties({ element, index, property, groups });
 
     if (item) {
       group.items.push(item);

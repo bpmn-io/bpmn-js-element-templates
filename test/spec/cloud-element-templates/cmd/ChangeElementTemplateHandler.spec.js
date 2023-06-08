@@ -7,9 +7,10 @@ import {
 import TestContainer from 'mocha-test-container-support';
 
 import CoreModule from 'bpmn-js/lib/core';
-import ElementTemplatesModule from 'src/provider/cloud-element-templates';
+import ElementTemplatesModule from 'src/cloud-element-templates';
 import ModelingModule from 'bpmn-js/lib/features/modeling';
-import PropertiesPanelCommandsModule from 'src/cmd';
+import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
+
 
 import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 
@@ -25,13 +26,13 @@ import {
   findTaskHeader,
   findZeebeProperty,
   findZeebeSubscription
-} from 'src/provider/cloud-element-templates/Helper';
+} from 'src/cloud-element-templates/Helper';
 
 import {
   createInputParameter,
   createOutputParameter,
   createZeebeProperty
-} from 'src/provider/cloud-element-templates/CreateHelper';
+} from 'src/cloud-element-templates/CreateHelper';
 
 import {
   find,
@@ -44,7 +45,7 @@ const modules = [
   CoreModule,
   ElementTemplatesModule,
   ModelingModule,
-  PropertiesPanelCommandsModule,
+  BpmnPropertiesPanelModule,
   {
     propertiesPanel: [ 'value', { registerProvider() {} } ]
   }

@@ -2,20 +2,20 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import { TextFieldEntry, ToggleSwitchEntry } from '@bpmn-io/properties-panel';
 
-import { containsSpace } from '../../bpmn/utils/ValidationUtil';
+import { containsSpace } from '../util/validationUtil';
 
 import {
   findExtension,
   findOutputParameter
 } from '../Helper';
 
-import { useService } from '../../../hooks';
+import { useService } from 'bpmn-js-properties-panel';
 
 import { without } from 'min-dash';
 
 import { PropertyDescription } from '../components/PropertyDescription';
 
-import { createElement } from '../../../utils/ElementUtil';
+import { createElement } from '../../utils/ElementUtil';
 
 import { createOutputParameter } from '../CreateHelper';
 

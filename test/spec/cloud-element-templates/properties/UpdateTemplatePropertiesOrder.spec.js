@@ -2,7 +2,7 @@ import TestContainer from 'mocha-test-container-support';
 
 import {
   findExtension
-} from 'src/provider/cloud-element-templates/Helper';
+} from 'src/cloud-element-templates/Helper';
 
 import {
   bootstrapModeler,
@@ -11,26 +11,25 @@ import {
 } from 'test/TestHelper';
 
 import elementTemplateChooserModule from '@bpmn-io/element-template-chooser';
-import zeebeElementTemplatesModule from 'src/provider/cloud-element-templates';
-import zeebePropertiesProviderModule from 'src/provider/zeebe';
+import zeebeElementTemplatesModule from 'src/cloud-element-templates';
+import { ZeebePropertiesProviderModule } from 'bpmn-js-properties-panel';
 
-import bpmnPropertiesProviderModule from 'src/provider/bpmn';
-import propertiesCommandsModule from 'src/cmd';
-import propertiesRenderModule from 'src/render';
+import { BpmnPropertiesProviderModule } from 'bpmn-js-properties-panel';
+import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
 
 import zeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 
 import {
   setPropertyValue
-} from 'src/provider/cloud-element-templates/util/propertyUtil';
+} from 'src/cloud-element-templates/util/propertyUtil';
 
 import {
   findInputParameter,
   findOutputParameter,
   findTaskHeader,
   findZeebeProperty
-} from 'src/provider/cloud-element-templates/Helper';
+} from 'src/cloud-element-templates/Helper';
 
 
 describe('provider/cloud-element-templates - UpdateTemplatePropertiesOrder', function() {
@@ -59,12 +58,11 @@ describe('provider/cloud-element-templates - UpdateTemplatePropertiesOrder', fun
     beforeEach(() => bootstrapModeler(diagramXML, {
       container: modelerContainer,
       additionalModules: [
-        bpmnPropertiesProviderModule,
-        zeebePropertiesProviderModule,
+        BpmnPropertiesProviderModule,
+        ZeebePropertiesProviderModule,
         zeebeBehaviorsModule,
         zeebeElementTemplatesModule,
-        propertiesRenderModule,
-        propertiesCommandsModule,
+        BpmnPropertiesPanelModule,
         elementTemplateChooserModule
       ],
       moddleExtensions: {
@@ -417,12 +415,11 @@ describe('provider/cloud-element-templates - UpdateTemplatePropertiesOrder', fun
     beforeEach(() => bootstrapModeler(diagramXML, {
       container: modelerContainer,
       additionalModules: [
-        bpmnPropertiesProviderModule,
-        zeebePropertiesProviderModule,
+        BpmnPropertiesProviderModule,
+        ZeebePropertiesProviderModule,
         zeebeBehaviorsModule,
         zeebeElementTemplatesModule,
-        propertiesRenderModule,
-        propertiesCommandsModule,
+        BpmnPropertiesPanelModule,
         elementTemplateChooserModule
       ],
       moddleExtensions: {

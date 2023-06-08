@@ -30,7 +30,7 @@ import {
   findTaskHeader,
   findZeebeProperty,
   findZeebeSubscription
-} from 'src/provider/cloud-element-templates/Helper';
+} from 'src/cloud-element-templates/Helper';
 
 import coreModule from 'bpmn-js/lib/core';
 import modelingModule from 'bpmn-js/lib/features/modeling';
@@ -38,8 +38,7 @@ import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
-import BpmnPropertiesPanel from 'src/render';
-import elementTemplatesModule from 'src/provider/cloud-element-templates';
+import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import elementTemplatesModule from 'src/cloud-element-templates';
 
 import diagramXML from './CustomProperties.bpmn';
 import templates from './CustomProperties.json';

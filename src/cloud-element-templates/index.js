@@ -11,14 +11,12 @@ import UpdateTemplatePropertiesOrder from './UpdateTemplatePropertiesOrder';
 import { ReferencedElementBehavior } from './ReferencedElementBehavior';
 import { GeneratedValueBehavior } from './GeneratedValueBehavior';
 
-import zeebePropertiesProviderModule from '../zeebe';
 
 export default {
   __depends__: [
     commandsModule,
     templateElementFactoryModule,
-    translateModule,
-    zeebePropertiesProviderModule
+    translateModule
   ],
   __init__: [
     'elementTemplatesLoader',

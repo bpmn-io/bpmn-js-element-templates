@@ -6,10 +6,11 @@ import {
 } from 'test/TestHelper';
 
 import coreModule from 'bpmn-js/lib/core';
-import elementTemplatesModule from 'src/provider/cloud-element-templates';
+import elementTemplatesModule from 'src/cloud-element-templates';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
-import PropertiesPanelCommandsModule from 'src/cmd';
+import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
+
 
 import diagramXML from './fixtures/condition.bpmn';
 import messageDiagramXML from './fixtures/condition-message.bpmn';
@@ -17,8 +18,8 @@ import messageDiagramXML from './fixtures/condition-message.bpmn';
 import template from './fixtures/condition.json';
 import messageTemplates from './fixtures/condition-message.json';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
-import { findExtension, findMessage, findZeebeSubscription } from 'src/provider/cloud-element-templates/Helper';
-import ElementTemplatesConditionChecker from 'src/provider/cloud-element-templates/ElementTemplatesConditionChecker';
+import { findExtension, findMessage, findZeebeSubscription } from 'src/cloud-element-templates/Helper';
+import ElementTemplatesConditionChecker from 'src/cloud-element-templates/ElementTemplatesConditionChecker';
 import { getBpmnJS } from 'bpmn-js/test/helper';
 import { isString } from 'min-dash';
 
@@ -38,7 +39,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       elementTemplatesModule,
       modelingModule,
       ElementTemplatesConditionChecker,
-      PropertiesPanelCommandsModule,
+      BpmnPropertiesPanelModule,
       {
         propertiesPanel: [ 'value', { registerProvider() {} } ]
       }
@@ -743,7 +744,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         elementTemplatesModule,
         modelingModule,
         ElementTemplatesConditionChecker,
-        PropertiesPanelCommandsModule,
+        BpmnPropertiesPanelModule,
         {
           propertiesPanel: [ 'value', { registerProvider() {} } ]
         }
@@ -890,7 +891,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         elementTemplatesModule,
         modelingModule,
         ElementTemplatesConditionChecker,
-        PropertiesPanelCommandsModule,
+        BpmnPropertiesPanelModule,
         {
           propertiesPanel: [ 'value', { registerProvider() {} } ]
         }
@@ -1043,7 +1044,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         elementTemplatesModule,
         modelingModule,
         ElementTemplatesConditionChecker,
-        PropertiesPanelCommandsModule,
+        BpmnPropertiesPanelModule,
         {
           propertiesPanel: [ 'value', { registerProvider() {} } ]
         }

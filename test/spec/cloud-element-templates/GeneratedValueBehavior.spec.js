@@ -7,11 +7,11 @@ import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 import {
   bootstrapModeler,
   inject
-} from '../../../TestHelper';
+} from '../../TestHelper';
 
-import BpmnPropertiesPanel from 'src/render';
-import BpmnPropertiesProvider from 'src/provider/bpmn';
-import ElementTemplatesModule from 'src/provider/cloud-element-templates';
+import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
+import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
+import ElementTemplatesModule from 'src/cloud-element-templates';
 import {
   findExtension,
   findInputParameter,
@@ -20,7 +20,7 @@ import {
   findTaskHeader,
   findZeebeProperty,
   findZeebeSubscription
-} from 'src/provider/cloud-element-templates/Helper';
+} from 'src/cloud-element-templates/Helper';
 
 import diagramXML from './GeneratedValueBehavior.bpmn';
 import templates from './GeneratedValueBehavior.json';

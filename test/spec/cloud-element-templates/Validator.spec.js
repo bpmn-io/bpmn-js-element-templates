@@ -1,4 +1,4 @@
-import { Validator } from 'src/provider/cloud-element-templates/Validator';
+import { Validator } from 'src/cloud-element-templates/Validator';
 
 import { getZeebeSchemaVersion as getTemplateSchemaVersion } from '@bpmn-io/element-templates-validator';
 import BPMNModdle from 'bpmn-moddle';

@@ -24,9 +24,8 @@ import {
   inject
 } from 'test/TestHelper';
 
-import BpmnPropertiesPanel from 'src/render';
-import elementTemplatesModule from 'src/provider/element-templates';
-import bpmnPropertiesProvider from 'src/provider/bpmn';
+import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import elementTemplatesModule from 'src/element-templates';
+import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
 
 import diagramXML from './ElementTemplatesPropertiesProvider.bpmn';
 import templates from './fixtures/simple.json';
@@ -47,7 +46,7 @@ describe('provider/element-templates - ElementTemplates', function() {
     modules: [
       BpmnPropertiesPanel,
       coreModule,
-      bpmnPropertiesProvider,
+      BpmnPropertiesProvider,
       elementTemplatesModule,
       modelingModule
     ],
@@ -145,7 +144,7 @@ describe('provider/element-templates - ElementTemplates', function() {
       modules: [
         BpmnPropertiesPanel,
         coreModule,
-        bpmnPropertiesProvider,
+        BpmnPropertiesProvider,
         elementTemplatesModule,
         modelingModule
       ],

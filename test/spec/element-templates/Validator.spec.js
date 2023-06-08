@@ -1,4 +1,4 @@
-import { Validator } from 'src/provider/element-templates/Validator';
+import { Validator } from 'src/element-templates/Validator';
 
 import { getSchemaVersion as getTemplateSchemaVersion } from '@bpmn-io/element-templates-validator';
 

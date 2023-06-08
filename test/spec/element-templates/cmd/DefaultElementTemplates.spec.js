@@ -6,9 +6,9 @@ import {
 import TestContainer from 'mocha-test-container-support';
 
 import CoreModule from 'bpmn-js/lib/core';
-import ElementTemplatesModule from 'src/provider/element-templates';
+import ElementTemplatesModule from 'src/element-templates';
 import ModelingModule from 'bpmn-js/lib/features/modeling';
-import PropertiesPanelCommandsModule from 'src/cmd';
+import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
 
 import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
 
@@ -18,7 +18,7 @@ const modules = [
   CoreModule,
   ElementTemplatesModule,
   ModelingModule,
-  PropertiesPanelCommandsModule,
+  BpmnPropertiesPanelModule,
   {
     propertiesPanel: [ 'value', { registerProvider() {} } ]
   }

@@ -17,8 +17,7 @@ import {
   inject
 } from 'test/TestHelper';
 
-import BpmnPropertiesPanel from 'src/render';
-import elementTemplatesModule from 'src/provider/element-templates';
+import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import elementTemplatesModule from 'src/element-templates';
 
 import diagramXML from './fixtures/template-props.bpmn';
 import templates from './fixtures/template-props.json';

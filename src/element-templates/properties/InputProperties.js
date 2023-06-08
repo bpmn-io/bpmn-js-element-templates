@@ -2,18 +2,16 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import { ToggleSwitchEntry } from '@bpmn-io/properties-panel';
 
-import InputOutputParameter from '../../camunda-platform/properties/InputOutputParameter';
-
 import {
   findExtension,
   findInputParameter
 } from '../Helper';
 
-import { useService } from '../../../hooks';
+import { useService } from 'bpmn-js-properties-panel';
 
 import { without } from 'min-dash';
 
-import { createElement } from '../../../utils/ElementUtil';
+import { createElement } from '../../utils/ElementUtil';
 
 import { PropertyDescription } from '../components/PropertyDescription';
 
@@ -24,7 +22,8 @@ export function InputProperties(props) {
   const {
     element,
     index,
-    property
+    property,
+    groups
   } = props;
 
   const {
@@ -45,11 +44,9 @@ export function InputProperties(props) {
   let entries = [];
 
   if (inputParameter) {
-    entries = InputOutputParameter({
-      idPrefix: id,
-      element,
-      parameter: inputParameter
-    });
+    const inputGroup = groups.find(({ id }) => id === 'CamundaPlatform__Input');
+    const item = inputGroup.items.find(({ entries }) => entries[0].parameter === inputParameter);
+    entries = item.entries;
 
     // (1) remove name entry
     entries = removeEntry(entries, '-name');

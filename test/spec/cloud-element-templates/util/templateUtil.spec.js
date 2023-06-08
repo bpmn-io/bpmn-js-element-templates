@@ -3,8 +3,8 @@ import {
   removeTemplate,
   unlinkTemplate,
   updateTemplate
-} from 'src/provider/cloud-element-templates/util/templateUtil';
-import { findMessage } from 'src/provider/cloud-element-templates/Helper';
+} from 'src/cloud-element-templates/util/templateUtil';
+import { findMessage } from 'src/cloud-element-templates/Helper';
 
 import TestContainer from 'mocha-test-container-support';
 
@@ -13,7 +13,7 @@ import { bootstrapModeler, inject } from 'test/TestHelper';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import coreModule from 'bpmn-js/lib/core';
-import elementTemplatesModule from 'src/provider/cloud-element-templates';
+import elementTemplatesModule from 'src/cloud-element-templates';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
 

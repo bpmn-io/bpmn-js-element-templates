@@ -16,8 +16,8 @@ import {
 } from 'bpmn-js/lib/util/ModelUtil';
 
 import coreModule from 'bpmn-js/lib/core';
-import elementTemplatesModule from 'src/provider/cloud-element-templates';
-import propertiesCommandsModule from 'src/cmd';
+import elementTemplatesModule from 'src/cloud-element-templates';
+import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 
 import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
@@ -28,7 +28,7 @@ import integrationXML from './fixtures/integration.bpmn';
 import templates from './fixtures/simple';
 import complexTemplates from './fixtures/complex';
 import integrationTemplates from './fixtures/integration';
-import { findExtensions, findExtension } from 'src/provider/cloud-element-templates/Helper';
+import { findExtensions, findExtension } from 'src/cloud-element-templates/Helper';
 
 
 describe('provider/cloud-element-templates - ElementTemplates', function() {
@@ -45,7 +45,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       coreModule,
       elementTemplatesModule,
       modelingModule,
-      propertiesCommandsModule,
+      BpmnPropertiesPanelModule,
       {
         propertiesPanel: [ 'value', { registerProvider() {} } ]
       }
@@ -746,7 +746,7 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
         coreModule,
         elementTemplatesModule,
         modelingModule,
-        propertiesCommandsModule,
+        BpmnPropertiesPanelModule,
         {
           propertiesPanel: [ 'value', { registerProvider() {} } ]
         }

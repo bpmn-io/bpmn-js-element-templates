@@ -23,7 +23,7 @@ export default [
         sourcemap: true,
         format: 'umd',
         file: pkg['umd:main'],
-        name: 'BpmnJSPropertiesPanel'
+        name: 'BpmnJSElementTemplates'
       }
     ],
     plugins: pgl()

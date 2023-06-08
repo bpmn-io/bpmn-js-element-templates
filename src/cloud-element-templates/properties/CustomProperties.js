@@ -5,7 +5,7 @@ import {
   isString
 } from 'min-dash';
 
-import { useService } from '../../../hooks';
+import { useService } from 'bpmn-js-properties-panel';
 
 import { PropertyDescription } from '../../element-templates/components/PropertyDescription';
 
@@ -34,7 +34,7 @@ import {
   FeelTextAreaEntryWithVariableContext,
   FeelEntry,
   FeelTextAreaEntry
-} from '../../../entries/FeelEntryWithContext';
+} from '../../entries/FeelEntryWithContext';
 
 
 const DEFAULT_CUSTOM_GROUP = {
