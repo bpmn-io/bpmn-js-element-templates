@@ -5,3 +5,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 ## Unreleased
 
 ___Note:__ Yet to be released changes appear here._
+
+
+## 1.0.0
+
+* initial release
