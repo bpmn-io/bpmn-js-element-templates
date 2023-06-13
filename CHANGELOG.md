@@ -6,6 +6,9 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.0.1
+
+* `FIX`: export `CloudElementTemplatesValidator`
 
 ## 1.0.0
 
