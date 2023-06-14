@@ -1,10 +1,10 @@
 # bpmn-js-element-templates
 
-A element templates provider, previously available from [bpmn-js-properties-panel](https://github.com/bpmn-io/bpmn-js-properties-panel).
+Element templates provider, previously available from [bpmn-js-properties-panel](https://github.com/bpmn-io/bpmn-js-properties-panel).
 
 ## Usage
 
-Use this module in addition the the [bpmn-js-properties-panel](https://github.com/bpmn-io/bpmn-js-properties-panel#usage).
+Use this module in addition to [bpmn-js-properties-panel](https://github.com/bpmn-io/bpmn-js-properties-panel#usage).
 
 
 ```javascript
@@ -33,10 +33,11 @@ const modeler = new BpmnModeler({
 });
 ```
 
-## Additional Resources
+## Additional resources
 
-* [Issue tracker](https://github.com/bpmn-io/bpmn-js-element-templates)
+* [Issue tracker](https://github.com/bpmn-io/bpmn-js-element-templates/issues)
 * [Forum](https://forum.bpmn.io)
+* [Element templates base repository](https://github.com/bpmn-io/element-templates)
 
 
 ## Development
