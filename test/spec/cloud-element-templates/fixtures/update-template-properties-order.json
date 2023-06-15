@@ -24,7 +24,7 @@
         "key": "header-1-key"
       },
       "condition": {
-         "equals": "update template properties order",
+        "equals": "update template properties order",
         "property": "name"
       }
     },

@@ -1,15 +1,14 @@
 import {
   find,
   forEach,
-  groupBy,
-  isString
+  groupBy
 } from 'min-dash';
 
 import { useService } from 'bpmn-js-properties-panel';
 
 import { PropertyDescription } from '../../element-templates/components/PropertyDescription';
 
-import { getPropertyValue, setPropertyValue } from '../util/propertyUtil';
+import { getPropertyValue, setPropertyValue, validateProperty } from '../util/propertyUtil';
 
 import {
   Group,
@@ -426,61 +425,16 @@ function propertyGetter(element, property) {
 }
 
 function propertySetter(bpmnFactory, commandStack, element, property) {
-  return function getValue(value) {
+  return function setValue(value) {
     return setPropertyValue(bpmnFactory, commandStack, element, property, value);
   };
 }
 
 function propertyValidator(translate, property) {
-  return function validate(value) {
-    const { constraints = {} } = property;
-
-    const {
-      maxLength,
-      minLength,
-      notEmpty
-    } = constraints;
-
-    if (notEmpty && isEmpty(value)) {
-      return translate('Must not be empty.');
-    }
-
-    if (maxLength && (value || '').length > maxLength) {
-      return translate('Must have max length {maxLength}.', { maxLength });
-    }
-
-    if (minLength && (value || '').length < minLength) {
-      return translate('Must have min length {minLength}.', { minLength });
-    }
-
-    let { pattern } = constraints;
-
-    if (pattern) {
-      let message;
-
-      if (!isString(pattern)) {
-        message = pattern.message;
-        pattern = pattern.value;
-      }
-
-      if (!matchesPattern(value, pattern)) {
-        return message || translate('Must match pattern {pattern}.', { pattern });
-      }
-    }
-  };
+  return value => validateProperty(value, property, translate);
 }
 
-function isEmpty(value) {
-  if (typeof value === 'string') {
-    return !value.trim().length;
-  }
 
-  return value === undefined;
-}
-
-function matchesPattern(string, pattern) {
-  return new RegExp(pattern).test(string);
-}
 
 function groupByGroupId(properties) {
   return groupBy(properties, 'group');
