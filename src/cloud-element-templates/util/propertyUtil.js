@@ -4,6 +4,11 @@ import {
 } from 'bpmn-js/lib/util/ModelUtil';
 
 import {
+  default as defaultTranslate
+} from 'diagram-js/lib/i18n/translate/translate';
+
+import {
+  isString,
   isUndefined, without
 } from 'min-dash';
 
@@ -755,6 +760,42 @@ export function unsetProperty(commandStack, element, property) {
   }
 }
 
+export function validateProperty(value, property, translate = defaultTranslate) {
+  const { constraints = {} } = property;
+
+  const {
+    maxLength,
+    minLength,
+    notEmpty
+  } = constraints;
+
+  if (notEmpty && isEmpty(value)) {
+    return translate('Must not be empty.');
+  }
+
+  if (maxLength && (value || '').length > maxLength) {
+    return translate('Must have max length {maxLength}.', { maxLength });
+  }
+
+  if (minLength && (value || '').length < minLength) {
+    return translate('Must have min length {minLength}.', { minLength });
+  }
+
+  let { pattern } = constraints;
+
+  if (pattern) {
+    let message;
+
+    if (!isString(pattern)) {
+      message = pattern.message;
+      pattern = pattern.value;
+    }
+
+    if (!matchesPattern(value, pattern)) {
+      return message || translate('Must match pattern {pattern}.', { pattern });
+    }
+  }
+}
 
 // helpers
 function unknownBindingError(element, property) {
@@ -767,4 +808,16 @@ function unknownBindingError(element, property) {
   const { type } = binding;
 
   return new Error(`unknown binding <${ type }> for element <${ id }>, this should never happen`);
+}
+
+function isEmpty(value) {
+  if (typeof value === 'string') {
+    return !value.trim().length;
+  }
+
+  return value === undefined;
+}
+
+function matchesPattern(string, pattern) {
+  return new RegExp(pattern).test(string);
 }
