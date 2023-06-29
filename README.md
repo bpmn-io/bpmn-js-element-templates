@@ -1,6 +1,6 @@
 # bpmn-js-element-templates
 
-Element templates provider, previously available from [bpmn-js-properties-panel](https://github.com/bpmn-io/bpmn-js-properties-panel).
+An [element templates](https://github.com/bpmn-io/element-templates) provider, previously available from [bpmn-js-properties-panel](https://github.com/bpmn-io/bpmn-js-properties-panel).
 
 ## Usage
 
