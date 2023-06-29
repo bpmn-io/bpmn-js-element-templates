@@ -35,9 +35,9 @@ const modeler = new BpmnModeler({
 
 ## Additional resources
 
+* [About element templates](https://github.com/bpmn-io/element-templates)
 * [Issue tracker](https://github.com/bpmn-io/bpmn-js-element-templates/issues)
 * [Forum](https://forum.bpmn.io)
-* [Element templates base repository](https://github.com/bpmn-io/element-templates)
 
 
 ## Development
