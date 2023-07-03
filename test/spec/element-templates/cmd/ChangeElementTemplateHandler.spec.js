@@ -1933,6 +1933,48 @@ describe('element-templates/cmd - ChangeElementTemplateHandler', function() {
 
       });
 
+
+      describe('complex', function() {
+
+        beforeEach(bootstrap(require('./service-task.bpmn').default));
+
+        it('remove old properties', inject(function(elementRegistry) {
+
+          // given
+          var serviceTask = elementRegistry.get('ServiceTask_1'),
+              businessObject = getBusinessObject(serviceTask);
+
+          var oldTemplate = createTemplate({
+            value: '${foo}',
+            binding: {
+              type: 'property',
+              name: 'camunda:expression'
+            }
+          });
+
+          var newTemplate = createTemplate({
+            value: '${bar}',
+            binding: {
+              type: 'property',
+              name: 'camunda:type'
+            }
+          });
+
+          changeTemplate('ServiceTask_1', oldTemplate);
+
+
+          // when
+          changeTemplate(serviceTask, newTemplate, oldTemplate);
+
+          // then
+          var expression = businessObject.get('camunda:expression');
+          expect(expression).to.not.exist;
+
+          var type = businessObject.get('camunda:type');
+          expect(type).to.equal('${bar}');
+        }));
+      });
+
     });
 
 

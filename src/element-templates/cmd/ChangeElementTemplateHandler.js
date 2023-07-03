@@ -782,6 +782,13 @@ export default class ChangeElementTemplateHandler {
       return newBindingType === 'property';
     });
 
+    const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      return oldBindingType === 'property';
+    });
+
     if (!newProperties.length) {
       return;
     }
@@ -798,6 +805,10 @@ export default class ChangeElementTemplateHandler {
 
       let changedElement,
           properties;
+
+      if (oldProperty) {
+        remove(oldProperties, oldProperty);
+      }
 
       if (newBindingName === 'conditionExpression') {
         this._updateConditionExpression(element, oldProperty, newProperty);
@@ -834,6 +845,17 @@ export default class ChangeElementTemplateHandler {
           properties
         });
       }
+    });
+
+    // remove old properties not present in new template
+    oldProperties && oldProperties.forEach((oldProperty) => {
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: businessObject,
+        properties: {
+          [oldProperty.binding.name]: null
+        }
+      });
     });
   }
 
