@@ -1237,7 +1237,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     [
       [ 'String', 'input' ],
       [ 'Select', 'select' ],
-      [ 'Textarea', 'textarea' ]
+      [ 'TextArea', 'textarea' ]
     ].forEach(function([ name, selector ]) {
 
       describe(name, function() {
@@ -1251,7 +1251,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
                 input = domQuery(selector, entry);
 
           // assume
-          expectError(entry, 'Must not be empty.');
+          expectError(entry, `${name} - NotEmpty must not be empty.`);
 
           // when
           changeInput(input, 'FOO');
@@ -1270,7 +1270,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
                 input = domQuery(selector, entry);
 
           // assume
-          expectError(entry, 'Must have min length 5.');
+          expectError(entry, `${name} - MinLength must have min length 5.`);
 
           // when
           changeInput(input, 'FOOOOOOO');
@@ -1295,7 +1295,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
           changeInput(input, 'FOOOOOOO');
 
           // then
-          expectError(entry, 'Must have max length 5.');
+          expectError(entry, `${name} - MaxLength must have max length 5.`);
         });
 
 
@@ -1308,7 +1308,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
                 input = domQuery(selector, entry);
 
           // assume
-          expectError(entry, 'Must match pattern A+B.');
+          expectError(entry, `${name} - Pattern (String) must match pattern A+B.`);
 
           // when
           changeInput(input, 'AAAB');
@@ -1327,7 +1327,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
                 input = domQuery(selector, entry);
 
           // assume
-          expectError(entry, 'Must start with https://');
+          expectError(entry, `${name} - Pattern (String + Message) Must start with https://`);
 
           // when
           changeInput(input, 'https://');
@@ -1346,7 +1346,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
                 input = domQuery(selector, entry);
 
           // assume
-          expectError(entry, 'Must be positive integer');
+          expectError(entry, `${name} - Pattern (Integer) Must be positive integer`);
 
           // when
           changeInput(input, '20');
@@ -1376,7 +1376,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         // then
         const entry = findEntry('custom-entry-com.validated-inputs-conditional.Task-authentication-1', container),
               input = domQuery('input', entry);
-        expectError(entry, 'Must not be empty.');
+        expectError(entry, 'Bearer token must not be empty.');
 
         // and when
         changeInput(input, '123456');
