@@ -761,7 +761,10 @@ export function unsetProperty(commandStack, element, property) {
 }
 
 export function validateProperty(value, property, translate = defaultTranslate) {
-  const { constraints = {} } = property;
+  const {
+    constraints = {},
+    label
+  } = property;
 
   const {
     maxLength,
@@ -770,15 +773,15 @@ export function validateProperty(value, property, translate = defaultTranslate) 
   } = constraints;
 
   if (notEmpty && isEmpty(value)) {
-    return translate('Must not be empty.');
+    return `${label} ${translate('must not be empty.')}`;
   }
 
   if (maxLength && (value || '').length > maxLength) {
-    return translate('Must have max length {maxLength}.', { maxLength });
+    return `${label} ${translate('must have max length {maxLength}.', { maxLength })}`;
   }
 
   if (minLength && (value || '').length < minLength) {
-    return translate('Must have min length {minLength}.', { minLength });
+    return `${label} ${translate('must have min length {minLength}.', { minLength })}`;
   }
 
   let { pattern } = constraints;
@@ -792,7 +795,11 @@ export function validateProperty(value, property, translate = defaultTranslate) 
     }
 
     if (!matchesPattern(value, pattern)) {
-      return message || translate('Must match pattern {pattern}.', { pattern });
+      if (message) {
+        return `${label} ${translate(message)}`;
+      }
+
+      return `${label} ${translate('must match pattern {pattern}.', { pattern })}`;
     }
   }
 }

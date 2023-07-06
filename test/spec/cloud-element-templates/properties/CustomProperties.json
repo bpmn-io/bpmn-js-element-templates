@@ -203,7 +203,7 @@
     ],
     "properties": [
       {
-        "label": "NotEmpty",
+        "label": "String - NotEmpty",
         "description": "Must not be empty",
         "type": "String",
         "group": "input",
@@ -216,7 +216,7 @@
         }
       },
       {
-        "label": "MinLength",
+        "label": "String - MinLength",
         "description": "Must have min length 5",
         "type": "String",
         "group": "input",
@@ -229,7 +229,7 @@
         }
       },
       {
-        "label": "MaxLength",
+        "label": "String - MaxLength",
         "description": "Must have max length 5",
         "type": "String",
         "group": "input",
@@ -242,7 +242,7 @@
         }
       },
       {
-        "label": "Pattern (String)",
+        "label": "String - Pattern (String)",
         "description": "Must match /A+B/",
         "type": "String",
         "group": "input",
@@ -255,7 +255,7 @@
         }
       },
       {
-        "label": "Pattern (String + Message)",
+        "label": "String - Pattern (String + Message)",
         "description": "Must be https url",
         "type": "String",
         "group": "input",
@@ -271,7 +271,7 @@
         }
       },
       {
-        "label": "Pattern (Integer)",
+        "label": "String - Pattern (Integer)",
         "description": "Must be integer",
         "type": "String",
         "group": "input",

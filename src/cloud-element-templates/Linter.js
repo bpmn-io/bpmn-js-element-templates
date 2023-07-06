@@ -66,7 +66,7 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
 
       reporter.report(
         node.id,
-        `${property.label} ${firstLetterToLowerCase(error)}`,
+        error,
         {
           propertiesPanel: {
             entryIds: [ getEntryId(property, template) ]
@@ -99,10 +99,6 @@ export const ElementTemplateLinterPlugin = function(templates) {
 
 
 // helpers //////////////////////
-
-function firstLetterToLowerCase(string) {
-  return string.charAt(0).toLowerCase() + string.slice(1);
-}
 
 function getEntryId(property, template) {
   const index = template.properties

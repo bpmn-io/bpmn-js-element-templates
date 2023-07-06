@@ -104,7 +104,7 @@ const invalid = [
     },
     report: {
       id: 'Task_1',
-      message: 'Test Property this is a custom message',
+      message: 'Test Property This is a custom message',
       propertiesPanel: { entryIds: [ 'custom-entry-constraints.pattern-custom-message-0' ] }
     }
   },
