@@ -55,7 +55,7 @@ const invalid = [
     report: {
       id: 'Task_1',
       message: 'Test Property must have min length 5.',
-      entryIds: [ 'custom-entry-constraints.minLength-0' ],
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.minLength-0' ] },
       name: 'a'
     }
   },
@@ -68,7 +68,7 @@ const invalid = [
     report: {
       id: 'Task_1',
       message: 'Test Property must have max length 5.',
-      entryIds: [ 'custom-entry-constraints.maxLength-0' ],
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.maxLength-0' ] },
       name: 'Very Long Name'
     }
   },
@@ -81,7 +81,7 @@ const invalid = [
     report: {
       id: 'Task_1',
       message: 'Test Property must not be empty.',
-      entryIds: [ 'custom-entry-constraints.notEmpty-0' ]
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.notEmpty-0' ] }
     }
   },
   {
@@ -93,7 +93,7 @@ const invalid = [
     report: {
       id: 'Task_1',
       message: 'Test Property must match pattern A+B.',
-      entryIds: [ 'custom-entry-constraints.pattern-0' ]
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.pattern-0' ] }
     }
   },
   {
@@ -105,7 +105,7 @@ const invalid = [
     report: {
       id: 'Task_1',
       message: 'Test Property this is a custom message',
-      entryIds: [ 'custom-entry-constraints.pattern-custom-message-0' ]
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.pattern-custom-message-0' ] }
     }
   },
   {
@@ -117,7 +117,7 @@ const invalid = [
     report: {
       id: 'Task_1',
       message: 'Test Property must match pattern A+B.',
-      entryIds: [ 'custom-entry-constraints.conditional-1' ],
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.conditional-1' ] },
       name: 'foo'
     }
   }

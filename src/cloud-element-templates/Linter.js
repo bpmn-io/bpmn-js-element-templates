@@ -68,7 +68,9 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
         node.id,
         `${property.label} ${firstLetterToLowerCase(error)}`,
         {
-          entryIds: [ getEntryId(property, template) ],
+          propertiesPanel: {
+            entryIds: [ getEntryId(property, template) ]
+          },
           name: node.name
         }
       );
