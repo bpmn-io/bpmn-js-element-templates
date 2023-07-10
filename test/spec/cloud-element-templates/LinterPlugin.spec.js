@@ -1,6 +1,6 @@
 import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 
-import { elementTemplateLintRule } from 'src/cloud-element-templates/Linter.js';
+import { elementTemplateLintRule } from 'src/cloud-element-templates/LinterPlugin.js';
 
 import {
   createModdle,
