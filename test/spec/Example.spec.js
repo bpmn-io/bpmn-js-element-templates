@@ -4,11 +4,14 @@ import {
   cleanup
 } from '@testing-library/preact/pure';
 
+import { domify } from 'min-dom';
+
 import {
   clearBpmnJS,
   setBpmnJS,
   insertCoreStyles,
   insertBpmnStyles,
+  insertCSS,
   enableLogging
 } from 'test/TestHelper';
 
@@ -24,8 +27,6 @@ import {
 import LintingModule from '@camunda/linting/modeler';
 import { Linter } from '@camunda/linting';
 
-import CloudElementTemplatesPropertiesProviderModule from 'src/cloud-element-templates';
-
 import ElementTemplateChooserModule from '@bpmn-io/element-template-chooser';
 import ElementTemplatesIconsRenderer from '@bpmn-io/element-templates-icons-renderer';
 
@@ -35,9 +36,10 @@ import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 import CamundaModdle from 'camunda-bpmn-moddle/resources/camunda';
 
 import ZeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
-import { ElementTemplateLinterPlugin } from '../../src/cloud-element-templates/Linter';
-import { domify } from 'min-dom';
-import { insertCSS } from '../TestHelper';
+
+import CloudElementTemplatesPropertiesProviderModule from 'src/cloud-element-templates';
+
+import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/LinterPlugin';
 
 const singleStart = window.__env__ && window.__env__.SINGLE_START;
 
