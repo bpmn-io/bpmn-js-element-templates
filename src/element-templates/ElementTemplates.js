@@ -234,11 +234,16 @@ export default class ElementTemplates {
 
     const newBusinessObject = createBlankBusinessObject(element, this._injector);
 
-    return replace.replaceElement(element, {
-      type: type,
-      businessObject: newBusinessObject,
-      eventDefinitionType: eventDefinitionType
-    });
+    return replace.replaceElement(element,
+      {
+        type: type,
+        businessObject: newBusinessObject,
+        eventDefinitionType: eventDefinitionType,
+      },
+      {
+        createElementsBehavior: false
+      }
+    );
   }
 
   /**

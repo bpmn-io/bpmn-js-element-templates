@@ -421,6 +421,23 @@ describe('provider/element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should remove default task template', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      let task = elementRegistry.get('ServiceTask');
+
+      // when
+      task = elementTemplates.removeTemplate(task);
+
+      // then
+      const taskBo = getBusinessObject(task);
+
+      expect(taskBo.modelerTemplate).not.to.exist;
+      expect(taskBo.modelerTemplateVersion).not.to.exist;
+      expect(taskBo.asyncBefore).to.be.false;
+    }));
+
+
     it('should remove group template', inject(function(elementRegistry, elementTemplates) {
 
       // given
