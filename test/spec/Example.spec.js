@@ -20,8 +20,7 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import {
   BpmnPropertiesPanelModule,
   BpmnPropertiesProviderModule,
-  ZeebePropertiesProviderModule,
-  ElementTemplatesPropertiesProviderModule
+  ZeebePropertiesProviderModule
 } from 'bpmn-js-properties-panel';
 
 import LintingModule from '@camunda/linting/modeler';
@@ -38,6 +37,7 @@ import CamundaModdle from 'camunda-bpmn-moddle/resources/camunda';
 import ZeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
 import CloudElementTemplatesPropertiesProviderModule from 'src/cloud-element-templates';
+import ElementTemplatesPropertiesProviderModule from 'src/element-templates';
 
 import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/LinterPlugin';
 
@@ -295,6 +295,15 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
         elementTemplates
       }
     );
+
+    const modeler = result.modeler;
+    const bpmnjs = modeler.get('bpmnjs');
+    const propertiesPanelParent = domify('<div class="properties-panel-container"></div>');
+
+    bpmnjs._container.appendChild(propertiesPanelParent);
+
+    modeler.get('propertiesPanel').attachTo(propertiesPanelParent);
+
 
     // then
     expect(result.error).not.to.exist;
