@@ -126,7 +126,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       async function(elementRegistry, selection) {
 
         // given
-        const element = elementRegistry.get('Process_1');
+        const element = elementRegistry.get('Gateway_1');
 
         // when
         await act(() => {

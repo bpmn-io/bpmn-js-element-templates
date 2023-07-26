@@ -168,7 +168,9 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         [ 'foo', 3 ],
         [ 'bar', 1 ],
         [ 'bar', 2 ],
-        [ 'baz' ]
+        [ 'baz' ],
+        [ 'process-template', 1 ],
+        [ 'subprocess-template', 1 ]
       ]);
     }));
 
@@ -234,7 +236,9 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         [ 'default', 1 ],
         [ 'foo', 3 ],
         [ 'bar', 2 ],
-        [ 'baz' ]
+        [ 'baz' ],
+        [ 'process-template', 1 ],
+        [ 'subprocess-template', 1 ]
       ]);
     }));
 
@@ -251,7 +255,9 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         [ 'default', 1 ],
         [ 'foo', 3 ],
         [ 'bar', 2 ],
-        [ 'baz' ]
+        [ 'baz' ],
+        [ 'process-template', 1 ],
+        [ 'subprocess-template', 1 ]
       ]);
     }));
 
@@ -882,6 +888,42 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should remove process template', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      let process = elementRegistry.get('Process_1');
+      const children = [ ...process.children ];
+
+      // when
+      process = elementTemplates.removeTemplate(process);
+
+      // then
+      const processBo = getBusinessObject(process);
+
+      expect(processBo.modelerTemplate).not.to.exist;
+      expect(processBo.modelerTemplateVersion).not.to.exist;
+      expect(process.children.length).to.eql(children.length);
+    }));
+
+
+    it('should remove subprocess template (plane)', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      let subprocess = elementRegistry.get('SubProcess_1');
+      let subprocessPlane = elementRegistry.get('SubProcess_1_plane');
+
+      // when
+      subprocess = elementTemplates.removeTemplate(subprocessPlane);
+
+      // then
+      const taskBo = getBusinessObject(subprocess);
+
+      expect(taskBo.modelerTemplate).not.to.exist;
+      expect(taskBo.modelerTemplateVersion).not.to.exist;
+      expect(taskBo.flowElements).to.have.length(1);
+    }));
+
+
     it('should fire elementTemplates.remove event', inject(function(elementRegistry, elementTemplates, eventBus) {
 
       // given
@@ -899,6 +941,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         element: task
       });
     }));
+
   });
 
 

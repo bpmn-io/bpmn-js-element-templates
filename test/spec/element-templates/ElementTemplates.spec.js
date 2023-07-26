@@ -175,7 +175,9 @@ describe('provider/element-templates - ElementTemplates', function() {
         [ 'bar', 2 ],
         [ 'baz' ],
         [ 'deprecated' ],
-        [ 'qux' ]
+        [ 'qux' ],
+        [ 'process-template' ],
+        [ 'subprocess-template' ]
       ]);
     }));
 
@@ -242,7 +244,9 @@ describe('provider/element-templates - ElementTemplates', function() {
         [ 'foo', 3 ],
         [ 'bar', 2 ],
         [ 'baz' ],
-        [ 'qux' ]
+        [ 'qux' ],
+        [ 'process-template' ],
+        [ 'subprocess-template' ]
       ]);
     }));
 
@@ -259,7 +263,9 @@ describe('provider/element-templates - ElementTemplates', function() {
         [ 'bar', 2 ],
         [ 'baz' ],
         [ 'deprecated' ],
-        [ 'qux' ]
+        [ 'qux' ],
+        [ 'process-template' ],
+        [ 'subprocess-template' ]
       ]);
     }));
 
@@ -489,6 +495,42 @@ describe('provider/element-templates - ElementTemplates', function() {
       expect(eventBo.modelerTemplateVersion).not.to.exist;
       expect(eventBo.eventDefinitions).to.have.length(1);
       expect(eventBo.asyncBefore).to.be.false;
+    }));
+
+
+    it('should remove process template', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      let process = elementRegistry.get('Process_1');
+      const children = [ ...process.children ];
+
+      // when
+      process = elementTemplates.removeTemplate(process);
+
+      // then
+      const processBo = getBusinessObject(process);
+
+      expect(processBo.modelerTemplate).not.to.exist;
+      expect(processBo.modelerTemplateVersion).not.to.exist;
+      expect(process.children.length).to.eql(children.length);
+    }));
+
+
+    it('should remove subprocess template (plane)', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      let subprocess = elementRegistry.get('SubProcess_1');
+      let subprocessPlane = elementRegistry.get('SubProcess_1_plane');
+
+      // when
+      subprocess = elementTemplates.removeTemplate(subprocessPlane);
+
+      // then
+      const taskBo = getBusinessObject(subprocess);
+
+      expect(taskBo.modelerTemplate).not.to.exist;
+      expect(taskBo.modelerTemplateVersion).not.to.exist;
+      expect(taskBo.flowElements).to.have.length(1);
     }));
 
   });

@@ -96,5 +96,21 @@
     "isDefault": true,
     "appliesTo": [ "bpmn:ServiceTask" ],
     "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "process-template",
+    "name": "Process Template",
+    "version": 1,
+    "appliesTo": [ "bpmn:Process" ],
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "subprocess-template",
+    "name": "Subprocess Template",
+    "version": 1,
+    "appliesTo": [ "bpmn:SubProcess" ],
+    "properties": []
   }
 ]

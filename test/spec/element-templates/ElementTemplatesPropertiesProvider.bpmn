@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_08adx7k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_08adx7k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
   <bpmn:process id="Process_1" isExecutable="true">
     <bpmn:task id="Task_1" camunda:modelerTemplate="foo" />
     <bpmn:task id="Task_2" camunda:modelerTemplate="foo" camunda:modelerTemplateVersion="1" />
     <bpmn:task id="Task_3" />
     <bpmn:task id="UnknownTemplateTask" camunda:modelerTemplate="unknown" />
     <bpmn:serviceTask id="ServiceTask" camunda:modelerTemplate="default" />
-    <bpmn:serviceTask id="ServiceTaskWithInputOutputError" camunda:type="external" camunda:topic="topic" camunda:modelerTemplate="input-output-error" camunda:modelerTemplateVersion="1">
+    <bpmn:serviceTask id="ServiceTaskWithInputOutputError" camunda:modelerTemplate="input-output-error" camunda:modelerTemplateVersion="1" camunda:type="external" camunda:topic="topic">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="input-1-name">input-1-value</camunda:inputParameter>
           <camunda:outputParameter name="output-1-value">output-1-source</camunda:outputParameter>
         </camunda:inputOutput>
-         <camunda:errorEventDefinition id="ErrorEventDefinition_1" errorRef="Error_error-1" expression="error-expression" />
+        <camunda:errorEventDefinition id="ErrorEventDefinition_1" errorRef="Error_error-1" expression="error-expression" />
       </bpmn:extensionElements>
     </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_1" />
   </bpmn:process>
   <bpmn:error id="Error_error-1" name="error-name" errorCode="error-code" camunda:errorMessage="error-message" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -36,6 +37,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTaskWithInputOutputError_di" bpmnElement="ServiceTaskWithInputOutputError">
         <dc:Bounds x="150" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1l7vqgv_di" bpmnElement="Gateway_1" isMarkerVisible="true">
+        <dc:Bounds x="295" y="215" width="50" height="50" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

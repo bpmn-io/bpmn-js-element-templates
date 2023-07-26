@@ -66,10 +66,22 @@
     ],
     "properties": []
   },
-    {
+  {
     "id": "qux",
     "name":"Qux",
     "appliesTo": [ "bpmn:TextAnnotation" ],
+    "properties": []
+  },
+  {
+    "id": "process-template",
+    "name":"Foo",
+    "appliesTo": [ "bpmn:Process" ],
+    "properties": []
+  },
+  {
+    "id": "subprocess-template",
+    "name":"Foo",
+    "appliesTo": [ "bpmn:SubProcess" ],
     "properties": []
   }
 ]
