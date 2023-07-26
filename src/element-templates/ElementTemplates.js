@@ -14,8 +14,7 @@ import {
   getTemplateVersion
 } from './Helper';
 
-import { getBusinessObject, is, isAny } from 'bpmn-js/lib/util/ModelUtil';
-import { getLabel, setLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
+import { isAny } from 'bpmn-js/lib/util/ModelUtil';
 
 /**
  * Registry for element templates.
@@ -222,28 +221,18 @@ export default class ElementTemplates {
    * @return {djs.model.Base} the updated element
    */
   removeTemplate(element) {
-    const replace = this._injector.get('replace'),
-          eventBus = this._injector.get('eventBus');
+    const eventBus = this._injector.get('eventBus');
 
     eventBus.fire('elementTemplates.remove', { element });
 
-    const businessObject = getBusinessObject(element);
+    const context = {
+      element
+    };
 
-    const type = businessObject.$type,
-          eventDefinitionType = getEventDefinitionType(businessObject);
+    this._commandStack.execute('propertiesPanel.removeTemplate', context);
 
-    const newBusinessObject = createBlankBusinessObject(element, this._injector);
+    return context.newElement;
 
-    return replace.replaceElement(element,
-      {
-        type: type,
-        businessObject: newBusinessObject,
-        eventDefinitionType: eventDefinitionType,
-      },
-      {
-        createElementsBehavior: false
-      }
-    );
   }
 
   /**
@@ -267,38 +256,3 @@ ElementTemplates.$inject = [
 ];
 
 
-// helper ///////////
-
-function getEventDefinitionType(businessObject) {
-  if (!businessObject.eventDefinitions) {
-    return null;
-  }
-
-  const eventDefinition = businessObject.eventDefinitions[ 0 ];
-
-  if (!eventDefinition) {
-    return null;
-  }
-
-  return eventDefinition.$type;
-}
-
-function createBlankBusinessObject(element, injector) {
-  const bpmnFactory = injector.get('bpmnFactory');
-
-  const bo = getBusinessObject(element),
-        newBo = bpmnFactory.create(bo.$type),
-        label = getLabel(element);
-
-  if (!label) {
-    return newBo;
-  }
-
-  if (is(element, 'bpmn:Group')) {
-    newBo.categoryValueRef = bpmnFactory.create('bpmn:CategoryValue');
-  }
-
-  setLabel({ businessObject: newBo }, label);
-
-  return newBo;
-}

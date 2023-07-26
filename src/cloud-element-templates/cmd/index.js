@@ -1,9 +1,15 @@
 import ChangeElementTemplateHandler from './ChangeElementTemplateHandler';
+import RemoveElementTemplateHandler from '../../element-templates/cmd/RemoveElementTemplateHandler';
 
 function registerHandlers(commandStack, elementTemplates, eventBus) {
   commandStack.registerHandler(
     'propertiesPanel.zeebe.changeTemplate',
     ChangeElementTemplateHandler
+  );
+
+  commandStack.registerHandler(
+    'propertiesPanel.removeTemplate',
+    RemoveElementTemplateHandler
   );
 
   // apply default element templates on shape creation

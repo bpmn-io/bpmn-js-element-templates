@@ -1,9 +1,15 @@
 import ChangeElementTemplateHandler from './ChangeElementTemplateHandler';
+import RemoveElementTemplateHandler from './RemoveElementTemplateHandler';
 
 function registerHandlers(commandStack, elementTemplates, eventBus) {
   commandStack.registerHandler(
     'propertiesPanel.camunda.changeTemplate',
     ChangeElementTemplateHandler
+  );
+
+  commandStack.registerHandler(
+    'propertiesPanel.removeTemplate',
+    RemoveElementTemplateHandler
   );
 
   // apply default element templates on shape creation
