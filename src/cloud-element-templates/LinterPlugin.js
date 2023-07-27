@@ -15,6 +15,8 @@ import { getPropertyValue, validateProperty } from './util/propertyUtil';
 import { applyConditions } from './Condition';
 
 import BpmnModdle from 'bpmn-moddle';
+import { is } from 'bpmn-js/lib/util/ModelUtil';
+
 import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
 import { Validator } from './Validator';
@@ -32,6 +34,10 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
   elementTemplates.set(validTemplates);
 
   function check(node, reporter) {
+
+    if (is(node, 'bpmn:Message')) {
+      return;
+    }
 
     let template = elementTemplates.get(node);
 

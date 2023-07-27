@@ -3,6 +3,7 @@ import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 import { elementTemplateLintRule } from 'src/cloud-element-templates/LinterPlugin.js';
 
 import {
+  createDefinitions,
   createModdle,
   createProcess
 } from '../../TestHelper';
@@ -27,6 +28,13 @@ const valid = [
   {
     name: 'No Template',
     moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" />')),
+    config: {
+      templates
+    }
+  },
+  {
+    name: 'All Messages',
+    moddleElement: createModdle(createDefinitions('<bpmn:message id="a" name="a" zeebe:modelerTemplate="constraints.minLength" />')),
     config: {
       templates
     }
