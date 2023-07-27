@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.2.1
+
+* `FIX`: don't lint messages ([#6](https://github.com/bpmn-io/bpmn-js-element-templates/pull/6))
+
 ## 1.2.0
 
 * `FEAT`: add C8 Element Template Linter ([#3](https://github.com/bpmn-io/bpmn-js-element-templates/pull/3))
