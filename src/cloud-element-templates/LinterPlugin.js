@@ -35,7 +35,7 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
 
   function check(node, reporter) {
 
-    if (is(node, 'bpmn:Message')) {
+    if (!is(node, 'bpmn:FlowElement')) {
       return;
     }
 
