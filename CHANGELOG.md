@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.2.2
+
+* `FIX`: allow removing templates from root elements ([#7](https://github.com/bpmn-io/bpmn-js-element-templates/pull/7))
+* `FIX`: allow removing default templates ([#7](https://github.com/bpmn-io/bpmn-js-element-templates/pull/7))
+
 ## 1.2.1
 
 * `FIX`: don't lint messages ([#6](https://github.com/bpmn-io/bpmn-js-element-templates/pull/6))
