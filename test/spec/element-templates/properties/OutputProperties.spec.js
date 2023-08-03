@@ -454,9 +454,7 @@ describe('provider/element-templates - OutputProperties', function() {
         const inputOutput = findExtension(task, 'camunda:InputOutput'),
               outputParameter = findOutputParameter(inputOutput, { source: '${resultStatus}' });
 
-        expect(outputParameter.get('camunda:name')).to.equal('resultStatus');
-
-        expectError(entry, 'Process variable name must not be empty.');
+        expect(outputParameter.get('camunda:name')).to.equal(undefined);
       });
 
 
@@ -477,9 +475,7 @@ describe('provider/element-templates - OutputProperties', function() {
         const inputOutput = findExtension(task, 'camunda:InputOutput'),
               outputParameter = findOutputParameter(inputOutput, { source: '${resultStatus}' });
 
-        expect(outputParameter.get('camunda:name')).to.equal('resultStatus');
-
-        expectError(entry, 'Process variable name must not contain spaces.');
+        expect(outputParameter.get('camunda:name')).to.equal('foo bar');
       });
 
     });
@@ -490,14 +486,6 @@ describe('provider/element-templates - OutputProperties', function() {
 
 
 // helpers //////////
-
-function expectError(entry, message) {
-  const errorMessage = domQuery('.bio-properties-panel-error', entry);
-
-  const error = errorMessage && errorMessage.textContent;
-
-  expect(error).to.equal(message);
-}
 
 function expectSelected(id) {
   return getBpmnJS().invoke(async function(elementRegistry, selection) {
