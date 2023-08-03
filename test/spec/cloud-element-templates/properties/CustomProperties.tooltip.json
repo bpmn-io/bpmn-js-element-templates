@@ -6,6 +6,13 @@
     "appliesTo": [
       "bpmn:Task"
     ],
+    "groups": [
+      {
+        "id": "group",
+        "label": "Custom group",
+        "tooltip": "GROUP_TOOLTIP"
+      }
+    ],
     "properties": [
       {
         "label": "string",
@@ -14,7 +21,8 @@
         "binding": {
           "type": "property",
           "name": "string"
-        }
+        },
+        "group": "group"
       },
       {
         "label": "text",
@@ -23,7 +31,8 @@
         "binding": {
           "type": "property",
           "name": "text"
-        }
+        },
+        "group": "group"
       },
       {
         "label": "boolean",
@@ -32,7 +41,8 @@
         "binding": {
           "type": "property",
           "name": "boolean"
-        }
+        },
+        "group": "group"
       },
       {
         "label": "dropdown",
@@ -63,7 +73,8 @@
         "binding": {
           "type": "zeebe:input",
           "name": "dropdown"
-        }
+        },
+        "group": "group"
       },
       {
         "label": "withHTML",
@@ -72,7 +83,8 @@
         "binding": {
           "type": "property",
           "name": "string"
-        }
+        },
+        "group": "group"
       },
       {
         "label": "empty",
@@ -80,7 +92,8 @@
         "binding": {
           "type": "property",
           "name": "string"
-        }
+        },
+        "group": "group"
       }
     ]
   }
