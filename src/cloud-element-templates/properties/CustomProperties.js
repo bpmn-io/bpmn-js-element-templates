@@ -7,6 +7,7 @@ import {
 import { useService } from 'bpmn-js-properties-panel';
 
 import { PropertyDescription } from '../../element-templates/components/PropertyDescription';
+import { PropertyTooltip } from '../components/PropertyTooltip';
 
 import { getPropertyValue, setPropertyValue, validateProperty } from '../util/propertyUtil';
 
@@ -208,7 +209,8 @@ function BooleanProperty(props) {
   const {
     description,
     editable,
-    label
+    label,
+    tooltip
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
@@ -221,7 +223,8 @@ function BooleanProperty(props) {
     label,
     description: PropertyDescription({ description }),
     setValue: propertySetter(bpmnFactory, commandStack, element, property),
-    disabled: editable === false
+    disabled: editable === false,
+    tooltip: PropertyTooltip({ tooltip })
   });
 }
 
@@ -235,7 +238,8 @@ function DropdownProperty(props) {
   const {
     description,
     editable,
-    label
+    label,
+    tooltip
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
@@ -269,7 +273,8 @@ function DropdownProperty(props) {
     getValue: propertyGetter(element, property),
     setValue: propertySetter(bpmnFactory, commandStack, element, property),
     validate: propertyValidator(translate, property),
-    disabled: editable === false
+    disabled: editable === false,
+    tooltip: PropertyTooltip({ tooltip })
   });
 }
 
@@ -284,7 +289,8 @@ function FeelTextAreaProperty(props) {
     description,
     editable,
     label,
-    feel
+    feel,
+    tooltip
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
@@ -307,7 +313,8 @@ function FeelTextAreaProperty(props) {
     description: PropertyDescription({ description }),
     setValue: propertySetter(bpmnFactory, commandStack, element, property),
     validate: propertyValidator(translate, property),
-    disabled: editable === false
+    disabled: editable === false,
+    tooltip: PropertyTooltip({ tooltip })
   });
 }
 
@@ -322,7 +329,8 @@ function FeelProperty(props) {
     description,
     editable,
     label,
-    feel
+    feel,
+    tooltip
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
@@ -345,7 +353,8 @@ function FeelProperty(props) {
     description: PropertyDescription({ description }),
     setValue: propertySetter(bpmnFactory, commandStack, element, property),
     validate: propertyValidator(translate, property),
-    disabled: editable === false
+    disabled: editable === false,
+    tooltip: PropertyTooltip({ tooltip })
   });
 }
 
@@ -360,7 +369,8 @@ function StringProperty(props) {
     description,
     editable,
     label,
-    feel
+    feel,
+    tooltip
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
@@ -378,7 +388,8 @@ function StringProperty(props) {
     description: PropertyDescription({ description }),
     setValue: propertySetter(bpmnFactory, commandStack, element, property),
     validate: propertyValidator(translate, property),
-    disabled: editable === false
+    disabled: editable === false,
+    tooltip: PropertyTooltip({ tooltip })
   });
 }
 
@@ -394,7 +405,8 @@ function TextAreaProperty(props) {
     editable,
     label,
     feel,
-    language
+    language,
+    tooltip
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
@@ -414,7 +426,8 @@ function TextAreaProperty(props) {
     getValue: propertyGetter(element, property),
     setValue: propertySetter(bpmnFactory, commandStack, element, property),
     validate: propertyValidator(translate, property),
-    disabled: editable === false
+    disabled: editable === false,
+    tooltip: PropertyTooltip({ tooltip })
   });
 }
 
