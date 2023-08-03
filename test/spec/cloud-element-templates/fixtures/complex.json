@@ -43,7 +43,8 @@
             "value": "^https?://.*",
             "message": "Must be http(s) URL."
           }
-        }
+        },
+        "tooltip": "Specify the url of the REST API to talk to."
       },
       {
         "id": "httpMethod",
@@ -451,15 +452,18 @@
     "groups": [
       {
         "id": "headers",
-        "label": "Request headers"
+        "label": "Request headers",
+        "tooltip": "Read the <a href='https://docs.camunda.io'>doccumentation</a> for more information."
       },
       {
         "id": "payload",
-        "label": "Request payload"
+        "label": "Request payload",
+        "tooltip": "Read the <a href='https://docs.camunda.io'>doccumentation</a> for more information."
       },
       {
         "id": "mapping",
-        "label": "Response mapping"
+        "label": "Response mapping",
+        "tooltip": "Read the <a href='https://docs.camunda.io'>doccumentation</a> for more information."
       }
     ]
   },
