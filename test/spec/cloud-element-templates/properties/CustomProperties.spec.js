@@ -1181,7 +1181,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       // given
       await expectSelected('Task');
 
-      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-0', container);
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-group-0', container);
       const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
 
       // when
@@ -1199,7 +1199,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       // when
       await expectSelected('Task');
 
-      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-1', container);
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-group-1', container);
       const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
 
       // then
@@ -1217,7 +1217,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       // given
       await expectSelected('Task');
 
-      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-2', container);
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-group-2', container);
       const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
 
       // when
@@ -1235,7 +1235,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       // given
       await expectSelected('Task');
 
-      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-3', container);
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-group-3', container);
       const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
 
       // when
@@ -1248,12 +1248,30 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     });
 
 
+    it('should display tooltip for groups', async function() {
+
+      // given
+      await expectSelected('Task');
+
+      const group = domQuery('.bio-properties-panel-group-header-title[title="Custom group"]', container);
+      const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', group);
+
+      // when
+      await openTooltip(tooltipWrapper);
+      const tooltip = domQuery('.bio-properties-panel-tooltip');
+
+      // then
+      expect(tooltip).to.exist;
+      expect(tooltip.textContent).to.contain('GROUP_TOOLTIP');
+    });
+
+
     it('should display HTML tooltips', async function() {
 
       // given
       await expectSelected('Task');
 
-      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-4', container);
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-group-4', container);
       const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
 
       // when
@@ -1279,7 +1297,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       // given
       await expectSelected('Task');
 
-      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-5', container);
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-group-5', container);
       const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
 
       // then

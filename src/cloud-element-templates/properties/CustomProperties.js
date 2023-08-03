@@ -74,7 +74,8 @@ export function CustomProperties(props) {
       id: `ElementTemplates__CustomProperties-${groupId}`,
       label: group.label,
       properties: properties,
-      templateId: `${id}-${groupId}`
+      templateId: `${id}-${groupId}`,
+      tooltip: PropertyTooltip({ tooltip: group.tooltip })
     });
   });
 
@@ -98,7 +99,8 @@ function addCustomGroup(groups, props) {
     id,
     label,
     properties,
-    templateId
+    templateId,
+    tooltip
   } = props;
 
   const customPropertiesGroup = {
@@ -106,7 +108,8 @@ function addCustomGroup(groups, props) {
     label,
     component: Group,
     entries: [],
-    shouldOpen: true
+    shouldOpen: true,
+    tooltip
   };
 
   properties.forEach((property, index) => {
