@@ -9,7 +9,9 @@ import {
 } from 'test/TestHelper';
 
 import {
-  act
+  act,
+  cleanup,
+  fireEvent
 } from '@testing-library/preact';
 
 import {
@@ -45,6 +47,9 @@ import templates from './CustomProperties.json';
 
 import descriptionDiagramXML from './CustomProperties.description.bpmn';
 import descriptionElementTemplates from './CustomProperties.description.json';
+
+import tooltipDiagramXML from './CustomProperties.tooltip.bpmn';
+import tooltipElementTemplates from './CustomProperties.tooltip.json';
 
 import editableDiagramXML from './CustomProperties.editable.bpmn';
 import editableElementTemplates from './CustomProperties.editable.json';
@@ -1131,6 +1136,154 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const description = domQuery('.bio-properties-panel-description', entry);
 
       expect(description).to.not.exist;
+    });
+  });
+
+
+  describe('tooltip', function() {
+
+    let clock;
+
+    function openTooltip(element) {
+      return act(() => {
+        fireEvent.mouseEnter(element);
+        clock.tick(200);
+      });
+    }
+
+    beforeEach(function() {
+      clock = sinon.useFakeTimers();
+    });
+
+    afterEach(function() {
+      cleanup();
+      clock.restore();
+    });
+
+    beforeEach(bootstrapPropertiesPanel(tooltipDiagramXML, {
+      container,
+      debounceInput: false,
+      elementTemplates: tooltipElementTemplates,
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      },
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        elementTemplatesModule,
+        modelingModule
+      ]
+    }));
+
+
+    it('should display tooltip for string property', async function() {
+
+      // given
+      await expectSelected('Task');
+
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-0', container);
+      const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
+
+      // when
+      await openTooltip(tooltipWrapper);
+      const tooltip = domQuery('.bio-properties-panel-tooltip', entry);
+
+      // then
+      expect(tooltip).to.exist;
+      expect(tooltip.textContent).to.contain('STRING_TOOLTIP');
+    });
+
+
+    it('should display tooltip for textarea property', async function() {
+
+      // when
+      await expectSelected('Task');
+
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-1', container);
+      const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
+
+      // then
+      await openTooltip(tooltipWrapper);
+      const tooltip = domQuery('.bio-properties-panel-tooltip', entry);
+
+      // then
+      expect(tooltip).to.exist;
+      expect(tooltip.textContent).to.contain('TEXT_TOOLTIP');
+    });
+
+
+    it('should display tooltip for boolean property', async function() {
+
+      // given
+      await expectSelected('Task');
+
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-2', container);
+      const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
+
+      // when
+      await openTooltip(tooltipWrapper);
+      const tooltip = domQuery('.bio-properties-panel-tooltip', entry);
+
+      // then
+      expect(tooltip).to.exist;
+      expect(tooltip.textContent).to.contain('BOOLEAN_TOOLTIP');
+    });
+
+
+    it('should display tooltip for dropdown property', async function() {
+
+      // given
+      await expectSelected('Task');
+
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-3', container);
+      const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
+
+      // when
+      await openTooltip(tooltipWrapper);
+      const tooltip = domQuery('.bio-properties-panel-tooltip', entry);
+
+      // then
+      expect(tooltip).to.exist;
+      expect(tooltip.textContent).to.contain('DROPDOWN_TOOLTIP');
+    });
+
+
+    it('should display HTML tooltips', async function() {
+
+      // given
+      await expectSelected('Task');
+
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-4', container);
+      const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
+
+      // when
+      await openTooltip(tooltipWrapper);
+      const tooltip = domQuery('.bio-properties-panel-tooltip-content', entry);
+
+      // then
+      expect(tooltip).to.exist;
+      expect(tooltip.innerHTML).to.eql(
+        '<div class="markup">' +
+          '<div xmlns="http://www.w3.org/1999/xhtml">' +
+            'By the way, you can use ' +
+            '<a href="https://freemarker.apache.org/" target="_blank" rel="noopener">freemarker templates</a> ' +
+            'here' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+
+    it('should NOT display empty descriptions', async function() {
+
+      // given
+      await expectSelected('Task');
+
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-5', container);
+      const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
+
+      // then
+      expect(tooltipWrapper).to.not.exist;
     });
   });
 

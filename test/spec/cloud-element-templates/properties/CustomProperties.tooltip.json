@@ -1,0 +1,87 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "tooltip Task",
+    "id": "com.zeebe.example.tooltip",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "label": "string",
+        "tooltip": "STRING_TOOLTIP",
+        "type": "String",
+        "binding": {
+          "type": "property",
+          "name": "string"
+        }
+      },
+      {
+        "label": "text",
+        "tooltip": "TEXT_TOOLTIP",
+        "type": "Text",
+        "binding": {
+          "type": "property",
+          "name": "text"
+        }
+      },
+      {
+        "label": "boolean",
+        "tooltip": "BOOLEAN_TOOLTIP",
+        "type": "Boolean",
+        "binding": {
+          "type": "property",
+          "name": "boolean"
+        }
+      },
+      {
+        "label": "dropdown",
+        "tooltip": "DROPDOWN_TOOLTIP",
+        "type": "Dropdown",
+        "choices": [
+          {
+            "value": "GET",
+            "name": "GET"
+          },
+          {
+            "value": "POST",
+            "name": "POST"
+          },
+          {
+            "value": "PUT",
+            "name": "PUT"
+          },
+          {
+            "value": "PATCH",
+            "name": "PATCH"
+          },
+          {
+            "value": "DELETE",
+            "name": "DELETE"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:input",
+          "name": "dropdown"
+        }
+      },
+      {
+        "label": "withHTML",
+        "tooltip": "By the way, you can use <a target='_blank' href=\"https://freemarker.apache.org/\">freemarker templates</a> here",
+        "type": "String",
+        "binding": {
+          "type": "property",
+          "name": "string"
+        }
+      },
+      {
+        "label": "empty",
+        "type": "String",
+        "binding": {
+          "type": "property",
+          "name": "string"
+        }
+      }
+    ]
+  }
+]
