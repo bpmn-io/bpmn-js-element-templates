@@ -6,6 +6,13 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.3.0
+
+* `FEAT`: support tooltips in template properties and groups ([#8](https://github.com/bpmn-io/bpmn-js-element-templates/issues/8))
+* `DEPS`: update to `bpmn-js-properties-panel@3.2.1`
+* `DEPS`: update to `@bpmn-io/element-templates-validator@0.15.0`
+* `DEPS`: update to `@bpmn.io/properties-panel@3.0.0`
+
 ## 1.2.2
 
 * `FIX`: allow removing templates from root elements ([#7](https://github.com/bpmn-io/bpmn-js-element-templates/pull/7))
