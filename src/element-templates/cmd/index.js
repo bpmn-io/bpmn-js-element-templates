@@ -1,7 +1,13 @@
 import ChangeElementTemplateHandler from './ChangeElementTemplateHandler';
 import RemoveElementTemplateHandler from './RemoveElementTemplateHandler';
+import MultiCommandHandler from './MultiCommandHandler';
 
 function registerHandlers(commandStack, elementTemplates, eventBus) {
+  commandStack.registerHandler(
+    'element-templates.multi-command-executor',
+    MultiCommandHandler
+  );
+
   commandStack.registerHandler(
     'propertiesPanel.camunda.changeTemplate',
     ChangeElementTemplateHandler

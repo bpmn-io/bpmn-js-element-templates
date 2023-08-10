@@ -886,7 +886,7 @@ function propertySetter(bpmnFactory, commandStack, element, property, scope) {
 
     if (commands.length) {
       commandStack.execute(
-        'properties-panel.multi-command-executor',
+        'element-templates.multi-command-executor',
         commands
       );
 

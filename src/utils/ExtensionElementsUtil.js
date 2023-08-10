@@ -81,7 +81,7 @@ export function addExtensionElements(element, businessObject, extensionElementTo
     }
   });
 
-  commandStack.execute('properties-panel.multi-command-executor', commands);
+  commandStack.execute('element-templates.multi-command-executor', commands);
 }
 
 /**

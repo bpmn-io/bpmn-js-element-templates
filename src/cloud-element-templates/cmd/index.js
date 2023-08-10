@@ -1,7 +1,14 @@
 import ChangeElementTemplateHandler from './ChangeElementTemplateHandler';
 import RemoveElementTemplateHandler from '../../element-templates/cmd/RemoveElementTemplateHandler';
+import MultiCommandHandler from '../../element-templates/cmd/MultiCommandHandler';
 
 function registerHandlers(commandStack, elementTemplates, eventBus) {
+
+  commandStack.registerHandler(
+    'element-templates.multi-command-executor',
+    MultiCommandHandler
+  );
+
   commandStack.registerHandler(
     'propertiesPanel.zeebe.changeTemplate',
     ChangeElementTemplateHandler

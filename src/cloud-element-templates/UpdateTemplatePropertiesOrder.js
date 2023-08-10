@@ -68,7 +68,7 @@ export default class UpdateTemplatePropertiesOrder extends CommandInterceptor {
       const commandsToExecute = commands.filter((command) => command !== null);
 
       commandsToExecute.length && this._commandStack.execute(
-        'properties-panel.multi-command-executor',
+        'element-templates.multi-command-executor',
         commandsToExecute
       );
 
