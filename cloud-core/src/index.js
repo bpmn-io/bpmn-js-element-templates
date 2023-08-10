@@ -1,0 +1,1 @@
+export * from '../../src/cloud-element-templates/core';
