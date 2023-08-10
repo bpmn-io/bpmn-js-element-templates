@@ -32,7 +32,7 @@ import {
 } from 'src/cloud-element-templates/Helper';
 
 
-describe('provider/cloud-element-templates - UpdateTemplatePropertiesOrder', function() {
+describe('provider/cloud-element-templates - UpdatePropertiesOrderBehavior', function() {
 
   let container, propertiesContainer, modelerContainer;
 
@@ -52,8 +52,8 @@ describe('provider/cloud-element-templates - UpdateTemplatePropertiesOrder', fun
 
   describe('should preserve definition order on update', function() {
 
-    const elementTemplates = require('./UpdateTemplatePropertiesOrder.json');
-    const diagramXML = require('./UpdateTemplatePropertiesOrder.bpmn').default;
+    const elementTemplates = require('./UpdatePropertiesOrderBehavior.template.json');
+    const diagramXML = require('./UpdatePropertiesOrderBehavior.bpmn').default;
 
     beforeEach(() => bootstrapModeler(diagramXML, {
       container: modelerContainer,
@@ -409,8 +409,8 @@ describe('provider/cloud-element-templates - UpdateTemplatePropertiesOrder', fun
 
   describe('should correct definition order on update', function() {
 
-    const elementTemplates = require('./UpdateTemplatePropertiesOrder.json');
-    const diagramXML = require('./UpdateTemplatePropertiesOrder.wrong-order.bpmn').default;
+    const elementTemplates = require('./UpdatePropertiesOrderBehavior.template.json');
+    const diagramXML = require('./UpdatePropertiesOrderBehavior.wrong-order.bpmn').default;
 
     beforeEach(() => bootstrapModeler(diagramXML, {
       container: modelerContainer,

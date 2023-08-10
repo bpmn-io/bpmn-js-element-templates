@@ -39,7 +39,7 @@ import ZeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 import CloudElementTemplatesPropertiesProviderModule from 'src/cloud-element-templates';
 import ElementTemplatesPropertiesProviderModule from 'src/element-templates';
 
-import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/LinterPlugin';
+import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/linting';
 
 const singleStart = window.__env__ && window.__env__.SINGLE_START;
 

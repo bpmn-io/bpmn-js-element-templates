@@ -20,25 +20,25 @@ import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 import {
   bootstrapPropertiesPanel,
   clickInput as click,
+  changeInput,
   inject
-} from 'test/TestHelper';
+} from '../../../TestHelper';
 
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
 import elementTemplatesModule from 'src/cloud-element-templates';
 import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
 
 import diagramXML from './ElementTemplatesPropertiesProvider.bpmn';
-import templates from './ElementTemplatesPropertiesProvider.templates.json';
-import entriesVisibleDiagramXML from './fixtures/entries-visible.bpmn';
-import entriesVisibleTemplates from './fixtures/entries-visible.json';
+import templates from './ElementTemplatesPropertiesProvider.json';
+import entriesVisibleDiagramXML from './ElementTemplatesPropertiesProvider.entries-visible.bpmn';
+import entriesVisibleTemplates from './ElementTemplatesPropertiesProvider.entries-visible.json';
 
-import conditionTemplate from './fixtures/condition.json';
-import multipleConditionTemplate from './fixtures/multiple-conditions.json';
-import conditionXML from './fixtures/condition.bpmn';
-import { changeInput } from '../../TestHelper';
+import conditionTemplate from '../fixtures/condition.json';
+import multipleConditionTemplate from '../fixtures/multiple-conditions.json';
+import conditionXML from '../fixtures/condition.bpmn';
 
 
-describe('provider/cloud-element-templates - ElementTemplates', function() {
+describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider', function() {
 
   let container;
 
