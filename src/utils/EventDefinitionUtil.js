@@ -1,10 +1,7 @@
 import {
-  isAny
-} from 'bpmn-js/lib/features/modeling/util/ModelingUtil';
-
-import {
   getBusinessObject,
-  is
+  is,
+  isAny
 } from 'bpmn-js/lib/util/ModelUtil';
 
 import {
