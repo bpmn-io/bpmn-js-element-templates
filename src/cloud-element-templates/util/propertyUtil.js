@@ -572,7 +572,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     const commandsToExecute = commands.filter((command) => command !== NO_OP);
 
     commandsToExecute.length && commandStack.execute(
-      'properties-panel.multi-command-executor',
+      'element-templates.multi-command-executor',
       commandsToExecute
     );
 
@@ -849,7 +849,7 @@ export function unsetProperty(commandStack, element, property) {
 
   if (commands.length) {
     commandStack.execute(
-      'properties-panel.multi-command-executor',
+      'element-templates.multi-command-executor',
       commands
     );
 
