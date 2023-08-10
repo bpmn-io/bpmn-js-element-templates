@@ -5,7 +5,7 @@ import {
   bootstrapModeler,
   bootstrapPropertiesPanel,
   inject
-} from 'test/TestHelper';
+} from '../../../TestHelper';
 
 import coreModule from 'bpmn-js/lib/core';
 import elementTemplatesModule from 'src/cloud-element-templates';
@@ -16,27 +16,27 @@ import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
 import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 
 
-import diagramXML from './fixtures/condition.bpmn';
-import messageDiagramXML from './fixtures/condition-message.bpmn';
-import messageCorrelationDiagramXML from './fixtures/message-correlation-key.bpmn';
+import diagramXML from '../fixtures/condition.bpmn';
+import messageDiagramXML from '../fixtures/condition-message.bpmn';
+import messageCorrelationDiagramXML from '../fixtures/message-correlation-key.bpmn';
 
-import template from './fixtures/condition.json';
-import updateTemplates from './fixtures/condition-update.json';
+import template from '../fixtures/condition.json';
+import updateTemplates from '../fixtures/condition-update.json';
 
-import messageTemplates from './fixtures/condition-message.json';
-import messageCorrelationTemplate from './fixtures/message-correlation-key.json';
+import messageTemplates from '../fixtures/condition-message.json';
+import messageCorrelationTemplate from '../fixtures/message-correlation-key.json';
 
-import calledElementTemplate from './fixtures/condition-called-element.json';
+import calledElementTemplate from '../fixtures/condition-called-element.json';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { findExtension, findMessage, findZeebeSubscription } from 'src/cloud-element-templates/Helper';
-import ElementTemplatesConditionChecker from 'src/cloud-element-templates/ElementTemplatesConditionChecker';
+import ConditionalBehavior from 'src/cloud-element-templates/behavior/ConditionalBehavior';
 import { getBpmnJS } from 'bpmn-js/test/helper';
 import { isString } from 'min-dash';
 import { query as domQuery } from 'min-dom';
 
 
-describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', function() {
+describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
   let container;
 
@@ -50,7 +50,6 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       coreModule,
       elementTemplatesModule,
       modelingModule,
-      ElementTemplatesConditionChecker,
       BpmnPropertiesPanelModule,
       {
         propertiesPanel: [ 'value', { registerProvider() {} } ]
@@ -761,7 +760,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         coreModule,
         elementTemplatesModule,
         modelingModule,
-        ElementTemplatesConditionChecker,
+        ConditionalBehavior,
         BpmnPropertiesPanelModule,
         {
           propertiesPanel: [ 'value', { registerProvider() {} } ]
@@ -908,7 +907,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         coreModule,
         elementTemplatesModule,
         modelingModule,
-        ElementTemplatesConditionChecker,
+        ConditionalBehavior,
         BpmnPropertiesPanelModule,
         {
           propertiesPanel: [ 'value', { registerProvider() {} } ]
@@ -933,7 +932,6 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
           coreModule,
           elementTemplatesModule,
           modelingModule,
-          ElementTemplatesConditionChecker,
           BpmnPropertiesPanelModule,
           ZeebeBehaviorsModule
         ],
@@ -1233,7 +1231,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         coreModule,
         elementTemplatesModule,
         modelingModule,
-        ElementTemplatesConditionChecker,
+        ConditionalBehavior,
         BpmnPropertiesPanelModule,
         {
           propertiesPanel: [ 'value', { registerProvider() {} } ]

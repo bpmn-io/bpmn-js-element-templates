@@ -9,17 +9,17 @@
  */
 
 import StaticResolver from 'bpmnlint/lib/resolver/static-resolver';
-import ElementTemplates from './ElementTemplates';
-import { getPropertyValue, validateProperty } from './util/propertyUtil';
+import ElementTemplates from '../ElementTemplates';
+import { getPropertyValue, validateProperty } from '../util/propertyUtil';
 
-import { applyConditions } from './Condition';
+import { applyConditions } from '../Condition';
 
 import BpmnModdle from 'bpmn-moddle';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
 
 import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
-import { Validator } from './Validator';
+import { Validator } from '../Validator';
 
 export const elementTemplateLintRule = ({ templates = [] }) => {
   const moddle = new BpmnModdle({ zeebe: zeebeModdle });

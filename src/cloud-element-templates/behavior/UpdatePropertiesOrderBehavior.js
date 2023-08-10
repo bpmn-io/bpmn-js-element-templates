@@ -1,8 +1,8 @@
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 
 import { isObject } from 'min-dash';
-import { applyConditions } from './Condition';
-import { findExtension } from './Helper';
+import { applyConditions } from '../Condition';
+import { findExtension } from '../Helper';
 
 /**
  * Restores the original order of the template properties

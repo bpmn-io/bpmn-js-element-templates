@@ -8,7 +8,7 @@ import {
   bootstrapModeler,
   getBpmnJS,
   inject
-} from '../../TestHelper';
+} from '../../../TestHelper';
 
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
 import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
@@ -16,8 +16,8 @@ import ElementTemplatesModule from 'src/cloud-element-templates';
 import { findMessage, getTemplateId, TEMPLATE_ID_ATTR } from 'src/cloud-element-templates/Helper';
 
 
-import diagramXML from './fixtures/referenced-element-behavior.bpmn';
-import templates from './fixtures/referenced-element-behavior.json';
+import diagramXML from './ReferencedElementBehavior.bpmn';
+import templates from './ReferencedElementBehavior.json';
 
 
 describe('provider/cloud-element-templates - ReferencedElementBehavior', function() {

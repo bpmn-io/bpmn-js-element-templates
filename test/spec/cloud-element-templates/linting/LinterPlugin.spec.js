@@ -1,14 +1,14 @@
 import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 
-import { elementTemplateLintRule } from 'src/cloud-element-templates/LinterPlugin.js';
+import { elementTemplateLintRule } from 'src/cloud-element-templates/linting';
 
 import {
   createDefinitions,
   createModdle,
   createProcess
-} from '../../TestHelper';
+} from '../../../TestHelper';
 
-import templates from './fixtures/constraints.json';
+import templates from './LinterPlugin.json';
 
 const valid = [
   {

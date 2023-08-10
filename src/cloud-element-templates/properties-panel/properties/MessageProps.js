@@ -7,7 +7,7 @@ import {
 } from 'min-dash';
 
 import { isSelectEntryEdited } from '@bpmn-io/properties-panel';
-import ReferenceSelect from '../../entries/ReferenceSelect';
+import ReferenceSelect from '../../../entries/ReferenceSelect';
 
 import { useService } from 'bpmn-js-properties-panel';
 
@@ -15,7 +15,7 @@ import {
   getMessage,
   getMessageEventDefinition,
   isMessageSupported
-} from '../../utils/EventDefinitionUtil';
+} from '../../../utils/EventDefinitionUtil';
 
 import {
   createElement,
@@ -23,7 +23,7 @@ import {
   findRootElementsByType,
   getRoot,
   nextId
-} from '../../utils/ElementUtil';
+} from '../../../utils/ElementUtil';
 
 export const EMPTY_OPTION = '';
 export const CREATE_NEW_OPTION = 'create-new';
