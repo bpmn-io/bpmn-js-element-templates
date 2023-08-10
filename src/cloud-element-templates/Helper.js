@@ -1,8 +1,6 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
-import { is } from 'bpmn-js/lib/util/ModelUtil';
-
-import { isAny } from 'bpmn-js/lib/features/modeling/util/ModelingUtil';
+import { is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 
 import { v4 as uuid } from 'uuid';
 
