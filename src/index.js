@@ -3,4 +3,4 @@ export { default as ElementTemplatesPropertiesProviderModule } from './element-t
 
 // utils
 export { Validator as CloudElementTemplatesValidator } from './cloud-element-templates/Validator';
-export { ElementTemplateLinterPlugin as CloudElementTemplatesLinterPlugin } from './cloud-element-templates/LinterPlugin';
+export { ElementTemplateLinterPlugin as CloudElementTemplatesLinterPlugin } from './cloud-element-templates/linting';

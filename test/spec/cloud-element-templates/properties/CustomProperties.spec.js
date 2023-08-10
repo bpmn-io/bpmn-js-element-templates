@@ -40,7 +40,8 @@ import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
-import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import elementTemplatesModule from 'src/cloud-element-templates';
+import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
+import elementTemplatesModule from 'src/cloud-element-templates';
 
 import diagramXML from './CustomProperties.bpmn';
 import templates from './CustomProperties.json';

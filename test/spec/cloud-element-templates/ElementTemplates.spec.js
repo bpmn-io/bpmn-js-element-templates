@@ -16,8 +16,7 @@ import {
 } from 'bpmn-js/lib/util/ModelUtil';
 
 import coreModule from 'bpmn-js/lib/core';
-import elementTemplatesModule from 'src/cloud-element-templates';
-import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
+import elementTemplatesCoreModule from 'src/cloud-element-templates/core';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 
 import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
@@ -46,12 +45,8 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     container: container,
     modules: [
       coreModule,
-      elementTemplatesModule,
-      modelingModule,
-      BpmnPropertiesPanelModule,
-      {
-        propertiesPanel: [ 'value', { registerProvider() {} } ]
-      }
+      elementTemplatesCoreModule,
+      modelingModule
     ],
     moddleExtensions: {
       zeebe: zeebeModdlePackage
@@ -996,7 +991,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       container: container,
       modules: [
         coreModule,
-        elementTemplatesModule,
+        elementTemplatesCoreModule,
         modelingModule,
         {
           propertiesPanel: [ 'value', { registerProvider() {} } ]
@@ -1130,12 +1125,8 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
       container: container,
       modules: [
         coreModule,
-        elementTemplatesModule,
-        modelingModule,
-        BpmnPropertiesPanelModule,
-        {
-          propertiesPanel: [ 'value', { registerProvider() {} } ]
-        }
+        elementTemplatesCoreModule,
+        modelingModule
       ],
       moddleExtensions: {
         zeebe: zeebeModdlePackage

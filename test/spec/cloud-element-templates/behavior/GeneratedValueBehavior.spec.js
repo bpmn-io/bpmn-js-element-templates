@@ -7,7 +7,7 @@ import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 import {
   bootstrapModeler,
   inject
-} from '../../TestHelper';
+} from '../../../TestHelper';
 
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
 import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';

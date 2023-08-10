@@ -2,11 +2,11 @@ import { getBusinessObject, isAny } from 'bpmn-js/lib/util/ModelUtil';
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 import { isString } from 'min-dash';
 
-import { findMessage, getTemplateId, TEMPLATE_ID_ATTR } from './Helper';
+import { findMessage, getTemplateId, TEMPLATE_ID_ATTR } from '../Helper';
 import {
   getReferringElement,
   removeRootElement
-} from './util/rootElementUtil';
+} from '../util/rootElementUtil';
 
 /**
  * Handles referenced elements.

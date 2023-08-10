@@ -1,7 +1,7 @@
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 
-import { getDefaultValue } from './Helper';
-import { getPropertyValue, setPropertyValue } from './util/propertyUtil';
+import { getDefaultValue } from '../Helper';
+import { getPropertyValue, setPropertyValue } from '../util/propertyUtil';
 
 /**
  * Handles generated value properties.

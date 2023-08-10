@@ -1,11 +1,11 @@
 import {
   applyConditions
-} from './Condition';
+} from '../Condition';
 
 import { isObject } from 'min-dash';
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 
-import { ZEEBE_TASK_DEFINITION, ZEEBE_TASK_DEFINITION_TYPE_TYPE } from './util/bindingTypes';
+import { ZEEBE_TASK_DEFINITION, ZEEBE_TASK_DEFINITION_TYPE_TYPE } from '../util/bindingTypes';
 
 const HIGH_PRIORITY = 2500;
 
@@ -13,7 +13,7 @@ const HIGH_PRIORITY = 2500;
  * Checks the conditions of an element template and sets/resets the
  * corresponding properties on the element.
  */
-export default class ElementTemplatesConditionChecker extends CommandInterceptor {
+export default class ConditionalBehavior extends CommandInterceptor {
   constructor(eventBus, elementTemplates, commandStack, bpmnFactory, injector) {
     super(eventBus);
 
@@ -105,7 +105,7 @@ export default class ElementTemplatesConditionChecker extends CommandInterceptor
 }
 
 
-ElementTemplatesConditionChecker.$inject = [
+ConditionalBehavior.$inject = [
   'eventBus',
   'elementTemplates',
   'commandStack',

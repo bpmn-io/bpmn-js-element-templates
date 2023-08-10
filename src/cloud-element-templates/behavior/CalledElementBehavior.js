@@ -1,7 +1,7 @@
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
 
-import { findExtension } from './Helper';
+import { findExtension } from '../Helper';
 
 /**
  * Enforces no variable propagation for templated call activities.
@@ -11,7 +11,7 @@ export class CalledElementBehavior extends CommandInterceptor {
   /**
    * @param {*} eventBus
    * @param {*} modeling
-   * @param {import('./ElementTemplates').default} elementTemplates
+   * @param {import('../ElementTemplates').default} elementTemplates
    */
   constructor(eventBus, modeling, elementTemplates) {
     super(eventBus);

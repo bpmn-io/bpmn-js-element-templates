@@ -1,17 +1,17 @@
 import {
   createElementTemplatesGroup,
   TemplateProps
-} from '../element-templates/components';
+} from '../../element-templates/components';
 
 import {
   CustomProperties,
   MessageProps
 } from './properties';
 
-import { getTemplateId } from './Helper';
+import { getTemplateId } from '../Helper';
 
-import { applyConditions } from './Condition';
-import { getPropertyValue } from './util/propertyUtil';
+import { applyConditions } from '../Condition';
+import { getPropertyValue } from '../util/propertyUtil';
 
 const LOWER_PRIORITY = 300;
 

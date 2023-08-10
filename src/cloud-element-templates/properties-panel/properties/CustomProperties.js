@@ -6,10 +6,10 @@ import {
 
 import { useService } from 'bpmn-js-properties-panel';
 
-import { PropertyDescription } from '../../element-templates/components/PropertyDescription';
+import { PropertyDescription } from '../../../element-templates/components/PropertyDescription';
 import { PropertyTooltip } from '../components/PropertyTooltip';
 
-import { getPropertyValue, setPropertyValue, validateProperty } from '../util/propertyUtil';
+import { getPropertyValue, setPropertyValue, validateProperty } from '../../util/propertyUtil';
 
 import {
   Group,
@@ -28,14 +28,14 @@ import {
   ZEEBE_OUTPUT_TYPE,
   ZEEBE_PROPERTY_TYPE,
   ZEEBE_TASK_HEADER_TYPE
-} from '../util/bindingTypes';
+} from '../../util/bindingTypes';
 
 import {
   FeelEntryWithVariableContext,
   FeelTextAreaEntryWithVariableContext,
   FeelEntry,
   FeelTextAreaEntry
-} from '../../entries/FeelEntryWithContext';
+} from '../../../entries/FeelEntryWithContext';
 
 
 const DEFAULT_CUSTOM_GROUP = {
