@@ -1,1 +1,1 @@
-export * from '../../src/cloud-element-templates/core';
+export { default } from '../../src/cloud-element-templates/core';
