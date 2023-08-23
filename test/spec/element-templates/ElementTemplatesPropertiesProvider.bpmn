@@ -16,6 +16,7 @@
       </bpmn:extensionElements>
     </bpmn:serviceTask>
     <bpmn:exclusiveGateway id="Gateway_1" />
+    <bpmn:serviceTask id="DeprecatedTemplateTask" camunda:modelerTemplate="deprecated" />
   </bpmn:process>
   <bpmn:error id="Error_error-1" name="error-name" errorCode="error-code" camunda:errorMessage="error-message" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -40,6 +41,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1l7vqgv_di" bpmnElement="Gateway_1" isMarkerVisible="true">
         <dc:Bounds x="295" y="215" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1e82w8j" bpmnElement="DeprecatedTemplateTask">
+        <dc:Bounds x="280" y="300" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

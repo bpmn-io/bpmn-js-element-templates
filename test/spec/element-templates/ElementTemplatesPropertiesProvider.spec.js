@@ -134,6 +134,30 @@ describe('provider/element-templates - ElementTemplates', function() {
         expect(updateAvailable).not.to.exist;
       })
     );
+
+
+    it('should display deprecation info if template is deprecated', inject(
+      async function(elementRegistry, selection) {
+
+        // given
+        const element = elementRegistry.get('DeprecatedTemplateTask');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const deprecatedButton = domQuery('.bio-properties-panel-deprecated-template-button', container);
+        const deprecationInfo = domQuery('.bio-properties-panel-deprecated-template-text', container);
+        const deprecationDocs = domQuery('a', deprecationInfo);
+
+        expect(deprecatedButton).to.exist;
+        expect(deprecationInfo).to.exist;
+        expect(deprecationDocs).to.exist;
+      })
+    );
+
   });
 
 
@@ -470,6 +494,7 @@ describe('provider/element-templates - ElementTemplates', function() {
       })
     );
   });
+
 });
 
 
