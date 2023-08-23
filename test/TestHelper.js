@@ -111,7 +111,7 @@ export function insertCoreStyles() {
 
   insertCSS(
     'element-templates.css',
-    require('bpmn-js-properties-panel/dist/assets/element-templates.css').default
+    require('../assets/element-templates.css').default
   );
 
   insertCSS(
