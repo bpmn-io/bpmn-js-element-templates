@@ -14,7 +14,7 @@ import {
 import handleLegacyScopes from '../util/handleLegacyScopes';
 
 import {
-  createCamundaExecutionListenerScript,
+  createCamundaExecutionListener,
   createCamundaFieldInjection,
   createCamundaIn,
   createCamundaInWithBusinessKey,
@@ -253,7 +253,7 @@ export default class ChangeElementTemplateHandler {
       const newBinding = newProperty.binding,
             propertyValue = newProperty.value;
 
-      return createCamundaExecutionListenerScript(newBinding, propertyValue, bpmnFactory);
+      return createCamundaExecutionListener(newBinding, propertyValue, bpmnFactory);
     });
 
     commandStack.execute('element.updateModdleProperties', {
