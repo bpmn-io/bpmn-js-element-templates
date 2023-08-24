@@ -15,7 +15,7 @@ import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import {
-  createCamundaExecutionListenerScript,
+  createCamundaExecutionListener,
   createCamundaIn,
   createCamundaInWithBusinessKey,
   createCamundaOut,
@@ -471,7 +471,7 @@ describe('provider/element-templates - CreateHelper', function() {
       };
 
       // when
-      const listener = createCamundaExecutionListenerScript(binding, 'println execution.eventName', bpmnFactory);
+      const listener = createCamundaExecutionListener(binding, 'println execution.eventName', bpmnFactory);
 
       // then
       expect(listener).to.jsonEqual({
@@ -482,6 +482,26 @@ describe('provider/element-templates - CreateHelper', function() {
           scriptFormat: 'groovy',
           value: 'println execution.eventName'
         }
+      });
+    }));
+
+    it('should bind value to configured property', inject(function(bpmnFactory) {
+
+      // given
+      const binding = {
+        type: 'camunda:executionListener',
+        event: 'end',
+        name: 'class'
+      };
+
+      // when
+      const listener = createCamundaExecutionListener(binding, 'path.to.my.class', bpmnFactory);
+
+      // then
+      expect(listener).to.jsonEqual({
+        $type: 'camunda:ExecutionListener',
+        event: 'end',
+        class: 'path.to.my.class'
       });
     }));
 
