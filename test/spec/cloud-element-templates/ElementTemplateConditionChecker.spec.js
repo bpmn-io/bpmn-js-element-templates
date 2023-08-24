@@ -2,6 +2,7 @@ import TestContainer from 'mocha-test-container-support';
 
 import {
   bootstrapModeler,
+  bootstrapPropertiesPanel,
   inject
 } from 'test/TestHelper';
 
@@ -17,12 +18,18 @@ import messageDiagramXML from './fixtures/condition-message.bpmn';
 
 import template from './fixtures/condition.json';
 import messageTemplates from './fixtures/condition-message.json';
+import dropdownConditions from './fixtures/condition-dropdown.json';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { findExtension, findMessage, findZeebeSubscription } from 'src/cloud-element-templates/Helper';
 import ElementTemplatesConditionChecker from 'src/cloud-element-templates/ElementTemplatesConditionChecker';
 import { getBpmnJS } from 'bpmn-js/test/helper';
 import { isString } from 'min-dash';
 
+import {
+  query as domQuery
+} from 'min-dom';
+
+import { act } from '@testing-library/preact';
 
 describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', function() {
 
@@ -1116,6 +1123,147 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       })
     );
   });
+
+
+  describe('conditional dropdown choices', function() {
+
+    beforeEach(bootstrapPropertiesPanel(diagramXML, {
+      container: container,
+      modules: [
+        coreModule,
+        elementTemplatesModule,
+        modelingModule,
+        ElementTemplatesConditionChecker,
+        BpmnPropertiesPanelModule
+      ],
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      }
+    }));
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set([ dropdownConditions ]);
+    }));
+
+
+    it('should add conditional entries', inject(
+      async function(elementRegistry, modeling, selection) {
+
+        // given
+        const element = elementRegistry.get('Task_1');
+
+        changeTemplate(element, dropdownConditions);
+
+        // when
+        await act(() => {
+          selection.select(element);
+          modeling.updateProperties(element, { name: 'foo' });
+        });
+
+        // then
+        expectDropdownOptions(container, 2, 'foo');
+      })
+    );
+
+
+    it('should switch between conditional properties', inject(
+      async function(elementRegistry, modeling, selection) {
+
+        // given
+        const element = elementRegistry.get('Task_1');
+
+        changeTemplate(element, dropdownConditions);
+
+        // when
+        await act(() => {
+          selection.select(element);
+          modeling.updateProperties(element, { name: 'foo' });
+        });
+
+        // then
+        expectDropdownOptions(container, 2, 'foo');
+
+        // when
+        await act(() =>
+          modeling.updateProperties(element, { name: 'bar' })
+        );
+
+        // then
+        expectDropdownOptions(container, 2, 'bar');
+      })
+    );
+
+
+    it('undo', inject(async function(commandStack, elementRegistry, modeling, selection) {
+
+      // given
+      const element = elementRegistry.get('Task_1');
+
+      changeTemplate(element, dropdownConditions);
+
+      // when
+      await act(() => {
+        selection.select(element);
+        modeling.updateProperties(element, { name: 'foo' });
+      });
+
+      // assume
+      expectDropdownOptions(container, 2, 'foo');
+
+      // when
+      await act(() => commandStack.undo());
+
+      // then
+      expectDropdownOptions(container, 1, 'foobar');
+    }));
+
+
+    it('redo', inject(async function(commandStack, elementRegistry, modeling, selection) {
+
+      // given
+      const element = elementRegistry.get('Task_1');
+
+      changeTemplate(element, dropdownConditions);
+
+      // when
+      await act(() => {
+        selection.select(element);
+        modeling.updateProperties(element, { name: 'foo' });
+      });
+
+      // when
+      await act(() => commandStack.undo());
+
+      // then
+      expectDropdownOptions(container, 1, 'foobar');
+
+      // when
+      await act(() => commandStack.redo());
+
+      // then
+      expectDropdownOptions(container, 2, 'foo');
+    }));
+
+
+    it('should remove conditional entries', inject(
+      async function(elementRegistry, modeling, selection) {
+
+        // given
+        const element = elementRegistry.get('Task_1');
+
+        changeTemplate(element, dropdownConditions);
+
+        // when
+        await act(() => {
+          selection.select(element);
+          modeling.updateProperties(element, { name: '' });
+        });
+
+        // then
+        expectDropdownOptions(container, 1, 'foobar');
+      })
+    );
+  });
 });
 
 
@@ -1178,4 +1326,11 @@ function expectZeebePropertyValue(businessObject, value) {
   expect(zeebeProperties).to.exist;
   expect(properties).to.have.lengthOf(1);
   expect(properties[0].value).to.eql(value);
+}
+
+function expectDropdownOptions(container, length, value) {
+  const selectOptions = domQuery('select', container).options;
+
+  expect(selectOptions).to.have.lengthOf(length);
+  expect(selectOptions[0].value).to.eql(value);
 }

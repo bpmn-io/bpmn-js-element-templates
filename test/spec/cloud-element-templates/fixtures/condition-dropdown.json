@@ -1,0 +1,46 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Conditional dropdown",
+  "id": "example.com.dropdown-condition",
+  "description": "A conditional template.",
+  "appliesTo": ["bpmn:Task"],
+  "properties": [
+    {
+      "id": "nameProp",
+      "label": "name",
+      "type": "String",
+      "binding": {
+        "type": "property",
+        "name": "name"
+      }
+    },
+    {
+      "label": "dropdown",
+      "type": "Dropdown",
+      "value": "foo",
+      "choices": [
+        {
+          "name": "FOO",
+          "value": "foo", 
+          "condition": {
+            "property": "nameProp",
+            "equals": "foo"
+          }
+        },
+        {
+          "name": "BAR",
+          "value": "bar",
+          "condition": {
+            "property": "nameProp",
+            "equals": "bar"
+          }
+        },
+        { "name": "FOOBAR", "value": "foobar" }
+      ],
+      "binding": {
+        "type": "property",
+        "name": "customDropdownValue"
+      }
+    }
+  ]
+}

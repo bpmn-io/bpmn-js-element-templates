@@ -6,14 +6,34 @@ import { getPropertyValue } from './util/propertyUtil';
 export function applyConditions(element, elementTemplate) {
   const { properties } = elementTemplate;
 
-  const filteredProperties = properties.filter(property => {
-    return isConditionMet(element, properties, property);
+  let filteredProperties = [];
+
+  properties.forEach(property => {
+    if (isConditionMet(element, properties, property)) {
+      filteredProperties.push(
+        applyDropdownConditions(element, properties, property)
+      );
+    }
   });
 
   return {
     ...elementTemplate,
     properties: filteredProperties
   };
+}
+
+export function applyDropdownConditions(element, properties, property) {
+  const { type, choices } = property;
+
+  if (type != 'Dropdown')
+    return property;
+
+  else {
+    return {
+      ...property,
+      choices: choices.filter(choice => isConditionMet(element, properties, choice))
+    };
+  }
 }
 
 export function isConditionMet(element, properties, property) {
