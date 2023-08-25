@@ -814,52 +814,67 @@
         "choices": [
           {
             "name": "Get an issue by ID",
-            "value": "getIssueById"
+            "value": "getIssueById",
+            "condition": {
+              "property": "operationGroup",
+              "equals": "issues"
+            }
           },
           {
             "name": "Create an issue",
-            "value": "createAnIssue"
+            "value": "createAnIssue",
+            "condition": {
+              "property": "operationGroup",
+              "equals": "issues"
+            }
           },
           {
             "name": "Delete an issue",
-            "value": "deleteAnIssue"
+            "value": "deleteAnIssue",
+            "condition": {
+              "property": "operationGroup",
+              "equals": "issues"
+            }
           },
           {
             "name": "Comment to an issue",
-            "value": "commentToAnIssue"
+            "value": "commentToAnIssue",
+            "condition": {
+              "property": "operationGroup",
+              "equals": "issues"
+            }
           },
           {
             "name": "Search issues",
-            "value": "searchIssues"
-          }
-        ],
-        "binding": {
-          "type": "zeebe:input",
-          "name": "operation"
-        },
-        "condition": {
-          "property": "operationGroup",
-          "equals": "issues"
-        }
-      },
-      {
-        "label": "Operation",
-        "id": "operation",
-        "group": "operation",
-        "description": "Choose operation to perform",
-        "type": "Dropdown",
-        "choices": [
+            "value": "searchIssues",
+            "condition": {
+              "property": "operationGroup",
+              "equals": "issues"
+            }
+          },
           {
             "name": "List all releases by project ID",
-            "value": "getReleasesByProjectId"
+            "value": "getReleasesByProjectId",
+            "condition": {
+              "property": "operationGroup",
+              "equals": "releases"
+            }
           },
           {
             "name": "Get release by a tag name",
-            "value": "getReleaseByTagName"
+            "value": "getReleaseByTagName",
+            "condition": {
+              "property": "operationGroup",
+              "equals": "releases"
+            }
           },
           {
             "name": "Create a release",
-            "value": "createRelease"
+            "value": "createRelease",
+            "condition": {
+              "property": "operationGroup",
+              "equals": "releases"
+            }
           }
         ],
         "binding": {
@@ -868,7 +883,7 @@
         },
         "condition": {
           "property": "operationGroup",
-          "equals": "releases"
+          "oneOf": ["issues", "releases"]
         }
       },
       {
