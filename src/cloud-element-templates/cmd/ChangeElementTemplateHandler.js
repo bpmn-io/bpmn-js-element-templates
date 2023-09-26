@@ -301,6 +301,8 @@ export default class ChangeElementTemplateHandler {
     if (!ioMapping) {
       ioMapping = bpmnFactory.create('zeebe:IoMapping');
 
+      ioMapping.$parent = businessObject;
+
       commandStack.execute('element.updateModdleProperties', {
         element,
         moddleElement: businessObject,
@@ -380,6 +382,8 @@ export default class ChangeElementTemplateHandler {
 
           newInputOrOutput = createOutputParameter(newBinding, newPropertyValue, bpmnFactory);
         }
+
+        newInputOrOutput.$parent = ioMapping;
 
         commandStack.execute('element.updateModdleProperties', {
           element,
