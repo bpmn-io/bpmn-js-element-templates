@@ -488,6 +488,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(ioMapping.get('zeebe:inputParameters')).to.have.length(2);
           expect(ioMapping.get('zeebe:outputParameters')).to.have.length(2);
 
+          expect(ioMapping.$parent)
+            .to.equal(getBusinessObject(task).get('extensionElements'));
+
+          ioMapping.get('zeebe:inputParameters').forEach((inputParameter) => {
+            expect(inputParameter.$parent).to.equal(ioMapping);
+          });
+
           expect(ioMapping.get('zeebe:inputParameters')).to.jsonEqual([
             {
               $type: 'zeebe:Input',
@@ -555,6 +562,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(ioMapping.get('zeebe:inputParameters')).to.have.length(2);
           expect(ioMapping.get('zeebe:outputParameters')).to.have.length(2);
 
+          expect(ioMapping.$parent)
+            .to.equal(getBusinessObject(task).get('extensionElements'));
+
+          ioMapping.get('zeebe:inputParameters').forEach((inputParameter) => {
+            expect(inputParameter.$parent).to.equal(ioMapping);
+          });
+
           expect(ioMapping.get('zeebe:inputParameters')).to.jsonEqual([
             {
               $type: 'zeebe:Input',
@@ -600,6 +614,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(ioMapping).to.exist;
           expect(ioMapping.get('zeebe:inputParameters')).to.have.length(2);
           expect(ioMapping.get('zeebe:outputParameters')).to.have.length(2);
+
+          expect(ioMapping.$parent)
+            .to.equal(getBusinessObject(task).get('extensionElements'));
+
+          ioMapping.get('zeebe:inputParameters').forEach((inputParameter) => {
+            expect(inputParameter.$parent).to.equal(ioMapping);
+          });
 
           expect(ioMapping.get('zeebe:inputParameters')).to.jsonEqual([
             {
