@@ -153,11 +153,12 @@ export function createCamundaOut(binding, value, bpmnFactory) {
 export function createCamundaExecutionListener(binding, value, bpmnFactory) {
   const {
     event,
-    name,
+    implementationType,
     scriptFormat
   } = binding;
 
-  if (scriptFormat) {
+  // To guarantee backwards compatibility scriptFormat is taken into account and has precedence before any other type
+  if (implementationType === 'script' || scriptFormat) {
     return bpmnFactory.create('camunda:ExecutionListener', {
       event,
       script: bpmnFactory.create('camunda:Script', {
@@ -167,10 +168,9 @@ export function createCamundaExecutionListener(binding, value, bpmnFactory) {
     });
   }
 
-  const boundPropertyName = name || 'value';
   return bpmnFactory.create('camunda:ExecutionListener', {
     event,
-    [boundPropertyName]: value
+    [implementationType]: value
   });
 }
 
