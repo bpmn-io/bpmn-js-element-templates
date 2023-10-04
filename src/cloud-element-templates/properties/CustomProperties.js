@@ -73,6 +73,7 @@ export function CustomProperties(props) {
       element,
       id: `ElementTemplates__CustomProperties-${groupId}`,
       label: group.label,
+      openByDefault: group.openByDefault,
       properties: properties,
       templateId: `${id}-${groupId}`,
       tooltip: PropertyTooltip({ tooltip: group.tooltip })
@@ -98,17 +99,20 @@ function addCustomGroup(groups, props) {
     element,
     id,
     label,
+    openByDefault,
     properties,
     templateId,
     tooltip
   } = props;
+
+  const shouldOpen = typeof openByDefault === 'undefined' ? true : openByDefault;
 
   const customPropertiesGroup = {
     id,
     label,
     component: Group,
     entries: [],
-    shouldOpen: true,
+    shouldOpen,
     tooltip
   };
 
