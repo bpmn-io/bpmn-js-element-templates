@@ -1795,22 +1795,22 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     });
 
 
-    it('should open custom groups', async function() {
+    it('should open custom groups by default', async function() {
 
       // given
-      await expectSelected('ServiceTask_1');
+      await expectSelected('ServiceTask_groupsCollapsed');
 
       // when
       var customGroups = [
-        getGroupById('ElementTemplates__CustomProperties-headers', container),
-        getGroupById('ElementTemplates__CustomProperties-payload', container),
-        getGroupById('ElementTemplates__CustomProperties-mapping', container),
-        getGroupById('ElementTemplates__CustomProperties', container)
+        [ getGroupById('ElementTemplates__CustomProperties-collapsed', container), false ],
+        [ getGroupById('ElementTemplates__CustomProperties-open', container), true ],
+        [ getGroupById('ElementTemplates__CustomProperties-unspecified', container), true ],
+        [ getGroupById('ElementTemplates__CustomProperties', container),true ]
       ];
 
       // then
-      customGroups.forEach(function(group) {
-        expectGroupOpen(group, true);
+      customGroups.forEach(function([ group, open ]) {
+        expectGroupOpen(group, open);
       });
 
     });
