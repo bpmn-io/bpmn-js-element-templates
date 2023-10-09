@@ -1499,7 +1499,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       const newTemplate = require('./event-template-1.json');
 
 
-      it('execute', inject(function(elementRegistry) {
+      it('execute', inject(function(bpmnjs, elementRegistry) {
 
         // given
         let event = elementRegistry.get('Event_1');
@@ -1515,6 +1515,8 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         expect(message).to.exist;
         expect(message.get('name')).to.equal('name');
+
+        expect(message.$parent).to.equal(bpmnjs.getDefinitions());
       }));
 
 
@@ -1537,7 +1539,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       }));
 
 
-      it('redo', inject(function(commandStack, elementRegistry) {
+      it('redo', inject(function(bpmnjs, commandStack, elementRegistry) {
 
         // given
         let event = elementRegistry.get('Event_1');
@@ -1555,7 +1557,10 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         expect(message).to.exist;
         expect(message.get('name')).to.equal('name');
+
+        expect(message.$parent).to.equal(bpmnjs.getDefinitions());
       }));
+
     });
 
 
