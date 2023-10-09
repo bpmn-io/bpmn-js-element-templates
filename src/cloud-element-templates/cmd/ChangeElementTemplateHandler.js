@@ -249,6 +249,8 @@ export default class ChangeElementTemplateHandler {
           newTaskDefinition = createTaskDefinitionWithType(newPropertyValue, bpmnFactory);
         }
 
+        newTaskDefinition.$parent = businessObject;
+
         commandStack.execute('element.updateModdleProperties', {
           element,
           moddleElement: businessObject,
