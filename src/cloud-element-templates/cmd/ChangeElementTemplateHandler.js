@@ -567,6 +567,8 @@ export default class ChangeElementTemplateHandler {
     if (!zeebeProperties) {
       zeebeProperties = bpmnFactory.create('zeebe:Properties');
 
+      zeebeProperties.$parent = businessObject;
+
       commandStack.execute('element.updateModdleProperties', {
         element,
         moddleElement: businessObject,
@@ -607,6 +609,8 @@ export default class ChangeElementTemplateHandler {
       // (3) add new zeebe:Property
       else if (shouldUpdate(newPropertyValue, newProperty)) {
         const newProperty = createZeebeProperty(newBinding, newPropertyValue, bpmnFactory);
+
+        newProperty.$parent = zeebeProperties;
 
         commandStack.execute('element.updateModdleProperties', {
           element,
