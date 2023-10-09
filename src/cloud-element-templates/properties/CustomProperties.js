@@ -99,20 +99,18 @@ function addCustomGroup(groups, props) {
     element,
     id,
     label,
-    openByDefault,
+    openByDefault = true,
     properties,
     templateId,
     tooltip
   } = props;
-
-  const shouldOpen = typeof openByDefault === 'undefined' ? true : openByDefault;
 
   const customPropertiesGroup = {
     id,
     label,
     component: Group,
     entries: [],
-    shouldOpen,
+    shouldOpen: openByDefault,
     tooltip
   };
 
