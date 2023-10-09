@@ -438,7 +438,6 @@ export default class ChangeElementTemplateHandler {
       return newBindingType === 'zeebe:taskHeader';
     });
 
-
     const businessObject = this._getOrCreateExtensionElements(element);
 
     let taskHeaders = findExtension(businessObject, 'zeebe:TaskHeaders');
@@ -460,6 +459,8 @@ export default class ChangeElementTemplateHandler {
 
     if (!taskHeaders) {
       taskHeaders = bpmnFactory.create('zeebe:TaskHeaders');
+
+      taskHeaders.$parent = businessObject;
 
       commandStack.execute('element.updateModdleProperties', {
         element,
@@ -501,6 +502,8 @@ export default class ChangeElementTemplateHandler {
       // (3) add new (non-empty) headers
       else if (newPropertyValue) {
         const newHeader = createTaskHeader(newBinding, newPropertyValue, bpmnFactory);
+
+        newHeader.$parent = taskHeaders;
 
         commandStack.execute('element.updateModdleProperties', {
           element,
