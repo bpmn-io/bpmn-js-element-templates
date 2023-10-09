@@ -283,6 +283,8 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           expect(taskDefinition).to.exist;
           expect(taskDefinition.get('type')).to.equal('task-type');
+
+          expect(taskDefinition.$parent).to.equal(getBusinessObject(task).get('extensionElements'));
         }));
 
 
@@ -323,6 +325,8 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           expect(taskDefinition).to.exist;
           expect(taskDefinition.get('type')).to.equal('task-type');
+
+          expect(taskDefinition.$parent).to.equal(getBusinessObject(task).get('extensionElements'));
         }));
 
 
@@ -341,6 +345,8 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           expect(taskDefinition).to.exist;
           expect(taskDefinition.get('type')).to.equal('task-type-old');
+
+          expect(taskDefinition.$parent).to.equal(getBusinessObject(task).get('extensionElements'));
         }));
 
       });
