@@ -865,6 +865,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(taskHeaders).to.exist;
           expect(taskHeaders.get('zeebe:values')).to.have.length(2);
 
+          expect(taskHeaders.$parent)
+            .to.equal(getBusinessObject(task).get('extensionElements'));
+
+          taskHeaders.get('zeebe:values').forEach((value) => {
+            expect(value.$parent).to.equal(taskHeaders);
+          });
+
           expect(taskHeaders.get('zeebe:values')).to.jsonEqual([
             {
               $type: 'zeebe:Header',
@@ -918,6 +925,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(taskHeaders).to.exist;
           expect(taskHeaders.get('zeebe:values')).to.have.length(2);
 
+          expect(taskHeaders.$parent)
+            .to.equal(getBusinessObject(task).get('extensionElements'));
+
+          taskHeaders.get('zeebe:values').forEach((value) => {
+            expect(value.$parent).to.equal(taskHeaders);
+          });
+
           expect(taskHeaders.get('zeebe:values')).to.jsonEqual([
             {
               $type: 'zeebe:Header',
@@ -948,6 +962,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           expect(taskHeaders).to.exist;
           expect(taskHeaders.get('zeebe:values')).to.have.length(2);
+
+          expect(taskHeaders.$parent)
+            .to.equal(getBusinessObject(task).get('extensionElements'));
+
+          taskHeaders.get('zeebe:values').forEach((value) => {
+            expect(value.$parent).to.equal(taskHeaders);
+          });
 
           expect(taskHeaders.get('zeebe:values')).to.jsonEqual([
             {
