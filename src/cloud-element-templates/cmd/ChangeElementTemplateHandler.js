@@ -31,7 +31,11 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE
 } from '../util/bindingTypes';
-import { createElement } from '../../utils/ElementUtil';
+
+import {
+  createElement,
+  getRoot
+} from '../../utils/ElementUtil';
 
 /**
  * Applies an element template to an element. Sets `zeebe:modelerTemplate` and
@@ -654,6 +658,7 @@ export default class ChangeElementTemplateHandler {
     }
 
     const message = this._getOrCreateMessage(element, newTemplate);
+
     newProperties.forEach((newProperty) => {
       const oldProperty = findOldProperty(oldTemplate, newProperty),
             newBinding = newProperty.binding,
@@ -761,6 +766,8 @@ export default class ChangeElementTemplateHandler {
 
     if (!message) {
       message = this._bpmnFactory.create('bpmn:Message', { 'zeebe:modelerTemplate': template.id });
+
+      message.$parent = getRoot(bo);
 
       this._modeling.updateModdleProperties(element, bo, { messageRef: message });
     }
