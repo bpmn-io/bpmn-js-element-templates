@@ -1215,6 +1215,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(zeebeProperties).to.exist;
           expect(zeebeProperties.get('properties')).to.have.length(2);
 
+          expect(zeebeProperties.$parent)
+            .to.equal(getBusinessObject(serviceTask).get('extensionElements'));
+
+          zeebeProperties.get('properties').forEach((property) => {
+            expect(property.$parent).to.equal(zeebeProperties);
+          });
+
           expect(zeebeProperties.get('properties')).to.jsonEqual([
             {
               $type: 'zeebe:Property',
@@ -1268,6 +1275,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(zeebeProperties).to.exist;
           expect(zeebeProperties.get('properties')).to.have.length(2);
 
+          expect(zeebeProperties.$parent)
+            .to.equal(getBusinessObject(serviceTask).get('extensionElements'));
+
+          zeebeProperties.get('properties').forEach((property) => {
+            expect(property.$parent).to.equal(zeebeProperties);
+          });
+
           expect(zeebeProperties.get('properties')).to.jsonEqual([
             {
               $type: 'zeebe:Property',
@@ -1298,6 +1312,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           expect(zeebeProperties).to.exist;
           expect(zeebeProperties.get('properties')).to.have.length(2);
+
+          expect(zeebeProperties.$parent)
+            .to.equal(getBusinessObject(serviceTask).get('extensionElements'));
+
+          zeebeProperties.get('properties').forEach((property) => {
+            expect(property.$parent).to.equal(zeebeProperties);
+          });
 
           expect(zeebeProperties.get('properties')).to.jsonEqual([
             {
@@ -1440,7 +1461,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         }));
 
       });
-
 
 
       describe('zeebe:Property not specified', function() {
