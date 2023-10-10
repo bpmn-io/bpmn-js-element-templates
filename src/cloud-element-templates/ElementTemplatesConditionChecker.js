@@ -5,7 +5,7 @@ import {
 import { isObject } from 'min-dash';
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 
-import { setPropertyValue, unsetProperty } from './util/propertyUtil';
+import { getPropertyValue, setPropertyValue, unsetProperty } from './util/propertyUtil';
 import { MESSAGE_BINDING_TYPES } from './util/bindingTypes';
 import { removeMessage } from './util/rootElementUtil';
 
@@ -58,7 +58,9 @@ export default class ElementTemplatesConditionChecker extends CommandInterceptor
       return;
     }
 
-    const newTemplate = applyConditions(element, template);
+    const newTemplate = applyConditions(element, template, this._injector);
+
+    updateDropdownValues(newTemplate.properties, element, this._injector);
 
     const propertiesToAdd = getMissingProperties(oldTemplate, newTemplate);
     const propertiesToRemove = getPropertiesToRemove(newTemplate, oldTemplate);
@@ -146,4 +148,23 @@ function equals(a, b) {
 
 function hasMessageProperties(template) {
   return template.properties.some(p => MESSAGE_BINDING_TYPES.includes(p.binding.type));
+}
+
+function updateDropdownValues(properties, element, injector) {
+
+  const commandStack = injector.get('commandStack');
+  const bpmnFactory = injector.get('bpmnFactory');
+
+  properties.forEach(property => {
+
+    if (property.type !== 'Dropdown' || !property.condition) {
+      return;
+    }
+
+    const value = getPropertyValue(element, property);
+
+    if (value && !property.choices.find(choice => choice.value === value)) {
+      setPropertyValue(bpmnFactory, commandStack, element, property, '');
+    }
+  });
 }
