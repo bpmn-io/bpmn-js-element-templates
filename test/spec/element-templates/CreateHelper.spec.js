@@ -15,7 +15,7 @@ import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import {
-  createCamundaExecutionListenerScript,
+  createCamundaExecutionListener,
   createCamundaIn,
   createCamundaInWithBusinessKey,
   createCamundaOut,
@@ -461,7 +461,7 @@ describe('provider/element-templates - CreateHelper', function() {
 
   describe('createExecutionListener', function() {
 
-    it('should create script', inject(function(bpmnFactory) {
+    it('should create script without explicit implementation type', inject(function(bpmnFactory) {
 
       // given
       const binding = {
@@ -471,7 +471,7 @@ describe('provider/element-templates - CreateHelper', function() {
       };
 
       // when
-      const listener = createCamundaExecutionListenerScript(binding, 'println execution.eventName', bpmnFactory);
+      const listener = createCamundaExecutionListener(binding, 'println execution.eventName', bpmnFactory);
 
       // then
       expect(listener).to.jsonEqual({
@@ -482,6 +482,116 @@ describe('provider/element-templates - CreateHelper', function() {
           scriptFormat: 'groovy',
           value: 'println execution.eventName'
         }
+      });
+    }));
+
+    it('should create script with implementation type script', inject(function(bpmnFactory) {
+
+      // given
+      const binding = {
+        type: 'camunda:executionListener',
+        event: 'end',
+        implementationType: 'script',
+        scriptFormat: 'groovy'
+      };
+
+      // when
+      const listener = createCamundaExecutionListener(binding, 'println execution.eventName', bpmnFactory);
+
+      // then
+      expect(listener).to.jsonEqual({
+        $type: 'camunda:ExecutionListener',
+        event: 'end',
+        script: {
+          $type: 'camunda:Script',
+          scriptFormat: 'groovy',
+          value: 'println execution.eventName'
+        }
+      });
+    }));
+
+    it('should create script with with script format ignoring the implementation type for backwards compatibility', inject(function(bpmnFactory) {
+
+      // given
+      const binding = {
+        type: 'camunda:executionListener',
+        event: 'end',
+        implementationType: 'class',
+        scriptFormat: 'groovy'
+      };
+
+      // when
+      const listener = createCamundaExecutionListener(binding, 'println execution.eventName', bpmnFactory);
+
+      // then
+      expect(listener).to.jsonEqual({
+        $type: 'camunda:ExecutionListener',
+        event: 'end',
+        script: {
+          $type: 'camunda:Script',
+          scriptFormat: 'groovy',
+          value: 'println execution.eventName'
+        }
+      });
+    }));
+
+    it('should create class-based execution listener', inject(function(bpmnFactory) {
+
+      // given
+      const binding = {
+        type: 'camunda:executionListener',
+        event: 'end',
+        implementationType: 'class'
+      };
+
+      // when
+      const listener = createCamundaExecutionListener(binding, 'path.to.my.class', bpmnFactory);
+
+      // then
+      expect(listener).to.jsonEqual({
+        $type: 'camunda:ExecutionListener',
+        event: 'end',
+        class: 'path.to.my.class'
+      });
+    }));
+
+    it('should create expression-based execution listener', inject(function(bpmnFactory) {
+
+      // given
+      const binding = {
+        type: 'camunda:executionListener',
+        event: 'end',
+        implementationType: 'expression'
+      };
+
+      // when
+      const listener = createCamundaExecutionListener(binding, '${expression}', bpmnFactory);
+
+      // then
+      expect(listener).to.jsonEqual({
+        $type: 'camunda:ExecutionListener',
+        event: 'end',
+        expression: '${expression}'
+      });
+    }));
+
+    it('should create delegateExpression-based execution listener', inject(function(bpmnFactory) {
+
+      // given
+      const binding = {
+        type: 'camunda:executionListener',
+        event: 'end',
+        implementationType: 'delegateExpression'
+      };
+
+      // when
+      const listener = createCamundaExecutionListener(binding, '${delegate}', bpmnFactory);
+
+      // then
+      expect(listener).to.jsonEqual({
+        $type: 'camunda:ExecutionListener',
+        event: 'end',
+        delegateExpression: '${delegate}'
       });
     }));
 

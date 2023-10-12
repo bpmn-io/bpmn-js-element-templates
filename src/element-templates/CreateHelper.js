@@ -150,28 +150,27 @@ export function createCamundaOut(binding, value, bpmnFactory) {
  *
  * @return {ModdleElement}
  */
-export function createCamundaExecutionListenerScript(binding, value, bpmnFactory) {
+export function createCamundaExecutionListener(binding, value, bpmnFactory) {
   const {
     event,
+    implementationType,
     scriptFormat
   } = binding;
 
-  let parameterValue,
-      parameterDefinition;
-
-  if (scriptFormat) {
-    parameterDefinition = bpmnFactory.create('camunda:Script', {
-      scriptFormat,
-      value
+  // To guarantee backwards compatibility scriptFormat is taken into account and has precedence before any other type
+  if (implementationType === 'script' || scriptFormat) {
+    return bpmnFactory.create('camunda:ExecutionListener', {
+      event,
+      script: bpmnFactory.create('camunda:Script', {
+        scriptFormat,
+        value
+      })
     });
-  } else {
-    parameterValue = value;
   }
 
   return bpmnFactory.create('camunda:ExecutionListener', {
     event,
-    value: parameterValue,
-    script: parameterDefinition
+    [implementationType]: value
   });
 }
 

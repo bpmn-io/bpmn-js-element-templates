@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `DEPS`: update to `@bpmn-io/element-templates-validator@1.2.0`
+
 ## 1.4.0
 
 * `FEAT`: visually show deprecated templates ([#11](https://github.com/bpmn-io/bpmn-js-element-templates/issues/11))
