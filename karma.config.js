@@ -87,10 +87,6 @@ module.exports = function(karma) {
                 ] : [])
               }
             }
-          },
-          {
-            test: /\.svg$/,
-            use: [ 'react-svg-loader' ]
           }
         ]
       },
