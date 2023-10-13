@@ -1,4 +1,4 @@
-import { useMemo } from '@bpmn-io/properties-panel/preact/hooks';
+import { useMemo } from 'preact/hooks';
 import { useService } from 'bpmn-js-properties-panel';
 
 export function withTooltipContainer(Component) {
