@@ -20,18 +20,6 @@ export default [
     output: [
       {
         sourcemap: true,
-        format: 'umd',
-        file: pkg['umd:main'],
-        name: 'BpmnJSElementTemplates'
-      }
-    ],
-    plugins: pgl()
-  },
-  {
-    input: 'src/index.js',
-    output: [
-      {
-        sourcemap: true,
         format: 'commonjs',
         file: pkg.main
       },
