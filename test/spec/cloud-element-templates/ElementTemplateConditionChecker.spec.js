@@ -938,7 +938,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         const message = findMessage(getBusinessObject(element));
         const subscription = findZeebeSubscription(message);
 
-        expect(subscription).not.to.have.property('correlationKey');
+        expect(subscription).to.not.exist;
       })
     );
 
@@ -969,6 +969,10 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       // given
       let element = elementRegistry.get('SubscriptionEvent_1');
       const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+      const getSubscription = () => {
+        const message = findMessage(getBusinessObject(element));
+        return findZeebeSubscription(message);
+      };
 
       // when
       modeling.updateModdleProperties(element, property, {
@@ -976,13 +980,13 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       });
 
       // assume
-      const message = findMessage(getBusinessObject(element));
-      const subscription = findZeebeSubscription(message);
-      expect(subscription).not.to.have.property('correlationKey');
+      let subscription = getSubscription();
+      expect(subscription).to.not.exist;
 
       // when
       commandStack.undo();
 
+      subscription = getSubscription();
       expect(subscription).to.have.property('correlationKey', 'one');
     }));
 
@@ -992,6 +996,10 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       // given
       let element = elementRegistry.get('SubscriptionEvent_1');
       const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+      const getSubscription = () => {
+        const message = findMessage(getBusinessObject(element));
+        return findZeebeSubscription(message);
+      };
 
       // when
       modeling.updateModdleProperties(element, property, {
@@ -999,20 +1007,22 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       });
 
       // assume
-      const message = findMessage(getBusinessObject(element));
-      const subscription = findZeebeSubscription(message);
+      let subscription = getSubscription();
+      expect(subscription).to.not.exist;
 
       // when
       commandStack.undo();
 
       // assume
+      subscription = getSubscription();
       expect(subscription).to.have.property('correlationKey', 'one');
 
       // when
       commandStack.redo();
 
       // then
-      expect(subscription).not.to.have.property('correlationKey');
+      subscription = getSubscription();
+      expect(subscription).to.not.exist;
     }));
 
 

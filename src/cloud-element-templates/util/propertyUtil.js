@@ -729,7 +729,7 @@ export function unsetProperty(commandStack, element, property) {
     });
   }
 
-  // bpmn:Message#property
+  // bpmn:Message#zeebe:subscription#property
   if (type === MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE) {
     const subscription = findZeebeSubscription(businessObject);
 
@@ -737,16 +737,30 @@ export function unsetProperty(commandStack, element, property) {
       return;
     }
 
-    commands.push({
-      cmd: 'element.updateModdleProperties',
-      context: {
-        ...context,
-        moddleElement: subscription,
-        properties: {
-          [ binding.name ]: undefined
+    // remove subscription of none properties are left
+    if (noPropertiesLeft(subscription, binding.name)) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: {
+            values: without(extensionElements.get('values'), subscription)
+          }
         }
-      }
-    });
+      });
+    } else {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: subscription,
+          properties: {
+            [ binding.name ]: undefined
+          }
+        }
+      });
+    }
   }
 
 
@@ -827,4 +841,20 @@ function isEmpty(value) {
 
 function matchesPattern(string, pattern) {
   return new RegExp(pattern).test(string);
+}
+
+/**
+ * Check if no properties are left on element besides `ignored`.
+ *
+ * @param {ModdleElement} moddleElement
+ * @param {string} ignored
+ */
+function noPropertiesLeft(moddleElement, ignored) {
+  const descriptor = moddleElement.$descriptor;
+
+  return descriptor.properties.every((property) => {
+    const { name } = property;
+
+    return name === ignored || moddleElement.get(name) === undefined;
+  });
 }
