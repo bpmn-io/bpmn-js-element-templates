@@ -43,6 +43,9 @@
       "url": "https://github.com/bpmn-io"
     }
   ],
+  "engines": {
+    "node": "*"
+  },
   "license": "MIT",
   "dependencies": {
     "@bpmn-io/element-templates-validator": "^1.2.0",
