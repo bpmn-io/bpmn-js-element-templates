@@ -20,18 +20,6 @@ export default [
     output: [
       {
         sourcemap: true,
-        format: 'umd',
-        file: pkg['umd:main'],
-        name: 'BpmnJSElementTemplates'
-      }
-    ],
-    plugins: pgl()
-  },
-  {
-    input: 'src/index.js',
-    output: [
-      {
-        sourcemap: true,
         format: 'commonjs',
         file: pkg.main
       },
@@ -57,15 +45,15 @@ function pgl(plugins = []) {
     ...plugins,
     alias({
       entries: [
-        { find: 'react', replacement: '@bpmn-io/properties-panel/preact/compat' },
-        { find: 'preact', replacement: '@bpmn-io/properties-panel/preact' }
+        { find: 'react', replacement: 'preact/compat' },
+        { find: 'preact', replacement: 'preact' }
       ]
     }),
     babel({
       babelHelpers: 'bundled',
       plugins: [
         [ '@babel/plugin-transform-react-jsx', {
-          'importSource': '@bpmn-io/properties-panel/preact',
+          'importSource': 'preact',
           'runtime': 'automatic'
         } ]
       ]

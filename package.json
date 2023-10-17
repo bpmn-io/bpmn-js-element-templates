@@ -1,6 +1,6 @@
 {
   "name": "bpmn-js-element-templates",
-  "version": "1.5.0",
+  "version": "2.0.0-1",
   "description": "",
   "files": [
     "dist"
@@ -32,7 +32,6 @@
   ],
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
-  "umd:main": "dist/bpmn-js-element-templates.umd.js",
   "author": {
     "name": "Nico Rehwaldt",
     "url": "https://github.com/nikku"
@@ -43,15 +42,21 @@
       "url": "https://github.com/bpmn-io"
     }
   ],
+  "engines": {
+    "node": "*"
+  },
   "license": "MIT",
   "dependencies": {
     "@bpmn-io/element-templates-validator": "^1.2.0",
     "@bpmn-io/extract-process-variables": "^0.8.0",
+    "@bpmn-io/properties-panel": "^4.0.0-2",
+    "bpmn-js-properties-panel": "^6.0.0-2",
     "bpmnlint": "^8.3.2",
     "classnames": "^2.3.1",
     "ids": "^1.0.0",
     "min-dash": "^4.0.0",
     "min-dom": "^4.0.3",
+    "preact": "^10.18.1",
     "preact-markup": "^2.1.1",
     "semver-compare": "^1.0.0",
     "uuid": "^9.0.0"
@@ -61,9 +66,8 @@
     "@babel/plugin-transform-react-jsx": "^7.14.3",
     "@bpmn-io/element-template-chooser": "^1.0.0",
     "@bpmn-io/element-templates-icons-renderer": "^0.3.0",
-    "@bpmn-io/properties-panel": "^3.2.1",
     "@bpmn-io/variable-resolver": "1.0.1",
-    "@camunda/linting": "^2.0.0",
+    "@camunda/linting": "^4.0.0-0",
     "@rollup/plugin-alias": "^5.0.0",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^25.0.0",
@@ -77,7 +81,6 @@
     "babel-plugin-istanbul": "^6.1.1",
     "bpmn-js": "^13.0.0",
     "bpmn-js-create-append-anything": "^0.2.1",
-    "bpmn-js-properties-panel": "^4.0.2",
     "bpmn-moddle": "^8.0.0",
     "camunda-bpmn-js-behaviors": "^0.6.0",
     "camunda-bpmn-moddle": "^7.0.1",
@@ -112,9 +115,7 @@
     "zeebe-bpmn-moddle": "^0.19.0"
   },
   "peerDependencies": {
-    "@bpmn-io/properties-panel": ">= 2.2",
     "bpmn-js": ">= 11.5",
-    "bpmn-js-properties-panel": ">= 2",
     "camunda-bpmn-js-behaviors": ">= 0.4",
     "diagram-js": ">= 11.9"
   }

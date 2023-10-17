@@ -2,8 +2,7 @@
 
 const path = require('path');
 const {
-  DefinePlugin,
-  NormalModuleReplacementPlugin
+  DefinePlugin
 } = require('webpack');
 
 const basePath = '.';
@@ -75,7 +74,7 @@ module.exports = function(karma) {
               options: {
                 plugins: [
                   [ '@babel/plugin-transform-react-jsx', {
-                    'importSource': '@bpmn-io/properties-panel/preact',
+                    'importSource': 'preact',
                     'runtime': 'automatic'
                   } ]
                 ].concat(coverage ? [
@@ -95,30 +94,7 @@ module.exports = function(karma) {
 
           // @barmac: process.env has to be defined to make @testing-library/preact work
           'process.env': {}
-        }),
-        new NormalModuleReplacementPlugin(
-          /^preact(\/[^/]+)?$/,
-          function(resource) {
-
-            const replMap = {
-              'preact/hooks': path.resolve('node_modules/@bpmn-io/properties-panel/preact/hooks/dist/hooks.module.js'),
-              'preact/jsx-runtime': path.resolve('node_modules/@bpmn-io/properties-panel/preact/jsx-runtime/dist/jsxRuntime.module.js'),
-              'preact': path.resolve('node_modules/@bpmn-io/properties-panel/preact/dist/preact.module.js')
-            };
-
-            const replacement = replMap[resource.request];
-
-            if (!replacement) {
-              return;
-            }
-
-            resource.request = replacement;
-          }
-        ),
-        new NormalModuleReplacementPlugin(
-          /^preact\/hooks/,
-          path.resolve('node_modules/@bpmn-io/properties-panel/preact/hooks/dist/hooks.module.js')
-        )
+        })
       ],
       resolve: {
         mainFields: [
@@ -127,9 +103,8 @@ module.exports = function(karma) {
           'main'
         ],
         alias: {
-          'preact': '@bpmn-io/properties-panel/preact',
-          'react': '@bpmn-io/properties-panel/preact/compat',
-          'react-dom': '@bpmn-io/properties-panel/preact/compat'
+          'react': 'preact/compat',
+          'react-dom': 'preact/compat'
         },
         modules: [
           'node_modules',
