@@ -6,6 +6,12 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.6.0
+
+* `FEAT`: add `zeebe:subscription` in single command ([#21](https://github.com/bpmn-io/bpmn-js-element-templates/issues/21))
+* `FIX`: clean up empty `zeebe:subscription` ([#21](https://github.com/bpmn-io/bpmn-js-element-templates/issues/21))
+* `DEPS`: update to `camunda-bpmn-js-behaviors@1.2.1`
+
 ## 1.5.0
 
 * `FEAT`: support `camunda:executionListener` with `implementationType` ([#13](https://github.com/bpmn-io/bpmn-js-element-templates/issues/13))
