@@ -27,7 +27,7 @@ import LintingModule from '@camunda/linting/modeler';
 import { Linter } from '@camunda/linting';
 
 import ElementTemplateChooserModule from '@bpmn-io/element-template-chooser';
-import ElementTemplatesIconsRenderer from '@bpmn-io/element-templates-icons-renderer';
+import ElementTemplatesIconsRenderer from '@bpmn-io/element-template-icon-renderer';
 
 import CamundaBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-platform';
 import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
