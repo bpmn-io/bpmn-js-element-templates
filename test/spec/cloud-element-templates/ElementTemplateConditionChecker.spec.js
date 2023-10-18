@@ -11,6 +11,8 @@ import modelingModule from 'bpmn-js/lib/features/modeling';
 import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
 
+import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
+
 
 import diagramXML from './fixtures/condition.bpmn';
 import messageDiagramXML from './fixtures/condition-message.bpmn';
@@ -42,7 +44,8 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       BpmnPropertiesPanelModule,
       {
         propertiesPanel: [ 'value', { registerProvider() {} } ]
-      }
+      },
+      ZeebeBehaviorsModule
     ],
     moddleExtensions: {
       zeebe: zeebeModdlePackage
@@ -894,7 +897,8 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         BpmnPropertiesPanelModule,
         {
           propertiesPanel: [ 'value', { registerProvider() {} } ]
-        }
+        },
+        ZeebeBehaviorsModule
       ],
       moddleExtensions: {
         zeebe: zeebeModdlePackage
@@ -938,7 +942,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         const message = findMessage(getBusinessObject(element));
         const subscription = findZeebeSubscription(message);
 
-        expect(subscription).not.to.have.property('correlationKey');
+        expect(subscription).not.to.exist;
       })
     );
 
@@ -967,8 +971,9 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
     it('undo', inject(function(commandStack, elementRegistry, modeling) {
 
       // given
-      let element = elementRegistry.get('SubscriptionEvent_1');
-      const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+      let element = elementRegistry.get('SubscriptionEvent_1'),
+          bo = getBusinessObject(element);
+      const property = findExtension(bo, 'zeebe:Properties').get('properties')[0];
 
       // when
       modeling.updateModdleProperties(element, property, {
@@ -976,13 +981,13 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       });
 
       // assume
-      const message = findMessage(getBusinessObject(element));
-      const subscription = findZeebeSubscription(message);
-      expect(subscription).not.to.have.property('correlationKey');
+      let subscription = findZeebeSubscription(findMessage(bo));
+      expect(subscription).to.not.exist;
 
       // when
       commandStack.undo();
 
+      subscription = findZeebeSubscription(findMessage(bo));
       expect(subscription).to.have.property('correlationKey', 'one');
     }));
 
@@ -990,8 +995,9 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
     it('redo', inject(function(commandStack, elementRegistry, modeling) {
 
       // given
-      let element = elementRegistry.get('SubscriptionEvent_1');
-      const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+      let element = elementRegistry.get('SubscriptionEvent_1'),
+          bo = getBusinessObject(element);
+      const property = findExtension(bo, 'zeebe:Properties').get('properties')[0];
 
       // when
       modeling.updateModdleProperties(element, property, {
@@ -999,20 +1005,22 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       });
 
       // assume
-      const message = findMessage(getBusinessObject(element));
-      const subscription = findZeebeSubscription(message);
+      let subscription = findZeebeSubscription(findMessage(bo));
+      expect(subscription).to.not.exist;
 
       // when
       commandStack.undo();
 
       // assume
+      subscription = findZeebeSubscription(findMessage(bo));
       expect(subscription).to.have.property('correlationKey', 'one');
 
       // when
       commandStack.redo();
 
       // then
-      expect(subscription).not.to.have.property('correlationKey');
+      subscription = findZeebeSubscription(findMessage(bo));
+      expect(subscription).to.not.exist;
     }));
 
 

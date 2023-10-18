@@ -483,9 +483,21 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
   // bpmn:Message#zeebe:subscription#property
   if (type === MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE) {
     let subscription = findExtension(extensionElements, 'zeebe:Subscription');
+    const properties = {
+      [ name ]: value || ''
+    };
 
-    if (!subscription) {
-      subscription = createElement('zeebe:Subscription', null, extensionElements, bpmnFactory);
+    if (subscription) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: subscription
+        }
+      });
+    } else {
+      subscription = createElement('zeebe:Subscription', properties, extensionElements, bpmnFactory);
 
       commands.push({
         cmd: 'element.updateModdleProperties',
@@ -496,17 +508,6 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
         }
       });
     }
-
-    commands.push({
-      cmd: 'element.updateModdleProperties',
-      context: {
-        element,
-        moddleElement: subscription,
-        properties: {
-          [ name ]: value || ''
-        }
-      }
-    });
   }
 
   if (commands.length) {
