@@ -714,6 +714,30 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
   });
+
+
+  describe('multiinstance characteristics', function() {
+
+    it('should display multi-instance configuration', inject(
+      async function(elementRegistry, selection, modeling, bpmnFactory) {
+
+        // given
+        const element = elementRegistry.get('Task_1'),
+              loopCharacteristics = bpmnFactory.create('bpmn:MultiInstanceLoopCharacteristics');
+
+        // when
+        modeling.updateProperties(element, { loopCharacteristics });
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('[data-group-id="group-multiInstance"]', container);
+
+        expect(group).to.exist;
+      })
+    );
+  });
 });
 
 

@@ -15,6 +15,11 @@ import { getPropertyValue } from './util/propertyUtil';
 
 const LOWER_PRIORITY = 300;
 
+const ALWAYS_DISPLAYED_GROUPS = [
+  'general',
+  'multiInstance'
+];
+
 
 export default class ElementTemplatesPropertiesProvider {
 
@@ -48,7 +53,7 @@ export default class ElementTemplatesPropertiesProvider {
       };
 
       // (1) Add templates group
-      addGroupsAfter('documentation', groups, [ templatesGroup ]);
+      addGroupsAfter(ALWAYS_DISPLAYED_GROUPS, groups, [ templatesGroup ]);
 
       let elementTemplate = this._elementTemplates.get(element);
 
@@ -111,12 +116,20 @@ function overrideGenericEntries(oldEntries, newEntries) {
 
 /**
  *
- * @param {string} id
+ * @param {string|string[]} idOrIds
  * @param {Array<{ id: string }} groups
  * @param {Array<{ id: string }>} groupsToAdd
  */
-function addGroupsAfter(id, groups, groupsToAdd) {
-  const index = groups.findIndex(group => group.id === id);
+function addGroupsAfter(idOrIds, groups, groupsToAdd) {
+  let ids = idOrIds;
+  if (!Array.isArray(idOrIds)) {
+    ids = [ idOrIds ];
+  }
+
+  // find index of last group with provided id
+  const index = groups.reduce((acc, group, index) => {
+    return ids.includes(group.id) ? index : acc;
+  }, -1);
 
   if (index !== -1) {
     groups.splice(index + 1, 0, ...groupsToAdd);
@@ -131,7 +144,7 @@ function filterWithEntriesVisible(template, groups) {
   if (!template.entriesVisible) {
     return groups.filter(group => {
       return (
-        group.id === 'general' ||
+        ALWAYS_DISPLAYED_GROUPS.includes(group.id) ||
         group.id.startsWith('ElementTemplates__')
       );
     });
