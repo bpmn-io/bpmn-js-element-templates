@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.6.1
+
 * `FIX`: display multi-instance configuration in properties panel
 
 ## 1.6.0
