@@ -70,15 +70,13 @@ export function createTaskHeader(binding, value, bpmnFactory) {
 /**
  * Create a task definition representing the given value.
  *
- * @param {String} value
+ * @param {object} attrs
  * @param {BpmnFactory} bpmnFactory
  *
  * @return {ModdleElement}
  */
-export function createTaskDefinitionWithType(value, bpmnFactory) {
-  return bpmnFactory.create('zeebe:TaskDefinition', {
-    type: value
-  });
+export function createTaskDefinition(attrs = {}, bpmnFactory) {
+  return bpmnFactory.create('zeebe:TaskDefinition', attrs);
 }
 
 /**

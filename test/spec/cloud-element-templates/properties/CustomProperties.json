@@ -680,5 +680,31 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Task Definition Template",
+    "id": "taskDefinitionTemplate",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "type": "String",
+        "value": "http",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "type": "String",
+        "value": "5",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "retries"
+        }
+      }
+    ]
   }
 ]

@@ -229,6 +229,50 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('zeebe:taskDefinition', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('TaskDefinition');
+
+      // then
+      const entry = findEntry('custom-entry-taskDefinitionTemplate-0', container),
+            input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('http');
+    });
+
+
+    it('should change value', async function() {
+
+      // given
+      const task = await expectSelected('TaskDefinition'),
+            businessObject = getBusinessObject(task);
+
+      // when
+      const entry = findEntry('custom-entry-taskDefinitionTemplate-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'foo@bar');
+
+      // then
+      const taskDefinition = findExtension(businessObject, 'zeebe:TaskDefinition');
+
+      // then
+      expect(taskDefinition).to.exist;
+      expect(taskDefinition).to.jsonEqual({
+        $type: 'zeebe:TaskDefinition',
+        type: 'foo@bar',
+        retries: '5'
+      });
+    });
+
+  });
+
+
   describe('zeebe:input', function() {
 
     it('should display', async function() {

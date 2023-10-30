@@ -178,7 +178,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
   });
 
 
-  describe('update zeebe:taskDefinition:type', function() {
+  describe('update zeebe:taskDefinition:type and zeebe:taskDefinition', function() {
 
     it('should add conditional entries', inject(
       async function(elementRegistry, modeling) {
@@ -199,6 +199,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         expect(taskDefinition).to.exist;
       })
     );
+
 
     it('should remove conditional entries', inject(
       async function(elementRegistry, modeling) {

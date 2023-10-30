@@ -146,6 +146,23 @@
   },
   {
     "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Task definition type binding",
+    "id": "example.camunda.TaskDefinitionBinding",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "value": "job-type",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
     "name": "Input binding",
     "id": "example.camunda.InputBinding",
     "appliesTo": [

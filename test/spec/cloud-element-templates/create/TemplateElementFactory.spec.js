@@ -241,6 +241,22 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
     }));
 
 
+    it('should handle <zeebe:taskDefinition>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.TaskDefinitionBinding');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      const taskDefinition = findExtension(element, 'zeebe:TaskDefinition');
+
+      // then
+      expect(taskDefinition).to.exist;
+      expect(taskDefinition.get('type')).to.equal('job-type');
+    }));
+
+
     it('should handle <zeebe:input>', inject(function(templateElementFactory) {
 
       // given

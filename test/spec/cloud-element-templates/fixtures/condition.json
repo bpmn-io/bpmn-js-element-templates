@@ -72,7 +72,8 @@
       "type": "String",
       "value": "nameProp=foobar",
       "binding": {
-        "type": "zeebe:taskDefinition:type"
+        "type": "zeebe:taskDefinition",
+        "property": "type"
       },
       "condition": {
         "property": "nameProp",
