@@ -58,6 +58,11 @@
       <bpmn:messageEventDefinition id="MessageEventDefinition_1hzq0o7" />
     </bpmn:intermediateCatchEvent>
     <bpmn:serviceTask id="ValidatedConditionalTask" name="Validated Conditional Task" />
+    <bpmn:serviceTask id="TaskDefinition" name="Task Definition" zeebe:modelerTemplate="taskDefinitionTemplate">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="http" retries="5" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:message id="Message" name="name">
     <bpmn:extensionElements>
@@ -121,6 +126,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0c7o61daaa_di" bpmnElement="ValidatedConditionalTask">
         <dc:Bounds x="760" y="480" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0tg2czn_di" bpmnElement="TaskDefinition">
+        <dc:Bounds x="620" y="80" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

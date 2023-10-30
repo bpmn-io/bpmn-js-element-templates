@@ -21,11 +21,16 @@ import {
   PROPERTY_BINDING_TYPES,
   TASK_DEFINITION_TYPES,
   ZEEBE_TASK_DEFINITION_TYPE_TYPE,
+  ZEEBE_TASK_DEFINITION,
   ZEBBE_INPUT_TYPE,
   ZEEBE_OUTPUT_TYPE,
   ZEEBE_PROPERTY_TYPE,
   ZEEBE_TASK_HEADER_TYPE
 } from './bindingTypes';
+
+import {
+  getTaskDefinitionPropertyName
+} from './taskDefinition';
 
 import {
   findExtension,
@@ -41,7 +46,7 @@ import {
 import {
   createInputParameter,
   createOutputParameter,
-  createTaskDefinitionWithType,
+  createTaskDefinition,
   createTaskHeader,
   createZeebeProperty,
   shouldUpdate
@@ -66,6 +71,7 @@ export function getPropertyValue(element, property, scope) {
 
   const {
     name,
+    property: bindingProperty,
     type
   } = binding;
 
@@ -88,6 +94,8 @@ export function getPropertyValue(element, property, scope) {
     if (taskDefinition) {
       if (type === ZEEBE_TASK_DEFINITION_TYPE_TYPE) {
         return taskDefinition.get('type');
+      } else if (type === ZEEBE_TASK_DEFINITION) {
+        return taskDefinition.get(bindingProperty);
       }
     }
 
@@ -313,26 +321,36 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
 
   // zeebe:taskDefinition
   if (TASK_DEFINITION_TYPES.includes(type)) {
-    const oldTaskDefinition = findExtension(extensionElements, 'zeebe:TaskDefinition');
+    const oldTaskDefinition = findExtension(extensionElements, 'zeebe:TaskDefinition'),
+          propertyName = getTaskDefinitionPropertyName(binding),
+          properties = {
+            [ propertyName ]: value || ''
+          };
 
-    let newTaskDefinition;
-
-    if (type === ZEEBE_TASK_DEFINITION_TYPE_TYPE) {
-      newTaskDefinition = createTaskDefinitionWithType(value, bpmnFactory);
+    if (oldTaskDefinition) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          properties,
+          moddleElement: oldTaskDefinition
+        }
+      });
     } else {
-      throw unknownBindingError(element, property);
+      const newTaskDefinition = createTaskDefinition(properties, bpmnFactory);
+      newTaskDefinition.$parent = businessObject;
+
+      const values = extensionElements.get('values');
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...values, newTaskDefinition ] }
+        }
+      });
     }
-
-    const values = extensionElements.get('values').filter((value) => value !== oldTaskDefinition);
-
-    commands.push({
-      cmd: 'element.updateModdleProperties',
-      context: {
-        ...context,
-        moddleElement: extensionElements,
-        properties: { values: [ ...values, newTaskDefinition ] }
-      }
-    });
   }
 
   if (IO_BINDING_TYPES.includes(type)) {
@@ -565,14 +583,38 @@ export function unsetProperty(commandStack, element, property) {
   if (TASK_DEFINITION_TYPES.includes(type)) {
     const oldTaskDefinition = findExtension(extensionElements, 'zeebe:TaskDefinition');
 
-    commands.push({
-      cmd: 'element.updateModdleProperties',
-      context: {
-        ...context,
-        moddleElement: extensionElements,
-        properties: { values:  without(extensionElements.get('values'), oldTaskDefinition) }
+    const propertyName = getTaskDefinitionPropertyName(binding);
+
+    if (oldTaskDefinition) {
+
+      if (isOnlyProperty(oldTaskDefinition, propertyName)) {
+
+        // remove task definition
+        commands.push({
+          cmd: 'element.updateModdleProperties',
+          context: {
+            ...context,
+            moddleElement: extensionElements,
+            properties: {
+              values: without(extensionElements.get('values'), oldTaskDefinition)
+            }
+          }
+        });
+      } else {
+
+        // remove property
+        commands.push({
+          cmd: 'element.updateModdleProperties',
+          context: {
+            ...context,
+            moddleElement: oldTaskDefinition,
+            properties: {
+              [ propertyName ]: undefined
+            }
+          }
+        });
       }
-    });
+    }
   }
 
 
@@ -828,4 +870,12 @@ function isEmpty(value) {
 
 function matchesPattern(string, pattern) {
   return new RegExp(pattern).test(string);
+}
+
+function isOnlyProperty(moddleElement, propertyName) {
+  const descriptor = moddleElement.$descriptor;
+
+  return descriptor.properties.every(({ name }) => {
+    return propertyName === name || moddleElement.get(name) === undefined;
+  });
 }

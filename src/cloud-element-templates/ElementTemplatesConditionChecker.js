@@ -6,7 +6,7 @@ import { isObject } from 'min-dash';
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 
 import { setPropertyValue, unsetProperty } from './util/propertyUtil';
-import { MESSAGE_BINDING_TYPES } from './util/bindingTypes';
+import { MESSAGE_BINDING_TYPES, ZEEBE_TASK_DEFINITION, ZEEBE_TASK_DEFINITION_TYPE_TYPE } from './util/bindingTypes';
 import { removeMessage } from './util/rootElementUtil';
 
 /**
@@ -104,14 +104,14 @@ function getMissingProperties(sourceTemplate, targetTemplate) {
 
 function compareProps(sourceProp, targetProp) {
   return (
-    equals(sourceProp.binding, targetProp.binding) &&
+    areBindingsEqual(sourceProp.binding, targetProp.binding) &&
     equals(sourceProp.condition, targetProp.condition)
   );
 }
 
 function findPropertyWithBinding(template, prop1) {
   return template.properties.some(
-    prop2 => equals(prop1.binding, prop2.binding)
+    prop2 => areBindingsEqual(prop1.binding, prop2.binding)
   );
 }
 
@@ -138,6 +138,28 @@ function normalizeReplacer(key, value) {
   }
 
   return value;
+}
+
+function areBindingsEqual(binding1, binding2) {
+  binding1 = normalizeBinding(binding1);
+  binding2 = normalizeBinding(binding2);
+
+  return equals(binding1, binding2);
+}
+
+/**
+ * Convert deprecated binding type to new type.
+ */
+function normalizeBinding(binding) {
+  if (binding.type === ZEEBE_TASK_DEFINITION_TYPE_TYPE) {
+    return {
+      ...binding,
+      type: ZEEBE_TASK_DEFINITION,
+      property: 'type'
+    };
+  }
+
+  return binding;
 }
 
 function equals(a, b) {

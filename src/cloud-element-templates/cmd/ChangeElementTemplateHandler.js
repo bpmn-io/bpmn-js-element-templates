@@ -13,7 +13,7 @@ import {
 import {
   createInputParameter,
   createOutputParameter,
-  createTaskDefinitionWithType,
+  createTaskDefinition,
   createTaskHeader,
   createZeebeProperty,
   shouldUpdate
@@ -29,8 +29,13 @@ import { applyConditions } from '../Condition';
 
 import {
   MESSAGE_PROPERTY_TYPE,
-  MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE
+  MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
+  TASK_DEFINITION_TYPES
 } from '../util/bindingTypes';
+
+import {
+  getTaskDefinitionPropertyName
+} from '../util/taskDefinition';
 
 import {
   createElement,
@@ -201,7 +206,7 @@ export default class ChangeElementTemplateHandler {
       const newBinding = newProperty.binding,
             newBindingType = newBinding.type;
 
-      return newBindingType === 'zeebe:taskDefinition:type';
+      return TASK_DEFINITION_TYPES.includes(newBindingType);
     });
 
     // (1) do not override old task definition if no new properties specified
@@ -213,27 +218,18 @@ export default class ChangeElementTemplateHandler {
 
     newProperties.forEach((newProperty) => {
       const oldProperty = findOldProperty(oldTemplate, newProperty),
-            oldBinding = oldProperty && oldProperty.binding,
-            oldBindingType = oldBinding && oldBinding.type,
             oldTaskDefinition = findBusinessObject(businessObject, newProperty),
             newPropertyValue = getDefaultValue(newProperty),
             newBinding = newProperty.binding,
-            newBindingType = newBinding.type;
+            propertyName = getTaskDefinitionPropertyName(newBinding);
 
       // (2) update old task definition
       if (oldTaskDefinition) {
 
         if (!shouldKeepValue(oldTaskDefinition, oldProperty, newProperty)) {
-
-          // TODO(pinussilvestrus): for now we only support <type>
-          // this needs to be adjusted once we support more
-          let properties = {};
-
-          if (oldBindingType === 'zeebe:taskDefinition:type' || !oldBindingType) {
-            properties = {
-              type: newPropertyValue
-            };
-          }
+          const properties = {
+            [propertyName]: newPropertyValue
+          };
 
           commandStack.execute('element.updateModdleProperties', {
             element,
@@ -245,13 +241,11 @@ export default class ChangeElementTemplateHandler {
 
       // (3) add new task definition
       else {
-        let newTaskDefinition;
+        const properties = {
+          [propertyName]: newPropertyValue
+        };
 
-        // TODO(pinussilvestrus): for now we only support <type>
-        // this needs to be adjusted once we support more
-        if (newBindingType === 'zeebe:taskDefinition:type') {
-          newTaskDefinition = createTaskDefinitionWithType(newPropertyValue, bpmnFactory);
-        }
+        const newTaskDefinition = createTaskDefinition(properties, bpmnFactory);
 
         newTaskDefinition.$parent = businessObject;
 
@@ -827,7 +821,7 @@ function findBusinessObject(element, property) {
   const binding = property.binding,
         bindingType = binding.type;
 
-  if (bindingType === 'zeebe:taskDefinition:type') {
+  if (TASK_DEFINITION_TYPES.includes(bindingType)) {
     return findExtension(businessObject, 'zeebe:TaskDefinition');
   }
 
@@ -904,12 +898,13 @@ export function findOldProperty(oldTemplate, newProperty) {
     });
   }
 
-  if (newBindingType === 'zeebe:taskDefinition:type') {
+  if (TASK_DEFINITION_TYPES.includes(newBindingType)) {
     return find(oldProperties, function(oldProperty) {
       const oldBinding = oldProperty.binding,
-            oldBindingType = oldBinding.type;
+            oldPropertyName = getTaskDefinitionPropertyName(oldBinding),
+            newPropertyName = getTaskDefinitionPropertyName(newBinding);
 
-      return oldBindingType === 'zeebe:taskDefinition:type';
+      return oldPropertyName === newPropertyName;
     });
   }
 
@@ -1059,8 +1054,8 @@ function getPropertyValue(element, property) {
     return businessObject.get(bindingName);
   }
 
-  if (bindingType === 'zeebe:taskDefinition:type') {
-    return businessObject.get('zeebe:type');
+  if (TASK_DEFINITION_TYPES.includes(bindingType)) {
+    return businessObject.get(getTaskDefinitionPropertyName(binding));
   }
 
   if (bindingType === 'zeebe:input') {

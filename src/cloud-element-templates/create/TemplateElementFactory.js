@@ -5,7 +5,7 @@ import {
 import { find } from 'min-dash';
 
 import PropertyBindingProvider from './PropertyBindingProvider';
-import TaskDefinitionTypeBindingProvider from './TaskDefinitionTypeBindingProvider';
+import TaskDefinitionBindingProvider from './TaskDefinitionBindingProvider';
 import InputBindingProvider from './InputBindingProvider';
 import OutputBindingProvider from './OutputBindingProvider';
 import TaskHeaderBindingProvider from './TaskHeaderBindingProvider';
@@ -18,6 +18,7 @@ import {
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   PROPERTY_TYPE,
   ZEEBE_TASK_DEFINITION_TYPE_TYPE,
+  ZEEBE_TASK_DEFINITION,
   ZEBBE_INPUT_TYPE,
   ZEEBE_OUTPUT_TYPE,
   ZEEBE_TASK_HEADER_TYPE,
@@ -36,7 +37,8 @@ export default class TemplateElementFactory {
 
     this._providers = {
       [PROPERTY_TYPE]: PropertyBindingProvider,
-      [ZEEBE_TASK_DEFINITION_TYPE_TYPE]: TaskDefinitionTypeBindingProvider,
+      [ZEEBE_TASK_DEFINITION_TYPE_TYPE]: TaskDefinitionBindingProvider,
+      [ZEEBE_TASK_DEFINITION]: TaskDefinitionBindingProvider,
       [ZEBBE_PROPERTY_TYPE]: ZeebePropertiesProvider,
       [ZEBBE_INPUT_TYPE]: InputBindingProvider,
       [ZEEBE_OUTPUT_TYPE]: OutputBindingProvider,
