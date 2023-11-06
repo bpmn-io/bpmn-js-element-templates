@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.7.0
+
+* `FEAT`: support `zeebe:taskDefinition` binding ([#29](https://github.com/bpmn-io/bpmn-js-element-templates/pull/29))
+
 ## 1.6.1
 
 * `FIX`: display multi-instance configuration in properties panel
