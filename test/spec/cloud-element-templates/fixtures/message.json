@@ -60,5 +60,63 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Message Event Template",
+    "id": "messageEventTemplateReceiveTask",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ReceiveTask"
+    },
+    "properties": [
+      {
+        "type": "String",
+        "value": "Message Event",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        }
+      },
+      {
+        "type": "Hidden",
+        "value": "hiddenName",
+        "binding": {
+          "type": "bpmn:Message#property",
+          "name": "name"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Message Event Template",
+    "id": "messageEventSubscriptionTemplateReceiveTask",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ReceiveTask"
+    },
+    "properties": [
+      {
+        "type": "String",
+        "value": "Message Event",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        }
+      },
+      {
+        "type": "Hidden",
+        "value": "=correlationKey",
+        "binding": {
+          "type": "bpmn:Message#zeebe:subscription#property",
+          "name": "correlationKey"
+        }
+      }
+    ]
   }
 ]
