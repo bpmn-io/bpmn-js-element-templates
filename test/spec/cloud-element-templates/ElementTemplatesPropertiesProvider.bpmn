@@ -9,7 +9,7 @@
     <bpmn:serviceTask id="Deprecated" name="Deprecated" zeebe:modelerTemplate="deprecated" />
     <bpmn:serviceTask id="Deprecated_Upgrade" name="Deprecated_Upgrade" zeebe:modelerTemplate="deprecated-upgrade" zeebe:modelerTemplateVersion="0" />
     <bpmn:intermediateCatchEvent id="Event_1">
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0qov42h" messageRef="Message_1"/>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0qov42h" messageRef="Message_1" />
     </bpmn:intermediateCatchEvent>
     <bpmn:intermediateCatchEvent id="Event_18wfkz8" zeebe:modelerTemplate="messageTemplate">
       <bpmn:messageEventDefinition id="MessageEventDefinition_0dgmqz0" messageRef="Message_1" />

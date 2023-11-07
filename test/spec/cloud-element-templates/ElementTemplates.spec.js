@@ -405,6 +405,24 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should create message (Send Task)', inject(function(elementTemplates) {
+
+      // given
+      const template = messageTemplates[3];
+
+      // when
+      const element = elementTemplates.createElement(template);
+
+      const businessObject = getBusinessObject(element);
+
+      // then
+      const message = businessObject.get('messageRef');
+
+      expect(message).to.exist;
+      expect(message.get('name')).to.eql('hiddenName');
+    }));
+
+
     it('should create message subscription', inject(function(elementTemplates) {
 
       // given
@@ -418,6 +436,27 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       // then
       const message = eventDefinitions[0].get('messageRef');
+
+      expect(message).to.exist;
+
+      const subscription = findExtension(message, 'zeebe:Subscription');
+      expect(subscription).to.exist;
+      expect(subscription.get('correlationKey')).to.eql('=correlationKey');
+    }));
+
+
+    it('should create message subscription (Send Task)', inject(function(elementTemplates) {
+
+      // given
+      const template = messageTemplates[3];
+
+      // when
+      const element = elementTemplates.createElement(template);
+
+      const businessObject = getBusinessObject(element);
+
+      // then
+      const message = businessObject.get('messageRef');
 
       expect(message).to.exist;
 

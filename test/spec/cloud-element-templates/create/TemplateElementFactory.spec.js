@@ -408,6 +408,22 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
     }));
 
 
+    it('should handle <bpmn:Message#property> (Receive Task)', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('messageEventTemplateReceiveTask');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+      const bo = getBusinessObject(element);
+      const message = bo.get('messageRef');
+
+      // then
+      expect(message).to.exist;
+      expect(message).to.have.property('name', 'hard-coded');
+    }));
+
+
     it('should handle <bpmn:Message#zeebe:subscription>', inject(function(templateElementFactory) {
 
       // given
@@ -419,6 +435,26 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
 
       const eventDefinition = bo.get('eventDefinitions')[0];
       const message = eventDefinition.get('messageRef');
+      const subscription = findExtension(message, 'zeebe:Subscription');
+
+      // then
+      expect(subscription).to.exist;
+      expect(subscription).to.jsonEqual({
+        $type: 'zeebe:Subscription',
+        correlationKey: '=variable'
+      });
+    }));
+
+
+    it('should handle <bpmn:Message#zeebe:subscription> (Receive Task)', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('messageEventSubscriptionTemplateReceiveTask');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+      const bo = getBusinessObject(element);
+      const message = bo.get('messageRef');
       const subscription = findExtension(message, 'zeebe:Subscription');
 
       // then

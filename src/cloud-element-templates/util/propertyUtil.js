@@ -772,7 +772,7 @@ export function unsetProperty(commandStack, element, property) {
     });
   }
 
-  // bpmn:Message#property
+  // bpmn:Message#zeebe:subscription#property
   if (type === MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE) {
     const subscription = findZeebeSubscription(businessObject);
 
