@@ -38,7 +38,17 @@ export function isConditionMet(element, properties, property) {
 }
 
 function isSimpleConditionMet(element, properties, condition) {
-  const { property, equals, oneOf } = condition;
+  const { property, equals, oneOf, isActive } = condition;
+
+  if (typeof isActive !== 'undefined') {
+    const relatedCondition = properties.find(p => p.id === property);
+
+    if (!relatedCondition) {
+      return !isActive;
+    }
+
+    return isActive ? isConditionMet(element, properties, relatedCondition) : !isConditionMet(element, properties, relatedCondition);
+  }
 
   const propertyValue = getValue(element, properties, property);
 

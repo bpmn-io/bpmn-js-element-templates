@@ -74,6 +74,9 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
 
         expect(businessObject.get('noDefaultProperty')).to.exist;
         expect(businessObject.get('noDefaultProperty')).to.equal('');
+
+        expect(businessObject.get('isActiveCondition')).to.exist;
+        expect(businessObject.get('isActiveCondition')).to.equal('otherProperty visible');
       })
     );
 
@@ -94,6 +97,7 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
 
         // then
         expect(businessObject.get('customProperty')).to.be.undefined;
+        expect(businessObject.get('isActiveCondition')).to.be.undefined;
       })
     );
 
