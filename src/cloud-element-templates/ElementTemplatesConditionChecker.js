@@ -28,7 +28,10 @@ export default class ElementTemplatesConditionChecker extends CommandInterceptor
     ], this._saveConditionalState, true, this);
 
     this.postExecute([
-      'element.updateProperties', 'element.updateModdleProperties', 'propertiesPanel.zeebe.changeTemplate'
+      'element.updateProperties',
+      'element.updateModdleProperties',
+      'propertiesPanel.zeebe.changeTemplate',
+      'element.move'
     ], this._applyConditions, true, this);
   }
 

@@ -184,6 +184,7 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
           ZeebeBehaviorsModule,
           BpmnPropertiesPanelModule,
           BpmnPropertiesProviderModule,
+          ZeebePropertiesProviderModule,
           CloudElementTemplatesPropertiesProviderModule,
           ElementTemplateChooserModule,
           ElementTemplatesIconsRenderer,
