@@ -1,0 +1,34 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Message Property",
+  "id": "message-correlation-key-rendering",
+  "description": "A conditional template.",
+  "appliesTo": [
+    "bpmn:Event"
+  ],
+  "elementType": {
+    "value": "bpmn:StartEvent",
+    "eventDefinition": "bpmn:MessageEventDefinition"
+  },
+  "properties": [
+    {
+      "label": "name",
+      "type": "Hidden",
+      "value": "one",
+      "binding": {
+        "type": "bpmn:Message#property",
+        "name": "name"
+      }
+    },
+    {
+      "label": "Correlation Key",
+      "id": "correlationKey",
+      "type": "String",
+      "value": "correlationKey",
+      "binding": {
+        "type": "bpmn:Message#zeebe:subscription#property",
+        "name": "correlationKey"
+      }
+    }
+  ]
+}

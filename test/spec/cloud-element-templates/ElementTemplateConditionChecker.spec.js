@@ -1,7 +1,9 @@
 import TestContainer from 'mocha-test-container-support';
+import { act } from '@testing-library/preact';
 
 import {
   bootstrapModeler,
+  bootstrapPropertiesPanel,
   inject
 } from 'test/TestHelper';
 
@@ -16,14 +18,18 @@ import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 
 import diagramXML from './fixtures/condition.bpmn';
 import messageDiagramXML from './fixtures/condition-message.bpmn';
+import messageCorrelationDiagramXML from './fixtures/message-correlation-key.bpmn';
 
 import template from './fixtures/condition.json';
 import messageTemplates from './fixtures/condition-message.json';
+import messageCorrelationTemplate from './fixtures/message-correlation-key.json';
+
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { findExtension, findMessage, findZeebeSubscription } from 'src/cloud-element-templates/Helper';
 import ElementTemplatesConditionChecker from 'src/cloud-element-templates/ElementTemplatesConditionChecker';
 import { getBpmnJS } from 'bpmn-js/test/helper';
 import { isString } from 'min-dash';
+import { query as domQuery } from 'min-dom';
 
 
 describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', function() {
@@ -913,6 +919,60 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
     beforeEach(inject(function(elementTemplates) {
       elementTemplates.set([ template ]);
     }));
+
+
+    describe('correlationKey visibility', function() {
+
+      beforeEach(bootstrapPropertiesPanel(messageCorrelationDiagramXML, {
+        container: container,
+        modules: [
+          coreModule,
+          elementTemplatesModule,
+          modelingModule,
+          ElementTemplatesConditionChecker,
+          BpmnPropertiesPanelModule,
+          ZeebeBehaviorsModule
+        ],
+        moddleExtensions: {
+          zeebe: zeebeModdlePackage
+        }
+      }));
+
+      beforeEach(inject(function(elementTemplates) {
+        elementTemplates.set([ messageCorrelationTemplate ]);
+      }));
+
+
+      it('should show correlation key - MessageStartSubprocess', inject(async function(elementRegistry, selection) {
+
+        // given
+        let element = elementRegistry.get('MessageStartSubprocess');
+
+        // when
+        element = changeTemplate(element, messageCorrelationTemplate);
+        await act(() => selection.select(element));
+
+        // then
+        const correlationKeyEntry = domQuery('[data-entry-id="custom-entry-message-correlation-key-rendering-1"]', container);
+        expect(correlationKeyEntry).to.exist;
+      }));
+
+
+      it('should NOT show correlation key', inject(async function(elementRegistry, selection) {
+
+        // given
+        let element = elementRegistry.get('MessageStart');
+
+        // when
+        element = changeTemplate(element, messageCorrelationTemplate);
+        await act(() => selection.select(element));
+
+        // then
+        const correlationKeyEntry = domQuery('[data-entry-id="custom-entry-message-correlation-key-rendering-1"]', container);
+        expect(correlationKeyEntry).not.to.exist;
+      }));
+
+    });
 
 
     it('should add conditional entries', inject(async function(elementRegistry) {
