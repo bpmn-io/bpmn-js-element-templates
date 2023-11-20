@@ -29,6 +29,20 @@
       }
     },
     {
+      "id": "isActiveCondition",
+      "label": "Visible if noDefaultProperty is visible",
+      "type": "Hidden",
+      "value": "otherProperty visible",
+      "binding": {
+        "type": "property",
+        "name": "isActiveCondition"
+      },
+      "condition": {
+        "property": "otherProperty",
+        "isActive": true
+      }
+    },
+    {
       "id": "otherProperty2",
       "label": "property",
       "type": "String",
