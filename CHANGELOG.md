@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.8.0
+
+* `FEAT`: support receive and send task message templating ([#30](https://github.com/bpmn-io/bpmn-js-element-templates/pull/30))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@1.5.0`
+
 ## 1.7.0
 
 * `FEAT`: support `zeebe:taskDefinition` binding ([#29](https://github.com/bpmn-io/bpmn-js-element-templates/pull/29))
