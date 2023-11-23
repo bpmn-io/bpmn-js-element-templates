@@ -572,6 +572,20 @@ export function unsetProperty(commandStack, element, property) {
     }
   }
 
+  // property
+  if (PROPERTY_BINDING_TYPES.includes(type)) {
+    const { name } = binding;
+
+    commands.push({
+      cmd: 'element.updateModdleProperties',
+      context: {
+        ...context,
+        moddleElement: businessObject,
+        properties: { [ name ]: undefined }
+      }
+    });
+  }
+
 
   if (EXTENSION_BINDING_TYPES.includes(type)) {
     extensionElements = businessObject.get('extensionElements');
