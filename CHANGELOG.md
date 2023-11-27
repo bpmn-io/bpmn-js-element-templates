@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.9.1
+
+* `FIX`: disallow subscription binding for `bpmn:SendTask`
+* `DEPS`: update to `@bpmn-io/element-templates-validator@1.6.1`
+
 ## 1.9.0
 
 * `FEAT`: support `isActive` condition ([#19](https://github.com/bpmn-io/bpmn-js-element-templates/issues/19))
