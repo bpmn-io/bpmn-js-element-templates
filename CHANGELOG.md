@@ -6,6 +6,13 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.9.0
+
+* `FEAT`: support `isActive` condition ([#19](https://github.com/bpmn-io/bpmn-js-element-templates/issues/19))
+* `FEAT`: add conditional correlationKey rendering ([#19](https://github.com/bpmn-io/bpmn-js-element-templates/issues/19))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@1.6.0`
+
+
 ## 1.8.0
 
 * `FEAT`: support receive and send task message templating ([#30](https://github.com/bpmn-io/bpmn-js-element-templates/pull/30))
