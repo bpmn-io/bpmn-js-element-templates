@@ -36,10 +36,10 @@ export default class ElementTemplatesConditionChecker extends CommandInterceptor
 
     // Apply Conditions before changing properties. This persists the template so we can check if conditions apply
     // after upgrading the template.
-    this.preExecute([ 'propertiesPanel.zeebe.changeTemplate' ], HIGH_PRIORITY, this._applyCondtions , true, this);
+    this.preExecute([ 'propertiesPanel.zeebe.changeTemplate' ], HIGH_PRIORITY, this._handleTemplateUpgrade, true, this);
   }
 
-  _applyCondtions(context) {
+  _handleTemplateUpgrade(context) {
     const {
       element,
       newTemplate
