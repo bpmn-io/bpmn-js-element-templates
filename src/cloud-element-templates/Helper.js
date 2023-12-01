@@ -143,6 +143,10 @@ export function findMessage(businessObject) {
     businessObject = eventDefinitions[0];
   }
 
+  if (!businessObject) {
+    return;
+  }
+
   return businessObject.get('messageRef');
 }
 

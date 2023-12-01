@@ -21,6 +21,8 @@ import messageDiagramXML from './fixtures/condition-message.bpmn';
 import messageCorrelationDiagramXML from './fixtures/message-correlation-key.bpmn';
 
 import template from './fixtures/condition.json';
+import updateTemplates from './fixtures/condition-update.json';
+
 import messageTemplates from './fixtures/condition-message.json';
 import messageCorrelationTemplate from './fixtures/message-correlation-key.json';
 
@@ -78,8 +80,8 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         // then
         expect(businessObject.get('customProperty')).to.exist;
 
-        expect(businessObject.get('noDefaultProperty')).to.exist;
-        expect(businessObject.get('noDefaultProperty')).to.equal('');
+        // empty values are not persisted in XML
+        expect(businessObject.get('noDefaultProperty')).not.to.exist;
 
         expect(businessObject.get('isActiveCondition')).to.exist;
         expect(businessObject.get('isActiveCondition')).to.equal('otherProperty visible');
@@ -1188,6 +1190,44 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
         expect(rootElements).to.have.lengthOf(initialRootElements.length);
       })
     );
+  });
+
+
+  describe('update template', function() {
+
+    it('should keep property value when condition property is still active', inject(function(elementRegistry, modeling) {
+
+      // given
+      const element = elementRegistry.get('Task_1');
+      changeTemplate(element, updateTemplates[0]);
+
+      modeling.updateProperties(element, {
+        name: 'foo'
+      });
+
+      const businessObject = getBusinessObject(element);
+
+      // assume
+      expect(businessObject.get('customProperty')).to.exist;
+      expect(businessObject.get('customProperty')).to.eql('defaultValue');
+
+
+      // when
+      modeling.updateProperties(element, {
+        customProperty: 'customValue'
+      });
+
+      // assume
+      expect(businessObject.get('customProperty')).to.eql('customValue');
+
+      // when
+      changeTemplate(element, updateTemplates[1], updateTemplates[0]);
+
+      // then
+      expect(businessObject.get('customProperty')).to.eql('customValue');
+
+    }));
+
   });
 });
 

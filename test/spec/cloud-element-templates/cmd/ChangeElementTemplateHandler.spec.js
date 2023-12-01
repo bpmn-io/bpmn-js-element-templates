@@ -10,6 +10,7 @@ import CoreModule from 'bpmn-js/lib/core';
 import ElementTemplatesModule from 'src/cloud-element-templates';
 import ModelingModule from 'bpmn-js/lib/features/modeling';
 import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
+import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 
 
 import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
@@ -48,7 +49,8 @@ const modules = [
   BpmnPropertiesPanelModule,
   {
     propertiesPanel: [ 'value', { registerProvider() {} } ]
-  }
+  },
+  ZeebeBehaviorsModule
 ];
 
 const moddleExtensions = {
@@ -359,7 +361,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         const newTemplate = require('./task-template-no-properties.json');
 
 
-        it('should not override existing', inject(function(elementRegistry) {
+        it('should remove task definition', inject(function(elementRegistry) {
 
           // given
           const task = elementRegistry.get('Task_1');
@@ -372,8 +374,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
 
-          expect(taskDefinition).to.exist;
-          expect(taskDefinition.get('type')).to.equal('task-type-old');
+          expect(taskDefinition).not.to.exist;
         }));
 
       });
@@ -1498,7 +1499,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
       const newTemplate = require('./event-template-1.json');
 
-
       it('execute', inject(function(bpmnjs, elementRegistry) {
 
         // given
@@ -1559,6 +1559,24 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(message.get('name')).to.equal('name');
 
         expect(message.$parent).to.equal(bpmnjs.getDefinitions());
+      }));
+
+
+      it('should remove bpmn:Message if bpmn:Message#property not specified', inject(function(bpmnjs, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('Event_1');
+        event = changeTemplate(event, newTemplate);
+
+        // when
+        const emptyTemplate = createTemplate([]);
+        changeTemplate(event, emptyTemplate, newTemplate);
+
+        // then
+        event = elementRegistry.get('Event_1');
+        const message = findMessage(getBusinessObject(event));
+
+        expect(message).not.to.exist;
       }));
 
     });
@@ -1630,6 +1648,55 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(subscription).to.exist;
         expect(subscription.get('correlationKey')).to.equal('correlationKey');
       }));
+
+
+      it('should remove message if no Message property is set', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('Event_1');
+
+        const emptyTemplate = createTemplate([]);
+        event = changeTemplate(event, newTemplate);
+
+        // when
+        changeTemplate(event, emptyTemplate, newTemplate);
+
+        // then
+        event = elementRegistry.get('Event_1');
+
+        const message = findMessage(getBusinessObject(event));
+        expect(message).not.to.exist;
+      }));
+
+
+      it('should remove Subscription if no subscription property is set', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('Event_1');
+
+        const noSubscription = createTemplate({
+          'value': 'foobar',
+          'binding': {
+            'type': 'bpmn:Message#property',
+            'name': 'name'
+          }
+        });
+
+        event = changeTemplate(event, newTemplate);
+
+        // when
+        changeTemplate(event, noSubscription, newTemplate);
+
+        // then
+        event = elementRegistry.get('Event_1');
+
+        const message = findMessage(getBusinessObject(event));
+        const subscription = findZeebeSubscription(message);
+
+        expect(message).to.exist;
+        expect(subscription).not.to.exist;
+      }));
+
     });
 
 
@@ -1867,7 +1934,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         beforeEach(bootstrap(require('./task.bpmn').default));
 
-
         it('property changed', inject(function(elementRegistry) {
 
           // given
@@ -1941,6 +2007,34 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           expect(name).to.exist;
           expect(name).to.equal('task-new-name');
+        }));
+
+
+        it('property removed', inject(function(elementRegistry) {
+
+          // given
+          const task = elementRegistry.get('Task_1'),
+                businessObject = getBusinessObject(task);
+
+          const oldTemplate = createTemplate({
+            value: 'task-old-name',
+            binding: {
+              type: 'property',
+              name: 'name'
+            }
+          });
+
+          const newTemplate = createTemplate([]);
+
+          changeTemplate('Task_1', oldTemplate);
+
+          // when
+          changeTemplate('Task_1', newTemplate, oldTemplate);
+
+          // then
+          const name = businessObject.get('bpmn:name');
+
+          expect(name).not.to.exist;
         }));
 
       });
