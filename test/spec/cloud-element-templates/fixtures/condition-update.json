@@ -1,0 +1,75 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Condition",
+    "id": "example.com.condition",
+    "version": "1",
+    "description": "A conditional template.",
+    "appliesTo": ["bpmn:Task"],
+    "properties": [
+      {
+        "id": "nameProp",
+        "label": "name",
+        "type": "String",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        }
+      },
+      {
+        "id": "otherProperty",
+        "label": "property",
+        "type": "String",
+        "value": "defaultValue",
+        "binding": {
+          "type": "property",
+          "name": "customProperty"
+        },
+        "condition": {
+          "type": "simple",
+          "property": "nameProp",
+          "oneOf": [
+            "foo"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Condition",
+    "version": "2",
+    "id": "example.com.condition",
+    "description": "A conditional template.",
+    "appliesTo": ["bpmn:Task"],
+    "properties": [
+      {
+        "id": "nameProp",
+        "label": "name",
+        "type": "String",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        }
+      },
+      {
+        "id": "otherProperty",
+        "label": "property",
+        "type": "String",
+        "value": "defaultValue",
+        "binding": {
+          "type": "property",
+          "name": "customProperty"
+        },
+        "condition": {
+          "type": "simple",
+          "property": "nameProp",
+          "oneOf": [
+            "foo",
+            "bar"
+          ]
+        }
+      }
+    ]
+  }
+]

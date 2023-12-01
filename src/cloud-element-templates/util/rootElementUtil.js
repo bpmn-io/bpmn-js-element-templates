@@ -36,6 +36,11 @@ export function removeMessage(element, injector) {
 
   const bo = getReferringElement(element);
 
+  // Event does not have an event definition
+  if (!bo) {
+    return;
+  }
+
   const message = findMessage(bo);
 
   if (!message) {

@@ -5,9 +5,9 @@ import {
 import { isObject } from 'min-dash';
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 
-import { setPropertyValue, unsetProperty } from './util/propertyUtil';
-import { MESSAGE_BINDING_TYPES, ZEEBE_TASK_DEFINITION, ZEEBE_TASK_DEFINITION_TYPE_TYPE } from './util/bindingTypes';
-import { removeMessage } from './util/rootElementUtil';
+import { ZEEBE_TASK_DEFINITION, ZEEBE_TASK_DEFINITION_TYPE_TYPE } from './util/bindingTypes';
+
+const HIGH_PRIORITY = 2500;
 
 /**
  * Checks the conditions of an element template and sets/resets the
@@ -33,6 +33,23 @@ export default class ElementTemplatesConditionChecker extends CommandInterceptor
       'propertiesPanel.zeebe.changeTemplate',
       'element.move'
     ], this._applyConditions, true, this);
+
+    // Apply Conditions before changing properties. This persists the template so we can check if conditions apply
+    // after upgrading the template.
+    this.preExecute([ 'propertiesPanel.zeebe.changeTemplate' ], HIGH_PRIORITY, this._applyCondtions , true, this);
+  }
+
+  _applyCondtions(context) {
+    const {
+      element,
+      newTemplate
+    } = context;
+
+    if (!element || !newTemplate) {
+      return;
+    }
+
+    context.newTemplate = applyConditions(context.element, context.newTemplate);
   }
 
   _saveConditionalState(context) {
@@ -52,10 +69,19 @@ export default class ElementTemplatesConditionChecker extends CommandInterceptor
   _applyConditions(context) {
     const {
       element,
-      oldTemplate
+      hints = {}
     } = context;
 
+
+    if (hints.skipConditionUpdate) {
+      return;
+    }
+
     const template = this._elementTemplates.get(element);
+
+    // New Template is persisted before applying default values,
+    // new conditions might apply after the defaults are present.
+    const oldTemplate = context.oldTemplate || context.newTemplate;
 
     if (!template || !oldTemplate || template.id !== oldTemplate.id) {
       return;
@@ -63,24 +89,18 @@ export default class ElementTemplatesConditionChecker extends CommandInterceptor
 
     const newTemplate = applyConditions(element, template);
 
-    const propertiesToAdd = getMissingProperties(oldTemplate, newTemplate);
-    const propertiesToRemove = getPropertiesToRemove(newTemplate, oldTemplate);
-
-    this._updateReferencedElement(element, oldTemplate, newTemplate);
-
-    propertiesToAdd.forEach(property =>
-      setPropertyValue(this._bpmnFactory, this._commandStack, element, property, property.value)
-    );
-
-    propertiesToRemove.forEach(property =>
-      unsetProperty(this._commandStack, element, property)
-    );
-  }
-
-  _updateReferencedElement(element, oldTemplate, newTemplate) {
-    if (hasMessageProperties(oldTemplate) && !hasMessageProperties(newTemplate)) {
-      removeMessage(element, this._injector);
+    if (!hasDifferentPropertyBindings(newTemplate, oldTemplate)) {
+      return;
     }
+
+    const changeContext = {
+      element,
+      newTemplate,
+      oldTemplate,
+      hints: { skipConditionUpdate: true }
+    };
+
+    this._commandStack.execute('propertiesPanel.zeebe.changeTemplate', changeContext);
   }
 }
 
@@ -95,6 +115,28 @@ ElementTemplatesConditionChecker.$inject = [
 
 
 // helpers
+
+function hasDifferentPropertyBindings(sourceTemplate, targetTemplate) {
+  return hasNewProperties(sourceTemplate, targetTemplate) || hasRemovedProperties(sourceTemplate, targetTemplate);
+}
+
+function hasNewProperties(sourceTemplate, targetTemplate) {
+  let properties = targetTemplate.properties;
+
+  return properties.some(targetProp =>!(
+    sourceTemplate.properties.find(sourceProp => compareProps(sourceProp, targetProp))
+  ));
+}
+
+function hasRemovedProperties(oldTemplate, newTemplate) {
+  const oldProperties = getMissingProperties(newTemplate, oldTemplate);
+
+  // ensure XML properties are mantained for properties with
+  // different conditions but same bindings
+  return oldProperties.some(property =>
+    !findPropertyWithBinding(newTemplate, property)
+  );
+}
 
 function getMissingProperties(sourceTemplate, targetTemplate) {
 
@@ -115,16 +157,6 @@ function compareProps(sourceProp, targetProp) {
 function findPropertyWithBinding(template, prop1) {
   return template.properties.some(
     prop2 => areBindingsEqual(prop1.binding, prop2.binding)
-  );
-}
-
-function getPropertiesToRemove(newTemplate, oldTemplate) {
-  const oldProperties = getMissingProperties(newTemplate, oldTemplate);
-
-  // ensure XML properties are mantained for properties with
-  // different conditions but same bindings
-  return oldProperties.filter(property =>
-    !findPropertyWithBinding(newTemplate, property)
   );
 }
 
@@ -167,8 +199,4 @@ function normalizeBinding(binding) {
 
 function equals(a, b) {
   return JSON.stringify(a, normalizeReplacer) === JSON.stringify(b, normalizeReplacer);
-}
-
-function hasMessageProperties(template) {
-  return template.properties.some(p => MESSAGE_BINDING_TYPES.includes(p.binding.type));
 }
