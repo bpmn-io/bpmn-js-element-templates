@@ -25,7 +25,8 @@ import {
   ZEBBE_INPUT_TYPE,
   ZEEBE_OUTPUT_TYPE,
   ZEEBE_PROPERTY_TYPE,
-  ZEEBE_TASK_HEADER_TYPE
+  ZEEBE_TASK_HEADER_TYPE,
+  ZEEBE_CALLED_ELEMENT
 } from './bindingTypes';
 
 import {
@@ -192,6 +193,13 @@ export function getPropertyValue(element, property, scope) {
     }
 
     return defaultValue;
+  }
+
+  // zeebe:calledElement
+  if (type === ZEEBE_CALLED_ELEMENT) {
+    const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+    return calledElement ? calledElement.get(bindingProperty) : defaultValue;
   }
 
   // should never throw as templates are validated beforehand
@@ -523,6 +531,38 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
           ...context,
           moddleElement: extensionElements,
           properties: { values: [ ...extensionElements.get('values'), subscription ] }
+        }
+      });
+    }
+  }
+
+  // zeebe:calledElement
+  if (type === ZEEBE_CALLED_ELEMENT) {
+    let calledElement = findExtension(element, 'zeebe:CalledElement');
+    const propertyName = binding.property;
+
+    const properties = {
+      [ propertyName ]: value || ''
+    };
+
+    if (calledElement) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: calledElement
+        }
+      });
+    } else {
+      calledElement = createElement('zeebe:CalledElement', properties, extensionElements, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), calledElement ] }
         }
       });
     }

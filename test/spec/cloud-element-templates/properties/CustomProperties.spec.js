@@ -928,6 +928,85 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('zeebe:calledElement', function() {
+
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('CalledElement');
+
+      // then
+      const entry = findEntry('custom-entry-calledElement-0', container),
+            input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('paymentProcess');
+    });
+
+
+    it('should change, setting zeebe:calledElement', async function() {
+
+      // given
+      const element = await expectSelected('CalledElement'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-calledElement-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'anotherProcessId');
+
+      // then
+      const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+      expect(calledElement).to.exist;
+      expect(calledElement).to.have.property('processId', 'anotherProcessId');
+    });
+
+
+    it('should change, creating zeebe:calledElement if non-existing', async function() {
+
+      // given
+      const element = await expectSelected('CalledElement_empty'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-calledElement-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'Called Element');
+
+      // then
+      const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+      expect(calledElement).to.exist;
+      expect(calledElement).to.have.property('processId', 'paymentProcess');
+    });
+
+
+    it('should NOT remove zeebe:calledElement when changed to empty value', inject(async function() {
+
+      // given
+      const event = await expectSelected('CalledElement'),
+            businessObject = getBusinessObject(event);
+
+      // when
+      const entry = findEntry('custom-entry-calledElement-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, '');
+
+      // then
+      const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+      expect(calledElement).to.exist;
+      expect(calledElement).to.have.property('processId', '');
+    }));
+  });
+
+
   describe('types', function() {
 
     describe('Dropdown', function() {

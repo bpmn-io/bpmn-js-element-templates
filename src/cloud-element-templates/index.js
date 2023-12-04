@@ -10,6 +10,7 @@ import ElementTemplatesPropertiesProvider from './ElementTemplatesPropertiesProv
 import UpdateTemplatePropertiesOrder from './UpdateTemplatePropertiesOrder';
 import { ReferencedElementBehavior } from './ReferencedElementBehavior';
 import { GeneratedValueBehavior } from './GeneratedValueBehavior';
+import { CalledElementBehavior } from './CalledElementBehavior';
 
 
 export default {
@@ -25,7 +26,8 @@ export default {
     'elementTemplatesConditionChecker',
     'generatedValueBehavior',
     'referencedElementBehavior',
-    'updateTemplatePropertiesOrder'
+    'updateTemplatePropertiesOrder',
+    'calledElementBehavior'
   ],
   elementTemplates: [ 'type', ElementTemplates ],
   elementTemplatesLoader: [ 'type', ElementTemplatesLoader ],
@@ -34,5 +36,6 @@ export default {
   elementTemplatesConditionChecker: [ 'type', ElementTemplatesConditionChecker ],
   generatedValueBehavior: [ 'type', GeneratedValueBehavior ],
   referencedElementBehavior: [ 'type', ReferencedElementBehavior ],
-  updateTemplatePropertiesOrder: [ 'type', UpdateTemplatePropertiesOrder ]
+  updateTemplatePropertiesOrder: [ 'type', UpdateTemplatePropertiesOrder ],
+  calledElementBehavior: [ 'type', CalledElementBehavior ]
 };

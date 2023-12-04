@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "id": "calledElement",
+  "name": "Payment",
+  "description": "Payment process call activity",
+  "appliesTo": [
+    "bpmn:Task",
+    "bpmn:CallActivity"
+  ],
+  "elementType": {
+    "value": "bpmn:CallActivity"
+  },
+  "properties":[
+    {
+      "type": "Hidden",
+      "value": "paymentProcess",
+      "binding": {
+        "type": "zeebe:calledElement",
+        "property": "processId"
+      }
+    }
+  ]
+}
