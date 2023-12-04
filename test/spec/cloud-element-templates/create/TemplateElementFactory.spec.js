@@ -464,6 +464,28 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
         correlationKey: '=variable'
       });
     }));
+
+
+    it('should handle <zeebe:calledElement>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('calledElement');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const calledElement = findExtension(bo, 'zeebe:CalledElement');
+
+      expect(calledElement).to.exist;
+      expect(calledElement).to.jsonEqual({
+        $type: 'zeebe:CalledElement',
+        propagateAllChildVariables: false,
+        propagateAllParentVariables: false,
+        processId: 'paymentProcess'
+      });
+    }));
   });
 
 

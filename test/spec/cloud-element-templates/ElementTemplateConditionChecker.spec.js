@@ -26,6 +26,8 @@ import updateTemplates from './fixtures/condition-update.json';
 import messageTemplates from './fixtures/condition-message.json';
 import messageCorrelationTemplate from './fixtures/message-correlation-key.json';
 
+import calledElementTemplate from './fixtures/condition-called-element.json';
+
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { findExtension, findMessage, findZeebeSubscription } from 'src/cloud-element-templates/Helper';
 import ElementTemplatesConditionChecker from 'src/cloud-element-templates/ElementTemplatesConditionChecker';
@@ -1103,6 +1105,119 @@ describe('provider/cloud-element-templates - ElementTemplatesConditionChecker', 
       const message = findMessage(getBusinessObject(element));
 
       expect(message.get('zeebe:modelerTemplate')).to.eql(template.id);
+    }));
+
+  });
+
+
+  describe('update zeebe:calledElement', function() {
+
+    it('should add conditional entries', inject(
+      async function(elementRegistry, modeling) {
+
+        // given
+        const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+        const businessObject = getBusinessObject(element);
+
+        // when
+        modeling.updateProperties(element, {
+          name: 'foo'
+        });
+
+        const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+        // then
+        expect(calledElement).to.have.property('processId', 'one');
+      })
+    );
+
+
+    it('should remove conditional entries', inject(
+      async function(elementRegistry, modeling) {
+
+        // given
+        const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+        const businessObject = getBusinessObject(element);
+
+        modeling.updateProperties(element, {
+          name: 'foo'
+        });
+
+        // when
+        modeling.updateProperties(element, {
+          name: ''
+        });
+
+        const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+        // then
+        expect(calledElement).not.to.exist;
+      })
+    );
+
+
+    it('should switch between conditional properties', inject(
+      async function(elementRegistry, modeling) {
+
+        // given
+        const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+        const businessObject = getBusinessObject(element);
+
+        modeling.updateProperties(element, {
+          name: 'foo'
+        });
+
+        // when
+        modeling.updateProperties(element, {
+          name: 'bar'
+        });
+
+        const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+        // then
+        expect(calledElement).to.have.property('processId', 'two');
+      })
+    );
+
+
+    it('undo', inject(function(commandStack, elementRegistry, modeling) {
+
+      // given
+      const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+      const businessObject = getBusinessObject(element);
+
+      modeling.updateProperties(element, {
+        name: 'foo'
+      });
+
+      // when
+      commandStack.undo();
+
+      const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+      // then
+      expect(calledElement).not.to.exist;
+    }));
+
+
+    it('redo', inject(function(commandStack, elementRegistry, modeling) {
+
+      // given
+      const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+      const businessObject = getBusinessObject(element);
+
+      modeling.updateProperties(element, {
+        name: 'foo'
+      });
+      commandStack.undo();
+
+      // when
+      commandStack.redo();
+
+      const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+      // then
+      expect(calledElement).to.have.property('processId', 'one');
     }));
 
   });

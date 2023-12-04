@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_00cqa19" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.9.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_00cqa19" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.16.0">
   <bpmn:process id="Process_1" isExecutable="true">
     <bpmn:serviceTask id="RestTask" name="REST Task" zeebe:modelerTemplate="com.example.rest">
       <bpmn:extensionElements>
@@ -63,6 +63,12 @@
         <zeebe:taskDefinition type="http" retries="5" />
       </bpmn:extensionElements>
     </bpmn:serviceTask>
+    <bpmn:callActivity id="CalledElement" name="Called Element" zeebe:modelerTemplate="calledElement">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="paymentProcess" propagateAllChildVariables="false" propagateAllParentVariables="false" />
+      </bpmn:extensionElements>
+    </bpmn:callActivity>
+    <bpmn:callActivity id="CalledElement_empty" name="Called Element empty" zeebe:modelerTemplate="calledElement" />
   </bpmn:process>
   <bpmn:message id="Message" name="name">
     <bpmn:extensionElements>
@@ -130,6 +136,14 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0tg2czn_di" bpmnElement="TaskDefinition">
         <dc:Bounds x="620" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nfgyhn_di" bpmnElement="CalledElement">
+        <dc:Bounds x="360" y="630" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_di" bpmnElement="CalledElement_empty">
+        <dc:Bounds x="480" y="630" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
