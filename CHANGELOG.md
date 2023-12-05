@@ -9,6 +9,8 @@ ___Note:__ Yet to be released changes appear here._
 ## 1.9.2
 
 * `FIX`: keep custom value on update when the condition was changed ([#32](https://github.com/bpmn-io/bpmn-js-element-templates/issues/32))
+* `FIX`: do not persist empty values when no default is set ([#35](https://github.com/bpmn-io/bpmn-js-element-templates/pull/35))
+* `FIX`: remove task definitions and messages if no properties are present in the template ([#35](https://github.com/bpmn-io/bpmn-js-element-templates/pull/35))
 
 ## 1.9.1
 
