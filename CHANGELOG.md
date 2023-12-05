@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.9.2
+
+* `FIX`: keep custom value on update when the condition was changed ([#32](https://github.com/bpmn-io/bpmn-js-element-templates/issues/32))
+
 ## 1.9.1
 
 * `FIX`: disallow subscription binding for `bpmn:SendTask`
