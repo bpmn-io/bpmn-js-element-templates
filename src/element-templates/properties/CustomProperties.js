@@ -527,11 +527,9 @@ function propertyGetter(element, property, scope) {
       if (camundaInOut) {
         if (type === CAMUNDA_IN_BUSINESS_KEY_TYPE) {
           return camundaInOut.get('camunda:businessKey');
-        } else
-        if (type === CAMUNDA_OUT_TYPE) {
+        } else if (type === CAMUNDA_OUT_TYPE) {
           return camundaInOut.get('camunda:target');
-        } else
-        if (type === CAMUNDA_IN_TYPE) {
+        } else if (type === CAMUNDA_IN_TYPE) {
           const { expression } = binding;
 
           if (expression) {
@@ -868,8 +866,7 @@ function propertySetter(bpmnFactory, commandStack, element, property, scope) {
 
       if (type === CAMUNDA_IN_TYPE) {
         newCamundaInOut = createCamundaIn(binding, value, bpmnFactory);
-      } else
-      if (type === CAMUNDA_OUT_TYPE) {
+      } else if (type === CAMUNDA_OUT_TYPE) {
         newCamundaInOut = createCamundaOut(binding, value, bpmnFactory);
       } else {
         newCamundaInOut = createCamundaInWithBusinessKey(value, bpmnFactory);
