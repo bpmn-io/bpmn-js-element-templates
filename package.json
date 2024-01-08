@@ -60,8 +60,8 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.3",
-    "@babel/plugin-transform-react-jsx": "^7.14.3",
+    "@babel/core": "^7.23.7",
+    "@babel/plugin-transform-react-jsx": "^7.23.4",
     "@bpmn-io/element-template-chooser": "^1.0.0",
     "@bpmn-io/element-template-icon-renderer": "^0.5.1",
     "@bpmn-io/properties-panel": "^3.13.0",
