@@ -107,13 +107,11 @@ export function findCamundaInOut(element, binding) {
     matcher = (element) => {
       return is(element, 'camunda:In') && isInOut(element, binding);
     };
-  } else
-  if (type === 'camunda:out') {
+  } else if (type === 'camunda:out') {
     matcher = (element) => {
       return is(element, 'camunda:Out') && isInOut(element, binding);
     };
-  } else
-  if (type === 'camunda:in:businessKey') {
+  } else if (type === 'camunda:in:businessKey') {
     matcher = (element) => {
       return is(element, 'camunda:In') && 'businessKey' in element;
     };
