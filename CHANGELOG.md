@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.11.0
+
+* `FEAT`: show documentation field for templated elements ([#50](https://github.com/bpmn-io/bpmn-js-element-templates/pull/50))
+
 ## 1.10.0
 
 * `FEAT`: support `zeebe:calledElement` binding ([#37](https://github.com/bpmn-io/bpmn-js-element-templates/pull/37))
