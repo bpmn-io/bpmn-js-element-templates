@@ -7,7 +7,7 @@ import { TextFieldEntry } from '@bpmn-io/properties-panel';
 import {
   findCamundaErrorEventDefinition,
   findExtensions
-} from '../Helper';
+} from '../../Helper';
 
 import { useService } from 'bpmn-js-properties-panel';
 

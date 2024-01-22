@@ -19,8 +19,8 @@ import {
 
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import elementTemplatesModule from 'src/element-templates';
 
-import diagramXML from './fixtures/template-props.bpmn';
-import templates from './fixtures/template-props.json';
+import diagramXML from '../fixtures/template-props.bpmn';
+import templates from '../fixtures/template-props.json';
 
 
 describe('provider/element-templates - TemplateProps', function() {

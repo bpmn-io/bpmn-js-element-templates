@@ -1,6 +1,6 @@
 import Markup from 'preact-markup';
 
-import { sanitizeHTML } from '../../../element-templates/util/sanitize';
+import { sanitizeHTML } from '../../../utils/sanitize';
 
 export function PropertyTooltip(props) {
 

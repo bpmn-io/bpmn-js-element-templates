@@ -1,4 +1,4 @@
-import { sanitizeHTML } from 'src/element-templates/util/sanitize';
+import { sanitizeHTML } from 'src/utils/sanitize';
 
 
 describe('provider/element-template - sanitize', function() {

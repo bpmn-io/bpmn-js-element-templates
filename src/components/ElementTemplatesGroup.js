@@ -12,11 +12,11 @@ import {
   useService
 } from 'bpmn-js-properties-panel';
 
-import { getTemplateId as defaultGetTemplateId } from '../Helper';
+import { getTemplateId as defaultGetTemplateId } from '../element-templates/Helper';
 
 import {
   getVersionOrDateFromTemplate
-} from '../util/templateUtil';
+} from '../utils/templateUtil';
 
 
 /**

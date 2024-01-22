@@ -1,7 +1,7 @@
 import {
   createElementTemplatesGroup,
   TemplateProps
-} from '../../element-templates/components';
+} from '../../components';
 
 import {
   CustomProperties,

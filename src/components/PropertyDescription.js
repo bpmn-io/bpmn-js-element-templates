@@ -1,6 +1,6 @@
 import Markup from 'preact-markup';
 
-import { sanitizeHTML } from '../util/sanitize';
+import { sanitizeHTML } from '../utils/sanitize';
 
 export function PropertyDescription(props) {
 

@@ -1,6 +1,6 @@
 import { useService } from 'bpmn-js-properties-panel';
 
-import { getVersionOrDateFromTemplate } from '../util/templateUtil';
+import { getVersionOrDateFromTemplate } from '../utils/templateUtil';
 
 export function TemplateProps({ element, elementTemplates }) {
   const template = elementTemplates.get(element);

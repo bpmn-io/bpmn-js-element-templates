@@ -5,17 +5,17 @@ import { ToggleSwitchEntry } from '@bpmn-io/properties-panel';
 import {
   findExtension,
   findInputParameter
-} from '../Helper';
+} from '../../Helper';
 
 import { useService } from 'bpmn-js-properties-panel';
 
 import { without } from 'min-dash';
 
-import { createElement } from '../../utils/ElementUtil';
+import { createElement } from '../../../utils/ElementUtil';
 
-import { PropertyDescription } from '../components/PropertyDescription';
+import { PropertyDescription } from '../../../components/PropertyDescription';
 
-import { createInputParameter } from '../CreateHelper';
+import { createInputParameter } from '../../CreateHelper';
 
 
 export function InputProperties(props) {

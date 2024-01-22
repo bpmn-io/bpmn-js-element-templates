@@ -28,9 +28,9 @@ import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-proper
 import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
 
 import diagramXML from './ElementTemplatesPropertiesProvider.bpmn';
-import templates from './fixtures/simple.json';
-import entriesVisibleDiagramXML from './fixtures/entries-visible.bpmn';
-import entriesVisibleTemplates from './fixtures/entries-visible.json';
+import templates from '../fixtures/simple.json';
+import entriesVisibleDiagramXML from '../fixtures/entries-visible.bpmn';
+import entriesVisibleTemplates from '../fixtures/entries-visible.json';
 
 
 describe('provider/element-templates - ElementTemplates', function() {
