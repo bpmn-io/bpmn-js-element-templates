@@ -1,6 +1,6 @@
 import {
   getVersionOrDateFromTemplate
-} from 'src/element-templates/util/templateUtil';
+} from 'src/utils/templateUtil';
 
 import TestContainer from 'mocha-test-container-support';
 
@@ -12,7 +12,7 @@ import modelingModule from 'bpmn-js/lib/features/modeling';
 
 import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
 
-import diagramXML from '../fixtures/template-util.bpmn';
+import diagramXML from './template-util.bpmn';
 
 
 describe('provider/element-template - templateUtil', function() {

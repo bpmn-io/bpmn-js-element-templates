@@ -6,7 +6,7 @@ import {
 
 import { useService } from 'bpmn-js-properties-panel';
 
-import { PropertyDescription } from '../../../element-templates/components/PropertyDescription';
+import { PropertyDescription } from '../../../components/PropertyDescription';
 import { PropertyTooltip } from '../components/PropertyTooltip';
 
 import { getPropertyValue, setPropertyValue, validateProperty } from '../../util/propertyUtil';

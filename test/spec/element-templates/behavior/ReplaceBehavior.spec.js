@@ -1,7 +1,7 @@
 import {
   bootstrapModeler,
   inject
-} from '../../TestHelper';
+} from '../../../TestHelper';
 
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
 import ElementTemplatesModule from 'src/element-templates';
@@ -13,9 +13,9 @@ import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
-import diagramXML from './fixtures/replace-behavior.bpmn';
+import diagramXML from '../fixtures/replace-behavior.bpmn';
 
-import elementTemplates from './fixtures/replace-behavior.json';
+import elementTemplates from '../fixtures/replace-behavior.json';
 
 
 describe('provider/element-templates - ReplaceBehavior', function() {

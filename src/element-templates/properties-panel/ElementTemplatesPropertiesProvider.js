@@ -3,7 +3,7 @@ import { ListGroup } from '@bpmn-io/properties-panel';
 import {
   createElementTemplatesGroup,
   TemplateProps
-} from './components';
+} from '../../components';
 
 import {
   CustomProperties,
@@ -12,7 +12,7 @@ import {
   OutputProperties
 } from './properties';
 
-import { getTemplateId } from './Helper';
+import { getTemplateId } from '../Helper';
 
 const CAMUNDA_ERROR_EVENT_DEFINITION_TYPE = 'camunda:errorEventDefinition',
       CAMUNDA_INPUT_PARAMETER_TYPE = 'camunda:inputParameter',

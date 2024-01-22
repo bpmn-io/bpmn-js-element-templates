@@ -19,7 +19,7 @@ import {
   TextFieldEntry, isTextFieldEntryEdited
 } from '@bpmn-io/properties-panel';
 
-import { PropertyDescription } from '../components/PropertyDescription';
+import { PropertyDescription } from '../../../components/PropertyDescription';
 
 import {
   findCamundaErrorEventDefinition,
@@ -29,12 +29,12 @@ import {
   findExtensions,
   findInputParameter,
   findOutputParameter
-} from '../Helper';
+} from '../../Helper';
 
 import {
   createElement,
   getRoot
-} from '../../utils/ElementUtil';
+} from '../../../utils/ElementUtil';
 
 import {
   createCamundaErrorEventDefinition,
@@ -46,7 +46,7 @@ import {
   createError,
   createInputParameter,
   createOutputParameter
-} from '../CreateHelper';
+} from '../../CreateHelper';
 
 import {
   CAMUNDA_ERROR_EVENT_DEFINITION_TYPE,
@@ -62,7 +62,7 @@ import {
   EXTENSION_BINDING_TYPES,
   IO_BINDING_TYPES,
   IN_OUT_BINDING_TYPES
-} from '../util/bindingTypes';
+} from '../../util/bindingTypes';
 
 const PRIMITIVE_MODDLE_TYPES = [
   'Boolean',
