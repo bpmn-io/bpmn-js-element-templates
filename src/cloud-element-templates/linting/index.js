@@ -1,1 +1,4 @@
-export * from './LinterPlugin';
+export {
+  elementTemplateLintRule,
+  ElementTemplateLinterPlugin
+} from './LinterPlugin';

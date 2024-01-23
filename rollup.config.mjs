@@ -49,6 +49,23 @@ export default [
         ]
       })
     ])
+  },
+  {
+    input: 'src/core.js',
+    output: [
+      {
+        sourcemap: true,
+        format: 'commonjs',
+        file: 'dist/core.js'
+      },
+      {
+        sourcemap: true,
+        format: 'esm',
+        file: 'dist/core.esm.js'
+      }
+    ],
+    external: externalDependencies(),
+    plugins: pgl()
   }
 ];
 
