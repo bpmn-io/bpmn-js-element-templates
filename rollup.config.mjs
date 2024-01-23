@@ -65,12 +65,12 @@ export default [
       }
     ],
     external: externalDependencies(),
-    plugins: pgl()
+    plugins: corePlugins()
   }
 ];
 
 function pgl(plugins = []) {
-  return [
+  return corePlugins([
     ...plugins,
     alias({
       entries: [
@@ -86,7 +86,13 @@ function pgl(plugins = []) {
           'runtime': 'automatic'
         } ]
       ]
-    }),
+    })
+  ]);
+}
+
+function corePlugins(plugins = []) {
+  return [
+    ...plugins,
     json(),
     resolve({
       mainFields: [
