@@ -3,9 +3,7 @@ import {
   is
 } from 'bpmn-js/lib/util/ModelUtil';
 
-import {
-  default as defaultTranslate
-} from 'diagram-js/lib/i18n/translate/translate';
+import defaultTranslate from 'diagram-js/lib/i18n/translate/translate';
 
 import {
   isString,

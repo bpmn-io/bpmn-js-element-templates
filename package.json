@@ -5,6 +5,16 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js"
+    },
+    "./core": {
+      "import": "./dist/core.esm.js",
+      "require": "./dist/core.js"
+    }
+  },
   "scripts": {
     "all": "run-s lint test distro",
     "distro": "run-s build test:build",
