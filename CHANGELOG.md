@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.12.0
+
+* `FEAT`: separate and expose core module ([#52](https://github.com/bpmn-io/bpmn-js-element-templates/pull/52))
+
 ## 1.11.0
 
 * `FEAT`: show documentation field for templated elements ([#50](https://github.com/bpmn-io/bpmn-js-element-templates/pull/50))
