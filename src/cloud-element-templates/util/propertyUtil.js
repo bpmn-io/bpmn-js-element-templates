@@ -853,7 +853,7 @@ export function unsetProperty(commandStack, element, property) {
   }
 }
 
-// TODO(@barmac): fix translate usage
+// TODO(@barmac): fix translate usage (https://github.com/bpmn-io/bpmn-js-element-templates/pull/53#issuecomment-1906203270)
 export function validateProperty(value, property, translate = defaultTranslate) {
   const {
     constraints = {},
