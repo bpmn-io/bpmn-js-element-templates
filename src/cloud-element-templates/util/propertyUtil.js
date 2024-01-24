@@ -3,8 +3,6 @@ import {
   is
 } from 'bpmn-js/lib/util/ModelUtil';
 
-import defaultTranslate from 'diagram-js/lib/i18n/translate/translate';
-
 import {
   isString,
   isUndefined, without
@@ -929,5 +927,14 @@ function isOnlyProperty(moddleElement, propertyName) {
 
   return descriptor.properties.every(({ name }) => {
     return propertyName === name || moddleElement.get(name) === undefined;
+  });
+}
+
+function defaultTranslate(template, replacements) {
+
+  replacements = replacements || {};
+
+  return template.replace(/{([^}]+)}/g, function(_, key) {
+    return replacements[key] || '{' + key + '}';
   });
 }
