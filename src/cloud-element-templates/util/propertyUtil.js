@@ -853,6 +853,7 @@ export function unsetProperty(commandStack, element, property) {
   }
 }
 
+// TODO(@barmac): fix translate usage
 export function validateProperty(value, property, translate = defaultTranslate) {
   const {
     constraints = {},
