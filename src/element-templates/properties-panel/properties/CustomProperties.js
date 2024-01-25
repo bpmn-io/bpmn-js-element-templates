@@ -295,7 +295,8 @@ function DropdownProperty(props) {
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
-        commandStack = useService('commandStack');
+        commandStack = useService('commandStack'),
+        translate = useService('translate');
 
   const getOptions = () => {
     const { choices } = property;
@@ -316,7 +317,8 @@ function DropdownProperty(props) {
     description: PropertyDescription({ description }),
     getValue: propertyGetter(element, property, scope),
     setValue: propertySetter(bpmnFactory, commandStack, element, property, scope),
-    disabled: editable === false
+    disabled: editable === false,
+    validate: propertyValidator(translate, property)
   });
 }
 
@@ -368,7 +370,8 @@ function TextAreaProperty(props) {
 
   const bpmnFactory = useService('bpmnFactory'),
         commandStack = useService('commandStack'),
-        debounce = useService('debounceInput');
+        debounce = useService('debounceInput'),
+        translate = useService('translate');
 
   return TextAreaEntry({
     debounce,
@@ -378,7 +381,8 @@ function TextAreaProperty(props) {
     description: PropertyDescription({ description }),
     getValue: propertyGetter(element, property, scope),
     setValue: propertySetter(bpmnFactory, commandStack, element, property, scope),
-    disabled: editable === false
+    disabled: editable === false,
+    validate: propertyValidator(translate, property)
   });
 }
 

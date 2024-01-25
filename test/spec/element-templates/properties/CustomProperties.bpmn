@@ -51,7 +51,7 @@
     </bpmn:sequenceFlow>
     <bpmn:serviceTask id="DelegateTask" name="Delegate Task" camunda:modelerTemplate="my.custom.ServiceTask" camunda:delegateExpression="com.my.custom.Foo" />
     <bpmn:task id="WebserviceTask_NoData" name="Webservice Task NoData" camunda:modelerTemplate="com.mycompany.WsCaller" />
-    <bpmn:task id="ValidateTask" name="Validate Task" camunda:modelerTemplate="com.validated-inputs.Task" />
+    <bpmn:task id="ValidateTask" camunda:modelerTemplate="com.validated-inputs.Task" />
     <bpmn:callActivity id="CallActivity" name="Call Activity" camunda:modelerTemplate="my.Caller" calledElement="calledProcess">
       <bpmn:extensionElements>
         <camunda:in source="var_local" target="var_called_source" />
