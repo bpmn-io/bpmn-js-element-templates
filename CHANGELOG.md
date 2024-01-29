@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.13.0
+
+* `FEAT`: validate text area and select ([#55](https://github.com/bpmn-io/bpmn-js-element-templates/issues/55))
+* `FIX`: explicitly expose `dist` assets ([#57](https://github.com/bpmn-io/bpmn-js-element-templates/issues/57))
+
 ## 1.12.1
 
 * `FIX`: correctly export the core moduel under `/core` ([#53](https://github.com/bpmn-io/bpmn-js-element-templates/pull/53))
