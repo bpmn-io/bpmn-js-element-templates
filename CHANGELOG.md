@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.13.1
+
+* `FIX`: expose `package.json`
+
 ## 1.13.0
 
 * `FEAT`: validate text area and select ([#55](https://github.com/bpmn-io/bpmn-js-element-templates/issues/55))
