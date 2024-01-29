@@ -15,7 +15,8 @@
       "require": "./dist/core.js"
     },
     "./dist/assets/*.css": "./dist/assets/*.css",
-    "./dist/*.js": "./dist/*.js"
+    "./dist/*.js": "./dist/*.js",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "all": "run-s lint test distro",
