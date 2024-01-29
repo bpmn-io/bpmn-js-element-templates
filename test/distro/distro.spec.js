@@ -7,6 +7,13 @@ const fs = require('fs'),
 
 const DIST_DIR = path.join(__dirname, '../../dist');
 
+const EXPORTS = [
+  'bpmn-js-element-templates',
+  'bpmn-js-element-templates/core',
+  'bpmn-js-element-templates/dist/assets/element-templates.css',
+  'bpmn-js-element-templates/dist/bpmn-js-element-templates.umd.js'
+];
+
 describe('modules', function() {
 
   it('should expose CJS bundle', verifyExists('index.js'));
@@ -16,8 +23,14 @@ describe('modules', function() {
 
 describe('assets', function() {
 
-  it('should expose element templates styles', verifyExists('assets/element-templates.css'));
+  EXPORTS.forEach(function(asset) {
 
+    it(`should expose "${asset}"`, function() {
+
+      expect(() => require.resolve(asset)).not.to.throw();
+    });
+
+  });
 });
 
 function verifyExists(relativePath) {

@@ -13,7 +13,9 @@
     "./core": {
       "import": "./dist/core.esm.js",
       "require": "./dist/core.js"
-    }
+    },
+    "./dist/assets/*.css": "./dist/assets/*.css",
+    "./dist/*.js": "./dist/*.js"
   },
   "scripts": {
     "all": "run-s lint test distro",
@@ -24,7 +26,7 @@
     "lint": "eslint .",
     "dev": "npm test -- --auto-watch --no-single-run",
     "test": "karma start karma.config.js",
-    "test:build": "mocha --reporter=spec --recursive test/distro",
+    "test:build": "mocha --reporter=spec --recursive test/distro/*.spec.js",
     "start": "cross-env SINGLE_START=cloud-templates npm run dev",
     "start:templates": "cross-env SINGLE_START=templates npm run dev",
     "prepare": "run-s bundle"
