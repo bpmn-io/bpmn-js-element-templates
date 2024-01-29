@@ -1,4 +1,4 @@
-const allTests = require.context('.', true, /.spec\.js$/);
+const allTests = require.context('./spec', true, /.spec\.js$/);
 
 allTests.keys().forEach(allTests);
 
