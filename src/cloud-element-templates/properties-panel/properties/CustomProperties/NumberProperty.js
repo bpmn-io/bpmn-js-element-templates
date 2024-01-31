@@ -1,10 +1,12 @@
+import { FeelNumberEntry, NumberFieldEntry } from '@bpmn-io/properties-panel';
 import { useService } from 'bpmn-js-properties-panel';
+import { propertyValidator, usePropertyAccessors } from './util';
 import { PropertyDescription } from '../../../../components/PropertyDescription';
 import { PropertyTooltip } from '../../components/PropertyTooltip';
-import { CheckboxEntry, FeelCheckboxEntry } from '@bpmn-io/properties-panel';
-import { usePropertyAccessors } from './util';
+import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
+import { isNumber } from 'min-dash';
 
-export function BooleanProperty(props) {
+export function NumberProperty(props) {
   const {
     element,
     id,
@@ -15,28 +17,37 @@ export function BooleanProperty(props) {
     description,
     editable,
     label,
-    tooltip,
-    feel
+    feel,
+    tooltip
   } = property;
+
+  const Component = feel === 'optional' ? FeelNumberEntry : NumberFieldEntry;
 
   const bpmnFactory = useService('bpmnFactory'),
         commandStack = useService('commandStack'),
         debounce = useService('debounceInput'),
         translate = useService('translate');
 
-  const Component = feel === 'optional' ? FeelCheckboxEntry : CheckboxEntry;
-
   const [ getValue, setValue ] = usePropertyAccessors(bpmnFactory, commandStack, element, property);
 
+  const validate = useCallback((value) => {
+    if (isNumber(value) && value.toString().includes('e')) {
+      return translate('Scientific Notation is disallowed');
+    }
+
+    const defaultValidator = propertyValidator(translate, property);
+    return defaultValidator(value);
+  }, [ translate, property ]);
+
   return Component({
-    element,
     debounce,
-    translate,
+    element,
     getValue,
     id,
     label,
     description: PropertyDescription({ description }),
     setValue,
+    validate: validate,
     disabled: editable === false,
     tooltip: PropertyTooltip({ tooltip })
   });
