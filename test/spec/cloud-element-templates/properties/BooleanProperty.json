@@ -1,0 +1,77 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "FEEL disabled",
+    "id": "booleanField.feel.disabled",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "BooleanProperty",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "BooleanProperty"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "FEEL required",
+    "id": "booleanField.feel.required",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "BooleanProperty",
+        "type": "Boolean",
+        "feel": "required",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "BooleanProperty"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "FEEL optional",
+    "id": "booleanField.feel.optional",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "BooleanProperty",
+        "type": "Boolean",
+        "feel": "optional",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "BooleanProperty"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "FEEL static",
+    "id": "booleanField.feel.static",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "BooleanProperty",
+        "type": "Boolean",
+        "feel": "static",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "BooleanProperty"
+        }
+      }
+    ]
+  }
+]

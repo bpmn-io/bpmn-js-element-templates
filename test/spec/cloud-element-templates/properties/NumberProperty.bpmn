@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_118jbsm" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.19.0">
+  <bpmn:process id="Process_1gpk8uz" isExecutable="true">
+    <bpmn:serviceTask id="disabled" name="feel disabled" zeebe:modelerTemplate="numberField.feel.disabled" />
+    <bpmn:serviceTask id="required" name="feel required" zeebe:modelerTemplate="numberField.feel.required" />
+    <bpmn:serviceTask id="optional" name="feel optional" zeebe:modelerTemplate="numberField.feel.optional" />
+    <bpmn:serviceTask id="static" name="feel static" zeebe:modelerTemplate="numberField.feel.static" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1gpk8uz">
+      <bpmndi:BPMNShape id="Task_di" bpmnElement="disabled">
+        <dc:Bounds x="160" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1h9vqa4" bpmnElement="required">
+        <dc:Bounds x="160" y="180" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_155y0qk" bpmnElement="optional">
+        <dc:Bounds x="290" y="180" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_07xiqk8" bpmnElement="static">
+        <dc:Bounds x="290" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

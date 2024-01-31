@@ -9,7 +9,8 @@ import {
   isCheckboxEntryEdited,
   isTextAreaEntryEdited,
   isTextFieldEntryEdited,
-  isFeelEntryEdited
+  isFeelEntryEdited,
+  isNumberFieldEntryEdited
 } from '@bpmn-io/properties-panel';
 
 import {
@@ -29,6 +30,7 @@ import { FeelProperty } from './FeelProperty';
 import { FeelTextAreaProperty } from './FeelTextAreaProperty';
 import { DropdownProperty } from './DropdownProperty';
 import { BooleanProperty } from './BooleanProperty';
+import { NumberProperty } from './NumberProperty';
 
 
 const DEFAULT_CUSTOM_GROUP = {
@@ -126,6 +128,24 @@ function createCustomEntry(id, element, property) {
 
   if (!type) {
     type = getDefaultType(property);
+  }
+
+  if (feel === 'required') {
+    return {
+      id,
+      component: FeelProperty,
+      isEdited: isFeelEntryEdited,
+      property
+    };
+  }
+
+  if (type === 'Number') {
+    return {
+      id,
+      component: NumberProperty,
+      isEdited: isNumberFieldEntryEdited,
+      property
+    };
   }
 
   if (type === 'Boolean') {
