@@ -570,7 +570,7 @@ describe('provider/element-templates - Validator', function() {
         templates.addAll(templateDescriptor);
 
         // then
-        expect(errors(templates)).to.contain('template(id: <foo>, name: <Connector>): should be array');
+        expect(errors(templates)).to.contain('template(id: <foo>, name: <Connector>): must be array');
 
         expect(valid(templates)).to.be.empty;
       });

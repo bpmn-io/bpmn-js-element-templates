@@ -266,7 +266,7 @@ export function getSchemaVersion(schemaUri) {
 export function filteredSchemaErrors(schemaErrors) {
   return filter(schemaErrors, (err) => {
     const {
-      dataPath,
+      instancePath,
       keyword
     } = err;
 
@@ -277,7 +277,7 @@ export function filteredSchemaErrors(schemaErrors) {
 
     // (2) data type errors
     // ignore type errors nested in scopes
-    if (keyword === 'type' && dataPath && !dataPath.startsWith('/scopes/')) {
+    if (keyword === 'type' && instancePath && !instancePath.startsWith('/scopes/')) {
       return true;
     }
 
