@@ -428,7 +428,7 @@ describe('provider/cloud-element-templates - Validator', function() {
       templates.addAll(templateDescriptor);
 
       // then
-      expect(errors(templates)).to.contain('template(id: <invalid>, name: <Invalid>): feel is only supported for "String" and "Text" type');
+      expect(errors(templates)).to.contain('template(id: <invalid>, name: <Invalid>): feel is only supported for "String", "Text", "Number" and "Boolean" type');
 
       expect(valid(templates)).to.be.empty;
     });
