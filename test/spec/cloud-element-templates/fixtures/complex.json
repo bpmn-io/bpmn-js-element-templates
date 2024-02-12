@@ -1615,5 +1615,46 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Boolean and Number",
+    "id": "com.zeebe.example.boolean.and.number",
+    "description": "Shows a Boolean and number field as optional FEEL fields",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "label": "Cardholder",
+        "value": "Jon Doe",
+        "type": "String",
+        "feel": "optional",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "name"
+        }
+      },
+      {
+        "label": "Amount",
+        "value": "=10",
+        "type": "Number",
+        "feel": "optional",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "Amount"
+        }
+      },
+      {
+        "label": "Capture",
+        "value": "=false",
+        "type": "Boolean",
+        "feel": "optional",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "capture"
+        }
+      }
+    ]
   }
 ]
