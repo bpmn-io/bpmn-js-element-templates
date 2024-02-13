@@ -9,7 +9,7 @@
     "properties": [
       {
         "id": "name",
-        "type": "Hidden",
+        "type": "String",
         "value": "task-name",
         "binding": {
           "type": "property",
@@ -142,7 +142,7 @@
     ],
     "properties": [
       {
-        "type": "Hidden",
+        "type": "String",
         "value": "foo",
         "id": "parentProp",
         "binding": {

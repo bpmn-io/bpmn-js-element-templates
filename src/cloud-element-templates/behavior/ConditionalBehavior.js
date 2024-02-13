@@ -63,25 +63,20 @@ export default class ConditionalBehavior extends CommandInterceptor {
       return;
     }
 
-    context.oldTemplate = applyConditions(element, template);
+    context.oldTemplateWithConditions = applyConditions(element, template);
   }
 
   _applyConditions(context) {
     const {
-      element,
-      hints = {}
+      element
     } = context;
 
-
-    if (hints.skipConditionUpdate) {
-      return;
-    }
 
     const template = this._elementTemplates.get(element);
 
     // New Template is persisted before applying default values,
     // new conditions might apply after the defaults are present.
-    const oldTemplate = context.oldTemplate || context.newTemplate;
+    const oldTemplate = context.oldTemplateWithConditions || context.newTemplate;
 
     if (!template || !oldTemplate || template.id !== oldTemplate.id) {
       return;
@@ -96,8 +91,7 @@ export default class ConditionalBehavior extends CommandInterceptor {
     const changeContext = {
       element,
       newTemplate,
-      oldTemplate,
-      hints: { skipConditionUpdate: true }
+      oldTemplate
     };
 
     this._commandStack.execute('propertiesPanel.zeebe.changeTemplate', changeContext);
