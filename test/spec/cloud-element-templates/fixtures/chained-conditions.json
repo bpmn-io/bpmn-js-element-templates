@@ -1,0 +1,44 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Condition",
+  "id": "example.com.nested.condition",
+  "description": "A conditional template.",
+  "appliesTo": ["bpmn:Task"],
+  "properties": [
+    {
+      "id": "prop1",
+      "type": "String",
+      "value": "foo",
+      "binding": {
+        "type": "property",
+        "name": "prop1"
+      }
+    },
+    {
+      "id": "prop2",
+      "type": "String",
+      "value": "bar",
+      "binding": {
+        "type": "property",
+        "name": "prop2"
+      },
+      "condition": {
+        "property": "prop1",
+        "equals": "foo"
+      }
+    },
+    {
+      "id": "prop3",
+      "type": "String",
+      "value": "baz",
+      "binding": {
+        "type": "property",
+        "name": "prop3"
+      },
+      "condition": {
+        "property": "prop2",
+        "equals": "bar"
+      }
+    }
+  ]
+}

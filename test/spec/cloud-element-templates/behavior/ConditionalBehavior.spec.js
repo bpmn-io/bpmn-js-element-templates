@@ -22,6 +22,7 @@ import messageCorrelationDiagramXML from '../fixtures/message-correlation-key.bp
 
 import template from '../fixtures/condition.json';
 import updateTemplates from '../fixtures/condition-update.json';
+import chainedConditions from '../fixtures/chained-conditions.json';
 
 import messageTemplates from '../fixtures/condition-message.json';
 import messageCorrelationTemplate from '../fixtures/message-correlation-key.json';
@@ -1342,6 +1343,33 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     }));
 
   });
+
+
+  describe('chained conditional properties', function() {
+
+    it('should apply a chain of dependent conditional properties', inject(function(elementRegistry, modeling) {
+
+      // given
+      const element = elementRegistry.get('Task_1');
+
+      // when
+      changeTemplate(element, chainedConditions);
+
+      // then
+      const businessObject = getBusinessObject(element);
+
+      expect(businessObject.get('prop1')).to.exist;
+      expect(businessObject.get('prop1')).to.eql('foo');
+
+      expect(businessObject.get('prop2')).to.exist;
+      expect(businessObject.get('prop2')).to.eql('bar');
+
+      expect(businessObject.get('prop3')).to.exist;
+      expect(businessObject.get('prop3')).to.eql('baz');
+    }));
+
+  });
+
 });
 
 
