@@ -84,13 +84,14 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
     });
 
 
-    it('should not accept scientific notation', async function() {
+    it('should accept scientific notation', async function() {
 
       // when
       await changeInput(input, '1.23e100');
 
       // then
-      expectError(entry, 'Scientific Notation is disallowed');
+      const errorMessage = domQuery('.bio-properties-panel-error', entry);
+      expect(errorMessage).not.to.exist;
     });
 
   });
@@ -149,7 +150,7 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
       await changeInput(input, '1.23e100');
 
       // then
-      expectError(entry, 'Scientific Notation is disallowed');
+      expectError(entry, 'Scientific notation is disallowed in FEEL.');
     });
 
   });
@@ -193,7 +194,7 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
         await changeInput(input, '1.23e100');
 
         // then
-        expectError(entry, 'Scientific Notation is disallowed');
+        expectError(entry, 'Scientific notation is disallowed in FEEL.');
       });
 
     });

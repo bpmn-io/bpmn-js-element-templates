@@ -1,6 +1,6 @@
 import { FeelNumberEntry, NumberFieldEntry } from '@bpmn-io/properties-panel';
 import { useService } from 'bpmn-js-properties-panel';
-import { propertyValidator, usePropertyAccessors } from './util';
+import { isSpecialFeelProperty, propertyValidator, usePropertyAccessors } from './util';
 import { PropertyDescription } from '../../../../components/PropertyDescription';
 import { PropertyTooltip } from '../../components/PropertyTooltip';
 import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
@@ -31,8 +31,8 @@ export function NumberProperty(props) {
   const [ getValue, setValue ] = usePropertyAccessors(bpmnFactory, commandStack, element, property);
 
   const validate = useCallback((value) => {
-    if (isNumber(value) && value.toString().includes('e')) {
-      return translate('Scientific Notation is disallowed');
+    if (isSpecialFeelProperty(property) && isNumber(value) && value.toString().includes('e')) {
+      return translate('Scientific notation is disallowed in FEEL.');
     }
 
     const defaultValidator = propertyValidator(translate, property);
