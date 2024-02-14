@@ -38,7 +38,7 @@ export function usePropertyAccessors(bpmnFactory, commandStack, element, propert
   return [ get, set ];
 }
 
-const isSpecialFeelProperty = (property) => {
+export const isSpecialFeelProperty = (property) => {
   return [ 'optional', 'static' ].includes(property.feel) && [ 'Boolean', 'Number' ].includes(property.type);
 };
 
