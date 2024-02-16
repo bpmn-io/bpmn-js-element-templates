@@ -170,11 +170,18 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
   (singleStart === 'cloud-templates' ? it.only : it)('should import simple process (cloud-templates)', async function() {
 
     // given
-    const diagramXml = require('test/spec/cloud-element-templates/fixtures/complex.bpmn').default;
+    const diagramXml = (await import('test/spec/cloud-element-templates/fixtures/complex.bpmn')).default;
 
-    const elementTemplateContext = require.context('test/spec/cloud-element-templates/fixtures', false, /\.json$/);
+    const elementTemplateContext = import.meta.webpackContext('test/spec/cloud-element-templates/fixtures', {
+      recursive: false,
+      regExp: /\.json$/
+    });
+
+    console.log(elementTemplateContext.keys());
 
     const elementTemplates = elementTemplateContext.keys().map(key => elementTemplateContext(key)).flat();
+
+    console.log(elementTemplates);
 
     // when
     const result = await createModeler(
@@ -273,9 +280,12 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
   (singleStart === 'templates' ? it.only : it)('should import simple process (templates)', async function() {
 
     // given
-    const diagramXml = require('test/spec/element-templates/fixtures/complex.bpmn').default;
+    const diagramXml = (await import('test/spec/element-templates/fixtures/complex.bpmn')).default;
 
-    const elementTemplateContext = require.context('test/spec/element-templates/fixtures', false, /\.json$/);
+    const elementTemplateContext = import.meta.webpackContext('test/spec/element-templates/fixtures', {
+      recursive: false,
+      regExp: /\.json$/
+    });
 
     const elementTemplates = elementTemplateContext.keys().map(key => elementTemplateContext(key)).flat();
 
