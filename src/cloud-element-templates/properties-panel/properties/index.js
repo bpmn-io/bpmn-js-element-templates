@@ -1,2 +1,2 @@
-export { CustomProperties } from './CustomProperties';
+export { CustomProperties } from './custom-properties';
 export { MessageProps } from './MessageProps';
