@@ -23,25 +23,8 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import BPMNModdle from 'bpmn-moddle';
 import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
-let PROPERTIES_PANEL_CONTAINER;
+import propertiesPanelCSS from '@bpmn-io/properties-panel/dist/assets/properties-panel.css';
 
-global.chai.use(function(chai, utils) {
-
-  utils.addMethod(chai.Assertion.prototype, 'jsonEqual', function(comparison) {
-
-    var actual = JSON.stringify(this._obj);
-    var expected = JSON.stringify(comparison);
-
-    this.assert(
-      actual == expected,
-      'expected #{this} to deep equal #{act}',
-      'expected #{this} not to deep equal #{act}',
-      comparison, // expected
-      this._obj, // actual
-      true // show diff
-    );
-  });
-});
 
 export * from 'bpmn-js/test/helper';
 
@@ -49,6 +32,8 @@ export {
   createCanvasEvent,
   createEvent
 } from 'bpmn-js/test/util/MockEvents';
+
+let PROPERTIES_PANEL_CONTAINER;
 
 export function bootstrapPropertiesPanel(diagram, options, locals) {
   return async function() {
@@ -284,3 +269,23 @@ export function createProcess(bpmn = '', bpmndi = '') {
     ${ bpmndi }
   `);
 }
+
+// additional chai helpers //////////////
+
+global.chai.use(function(chai, utils) {
+
+  utils.addMethod(chai.Assertion.prototype, 'jsonEqual', function(comparison) {
+
+    var actual = JSON.stringify(this._obj);
+    var expected = JSON.stringify(comparison);
+
+    this.assert(
+      actual == expected,
+      'expected #{this} to deep equal #{act}',
+      'expected #{this} not to deep equal #{act}',
+      comparison, // expected
+      this._obj, // actual
+      true // show diff
+    );
+  });
+});
