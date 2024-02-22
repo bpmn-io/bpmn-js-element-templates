@@ -10,7 +10,7 @@ ___Note:__ Yet to be released changes appear here._
 
 * `FEAT`: always display `documentation` field in Camunda 7 diagrams ([#67](https://github.com/bpmn-io/bpmn-js-element-templates/pull/67))
 * `FEAT`: always display `multi-instance` group in Camunda 7 diagrams ([#68](https://github.com/bpmn-io/bpmn-js-element-templates/pull/68))
-* `FEAT`: allow `Boolean` and `Number` types in Camunda 8 diagrams ([#64](https://github.com/bpmn-io/bpmn-js-element-templates/pull/64))
+* `FEAT`: allow `Boolean` and `Number` types in Camunda 8 diagrams ([#39](https://github.com/bpmn-io/bpmn-js-element-templates/issues/39), [#64](https://github.com/bpmn-io/bpmn-js-element-templates/pull/64))
 
 ## 1.13.2
 
