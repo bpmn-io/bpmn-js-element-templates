@@ -523,6 +523,29 @@ describe('provider/element-templates - ElementTemplates', function() {
 
   });
 
+
+  describe('multiInstance', function() {
+
+    it('should display multi-instance section', inject(
+      async function(elementRegistry, selection, modeling, bpmnFactory) {
+
+        // given
+        const element = elementRegistry.get('MultiInstanceTask');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('[data-group-id="group-multiInstance"]', container);
+
+        expect(group).to.exist;
+      })
+    );
+
+  });
+
 });
 
 
