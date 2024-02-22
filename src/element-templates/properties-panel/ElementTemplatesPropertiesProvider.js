@@ -22,7 +22,8 @@ const LOWER_PRIORITY = 300;
 
 const ALWAYS_DISPLAYED_GROUPS = [
   'general',
-  'documentation'
+  'documentation',
+  'multiInstance'
 ];
 
 
