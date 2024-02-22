@@ -180,7 +180,7 @@ describe('provider/element-templates - ElementTemplates', function() {
     }));
 
 
-    it('should show only general group, and template-related entries when entriesVisible is unset',
+    it('should show only general and documentation group, and template-related entries when entriesVisible is unset',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -194,13 +194,14 @@ describe('provider/element-templates - ElementTemplates', function() {
         // then
         expectOnlyGroups(container, [
           'general',
+          'documentation',
           'ElementTemplates__Template'
         ]);
       })
     );
 
 
-    it('should show only general group, and template-related entries when entriesVisible=false',
+    it('should show only general and documentation group, and template-related entries when entriesVisible=false',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -214,6 +215,7 @@ describe('provider/element-templates - ElementTemplates', function() {
         // then
         expectOnlyGroups(container, [
           'general',
+          'documentation',
           'ElementTemplates__Template'
         ]);
       })
@@ -234,6 +236,7 @@ describe('provider/element-templates - ElementTemplates', function() {
         // then
         expectOnlyGroups(container, [
           'general',
+          'documentation',
           'ElementTemplates__Template',
           'ElementTemplates__Input',
           'ElementTemplates__Output',
@@ -251,6 +254,7 @@ describe('provider/element-templates - ElementTemplates', function() {
       // then
       expectOnlyGroups(container, [
         'general',
+        'documentation',
         'ElementTemplates__Template',
         'ElementTemplates__Input',
         'ElementTemplates__Output'
@@ -258,7 +262,7 @@ describe('provider/element-templates - ElementTemplates', function() {
     });
 
 
-    it('should show only general group, and template group when template is unknown',
+    it('should show only general and documentation group, and template group when template is unknown',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -272,6 +276,7 @@ describe('provider/element-templates - ElementTemplates', function() {
         // then
         expectOnlyGroups(container, [
           'general',
+          'documentation',
           'ElementTemplates__Template'
         ]);
       })
@@ -294,7 +299,7 @@ describe('provider/element-templates - ElementTemplates', function() {
 
         expect(groups).to.contain('general');
         expect(groups).to.contain('ElementTemplates__Template');
-        expect(groups).to.contain('documentation');
+        expect(groups).to.contain('CamundaPlatform__ExecutionListener');
       })
     );
   });
@@ -493,6 +498,29 @@ describe('provider/element-templates - ElementTemplates', function() {
         expect(template).to.have.property('version', 3);
       })
     );
+  });
+
+
+  describe('documentation', function() {
+
+    it('should display documentation section', inject(
+      async function(elementRegistry, selection, modeling, bpmnFactory) {
+
+        // given
+        const element = elementRegistry.get('Task_1');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('[data-group-id="group-documentation"]', container);
+
+        expect(group).to.exist;
+      })
+    );
+
   });
 
 });
