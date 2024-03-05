@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.14.1
+
+* `FIX`: disallow non-string values for `feel: required` properties ([#70](https://github.com/bpmn-io/bpmn-js-element-templates/issues/70))
+* `DEPS`: update to @bpmn-io/element-templates-validator@2.0.1
+
 ## 1.14.0
 
 * `FEAT`: always display `documentation` field in Camunda 7 diagrams ([#67](https://github.com/bpmn-io/bpmn-js-element-templates/pull/67))
