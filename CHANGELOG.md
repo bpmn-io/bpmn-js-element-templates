@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.14.2
+
+* `FIX`: make command registration named module to prevent duplicate command registration ([#76](https://github.com/bpmn-io/bpmn-js-element-templates/pull/76))
+
 ## 1.14.1
 
 * `FIX`: disallow non-string values for `feel: required` properties ([#70](https://github.com/bpmn-io/bpmn-js-element-templates/issues/70))
