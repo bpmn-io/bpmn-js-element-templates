@@ -4,7 +4,6 @@ import {
   bootstrapPropertiesPanel,
   changeInput,
   getBpmnJS,
-  withPropertiesPanel,
   inject
 } from 'test/TestHelper';
 
@@ -1145,7 +1144,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
 
-      withPropertiesPanel('>=1.3.0')('should be auto-resizable', async function() {
+      it('should be auto-resizable', async function() {
 
         // when
         await expectSelected('textTask');

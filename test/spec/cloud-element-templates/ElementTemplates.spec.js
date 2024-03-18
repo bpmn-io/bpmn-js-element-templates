@@ -346,10 +346,10 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   describe('createElement', function() {
 
-    it('should create element', inject(function(elementTemplates) {
+    it('should create element', inject(async function(elementTemplates) {
 
       // given
-      const templates = require('./fixtures/complex.json');
+      const templates = (await import('./fixtures/complex.json')).default;
 
       // when
       const element = elementTemplates.createElement(templates[0]);
@@ -363,28 +363,30 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
-    it('should create element with bpmn:MessageEventDefinition', inject(function(elementTemplates) {
+    it('should create element with bpmn:MessageEventDefinition', inject(
+      async function(elementTemplates) {
+
+        // given
+        const templates = (await import('./fixtures/message.json')).default;
+
+        // when
+        const element = elementTemplates.createElement(templates[0]);
+
+        const businessObject = getBusinessObject(element);
+        const eventDefinitions = businessObject.get('eventDefinitions');
+
+        // then
+        expect(businessObject.get('name')).to.eql('Message Event');
+        expect(eventDefinitions).to.have.lengthOf(1);
+        expect(is(eventDefinitions[0], 'bpmn:MessageEventDefinition')).to.be.true;
+      }
+    ));
+
+
+    it('should create message', inject(async function(elementTemplates) {
 
       // given
-      const templates = require('./fixtures/message.json');
-
-      // when
-      const element = elementTemplates.createElement(templates[0]);
-
-      const businessObject = getBusinessObject(element);
-      const eventDefinitions = businessObject.get('eventDefinitions');
-
-      // then
-      expect(businessObject.get('name')).to.eql('Message Event');
-      expect(eventDefinitions).to.have.lengthOf(1);
-      expect(is(eventDefinitions[0], 'bpmn:MessageEventDefinition')).to.be.true;
-    }));
-
-
-    it('should create message', inject(function(elementTemplates) {
-
-      // given
-      const templates = require('./fixtures/message.json');
+      const templates = (await import('./fixtures/message.json')).default;
 
       // when
       const element = elementTemplates.createElement(templates[0]);
@@ -418,75 +420,81 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
-    it('should create message subscription', inject(function(elementTemplates) {
+    it('should create message subscription', inject(
+      async function(elementTemplates) {
 
-      // given
-      const templates = require('./fixtures/message.json');
+        // given
+        const templates = (await import('./fixtures/message.json')).default;
 
-      // when
-      const element = elementTemplates.createElement(templates[1]);
+        // when
+        const element = elementTemplates.createElement(templates[1]);
 
-      const businessObject = getBusinessObject(element);
-      const eventDefinitions = businessObject.get('eventDefinitions');
+        const businessObject = getBusinessObject(element);
+        const eventDefinitions = businessObject.get('eventDefinitions');
 
-      // then
-      const message = eventDefinitions[0].get('messageRef');
+        // then
+        const message = eventDefinitions[0].get('messageRef');
 
-      expect(message).to.exist;
+        expect(message).to.exist;
 
-      const subscription = findExtension(message, 'zeebe:Subscription');
-      expect(subscription).to.exist;
-      expect(subscription.get('correlationKey')).to.eql('=correlationKey');
-    }));
-
-
-    it('should create message subscription (Send Task)', inject(function(elementTemplates) {
-
-      // given
-      const template = messageTemplates[3];
-
-      // when
-      const element = elementTemplates.createElement(template);
-
-      const businessObject = getBusinessObject(element);
-
-      // then
-      const message = businessObject.get('messageRef');
-
-      expect(message).to.exist;
-
-      const subscription = findExtension(message, 'zeebe:Subscription');
-      expect(subscription).to.exist;
-      expect(subscription.get('correlationKey')).to.eql('=correlationKey');
-    }));
+        const subscription = findExtension(message, 'zeebe:Subscription');
+        expect(subscription).to.exist;
+        expect(subscription.get('correlationKey')).to.eql('=correlationKey');
+      }
+    ));
 
 
-    it('should not create conditional properties', inject(function(elementTemplates) {
+    it('should create message subscription (Send Task)', inject(
+      function(elementTemplates) {
 
-      // given
-      const template = require('./fixtures/condition.json');
+        // given
+        const template = messageTemplates[3];
 
-      // when
-      const element = elementTemplates.createElement(template);
+        // when
+        const element = elementTemplates.createElement(template);
 
-      const businessObject = getBusinessObject(element);
+        const businessObject = getBusinessObject(element);
 
-      // then
-      // expect properties
-      expect(businessObject.get('customProperty')).to.be.undefined;
+        // then
+        const message = businessObject.get('messageRef');
 
-      // expect ioMapping
-      const ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
-      expect(ioMapping).to.be.undefined;
+        expect(message).to.exist;
 
-      // expect taskHeaders
-      const taskHeaders = findExtension(businessObject, 'zeebe:TaskHeaders');
-      expect(taskHeaders).to.be.undefined;
+        const subscription = findExtension(message, 'zeebe:Subscription');
+        expect(subscription).to.exist;
+        expect(subscription.get('correlationKey')).to.eql('=correlationKey');
+      }
+    ));
 
-      // expect taskDefinition
-      const taskDefinition = findExtension(businessObject, 'zeebe:TaskDefinition');
-      expect(taskDefinition).to.be.undefined;
-    }));
+
+    it('should not create conditional properties', inject(
+      async function(elementTemplates) {
+
+        // given
+        const template = (await import('./fixtures/condition.json')).default;
+
+        // when
+        const element = elementTemplates.createElement(template);
+
+        const businessObject = getBusinessObject(element);
+
+        // then
+        // expect properties
+        expect(businessObject.get('customProperty')).to.be.undefined;
+
+        // expect ioMapping
+        const ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
+        expect(ioMapping).to.be.undefined;
+
+        // expect taskHeaders
+        const taskHeaders = findExtension(businessObject, 'zeebe:TaskHeaders');
+        expect(taskHeaders).to.be.undefined;
+
+        // expect taskDefinition
+        const taskDefinition = findExtension(businessObject, 'zeebe:TaskDefinition');
+        expect(taskDefinition).to.be.undefined;
+      }
+    ));
 
 
     it('should throw error - no template', inject(function(elementTemplates) {
@@ -502,10 +510,10 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
 
     it('integration', inject(
-      function(create, dragging, elementRegistry, elementTemplates) {
+      async function(create, dragging, elementRegistry, elementTemplates) {
 
         // given
-        const templates = require('./fixtures/complex.json');
+        const templates = (await import('./fixtures/complex.json')).default;
 
         const processElement = elementRegistry.get('Process_1');
 
@@ -520,8 +528,8 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         // then
         expect(element).to.exist;
         expect(element.parent).to.eql(processElement);
-      })
-    );
+      }
+    ));
 
   });
 
@@ -569,57 +577,59 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
-    it('should apply valid dynamic property binding', inject(function(elementRegistry, elementTemplates) {
+    it('should apply valid dynamic property binding', inject(
+      async function(elementRegistry, elementTemplates) {
 
-      // given
-      elementTemplates.set([
-        require('./fixtures/condition-dropdown-dynamic-values.json'),
-        require('./fixtures/condition-dropdown-dynamic-values-1.json')
-      ]);
+        // given
+        elementTemplates.set([
+          (await import('./fixtures/condition-dropdown-dynamic-values.json')).default,
+          (await import('./fixtures/condition-dropdown-dynamic-values-1.json')).default
+        ]);
 
-      const template = elementTemplates.get('condition-dropdown-dynamic-values');
-      const task = elementTemplates.applyTemplate(elementRegistry.get('Task_3'), template);
+        const template = elementTemplates.get('condition-dropdown-dynamic-values');
+        const task = elementTemplates.applyTemplate(elementRegistry.get('Task_3'), template);
 
-      // assume
-      expect(
-        task.businessObject.extensionElements.values[0].inputParameters[0].source
-      ).to.eql(
-        'action1'
-      );
+        // assume
+        expect(
+          task.businessObject.extensionElements.values[0].inputParameters[0].source
+        ).to.eql(
+          'action1'
+        );
 
-      expect(
-        task.businessObject.extensionElements.values[1].type
-      ).to.eql(
-        'action1-value'
-      );
+        expect(
+          task.businessObject.extensionElements.values[1].type
+        ).to.eql(
+          'action1-value'
+        );
 
-      // when
-      const newTemplate = elementTemplates.get('condition-dropdown-dynamic-values-1');
-      const updatedTask = elementTemplates.applyTemplate(task, newTemplate);
+        // when
+        const newTemplate = elementTemplates.get('condition-dropdown-dynamic-values-1');
+        const updatedTask = elementTemplates.applyTemplate(task, newTemplate);
 
-      // then
-      expect(updatedTask).to.exist;
+        // then
+        expect(updatedTask).to.exist;
 
-      // assume
-      expect(
-        updatedTask.businessObject.extensionElements.values[0].inputParameters[0].source
-      ).to.eql(
-        'action1'
-      );
+        // assume
+        expect(
+          updatedTask.businessObject.extensionElements.values[0].inputParameters[0].source
+        ).to.eql(
+          'action1'
+        );
 
-      expect(
-        updatedTask.businessObject.extensionElements.values[1].type
-      ).to.eql(
-        'action1-value-2'
-      );
-    }));
+        expect(
+          updatedTask.businessObject.extensionElements.values[1].type
+        ).to.eql(
+          'action1-value-2'
+        );
+      }
+    ));
 
 
     it('should apply start event template without event definition', inject(
-      function(elementRegistry, elementTemplates) {
+      async function(elementRegistry, elementTemplates) {
 
         // given
-        const templates = require('./fixtures/start-event.json');
+        const templates = (await import('./fixtures/start-event.json')).default;
         elementTemplates.set(templates);
 
         const template = templates[0];
@@ -639,342 +649,377 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
         const eventDefinitions = getBusinessObject(updatedEvent).get('eventDefinitions');
         expect(eventDefinitions).to.be.empty;
-      })
-    );
+      }
+    ));
 
 
-    it('should apply event definition', inject(function(elementRegistry, elementTemplates) {
+    it('should apply event definition', inject(
+      async function(elementRegistry, elementTemplates) {
 
-      // given
-      const templates = require('./fixtures/message.json');
-      elementTemplates.set(templates);
+        // given
+        const templates = (await import('./fixtures/message.json')).default;
+        elementTemplates.set(templates);
 
-      const template = templates[0];
-      const event = elementRegistry.get('IntermediateThrow');
+        const template = templates[0];
+        const event = elementRegistry.get('IntermediateThrow');
 
-      // assume
-      expect(template).to.exist;
+        // assume
+        expect(template).to.exist;
 
-      // when
-      const updatedEvent = elementTemplates.applyTemplate(event, template);
+        // when
+        const updatedEvent = elementTemplates.applyTemplate(event, template);
 
-      // then
-      expect(updatedEvent).to.exist;
-      expect(elementTemplates.get(updatedEvent)).to.equal(template);
+        // then
+        expect(updatedEvent).to.exist;
+        expect(elementTemplates.get(updatedEvent)).to.equal(template);
 
-      expect(is(updatedEvent, 'bpmn:IntermediateCatchEvent')).to.be.true;
+        expect(is(updatedEvent, 'bpmn:IntermediateCatchEvent')).to.be.true;
 
-      const eventDefinitions = getBusinessObject(updatedEvent).get('eventDefinitions');
-      expect(eventDefinitions).to.have.length(1);
-      expect(is(eventDefinitions[0], 'bpmn:MessageEventDefinition')).to.be.true;
-    }));
-
-
-    it('should replace existing event definition', inject(function(elementRegistry, elementTemplates) {
-
-      // given
-      const templates = require('./fixtures/message.json');
-      elementTemplates.set(templates);
-
-      const template = templates[0];
-      const event = elementRegistry.get('IntermediateCatchMessage');
-      const oldMessageEventDefinition = getBusinessObject(event).get('eventDefinitions')[0];
-
-      // assume
-      expect(template).to.exist;
-
-      // when
-      const updatedEvent = elementTemplates.applyTemplate(event, template);
-
-      // then
-      expect(updatedEvent).to.exist;
-      expect(elementTemplates.get(updatedEvent)).to.equal(template);
-
-      expect(is(updatedEvent, 'bpmn:IntermediateCatchEvent')).to.be.true;
-
-      const eventDefinitions = getBusinessObject(updatedEvent).get('eventDefinitions');
-      expect(eventDefinitions).to.have.length(1);
-      expect(is(eventDefinitions[0], 'bpmn:MessageEventDefinition')).to.be.true;
-      expect(eventDefinitions[0]).not.to.eql(oldMessageEventDefinition);
-    }));
+        const eventDefinitions = getBusinessObject(updatedEvent).get('eventDefinitions');
+        expect(eventDefinitions).to.have.length(1);
+        expect(is(eventDefinitions[0], 'bpmn:MessageEventDefinition')).to.be.true;
+      }
+    ));
 
 
-    it('should apply message binding', inject(function(elementRegistry, elementTemplates) {
+    it('should replace existing event definition', inject(
+      async function(elementRegistry, elementTemplates) {
 
-      // given
-      const templates = require('./fixtures/message.json');
-      elementTemplates.set(templates);
+        // given
+        const templates = (await import('./fixtures/message.json')).default;
+        elementTemplates.set(templates);
 
-      const template = templates[0];
-      const event = elementRegistry.get('IntermediateCatchMessage');
+        const template = templates[0];
+        const event = elementRegistry.get('IntermediateCatchMessage');
+        const oldMessageEventDefinition = getBusinessObject(event).get('eventDefinitions')[0];
 
-      // assume
-      expect(template).to.exist;
+        // assume
+        expect(template).to.exist;
 
-      // when
-      const updatedEvent = elementTemplates.applyTemplate(event, template);
+        // when
+        const updatedEvent = elementTemplates.applyTemplate(event, template);
 
-      // then
-      const businessObject = getBusinessObject(updatedEvent);
-      const eventDefinitions = businessObject.get('eventDefinitions');
+        // then
+        expect(updatedEvent).to.exist;
+        expect(elementTemplates.get(updatedEvent)).to.equal(template);
 
-      // then
-      const message = eventDefinitions[0].get('messageRef');
+        expect(is(updatedEvent, 'bpmn:IntermediateCatchEvent')).to.be.true;
 
-      expect(message).to.exist;
-      expect(message.get('name')).to.eql('hiddenName');
-    }));
-
-
-    it('should apply message zeebe:subscription binding', inject(function(elementRegistry, elementTemplates) {
-
-      // given
-      const templates = require('./fixtures/message.json');
-      elementTemplates.set(templates);
-
-      const template = templates[1];
-      const event = elementRegistry.get('IntermediateCatchMessage');
-
-      // assume
-      expect(template).to.exist;
-
-      // when
-      const updatedEvent = elementTemplates.applyTemplate(event, template);
-
-      // then
-      const businessObject = getBusinessObject(updatedEvent);
-      const eventDefinitions = businessObject.get('eventDefinitions');
-
-      // then
-      const message = eventDefinitions[0].get('messageRef');
-
-      expect(message).to.exist;
-
-      const subscription = findExtension(message, 'zeebe:Subscription');
-      expect(subscription).to.exist;
-      expect(subscription.get('correlationKey')).to.eql('=correlationKey');
-    }));
+        const eventDefinitions = getBusinessObject(updatedEvent).get('eventDefinitions');
+        expect(eventDefinitions).to.have.length(1);
+        expect(is(eventDefinitions[0], 'bpmn:MessageEventDefinition')).to.be.true;
+        expect(eventDefinitions[0]).not.to.eql(oldMessageEventDefinition);
+      }
+    ));
 
 
-    it('should fire elementTemplates.apply event', inject(function(elementRegistry, elementTemplates, eventBus) {
+    it('should apply message binding', inject(
+      async function(elementRegistry, elementTemplates) {
 
-      // given
-      const task = elementRegistry.get('Task_1');
-      const newTemplate = templates[6];
-      const spy = sinon.spy();
+        // given
+        const templates = (await import('./fixtures/message.json')).default;
+        elementTemplates.set(templates);
 
-      eventBus.on('elementTemplates.apply', spy);
+        const template = templates[0];
+        const event = elementRegistry.get('IntermediateCatchMessage');
 
-      // when
-      elementTemplates.applyTemplate(task, newTemplate);
+        // assume
+        expect(template).to.exist;
 
-      // then
-      expect(spy).to.have.been.calledOnce;
-      expect(spy.getCalls()[0].args[1]).to.eql({
-        element: task,
-        newTemplate
-      });
-    }));
+        // when
+        const updatedEvent = elementTemplates.applyTemplate(event, template);
+
+        // then
+        const businessObject = getBusinessObject(updatedEvent);
+        const eventDefinitions = businessObject.get('eventDefinitions');
+
+        // then
+        const message = eventDefinitions[0].get('messageRef');
+
+        expect(message).to.exist;
+        expect(message.get('name')).to.eql('hiddenName');
+      }
+    ));
+
+
+    it('should apply message zeebe:subscription binding', inject(
+      async function(elementRegistry, elementTemplates) {
+
+        // given
+        const templates = (await import('./fixtures/message.json')).default;
+        elementTemplates.set(templates);
+
+        const template = templates[1];
+        const event = elementRegistry.get('IntermediateCatchMessage');
+
+        // assume
+        expect(template).to.exist;
+
+        // when
+        const updatedEvent = elementTemplates.applyTemplate(event, template);
+
+        // then
+        const businessObject = getBusinessObject(updatedEvent);
+        const eventDefinitions = businessObject.get('eventDefinitions');
+
+        // then
+        const message = eventDefinitions[0].get('messageRef');
+
+        expect(message).to.exist;
+
+        const subscription = findExtension(message, 'zeebe:Subscription');
+        expect(subscription).to.exist;
+        expect(subscription.get('correlationKey')).to.eql('=correlationKey');
+      }
+    ));
+
+
+    it('should fire elementTemplates.apply event', inject(
+      function(elementRegistry, elementTemplates, eventBus) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+        const newTemplate = templates[6];
+        const spy = sinon.spy();
+
+        eventBus.on('elementTemplates.apply', spy);
+
+        // when
+        elementTemplates.applyTemplate(task, newTemplate);
+
+        // then
+        expect(spy).to.have.been.calledOnce;
+        expect(spy.getCalls()[0].args[1]).to.eql({
+          element: task,
+          newTemplate
+        });
+      }
+    ));
+
   });
 
 
   describe('unlinkTemplate', function() {
 
-    it('should unlink task template', inject(function(elementRegistry, elementTemplates) {
+    it('should unlink task template', inject(
+      function(elementRegistry, elementTemplates) {
 
-      // given
-      const task = elementRegistry.get('Task_1');
+        // given
+        const task = elementRegistry.get('Task_1');
 
-      // when
-      elementTemplates.unlinkTemplate(task);
+        // when
+        elementTemplates.unlinkTemplate(task);
 
-      // then
-      const taskBo = getBusinessObject(task);
+        // then
+        const taskBo = getBusinessObject(task);
 
-      expect(taskBo.modelerTemplate).not.to.exist;
-      expect(taskBo.modelerTemplateVersion).not.to.exist;
-      expect(taskBo.name).to.equal('foo');
-    }));
+        expect(taskBo.modelerTemplate).not.to.exist;
+        expect(taskBo.modelerTemplateVersion).not.to.exist;
+        expect(taskBo.name).to.equal('foo');
+      }
+    ));
 
 
-    it('should remove template icon', inject(function(elementRegistry, elementTemplates) {
+    it('should remove template icon', inject(
+      function(elementRegistry, elementTemplates) {
 
-      // given
-      let task = elementRegistry.get('Task_2');
+        // given
+        let task = elementRegistry.get('Task_2');
 
-      // assume
-      expect(getBusinessObject(task).get('zeebe:modelerTemplateIcon')).to.exist;
+        // assume
+        expect(getBusinessObject(task).get('zeebe:modelerTemplateIcon')).to.exist;
 
-      // when
-      elementTemplates.unlinkTemplate(task);
+        // when
+        elementTemplates.unlinkTemplate(task);
 
-      // then
-      task = elementRegistry.get('Task_1');
-      expect(getBusinessObject(task).get('zeebe:modelerTemplateIcon')).to.not.exist;
-    }));
+        // then
+        task = elementRegistry.get('Task_1');
+        expect(getBusinessObject(task).get('zeebe:modelerTemplateIcon')).to.not.exist;
+      }
+    ));
 
-    it('should fire elementTemplates.unlink event', inject(function(elementRegistry, elementTemplates, eventBus) {
 
-      // given
-      const task = elementRegistry.get('Task_1');
-      const spy = sinon.spy();
+    it('should fire elementTemplates.unlink event', inject(
+      function(elementRegistry, elementTemplates, eventBus) {
 
-      eventBus.on('elementTemplates.unlink', spy);
+        // given
+        const task = elementRegistry.get('Task_1');
+        const spy = sinon.spy();
 
-      // when
-      elementTemplates.unlinkTemplate(task);
+        eventBus.on('elementTemplates.unlink', spy);
 
-      // then
-      expect(spy).to.have.been.calledOnce;
-      expect(spy.getCalls()[0].args[1]).to.eql({
-        element: task
-      });
-    }));
+        // when
+        elementTemplates.unlinkTemplate(task);
+
+        // then
+        expect(spy).to.have.been.calledOnce;
+        expect(spy.getCalls()[0].args[1]).to.eql({
+          element: task
+        });
+      }
+    ));
+
   });
 
 
   describe('removeTemplate', function() {
 
-    it('should remove task template', inject(function(elementRegistry, elementTemplates) {
+    it('should remove task template', inject(
+      function(elementRegistry, elementTemplates) {
 
-      // given
-      let task = elementRegistry.get('Task_1');
+        // given
+        let task = elementRegistry.get('Task_1');
 
-      // when
-      task = elementTemplates.removeTemplate(task);
+        // when
+        task = elementTemplates.removeTemplate(task);
 
-      // then
-      const taskBo = getBusinessObject(task);
-      const label = getLabel(task);
+        // then
+        const taskBo = getBusinessObject(task);
+        const label = getLabel(task);
 
-      expect(taskBo.modelerTemplate).not.to.exist;
-      expect(taskBo.modelerTemplateVersion).not.to.exist;
-      expect(label).to.eql('foo');
-    }));
-
-
-    it('should remove default task template', inject(function(elementRegistry, elementTemplates) {
-
-      // given
-      let task = elementRegistry.get('ServiceTask');
-
-      // when
-      task = elementTemplates.removeTemplate(task);
-
-      // then
-      const taskBo = getBusinessObject(task);
-
-      expect(taskBo.modelerTemplate).not.to.exist;
-      expect(taskBo.modelerTemplateVersion).not.to.exist;
-    }));
+        expect(taskBo.modelerTemplate).not.to.exist;
+        expect(taskBo.modelerTemplateVersion).not.to.exist;
+        expect(label).to.eql('foo');
+      }
+    ));
 
 
-    it('should remove group template', inject(function(elementRegistry, elementTemplates) {
+    it('should remove default task template', inject(
+      function(elementRegistry, elementTemplates) {
 
-      // given
-      let group = elementRegistry.get('Group_1');
+        // given
+        let task = elementRegistry.get('ServiceTask');
 
-      // when
-      group = elementTemplates.removeTemplate(group);
+        // when
+        task = elementTemplates.removeTemplate(task);
 
-      // then
-      const groupBo = getBusinessObject(group);
-      const label = getLabel(group);
+        // then
+        const taskBo = getBusinessObject(task);
 
-      expect(groupBo.modelerTemplate).not.to.exist;
-      expect(groupBo.modelerTemplateVersion).not.to.exist;
-      expect(label).to.eql('Group Name');
-    }));
-
-
-    it('should remove annotation template', inject(function(elementRegistry, elementTemplates) {
-
-      // given
-      let annotation = elementRegistry.get('TextAnnotation_1');
-
-      // when
-      annotation = elementTemplates.removeTemplate(annotation);
-
-      // then
-      const annotationBo = getBusinessObject(annotation);
-      const label = getLabel(annotation);
-
-      expect(annotationBo.modelerTemplate).not.to.exist;
-      expect(annotationBo.modelerTemplateVersion).not.to.exist;
-      expect(label).to.eql('Text Annotation');
-    }));
+        expect(taskBo.modelerTemplate).not.to.exist;
+        expect(taskBo.modelerTemplateVersion).not.to.exist;
+      }
+    ));
 
 
-    it('should remove conditional event template', inject(function(elementRegistry, elementTemplates) {
+    it('should remove group template', inject(
+      function(elementRegistry, elementTemplates) {
 
-      // given
-      let event = elementRegistry.get('ConditionalEvent');
+        // given
+        let group = elementRegistry.get('Group_1');
 
-      // when
-      event = elementTemplates.removeTemplate(event);
+        // when
+        group = elementTemplates.removeTemplate(group);
 
-      // then
-      const eventBo = getBusinessObject(event);
+        // then
+        const groupBo = getBusinessObject(group);
+        const label = getLabel(group);
 
-      expect(eventBo.modelerTemplate).not.to.exist;
-      expect(eventBo.modelerTemplateVersion).not.to.exist;
-      expect(eventBo.eventDefinitions).to.have.length(1);
-    }));
-
-
-    it('should remove process template', inject(function(elementRegistry, elementTemplates) {
-
-      // given
-      let process = elementRegistry.get('Process_1');
-      const children = [ ...process.children ];
-
-      // when
-      process = elementTemplates.removeTemplate(process);
-
-      // then
-      const processBo = getBusinessObject(process);
-
-      expect(processBo.modelerTemplate).not.to.exist;
-      expect(processBo.modelerTemplateVersion).not.to.exist;
-      expect(process.children.length).to.eql(children.length);
-    }));
+        expect(groupBo.modelerTemplate).not.to.exist;
+        expect(groupBo.modelerTemplateVersion).not.to.exist;
+        expect(label).to.eql('Group Name');
+      }
+    ));
 
 
-    it('should remove subprocess template (plane)', inject(function(elementRegistry, elementTemplates) {
+    it('should remove annotation template', inject(
+      function(elementRegistry, elementTemplates) {
 
-      // given
-      let subprocess = elementRegistry.get('SubProcess_1');
-      let subprocessPlane = elementRegistry.get('SubProcess_1_plane');
+        // given
+        let annotation = elementRegistry.get('TextAnnotation_1');
 
-      // when
-      subprocess = elementTemplates.removeTemplate(subprocessPlane);
+        // when
+        annotation = elementTemplates.removeTemplate(annotation);
 
-      // then
-      const taskBo = getBusinessObject(subprocess);
+        // then
+        const annotationBo = getBusinessObject(annotation);
+        const label = getLabel(annotation);
 
-      expect(taskBo.modelerTemplate).not.to.exist;
-      expect(taskBo.modelerTemplateVersion).not.to.exist;
-      expect(taskBo.flowElements).to.have.length(1);
-    }));
+        expect(annotationBo.modelerTemplate).not.to.exist;
+        expect(annotationBo.modelerTemplateVersion).not.to.exist;
+        expect(label).to.eql('Text Annotation');
+      }
+    ));
 
 
-    it('should fire elementTemplates.remove event', inject(function(elementRegistry, elementTemplates, eventBus) {
+    it('should remove conditional event template', inject(
+      function(elementRegistry, elementTemplates) {
 
-      // given
-      const task = elementRegistry.get('Task_1');
-      const spy = sinon.spy();
+        // given
+        let event = elementRegistry.get('ConditionalEvent');
 
-      eventBus.on('elementTemplates.remove', spy);
+        // when
+        event = elementTemplates.removeTemplate(event);
 
-      // when
-      elementTemplates.removeTemplate(task);
+        // then
+        const eventBo = getBusinessObject(event);
 
-      // then
-      expect(spy).to.have.been.calledOnce;
-      expect(spy.getCalls()[0].args[1]).to.eql({
-        element: task
-      });
-    }));
+        expect(eventBo.modelerTemplate).not.to.exist;
+        expect(eventBo.modelerTemplateVersion).not.to.exist;
+        expect(eventBo.eventDefinitions).to.have.length(1);
+      }
+    ));
+
+
+    it('should remove process template', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        let process = elementRegistry.get('Process_1');
+        const children = [ ...process.children ];
+
+        // when
+        process = elementTemplates.removeTemplate(process);
+
+        // then
+        const processBo = getBusinessObject(process);
+
+        expect(processBo.modelerTemplate).not.to.exist;
+        expect(processBo.modelerTemplateVersion).not.to.exist;
+        expect(process.children.length).to.eql(children.length);
+      }
+    ));
+
+
+    it('should remove subprocess template (plane)', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        let subprocess = elementRegistry.get('SubProcess_1');
+        let subprocessPlane = elementRegistry.get('SubProcess_1_plane');
+
+        // when
+        subprocess = elementTemplates.removeTemplate(subprocessPlane);
+
+        // then
+        const taskBo = getBusinessObject(subprocess);
+
+        expect(taskBo.modelerTemplate).not.to.exist;
+        expect(taskBo.modelerTemplateVersion).not.to.exist;
+        expect(taskBo.flowElements).to.have.length(1);
+      }
+    ));
+
+
+    it('should fire elementTemplates.remove event', inject(
+      function(elementRegistry, elementTemplates, eventBus) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+        const spy = sinon.spy();
+
+        eventBus.on('elementTemplates.remove', spy);
+
+        // when
+        elementTemplates.removeTemplate(task);
+
+        // then
+        expect(spy).to.have.been.calledOnce;
+        expect(spy.getCalls()[0].args[1]).to.eql({
+          element: task
+        });
+      }
+    ));
 
   });
 
@@ -1024,26 +1069,28 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
-    it('should update message event template', inject(function(elementRegistry, elementTemplates) {
+    it('should update message event template', inject(
+      function(elementRegistry, elementTemplates) {
 
-      // given
-      const newTemplate = messageTemplates.find(
-        template => template.id === 'updateTemplate' && template.version === 2);
-      let event = elementRegistry.get('MessageEvent');
+        // given
+        const newTemplate = messageTemplates.find(
+          template => template.id === 'updateTemplate' && template.version === 2);
+        let event = elementRegistry.get('MessageEvent');
 
 
-      // when
-      event = elementTemplates.applyTemplate(event, newTemplate);
+        // when
+        event = elementTemplates.applyTemplate(event, newTemplate);
 
-      // then
-      const eventBo = getBusinessObject(event);
+        // then
+        const eventBo = getBusinessObject(event);
 
-      expect(eventBo.modelerTemplate).to.eql('updateTemplate');
-      expect(eventBo.modelerTemplateVersion).to.eql(2);
+        expect(eventBo.modelerTemplate).to.eql('updateTemplate');
+        expect(eventBo.modelerTemplateVersion).to.eql(2);
 
-      const message = findMessage(eventBo);
-      expect(message.name).to.eql('version_2');
-    }));
+        const message = findMessage(eventBo);
+        expect(message.name).to.eql('version_2');
+      }
+    ));
 
 
     it('should update message event template but keep user-edited name',
@@ -1071,27 +1118,29 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     );
 
 
-    it('should fire elementTemplates.update event', inject(function(elementRegistry, elementTemplates, eventBus) {
+    it('should fire elementTemplates.update event', inject(
+      function(elementRegistry, elementTemplates, eventBus) {
 
-      // given
-      const newTemplate = templates.find(
-        template => template.id === 'foo' && template.version === 2);
+        // given
+        const newTemplate = templates.find(
+          template => template.id === 'foo' && template.version === 2);
 
-      const task = elementRegistry.get('Task_1');
-      const spy = sinon.spy();
+        const task = elementRegistry.get('Task_1');
+        const spy = sinon.spy();
 
-      eventBus.on('elementTemplates.update', spy);
+        eventBus.on('elementTemplates.update', spy);
 
-      // when
-      elementTemplates.applyTemplate(task, newTemplate);
+        // when
+        elementTemplates.applyTemplate(task, newTemplate);
 
-      // then
-      expect(spy).to.have.been.calledOnce;
-      expect(spy.getCalls()[0].args[1]).to.eql({
-        element: task,
-        newTemplate
-      });
-    }));
+        // then
+        expect(spy).to.have.been.calledOnce;
+        expect(spy.getCalls()[0].args[1]).to.eql({
+          element: task,
+          newTemplate
+        });
+      }
+    ));
   });
 
 });
