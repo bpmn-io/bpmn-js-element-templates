@@ -1,0 +1,19 @@
+[
+  {
+    "id": "foo",
+    "name":"foo",
+    "appliesTo": [ "bpmn:ServiceTask" ],
+    "properties": [
+      {
+        "id": "name",
+        "type": "String",
+        "label": "Name",
+        "value": "value",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        }
+      }
+    ]
+  }
+]
