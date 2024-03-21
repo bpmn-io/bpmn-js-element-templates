@@ -70,17 +70,14 @@ const PRIMITIVE_MODDLE_TYPES = [
   'String'
 ];
 
-const DEFAULT_CUSTOM_GROUP = {
-  id: 'ElementTemplates__CustomProperties',
-  label: 'Custom properties'
-};
-
-
 export function CustomProperties(props) {
   const {
     element,
-    elementTemplate
+    elementTemplate,
+    injector
   } = props;
+
+  const translate = injector.get('translate');
 
   const groups = [];
 
@@ -106,7 +103,7 @@ export function CustomProperties(props) {
     addCustomGroup(groups, {
       element,
       id: `ElementTemplates__CustomProperties-${groupId}`,
-      label: group.label,
+      label: translate(group.label),
       properties: properties,
       templateId: `${id}-${groupId}`
     });
@@ -115,7 +112,8 @@ export function CustomProperties(props) {
   // (2) add default custom props
   if (defaultProps.length) {
     addCustomGroup(groups, {
-      ...DEFAULT_CUSTOM_GROUP,
+      id: 'ElementTemplates__CustomProperties',
+      label: translate('Custom properties'),
       element,
       properties: defaultProps,
       templateId: id
@@ -135,7 +133,7 @@ export function CustomProperties(props) {
       addCustomGroup(groups, {
         element,
         id: `ElementTemplates__CustomGroup-${ id }`,
-        label: `Custom properties for scope <${ type }>`,
+        label: translate(`Custom properties for scope <${ type }>`),
         properties,
         templateId: id,
         scope
@@ -267,13 +265,14 @@ function BooleanProperty(props) {
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
-        commandStack = useService('commandStack');
+        commandStack = useService('commandStack'),
+        translate = useService('translate');
 
   return CheckboxEntry({
     element,
     getValue: propertyGetter(element, property, scope),
     id,
-    label,
+    label: label ? translate(label) : label,
     description: PropertyDescription({ description }),
     setValue: propertySetter(bpmnFactory, commandStack, element, property, scope),
     disabled: editable === false
@@ -303,7 +302,7 @@ function DropdownProperty(props) {
 
     return choices.map(({ name, value }) => {
       return {
-        label: name,
+        label: translate(name),
         value
       };
     });
@@ -312,7 +311,7 @@ function DropdownProperty(props) {
   return SelectEntry({
     element,
     id,
-    label,
+    label: label ? translate(label) : label,
     getOptions,
     description: PropertyDescription({ description }),
     getValue: propertyGetter(element, property, scope),
@@ -346,7 +345,7 @@ function StringProperty(props) {
     element,
     getValue: propertyGetter(element, property, scope),
     id,
-    label,
+    label: label ? translate(label) : label,
     description: PropertyDescription({ description }),
     setValue: propertySetter(bpmnFactory, commandStack, element, property, scope),
     validate: propertyValidator(translate, property),
@@ -377,7 +376,7 @@ function TextAreaProperty(props) {
     debounce,
     element,
     id,
-    label,
+    label: label ? translate(label) : label,
     description: PropertyDescription({ description }),
     getValue: propertyGetter(element, property, scope),
     setValue: propertySetter(bpmnFactory, commandStack, element, property, scope),

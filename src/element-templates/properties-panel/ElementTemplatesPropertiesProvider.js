@@ -44,13 +44,15 @@ export default class ElementTemplatesPropertiesProvider {
         return groups;
       }
 
+      const translate = injector.get('translate');
+
       // (0) Copy provided groups
       groups = groups.slice();
 
       const templatesGroup = {
         element,
         id: 'ElementTemplates__Template',
-        label: 'Template',
+        label: translate('Template'),
         component: createElementTemplatesGroup(),
         entries: TemplateProps({ element, elementTemplates: this._elementTemplates })
       };
@@ -65,7 +67,7 @@ export default class ElementTemplatesPropertiesProvider {
           createInputGroup(element, elementTemplate, injector, groups) || [],
           createOutputGroup(element, elementTemplate, injector, groups) || [],
           createErrorGroup(element, elementTemplate, injector, groups) || [],
-          CustomProperties({ element, elementTemplate })
+          CustomProperties({ element, elementTemplate, injector })
         );
 
         // (2) add template-specific properties groups
