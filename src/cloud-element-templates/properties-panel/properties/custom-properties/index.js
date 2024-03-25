@@ -33,17 +33,14 @@ import { BooleanProperty } from './BooleanProperty';
 import { NumberProperty } from './NumberProperty';
 
 
-const DEFAULT_CUSTOM_GROUP = {
-  id: 'ElementTemplates__CustomProperties',
-  label: 'Custom properties'
-};
-
-
 export function CustomProperties(props) {
   const {
     element,
-    elementTemplate
+    elementTemplate,
+    injector
   } = props;
+
+  const translate = injector.get('translate');
 
   const groups = [];
 
@@ -68,7 +65,7 @@ export function CustomProperties(props) {
     addCustomGroup(groups, {
       element,
       id: `ElementTemplates__CustomProperties-${groupId}`,
-      label: group.label,
+      label: translate(group.label),
       openByDefault: group.openByDefault,
       properties: properties,
       templateId: `${id}-${groupId}`,
@@ -79,7 +76,8 @@ export function CustomProperties(props) {
   // (2) add default custom props
   if (defaultProps.length) {
     addCustomGroup(groups, {
-      ...DEFAULT_CUSTOM_GROUP,
+      id: 'ElementTemplates__CustomProperties',
+      label: translate('Custom properties'),
       element,
       properties: defaultProps,
       templateId: id
