@@ -2,16 +2,50 @@
   {
     "id": "foo",
     "name":"foo",
-    "appliesTo": [ "bpmn:ServiceTask" ],
+    "appliesTo": ["bpmn:ServiceTask"],
     "properties": [
       {
-        "id": "name",
-        "type": "String",
-        "label": "Name",
-        "value": "value",
+        "type": "Boolean",
+        "label": "BooleanLabel",
+        "description": "BooleanDescription",
+        "value": "boolean",
         "binding": {
           "type": "property",
-          "name": "name"
+          "name": "boolean"
+        }
+      },
+      {
+        "type": "Dropdown",
+        "label": "DropdownLabel",
+        "description": "DropdownDescription",
+        "value": "dropdown",
+        "choices": [
+          {"name": "Choice1", "value": "choice1"},
+          {"name": "Choice2", "value": "choice2"}
+        ],
+        "binding": {
+          "type": "property",
+          "name": "dropdown"
+        }
+      },
+      {
+        "type": "String",
+        "label": "StringLabel",
+        "description": "StringDescription",
+        "value": "string",
+        "binding": {
+          "type": "property",
+          "name": "string"
+        }
+      },
+      {
+        "type": "Text",
+        "label": "TextLabel",
+        "description": "TextDescription",
+        "value": "text",
+        "binding": {
+          "type": "property",
+          "name": "text"
         }
       }
     ]
