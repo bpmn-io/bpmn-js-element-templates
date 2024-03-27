@@ -22,12 +22,20 @@ export default class ConditionalBehavior extends CommandInterceptor {
     this._bpmnFactory = bpmnFactory;
     this._injector = injector;
 
+    // (1) save pre-conditional state
     this.preExecute([
       'element.updateProperties',
       'element.updateModdleProperties',
       'element.move'
     ], this._saveConditionalState, true, this);
 
+    // (2) so we can check if we need to apply post-conditional updates
+    //
+    //   if [additional bindings activate] then
+    //     re-trigger setting the template
+    //   else
+    //     else we're done
+    //
     this.postExecute([
       'element.updateProperties',
       'element.updateModdleProperties',
@@ -67,6 +75,8 @@ export default class ConditionalBehavior extends CommandInterceptor {
 
     const newTemplate = applyConditions(element, template);
 
+    // (3) this is the important check that verifies if we need to apply
+    //     additional template properties
     if (!hasDifferentPropertyBindings(newTemplate, oldTemplate)) {
       return;
     }
