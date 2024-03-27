@@ -4141,12 +4141,15 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
 
     describe('conditions', function() {
+
       beforeEach(bootstrap(require('../fixtures/condition.bpmn').default));
-      const newTemplate = require('../fixtures/condition.json');
+
 
       it('should not add conditional properties', inject(function(elementRegistry) {
 
         // given
+        const newTemplate = require('../fixtures/condition.json');
+
         const task = elementRegistry.get('Task_1');
 
         // when
@@ -4175,6 +4178,8 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       it('should add conditional properties', inject(function(elementRegistry) {
 
         // given
+        const newTemplate = require('../fixtures/condition.json');
+
         const task = elementRegistry.get('Task_3');
 
         // when
