@@ -582,13 +582,13 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       // assume
       expect(
-        task.businessObject.extensionElements.values[0].inputParameters[0].source
+        task.businessObject.extensionElements.values[1].inputParameters[0].source
       ).to.eql(
         'action1'
       );
 
       expect(
-        task.businessObject.extensionElements.values[1].type
+        task.businessObject.extensionElements.values[0].type
       ).to.eql(
         'action1-value'
       );
@@ -602,13 +602,13 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       // assume
       expect(
-        updatedTask.businessObject.extensionElements.values[0].inputParameters[0].source
+        updatedTask.businessObject.extensionElements.values[1].inputParameters[0].source
       ).to.eql(
         'action1'
       );
 
       expect(
-        updatedTask.businessObject.extensionElements.values[1].type
+        updatedTask.businessObject.extensionElements.values[0].type
       ).to.eql(
         'action1-value-2'
       );

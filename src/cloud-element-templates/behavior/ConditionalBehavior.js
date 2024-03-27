@@ -7,7 +7,6 @@ import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 
 import { ZEEBE_TASK_DEFINITION, ZEEBE_TASK_DEFINITION_TYPE_TYPE } from '../util/bindingTypes';
 
-const HIGH_PRIORITY = 2500;
 
 /**
  * Checks the conditions of an element template and sets/resets the
@@ -24,7 +23,9 @@ export default class ConditionalBehavior extends CommandInterceptor {
     this._injector = injector;
 
     this.preExecute([
-      'element.updateProperties', 'element.updateModdleProperties'
+      'element.updateProperties',
+      'element.updateModdleProperties',
+      'element.move'
     ], this._saveConditionalState, true, this);
 
     this.postExecute([
@@ -33,23 +34,6 @@ export default class ConditionalBehavior extends CommandInterceptor {
       'propertiesPanel.zeebe.changeTemplate',
       'element.move'
     ], this._applyConditions, true, this);
-
-    // Apply Conditions before changing properties. This persists the template so we can check if conditions apply
-    // after upgrading the template.
-    this.preExecute([ 'propertiesPanel.zeebe.changeTemplate' ], HIGH_PRIORITY, this._handleTemplateUpgrade, true, this);
-  }
-
-  _handleTemplateUpgrade(context) {
-    const {
-      element,
-      newTemplate
-    } = context;
-
-    if (!element || !newTemplate) {
-      return;
-    }
-
-    context.newTemplate = applyConditions(context.element, context.newTemplate);
   }
 
   _saveConditionalState(context) {
@@ -70,7 +54,6 @@ export default class ConditionalBehavior extends CommandInterceptor {
     const {
       element
     } = context;
-
 
     const template = this._elementTemplates.get(element);
 
