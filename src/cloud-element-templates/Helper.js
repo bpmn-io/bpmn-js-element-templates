@@ -20,6 +20,14 @@ export const TEMPLATE_ID_ATTR = 'zeebe:modelerTemplate';
  */
 export const TEMPLATE_VERSION_ATTR = 'zeebe:modelerTemplateVersion';
 
+/**
+ * The BPMN 2.0 extension attribute name under
+ * which the element template icon is stored.
+ *
+ * @type {String}
+ */
+export const TEMPLATE_ICON_ATTR = 'zeebe:modelerTemplateIcon';
+
 
 /**
  * Get template id for a given diagram element.
@@ -48,6 +56,21 @@ export function getTemplateVersion(element) {
 
   if (businessObject) {
     return businessObject.get(TEMPLATE_VERSION_ATTR);
+  }
+}
+
+/**
+ * Get template icon for a given diagram element.
+ *
+ * @param {djs.model.Base} element
+ *
+ * @return {String}
+ */
+export function getTemplateIcon(element) {
+  const businessObject = getBusinessObject(element);
+
+  if (businessObject) {
+    return businessObject.get(TEMPLATE_ICON_ATTR);
   }
 }
 
