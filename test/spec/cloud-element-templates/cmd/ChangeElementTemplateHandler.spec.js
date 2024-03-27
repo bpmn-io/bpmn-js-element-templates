@@ -4212,6 +4212,52 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 });
 
 
+describe('cloud-element-templates/cmd - ChangeElementTemplateHandler - integration', () => {
+
+  let container;
+
+  beforeEach(function() {
+    container = TestContainer.get(this);
+  });
+
+  function bootstrap(diagramXML) {
+    return bootstrapModeler(diagramXML, {
+      container,
+      modules,
+      moddleExtensions
+    });
+  }
+
+  const allTemplateRequires = require.context('./c8-templates', true, /.json$/);
+
+  const allTemplates = allTemplateRequires.keys().map(allTemplateRequires);
+
+  beforeEach(bootstrap(require('../fixtures/condition.bpmn').default));
+
+  allTemplates.forEach(template => {
+
+    const elementType = template.elementType;
+
+    if (elementType && elementType.value !== 'bpmn:ServiceTask') {
+      return;
+    }
+
+    it(`should apply template ${template.id}`, inject(function(elementRegistry) {
+
+      // given
+      const task = elementRegistry.get('Task_3');
+
+      // when
+      changeTemplate(task, template);
+
+      // then
+      // expect applied
+    }));
+
+  });
+
+});
+
 
 // helpers //////////
 
