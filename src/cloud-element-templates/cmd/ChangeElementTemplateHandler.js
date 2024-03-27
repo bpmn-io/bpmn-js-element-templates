@@ -49,36 +49,12 @@ import { removeMessage } from '../util/rootElementUtil';
  * `zeebe:modelerTemplateVersion`.
  */
 export default class ChangeElementTemplateHandler {
-  constructor(bpmnFactory, bpmnReplace, commandStack, injector) {
+  constructor(bpmnFactory, bpmnReplace, commandStack, modeling, injector) {
     this._bpmnFactory = bpmnFactory;
     this._bpmnReplace = bpmnReplace;
 
-    // Wrap commandStack and modeling to add hints to all commands
-    this._commandStackWrapper = {
-      execute: (event, context, ...rest) => {
-        commandStack.execute(
-          event,
-          {
-            hints: { skipConditionUpdate: true },
-            ...context
-          },
-          ...rest
-        );
-      }
-    };
-    this._modelingWrapper = {
-      updateModdleProperties: (element, moddleElement, properties) =>
-        this._commandStackWrapper.execute('element.updateModdleProperties', {
-          element,
-          moddleElement,
-          properties
-        }),
-      updateProperties: (element, properties) =>
-        this._commandStackWrapper.execute('element.updateProperties', {
-          element,
-          properties
-        })
-    };
+    this._modeling = modeling;
+    this._commandStack = commandStack;
 
     this._injector = injector;
   }
@@ -134,7 +110,7 @@ export default class ChangeElementTemplateHandler {
 
   _getOrCreateExtensionElements(element, businessObject = getBusinessObject(element)) {
     const bpmnFactory = this._bpmnFactory,
-          modeling = this._modelingWrapper;
+          modeling = this._modeling;
 
     let extensionElements = businessObject.get('extensionElements');
 
@@ -154,7 +130,7 @@ export default class ChangeElementTemplateHandler {
   }
 
   _updateZeebeModelerTemplate(element, newTemplate) {
-    const modeling = this._modelingWrapper;
+    const modeling = this._modeling;
 
     modeling.updateProperties(element, {
       'zeebe:modelerTemplate': newTemplate && newTemplate.id,
@@ -163,7 +139,7 @@ export default class ChangeElementTemplateHandler {
   }
 
   _updateZeebeModelerTemplateIcon(element, newTemplate) {
-    const modeling = this._modelingWrapper;
+    const modeling = this._modeling;
 
     const icon = newTemplate && newTemplate.icon;
 
@@ -173,7 +149,7 @@ export default class ChangeElementTemplateHandler {
   }
 
   _updateProperties(element, oldTemplate, newTemplate) {
-    const commandStack = this._commandStackWrapper;
+    const commandStack = this._commandStack;
     const businessObject = getBusinessObject(element);
 
     const newProperties = newTemplate.properties.filter((newProperty) => {
@@ -241,7 +217,7 @@ export default class ChangeElementTemplateHandler {
    */
   _updateZeebeTaskDefinition(element, oldTemplate, newTemplate) {
     const bpmnFactory = this._bpmnFactory,
-          commandStack = this._commandStackWrapper;
+          commandStack = this._commandStack;
 
     const newProperties = newTemplate.properties.filter((newProperty) => {
       const newBinding = newProperty.binding,
@@ -341,7 +317,7 @@ export default class ChangeElementTemplateHandler {
    */
   _updateZeebeInputOutputParameterProperties(element, oldTemplate, newTemplate) {
     const bpmnFactory = this._bpmnFactory,
-          commandStack = this._commandStackWrapper;
+          commandStack = this._commandStack;
 
     const newProperties = newTemplate.properties.filter((newProperty) => {
       const newBinding = newProperty.binding,
@@ -498,7 +474,7 @@ export default class ChangeElementTemplateHandler {
    */
   _updateZeebeTaskHeaderProperties(element, oldTemplate, newTemplate) {
     const bpmnFactory = this._bpmnFactory,
-          commandStack = this._commandStackWrapper;
+          commandStack = this._commandStack;
 
     const newProperties = newTemplate.properties.filter((newProperty) => {
       const newBinding = newProperty.binding,
@@ -605,7 +581,7 @@ export default class ChangeElementTemplateHandler {
    */
   _updateZeebePropertyProperties(element, oldTemplate, newTemplate) {
     const bpmnFactory = this._bpmnFactory,
-          commandStack = this._commandStackWrapper;
+          commandStack = this._commandStack;
 
     const newProperties = newTemplate.properties.filter((newProperty) => {
       const newBinding = newProperty.binding,
@@ -743,7 +719,7 @@ export default class ChangeElementTemplateHandler {
     let message = this._getMessage(element);
     message && removedProperties.forEach((removedProperty) => {
 
-      this._modelingWrapper.updateModdleProperties(element, message, {
+      this._modeling.updateModdleProperties(element, message, {
         [removedProperty.binding.name]: undefined
       });
     });
@@ -769,7 +745,7 @@ export default class ChangeElementTemplateHandler {
 
       properties[ newBindingName ] = newPropertyValue;
 
-      this._modelingWrapper.updateModdleProperties(element, changedElement, properties);
+      this._modeling.updateModdleProperties(element, changedElement, properties);
     });
   }
 
@@ -820,14 +796,14 @@ export default class ChangeElementTemplateHandler {
 
     // Update zeebe Subscription
     if (zeebeSubscription) {
-      this._modelingWrapper.updateModdleProperties(element, zeebeSubscription,
+      this._modeling.updateModdleProperties(element, zeebeSubscription,
         propertiesToSet
       );
     } else {
 
       // create new Subscription
       const newSubscription = createElement('zeebe:Subscription', propertiesToSet, message, this._bpmnFactory);
-      this._modelingWrapper.updateModdleProperties(element, messageExtensionElements, {
+      this._modeling.updateModdleProperties(element, messageExtensionElements, {
         values: [ ...messageExtensionElements.get('values'), newSubscription ]
       });
     }
@@ -842,7 +818,7 @@ export default class ChangeElementTemplateHandler {
       return properties;
     }, {});
 
-    this._modelingWrapper.updateModdleProperties(element, zeebeSubscription,
+    this._modeling.updateModdleProperties(element, zeebeSubscription,
       propertiesToRemove
     );
   }
@@ -860,7 +836,7 @@ export default class ChangeElementTemplateHandler {
       return;
     }
 
-    this._modelingWrapper.updateModdleProperties(element, message, {
+    this._modeling.updateModdleProperties(element, message, {
       'zeebe:modelerTemplate': newTemplate.id
     });
   }
@@ -890,7 +866,7 @@ export default class ChangeElementTemplateHandler {
 
     message.$parent = getRoot(bo);
 
-    this._modelingWrapper.updateModdleProperties(element, bo, { messageRef: message });
+    this._modeling.updateModdleProperties(element, bo, { messageRef: message });
 
     return message;
   }
@@ -917,7 +893,7 @@ export default class ChangeElementTemplateHandler {
    */
   _updateCalledElement(element, oldTemplate, newTemplate) {
     const bpmnFactory = this._bpmnFactory,
-          commandStack = this._commandStackWrapper;
+          commandStack = this._commandStack;
 
     const newProperties = newTemplate.properties.filter((newProperty) => {
       const newBinding = newProperty.binding,
@@ -1046,6 +1022,7 @@ ChangeElementTemplateHandler.$inject = [
   'bpmnFactory',
   'bpmnReplace',
   'commandStack',
+  'modeling',
   'injector'
 ];
 
