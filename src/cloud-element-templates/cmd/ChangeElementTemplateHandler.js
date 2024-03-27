@@ -7,7 +7,9 @@ import {
   findExtension,
   findMessage,
   getDefaultValue,
-  getTemplateId
+  getTemplateVersion,
+  getTemplateId,
+  getTemplateIcon
 } from '../Helper';
 
 import {
@@ -132,20 +134,28 @@ export default class ChangeElementTemplateHandler {
   _updateZeebeModelerTemplate(element, newTemplate) {
     const modeling = this._modeling;
 
-    modeling.updateProperties(element, {
-      'zeebe:modelerTemplate': newTemplate && newTemplate.id,
-      'zeebe:modelerTemplateVersion': newTemplate && newTemplate.version
-    });
+    const newId = newTemplate && newTemplate.id;
+    const newVersion = newTemplate && newTemplate.version;
+
+    if (getTemplateId(element) !== newId || getTemplateVersion(element) !== newVersion) {
+      modeling.updateProperties(element, {
+        'zeebe:modelerTemplate': newId,
+        'zeebe:modelerTemplateVersion': newVersion
+      });
+    }
   }
 
   _updateZeebeModelerTemplateIcon(element, newTemplate) {
     const modeling = this._modeling;
 
-    const icon = newTemplate && newTemplate.icon;
+    const newIcon = newTemplate && newTemplate.icon;
+    const newIconContents = newIcon && newIcon.contents;
 
-    modeling.updateProperties(element, {
-      'zeebe:modelerTemplateIcon': icon && icon.contents
-    });
+    if (getTemplateIcon(element) !== newIconContents) {
+      modeling.updateProperties(element, {
+        'zeebe:modelerTemplateIcon': newIconContents
+      });
+    }
   }
 
   _updateProperties(element, oldTemplate, newTemplate) {
