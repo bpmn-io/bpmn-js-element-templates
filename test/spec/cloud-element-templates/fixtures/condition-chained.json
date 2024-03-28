@@ -17,7 +17,7 @@
     {
       "id": "prop2",
       "type": "String",
-      "value": "bar",
+      "value": "prop2:foo",
       "binding": {
         "type": "property",
         "name": "prop2"
@@ -28,16 +28,42 @@
       }
     },
     {
+      "id": "prop2_1",
+      "type": "String",
+      "value": "prop2_1:bar",
+      "binding": {
+        "type": "property",
+        "name": "prop2"
+      },
+      "condition": {
+        "property": "prop1",
+        "equals": "bar"
+      }
+    },
+    {
       "id": "prop3",
       "type": "String",
-      "value": "baz",
+      "value": "prop3:foo",
       "binding": {
         "type": "property",
         "name": "prop3"
       },
       "condition": {
         "property": "prop2",
-        "equals": "bar"
+        "equals": "prop2:foo"
+      }
+    },
+    {
+      "id": "prop3_1",
+      "type": "String",
+      "value": "prop3_1:bar",
+      "binding": {
+        "type": "property",
+        "name": "prop3"
+      },
+      "condition": {
+        "property": "prop2_1",
+        "equals": "prop2_1:bar"
       }
     }
   ]

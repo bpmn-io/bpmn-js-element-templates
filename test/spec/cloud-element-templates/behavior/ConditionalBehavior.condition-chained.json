@@ -1,0 +1,137 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Condition Chained (duplicate ids)",
+  "id": "example.com.nested.condition.chained.duplicate-ids",
+  "description": "A chained conditional template.",
+  "appliesTo": ["bpmn:Task"],
+  "properties": [
+    {
+      "id": "prop1",
+      "type": "String",
+      "value": "prop1:foo",
+      "binding": {
+        "type": "property",
+        "name": "prop1"
+      }
+    },
+    {
+      "id": "prop2",
+      "type": "String",
+      "value": "prop2:foo",
+      "binding": {
+        "type": "property",
+        "name": "prop2"
+      }
+    },
+    {
+      "id": "prop3_a",
+      "type": "String",
+      "value": "prop3:foo",
+      "binding": {
+        "type": "property",
+        "name": "prop3"
+      },
+      "condition": {
+        "allMatch": [
+          {
+            "property": "prop1",
+            "equals": "prop1:foo"
+          },
+          {
+            "property": "prop2",
+            "equals": "prop2:foo"
+          }
+        ]
+      }
+    },
+    {
+      "id": "prop3_b",
+      "type": "String",
+      "value": "prop3:bar",
+      "binding": {
+        "type": "property",
+        "name": "prop3"
+      },
+      "condition": {
+        "allMatch": [
+          {
+            "property": "prop1",
+            "equals": "prop1:bar"
+          },
+          {
+            "property": "prop2",
+            "equals": "prop2:foo"
+          }
+        ]
+      }
+    },
+    {
+      "id": "prop4_a",
+      "type": "String",
+      "value": "prop4:foo",
+      "binding": {
+        "type": "property",
+        "name": "prop4"
+      },
+      "condition": {
+        "allMatch": [
+          {
+            "property": "prop3_a",
+            "equals": "prop3:foo"
+          },
+          {
+            "property": "prop1",
+            "equals": "prop1:foo"
+          }
+        ]
+      }
+    },
+    {
+      "id": "prop4_b",
+      "type": "String",
+      "value": "prop4:bar",
+      "binding": {
+        "type": "property",
+        "name": "prop4"
+      },
+      "condition": {
+        "allMatch": [
+          {
+            "property": "prop3_b",
+            "equals": "prop3:bar"
+          },
+          {
+            "property": "prop1",
+            "equals": "prop1:bar"
+          }
+        ]
+      }
+    },
+    {
+      "id": "prop5_a",
+      "type": "String",
+      "value": "prop5:foo",
+      "binding": {
+        "type": "property",
+        "name": "prop5"
+      },
+      "condition": {
+        "property": "prop4_a",
+        "equals": "prop4:foo"
+      }
+    },
+    {
+      "id": "prop5_b",
+      "type": "String",
+      "value": "prop5:bar",
+      "binding": {
+        "type": "property",
+        "name": "prop5"
+      },
+      "condition": {
+        "property": "prop4_b",
+        "equals": "prop4:bar"
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Condition Chained (duplicate ids)",
+  "id": "example.com.nested.condition.chained.duplicate-ids",
+  "description": "A chained conditional template with duplicate ids.",
+  "appliesTo": ["bpmn:Task"],
+  "properties": [
+    {
+      "id": "prop1",
+      "type": "String",
+      "value": "prop1:foo",
+      "binding": {
+        "type": "property",
+        "name": "prop1"
+      }
+    },
+    {
+      "id": "prop3_a",
+      "type": "String",
+      "value": "prop3_a:foo",
+      "binding": {
+        "type": "property",
+        "name": "prop3"
+      },
+      "condition": {
+        "allMatch": [
+          {
+            "property": "prop1",
+            "equals": "prop1:foo"
+          }
+        ]
+      }
+    },
+    {
+      "id": "prop3_b",
+      "type": "String",
+      "value": "prop3_b:foo",
+      "binding": {
+        "type": "property",
+        "name": "prop3"
+      },
+      "condition": {
+        "allMatch": [
+          {
+            "property": "prop1",
+            "equals": "prop1:bar"
+          }
+        ]
+      }
+    },
+    {
+      "id": "prop4",
+      "type": "String",
+      "value": "prop4:bar",
+      "binding": {
+        "type": "property",
+        "name": "prop4"
+      },
+      "condition": {
+        "property": "prop3_b",
+        "equals": "prop3_a:foo"
+      }
+    }
+  ]
+}
