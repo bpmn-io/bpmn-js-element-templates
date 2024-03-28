@@ -6,6 +6,12 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.15.0
+
+* `FIX`: handle conflicting templates with shared bindings ([#78](https://github.com/bpmn-io/bpmn-js-element-templates/issues/78))
+* `FIX`: prevent infinite loop when applying conditional template ([#78](https://github.com/bpmn-io/bpmn-js-element-templates/issues/78))
+* `CHORE`: only update template properties if necessary
+
 ## 1.14.2
 
 * `FIX`: make command registration named module to prevent duplicate command registration ([#76](https://github.com/bpmn-io/bpmn-js-element-templates/pull/76))
