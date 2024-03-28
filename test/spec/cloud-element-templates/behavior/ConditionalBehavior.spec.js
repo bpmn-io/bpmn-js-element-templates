@@ -22,7 +22,9 @@ import messageCorrelationDiagramXML from '../fixtures/message-correlation-key.bp
 
 import template from '../fixtures/condition.json';
 import updateTemplates from '../fixtures/condition-update.json';
-import chainedConditions from '../fixtures/chained-conditions.json';
+import chainedConditionsSimpleTemplate from '../fixtures/condition-chained.json';
+import chainedConditionsComplexTemplate from './ConditionalBehavior.condition-chained.json';
+import chainedConditionsSharedBindingTemplate from './ConditionalBehavior.condition-chained-shared-binding.json';
 
 import messageTemplates from '../fixtures/condition-message.json';
 import messageCorrelationTemplate from '../fixtures/message-correlation-key.json';
@@ -1347,26 +1349,282 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
   describe('chained conditional properties', function() {
 
-    it('should apply a chain of dependent conditional properties', inject(function(elementRegistry, modeling) {
+    describe('simple', function() {
 
-      // given
-      const element = elementRegistry.get('Task_1');
+      it('should set when applying template', inject(
+        function(elementRegistry, modeling) {
 
-      // when
-      changeTemplate(element, chainedConditions);
+          // given
+          const element = elementRegistry.get('Task_1');
 
-      // then
-      const businessObject = getBusinessObject(element);
+          // when
+          changeTemplate(element, chainedConditionsSimpleTemplate);
 
-      expect(businessObject.get('prop1')).to.exist;
-      expect(businessObject.get('prop1')).to.eql('foo');
+          // then
+          const businessObject = getBusinessObject(element);
 
-      expect(businessObject.get('prop2')).to.exist;
-      expect(businessObject.get('prop2')).to.eql('bar');
+          expect(businessObject.get('prop1')).to.exist;
+          expect(businessObject.get('prop1')).to.eql('foo');
 
-      expect(businessObject.get('prop3')).to.exist;
-      expect(businessObject.get('prop3')).to.eql('baz');
-    }));
+          expect(businessObject.get('prop2')).to.exist;
+          expect(businessObject.get('prop2')).to.eql('prop2:foo');
+
+          expect(businessObject.get('prop3')).to.exist;
+          expect(businessObject.get('prop3')).to.eql('prop3:foo');
+        }
+      ));
+
+
+      it('should set when updating property', inject(
+        function(elementRegistry, modeling) {
+
+          // given
+          const element = elementRegistry.get('Task_1');
+
+          // assume
+          changeTemplate(element, chainedConditionsSimpleTemplate);
+
+          // when
+          modeling.updateProperties(element, {
+            prop1: 'bar'
+          });
+
+          // then
+          const businessObject = getBusinessObject(element);
+
+          expect(businessObject.get('prop1')).to.exist;
+          expect(businessObject.get('prop1')).to.eql('bar');
+
+          expect(businessObject.get('prop2')).to.exist;
+          expect(businessObject.get('prop2')).to.eql('prop2_1:bar');
+
+          expect(businessObject.get('prop3')).to.exist;
+          expect(businessObject.get('prop3')).to.eql('prop3_1:bar');
+        }
+      ));
+
+
+      it('should set when updating moddle property', inject(
+        function(elementRegistry, modeling) {
+
+          // given
+          const element = elementRegistry.get('Task_1');
+          const businessObject = getBusinessObject(element);
+
+          // assume
+          changeTemplate(element, chainedConditionsSimpleTemplate);
+
+          // when
+          modeling.updateModdleProperties(element, businessObject, {
+            prop1: 'bar'
+          });
+
+          // then
+          expect(businessObject.get('prop1')).to.exist;
+          expect(businessObject.get('prop1')).to.eql('bar');
+
+          expect(businessObject.get('prop2')).to.exist;
+          expect(businessObject.get('prop2')).to.eql('prop2_1:bar');
+
+          expect(businessObject.get('prop3')).to.exist;
+          expect(businessObject.get('prop3')).to.eql('prop3_1:bar');
+        }
+      ));
+
+    });
+
+
+    describe('complex', function() {
+
+      it('should set when applying template', inject(
+        function(elementRegistry, modeling) {
+
+          // given
+          const element = elementRegistry.get('Task_1');
+
+          // when
+          changeTemplate(element, chainedConditionsComplexTemplate);
+
+          // then
+          const businessObject = getBusinessObject(element);
+
+          expect(businessObject.get('prop1')).to.exist;
+          expect(businessObject.get('prop1')).to.eql('prop1:foo');
+
+          expect(businessObject.get('prop2')).to.exist;
+          expect(businessObject.get('prop2')).to.eql('prop2:foo');
+
+          expect(businessObject.get('prop3')).to.exist;
+          expect(businessObject.get('prop3')).to.eql('prop3:foo');
+
+          expect(businessObject.get('prop4')).to.exist;
+          expect(businessObject.get('prop4')).to.eql('prop4:foo');
+
+          expect(businessObject.get('prop5')).to.exist;
+          expect(businessObject.get('prop5')).to.eql('prop5:foo');
+        }
+      ));
+
+
+      it('should set when updating property', inject(
+        function(elementRegistry, modeling) {
+
+          // given
+          const element = elementRegistry.get('Task_1');
+
+          // assume
+          changeTemplate(element, chainedConditionsComplexTemplate);
+
+          // when
+          modeling.updateProperties(element, {
+            prop1: 'prop1:bar'
+          });
+
+          // then
+          const businessObject = getBusinessObject(element);
+
+          expect(businessObject.get('prop1')).to.exist;
+          expect(businessObject.get('prop1')).to.eql('prop1:bar');
+
+          expect(businessObject.get('prop2')).to.exist;
+          expect(businessObject.get('prop2')).to.eql('prop2:foo');
+
+          expect(businessObject.get('prop3')).to.exist;
+          expect(businessObject.get('prop3')).to.eql('prop3:bar');
+
+          expect(businessObject.get('prop4')).to.exist;
+          expect(businessObject.get('prop4')).to.eql('prop4:bar');
+
+          expect(businessObject.get('prop5')).to.exist;
+          expect(businessObject.get('prop5')).to.eql('prop5:bar');
+        }
+      ));
+
+
+      it('should set when updating moddle property', inject(
+        function(elementRegistry, modeling) {
+
+          // given
+          const element = elementRegistry.get('Task_1');
+          const businessObject = getBusinessObject(element);
+
+          // assume
+          changeTemplate(element, chainedConditionsComplexTemplate);
+
+          // when
+          modeling.updateModdleProperties(element, businessObject, {
+            prop1: 'prop1:bar'
+          });
+
+          // then
+          expect(businessObject.get('prop1')).to.exist;
+          expect(businessObject.get('prop1')).to.eql('prop1:bar');
+
+          expect(businessObject.get('prop2')).to.exist;
+          expect(businessObject.get('prop2')).to.eql('prop2:foo');
+
+          expect(businessObject.get('prop3')).to.exist;
+          expect(businessObject.get('prop3')).to.eql('prop3:bar');
+
+          expect(businessObject.get('prop4')).to.exist;
+          expect(businessObject.get('prop4')).to.eql('prop4:bar');
+
+          expect(businessObject.get('prop5')).to.exist;
+          expect(businessObject.get('prop5')).to.eql('prop5:bar');
+        }
+      ));
+
+    });
+
+
+    describe('shared-binding', function() {
+
+      it('should set when applying template', inject(
+        function(elementRegistry, modeling) {
+
+          // given
+          const element = elementRegistry.get('Task_1');
+
+          // when
+          changeTemplate(element, chainedConditionsSharedBindingTemplate);
+
+          // then
+          const businessObject = getBusinessObject(element);
+
+          expect(businessObject.get('prop1')).to.exist;
+          expect(businessObject.get('prop1')).to.eql('prop1:foo');
+
+          expect(businessObject.get('prop3')).to.exist;
+          expect(businessObject.get('prop3')).to.eql('prop3_a:foo');
+
+          // TODO(nikku): the following scenario is not the expected output
+          // and currently broken:
+          //
+          //   [ prop4 -> prop4:bar | depends on prop3_b ] -
+          //   It is only valid when prop3_b is active with a particular
+          //   value, but due to the fact that another property [prop3_a]
+          //   uses the same technical binding it activates regardless
+          expect(businessObject.get('prop4')).to.to.exist;
+          expect(businessObject.get('prop4')).to.eql('prop4:bar');
+        }
+      ));
+
+
+      it('should set when updating property', inject(
+        function(elementRegistry, modeling) {
+
+          // given
+          const element = elementRegistry.get('Task_1');
+
+          // assume
+          changeTemplate(element, chainedConditionsSharedBindingTemplate);
+
+          // when
+          modeling.updateProperties(element, {
+            prop1: 'prop1:bar'
+          });
+
+          // then
+          const businessObject = getBusinessObject(element);
+
+          expect(businessObject.get('prop1')).to.exist;
+          expect(businessObject.get('prop1')).to.eql('prop1:bar');
+
+          expect(businessObject.get('prop3')).to.exist;
+          expect(businessObject.get('prop3')).to.eql('prop3_b:foo');
+
+          expect(businessObject.get('prop4')).not.to.exist;
+        }
+      ));
+
+
+      it('should set when updating moddle property', inject(
+        function(elementRegistry, modeling) {
+
+          // given
+          const element = elementRegistry.get('Task_1');
+          const businessObject = getBusinessObject(element);
+
+          // assume
+          changeTemplate(element, chainedConditionsSharedBindingTemplate);
+
+          // when
+          modeling.updateModdleProperties(element, businessObject, {
+            prop1: 'prop1:bar'
+          });
+
+          // then
+          expect(businessObject.get('prop1')).to.exist;
+          expect(businessObject.get('prop1')).to.eql('prop1:bar');
+
+          expect(businessObject.get('prop3')).to.exist;
+          expect(businessObject.get('prop3')).to.eql('prop3_b:foo');
+
+          expect(businessObject.get('prop4')).not.to.exist;
+        }
+      ));
+
+    });
 
   });
 
