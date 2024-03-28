@@ -7,7 +7,9 @@ import {
 import {
   findCamundaErrorEventDefinition,
   findExtension,
-  findExtensions
+  findExtensions,
+  getTemplateId,
+  getTemplateVersion
 } from '../Helper';
 
 import handleLegacyScopes from '../util/handleLegacyScopes';
@@ -614,10 +616,15 @@ export default class ChangeElementTemplateHandler {
   _updateCamundaModelerTemplate(element, newTemplate) {
     const modeling = this._modeling;
 
-    modeling.updateProperties(element, {
-      'camunda:modelerTemplate': newTemplate && newTemplate.id,
-      'camunda:modelerTemplateVersion': newTemplate && newTemplate.version
-    });
+    const newId = newTemplate && newTemplate.id;
+    const newVersion = newTemplate && newTemplate.version;
+
+    if (getTemplateId(element) !== newId || getTemplateVersion(element) !== newVersion) {
+      modeling.updateProperties(element, {
+        'camunda:modelerTemplate': newId,
+        'camunda:modelerTemplateVersion': newVersion
+      });
+    }
   }
 
   /**
