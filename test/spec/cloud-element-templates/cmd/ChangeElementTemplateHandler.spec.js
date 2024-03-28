@@ -4145,7 +4145,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       beforeEach(bootstrap(require('../fixtures/condition.bpmn').default));
 
 
-      it('should not add conditional properties', inject(function(elementRegistry) {
+      it('should apply template, not adding conditional properties', inject(function(elementRegistry) {
 
         // given
         const newTemplate = require('../fixtures/condition.json');
@@ -4175,7 +4175,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       }));
 
 
-      it('should add conditional properties', inject(function(elementRegistry) {
+      it('should apply template, adding conditional properties', inject(function(elementRegistry) {
 
         // given
         const newTemplate = require('../fixtures/condition.json');
@@ -4209,6 +4209,39 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(taskDefinition).to.exist;
       }));
 
+
+      it('should apply chained updates', inject(function(elementRegistry) {
+
+        // given
+        const newTemplate = require('../fixtures/condition-chained.json');
+
+        const task = elementRegistry.get('Task_3');
+
+        // when
+        const setTemplate = function() {
+          changeTemplate(task, newTemplate);
+        };
+
+        // then
+        expect(setTemplate).not.to.throw();
+      }));
+
+
+      it('should apply chained updates (shared binding / duplicate property#id)', inject(function(elementRegistry) {
+
+        // given
+        const newTemplate = require('../fixtures/condition-chained-shared-binding.json');
+
+        const task = elementRegistry.get('Task_1');
+
+        // when
+        const setTemplate = function() {
+          changeTemplate(task, newTemplate);
+        };
+
+        // then
+        expect(setTemplate).not.to.throw();
+      }));
 
     });
 

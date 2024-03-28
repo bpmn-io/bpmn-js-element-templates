@@ -1,8 +1,8 @@
 {
   "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
-  "name": "Condition",
-  "id": "example.com.nested.condition",
-  "description": "A conditional template.",
+  "name": "Condition Chained",
+  "id": "example.com.nested.condition.chained",
+  "description": "A conditional chained template.",
   "appliesTo": ["bpmn:Task"],
   "properties": [
     {

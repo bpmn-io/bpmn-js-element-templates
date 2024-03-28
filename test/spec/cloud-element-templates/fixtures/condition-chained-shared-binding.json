@@ -1,0 +1,83 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Condition Chained (duplicate IDs)",
+  "id": "example.com.nested.condition.chained.duplicate-ids",
+  "description": "A chained conditional template.",
+  "appliesTo": [
+    "bpmn:Task"
+  ],
+  "properties": [
+    {
+      "id": "authType",
+      "type": "String",
+      "value": "refresh",
+      "binding": {
+        "type": "property",
+        "name": "authentication_type"
+      }
+    },
+    {
+      "id": "operationType",
+      "value": "chat",
+      "type": "String",
+      "binding": {
+        "type": "property",
+        "name": "data_type"
+      }
+    },
+    {
+      "id": "chatMethod",
+      "value": "sendMessageToChat",
+      "type": "String",
+      "condition": {
+        "allMatch": [
+          {
+            "property": "operationType",
+            "equals": "chat"
+          },
+          {
+            "property": "authType",
+            "equals": "refresh"
+          }
+        ]
+      },
+      "binding": {
+        "type": "property",
+        "name": "data_method"
+      }
+    },
+    {
+      "id": "channelMethod",
+      "value": "sendMessageToChannel",
+      "type": "String",
+      "condition": {
+        "allMatch": [
+          {
+            "property": "operationType",
+            "equals": "channel"
+          },
+          {
+            "property": "authType",
+            "equals": "refresh"
+          }
+        ]
+      },
+      "binding": {
+        "type": "property",
+        "name": "data_method"
+      }
+    },
+    {
+      "type": "String",
+      "value": "TEXT",
+      "binding": {
+        "type": "property",
+        "name": "data_bodyType"
+      },
+      "condition": {
+        "property": "channelMethod",
+        "equals": "sendMessageToChat"
+      }
+    }
+  ]
+}
