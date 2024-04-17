@@ -68,18 +68,16 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
   describe('update property', function() {
 
     it('should add conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1');
-        changeTemplate(element, template);
+        const element = changeTemplate('Task_1', template);
+        const businessObject = getBusinessObject(element);
 
         // when
         modeling.updateProperties(element, {
           name: 'foo'
         });
-
-        const businessObject = getBusinessObject(element);
 
         // then
         expect(businessObject.get('customProperty')).to.exist;
@@ -94,20 +92,19 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should remove conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_2');
-        changeTemplate(element, template);
+        const element = changeTemplate('Task_2', template);
 
         // when
         modeling.updateProperties(element, {
           name: ''
         });
 
+        // then
         const businessObject = getBusinessObject(element);
 
-        // then
         expect(businessObject.get('customProperty')).to.be.undefined;
         expect(businessObject.get('isActiveCondition')).to.be.undefined;
       })
@@ -115,12 +112,11 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should switch between conditional properties', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1');
-        let businessObject = getBusinessObject(element);
-        changeTemplate(element, template);
+        const element = changeTemplate('Task_1', template);
+        const businessObject = getBusinessObject(element);
 
         // when
         modeling.updateProperties(element, {
@@ -141,18 +137,16 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     );
 
 
-    it('undo', inject(function(commandStack, elementRegistry, modeling) {
+    it('undo', inject(function(commandStack, modeling) {
 
       // given
-      const element = elementRegistry.get('Task_1');
-      changeTemplate(element, template);
+      const element = changeTemplate('Task_1', template);
+      const businessObject = getBusinessObject(element);
 
       // when
       modeling.updateProperties(element, {
         name: 'foo'
       });
-
-      const businessObject = getBusinessObject(element);
 
       // assume
       expect(businessObject.get('customProperty')).to.exist;
@@ -164,11 +158,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     }));
 
 
-    it('redo', inject(function(commandStack, elementRegistry, modeling) {
+    it('redo', inject(function(commandStack, modeling) {
 
       // given
-      const element = elementRegistry.get('Task_1');
-      changeTemplate(element, template);
+      const element = changeTemplate('Task_1', template);
 
       // when
       modeling.updateProperties(element, {
@@ -197,11 +190,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
   describe('update zeebe:taskDefinition:type and zeebe:taskDefinition', function() {
 
     it('should add conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1');
-        changeTemplate(element, template);
+        const element = changeTemplate('Task_1', template);
 
         // when
         modeling.updateProperties(element, {
@@ -218,11 +210,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should remove conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_2');
-        changeTemplate(element, template);
+        const element = changeTemplate('Task_2', template);
 
         // when
         modeling.updateProperties(element, {
@@ -239,13 +230,11 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should switch between conditional properties', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1');
-        let businessObject = getBusinessObject(element);
-
-        changeTemplate(element, template);
+        const element = changeTemplate('Task_1', template);
+        const businessObject = getBusinessObject(element);
 
         // when
         modeling.updateProperties(element, {
@@ -266,11 +255,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     );
 
 
-    it('undo', inject(function(commandStack, elementRegistry, modeling) {
+    it('undo', inject(function(commandStack, modeling) {
 
       // given
-      const element = elementRegistry.get('Task_2');
-      changeTemplate(element, template);
+      const element = changeTemplate('Task_2', template);
 
       // when
       modeling.updateProperties(element, {
@@ -289,11 +277,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     }));
 
 
-    it('redo', inject(function(commandStack, elementRegistry, modeling) {
+    it('redo', inject(function(commandStack, modeling) {
 
       // given
-      const element = elementRegistry.get('Task_2');
-      changeTemplate(element, template);
+      const element = changeTemplate('Task_2', template);
 
       // when
       modeling.updateProperties(element, {
@@ -321,12 +308,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
   describe('update zeebe:ioMapping', function() {
 
     it('should add conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1');
-        changeTemplate(element, template);
-
+        const element = changeTemplate('Task_1', template);
         const businessObject = getBusinessObject(element);
 
         // when
@@ -346,12 +331,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should remove conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_2');
-        changeTemplate(element, template);
-
+        const element = changeTemplate('Task_2', template);
         const businessObject = getBusinessObject(element);
 
         // when
@@ -369,12 +352,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should clear IO mapping if no input parameters', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_2');
-        changeTemplate(element, template);
-
+        const element = changeTemplate('Task_2', template);
         const businessObject = getBusinessObject(element);
 
         // when
@@ -391,12 +372,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should switch between conditional properties', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1');
-        changeTemplate(element, template);
-
+        const element = changeTemplate('Task_1', template);
         const businessObject = getBusinessObject(element);
 
         // when
@@ -418,12 +397,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     );
 
 
-    it('undo', inject(function(commandStack, elementRegistry, modeling) {
+    it('undo', inject(function(commandStack, modeling) {
 
       // given
-      const element = elementRegistry.get('Task_2');
-      changeTemplate(element, template);
-
+      const element = changeTemplate('Task_2', template);
       const businessObject = getBusinessObject(element);
 
       // when
@@ -442,12 +419,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     }));
 
 
-    it('redo', inject(function(commandStack, elementRegistry, modeling) {
+    it('redo', inject(function(commandStack, modeling) {
 
       // given
-      const element = elementRegistry.get('Task_2');
-      changeTemplate(element, template);
-
+      const element = changeTemplate('Task_2', template);
       const businessObject = getBusinessObject(element);
 
       modeling.updateProperties(element, {
@@ -474,12 +449,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
   describe('update zeebe:taskHeader', function() {
 
     it('should add conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1');
-        changeTemplate(element, template);
-
+        const element = changeTemplate('Task_1', template);
         const businessObject = getBusinessObject(element);
 
         // when
@@ -496,12 +469,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should remove conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_2');
-        changeTemplate(element, template);
-
+        const element = changeTemplate('Task_2', template);
         const businessObject = getBusinessObject(element);
 
         // when
@@ -518,12 +489,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should clear taskHeaders if no task headers', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_2');
-        changeTemplate(element, template);
-
+        const element = changeTemplate('Task_2', template);
         const businessObject = getBusinessObject(element);
 
         // when
@@ -540,12 +509,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should switch between conditional properties', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1');
-        changeTemplate(element, template);
-
+        const element = changeTemplate('Task_1', template);
         const businessObject = getBusinessObject(element);
 
         // when
@@ -567,12 +534,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     );
 
 
-    it('undo', inject(function(commandStack, elementRegistry, modeling) {
+    it('undo', inject(function(commandStack, modeling) {
 
       // given
-      const element = elementRegistry.get('Task_1');
-      changeTemplate(element, template);
-
+      const element = changeTemplate('Task_1', template);
       const businessObject = getBusinessObject(element);
 
       // when
@@ -592,12 +557,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     }));
 
 
-    it('redo', inject(function(commandStack, elementRegistry, modeling) {
+    it('redo', inject(function(commandStack, modeling) {
 
       // given
-      const element = elementRegistry.get('Task_1');
-      changeTemplate(element, template);
-
+      const element = changeTemplate('Task_1', template);
       const businessObject = getBusinessObject(element);
 
       // when
@@ -625,13 +588,11 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     describe('adding conditional entries', function() {
 
       it('should add conditional entries', inject(
-        async function(elementRegistry, modeling) {
+        async function(modeling) {
 
           // given
-          const element = elementRegistry.get('Task_1'),
-                businessObject = getBusinessObject(element);
-
-          changeTemplate(element, template);
+          const element = changeTemplate('Task_1', template);
+          const businessObject = getBusinessObject(element);
 
           // when
           modeling.updateProperties(element, {
@@ -648,13 +609,11 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
       it('should switch between conditional properties', inject(
-        async function(elementRegistry, modeling) {
+        async function(modeling) {
 
           // given
-          const element = elementRegistry.get('Task_1'),
-                businessObject = getBusinessObject(element);
-
-          changeTemplate(element, template);
+          const element = changeTemplate('Task_1', template);
+          const businessObject = getBusinessObject(element);
 
           // when
           modeling.updateProperties(element, {
@@ -675,13 +634,11 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       );
 
 
-      it('undo', inject(function(commandStack, elementRegistry, modeling) {
+      it('undo', inject(function(commandStack, modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1'),
-              businessObject = getBusinessObject(element);
-
-        changeTemplate(element, template);
+        const element = changeTemplate('Task_1', template);
+        const businessObject = getBusinessObject(element);
 
         // when
         modeling.updateProperties(element, {
@@ -699,13 +656,11 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       }));
 
 
-      it('redo', inject(function(commandStack, elementRegistry, modeling) {
+      it('redo', inject(function(commandStack, modeling) {
 
         // given
-        const element = elementRegistry.get('Task_1'),
-              businessObject = getBusinessObject(element);
-
-        changeTemplate(element, template);
+        const element = changeTemplate('Task_1', template);
+        const businessObject = getBusinessObject(element);
 
         // when
         modeling.updateProperties(element, {
@@ -731,13 +686,11 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should remove conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = elementRegistry.get('Task_2'),
-              businessObject = getBusinessObject(element);
-
-        changeTemplate(element, template);
+        const element = changeTemplate('Task_2', template);
+        const businessObject = getBusinessObject(element);
 
         // when
         modeling.updateProperties(element, {
@@ -779,13 +732,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     }));
 
 
-    it('should add conditional entries', inject(async function(elementRegistry) {
-
-      // given
-      let element = elementRegistry.get('Event_3');
+    it('should add conditional entries', inject(async function() {
 
       // when
-      element = changeTemplate(element, template);
+      const element = changeTemplate('Event_3', template);
 
       // then
       const message = findMessage(getBusinessObject(element));
@@ -884,13 +834,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     }));
 
 
-    it('should set zeebe:modelerTemplate on created message', inject(function(elementRegistry) {
-
-      // given
-      let element = elementRegistry.get('Event_3');
+    it('should set zeebe:modelerTemplate on created message', inject(function() {
 
       // when
-      element = changeTemplate(element, template);
+      const element = changeTemplate('Event_3', template);
 
       // then
       const message = findMessage(getBusinessObject(element));
@@ -948,13 +895,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       }));
 
 
-      it('should show correlation key - MessageStartSubprocess', inject(async function(elementRegistry, selection) {
-
-        // given
-        let element = elementRegistry.get('MessageStartSubprocess');
+      it('should show correlation key - MessageStartSubprocess', inject(async function(selection) {
 
         // when
-        element = changeTemplate(element, messageCorrelationTemplate);
+        const element = changeTemplate('MessageStartSubprocess', messageCorrelationTemplate);
         await act(() => selection.select(element));
 
         // then
@@ -963,13 +907,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       }));
 
 
-      it('should NOT show correlation key', inject(async function(elementRegistry, selection) {
-
-        // given
-        let element = elementRegistry.get('MessageStart');
+      it('should NOT show correlation key', inject(async function(selection) {
 
         // when
-        element = changeTemplate(element, messageCorrelationTemplate);
+        const element = changeTemplate('MessageStart', messageCorrelationTemplate);
         await act(() => selection.select(element));
 
         // then
@@ -980,13 +921,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     });
 
 
-    it('should add conditional entries', inject(async function(elementRegistry) {
-
-      // given
-      let element = elementRegistry.get('SubscriptionEvent_3');
+    it('should add conditional entries', inject(async function() {
 
       // when
-      element = changeTemplate(element, template);
+      const element = changeTemplate('SubscriptionEvent_3', template);
 
       // then
       const message = findMessage(getBusinessObject(element));
@@ -1041,9 +979,9 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     it('undo', inject(function(commandStack, elementRegistry, modeling) {
 
       // given
-      let element = elementRegistry.get('SubscriptionEvent_1'),
-          bo = getBusinessObject(element);
-      const property = findExtension(bo, 'zeebe:Properties').get('properties')[0];
+      const element = elementRegistry.get('SubscriptionEvent_1');
+      const businessObject = getBusinessObject(element);
+      const property = findExtension(businessObject, 'zeebe:Properties').get('properties')[0];
 
       // when
       modeling.updateModdleProperties(element, property, {
@@ -1051,13 +989,13 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       });
 
       // assume
-      let subscription = findZeebeSubscription(findMessage(bo));
+      let subscription = findZeebeSubscription(findMessage(businessObject));
       expect(subscription).to.not.exist;
 
       // when
       commandStack.undo();
 
-      subscription = findZeebeSubscription(findMessage(bo));
+      subscription = findZeebeSubscription(findMessage(businessObject));
       expect(subscription).to.have.property('correlationKey', 'one');
     }));
 
@@ -1065,9 +1003,9 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     it('redo', inject(function(commandStack, elementRegistry, modeling) {
 
       // given
-      let element = elementRegistry.get('SubscriptionEvent_1'),
-          bo = getBusinessObject(element);
-      const property = findExtension(bo, 'zeebe:Properties').get('properties')[0];
+      const element = elementRegistry.get('SubscriptionEvent_1');
+      const businessObject = getBusinessObject(element);
+      const property = findExtension(businessObject, 'zeebe:Properties').get('properties')[0];
 
       // when
       modeling.updateModdleProperties(element, property, {
@@ -1075,32 +1013,29 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       });
 
       // assume
-      let subscription = findZeebeSubscription(findMessage(bo));
+      let subscription = findZeebeSubscription(findMessage(businessObject));
       expect(subscription).to.not.exist;
 
       // when
       commandStack.undo();
 
       // assume
-      subscription = findZeebeSubscription(findMessage(bo));
+      subscription = findZeebeSubscription(findMessage(businessObject));
       expect(subscription).to.have.property('correlationKey', 'one');
 
       // when
       commandStack.redo();
 
       // then
-      subscription = findZeebeSubscription(findMessage(bo));
+      subscription = findZeebeSubscription(findMessage(businessObject));
       expect(subscription).to.not.exist;
     }));
 
 
-    it('should set zeebe:modelerTemplate on created message', inject(function(elementRegistry) {
-
-      // given
-      let element = elementRegistry.get('SubscriptionEvent_3');
+    it('should set zeebe:modelerTemplate on created message', inject(function() {
 
       // when
-      element = changeTemplate(element, template);
+      const element = changeTemplate('SubscriptionEvent_3', template);
 
       // then
       const message = findMessage(getBusinessObject(element));
@@ -1114,10 +1049,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
   describe('update zeebe:calledElement', function() {
 
     it('should add conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+        const element = changeTemplate('Task_1', calledElementTemplate);
         const businessObject = getBusinessObject(element);
 
         // when
@@ -1134,10 +1069,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should remove conditional entries', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+        const element = changeTemplate('Task_1', calledElementTemplate);
         const businessObject = getBusinessObject(element);
 
         modeling.updateProperties(element, {
@@ -1158,10 +1093,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
     it('should switch between conditional properties', inject(
-      async function(elementRegistry, modeling) {
+      async function(modeling) {
 
         // given
-        const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+        const element = changeTemplate('Task_1', calledElementTemplate);
         const businessObject = getBusinessObject(element);
 
         modeling.updateProperties(element, {
@@ -1181,10 +1116,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     );
 
 
-    it('undo', inject(function(commandStack, elementRegistry, modeling) {
+    it('undo', inject(function(commandStack, modeling) {
 
       // given
-      const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+      const element = changeTemplate('Task_1', calledElementTemplate);
       const businessObject = getBusinessObject(element);
 
       modeling.updateProperties(element, {
@@ -1201,10 +1136,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     }));
 
 
-    it('redo', inject(function(commandStack, elementRegistry, modeling) {
+    it('redo', inject(function(commandStack, modeling) {
 
       // given
-      const element = changeTemplate(elementRegistry.get('Task_1'), calledElementTemplate);
+      const element = changeTemplate('Task_1', calledElementTemplate);
       const businessObject = getBusinessObject(element);
 
       modeling.updateProperties(element, {
@@ -1311,11 +1246,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
   describe('update template', function() {
 
-    it('should keep property value when condition property is still active', inject(function(elementRegistry, modeling) {
+    it('should keep property value when condition property is still active', inject(function(modeling) {
 
       // given
-      const element = elementRegistry.get('Task_1');
-      changeTemplate(element, updateTemplates[0]);
+      const element = changeTemplate('Task_1', updateTemplates[0]);
 
       modeling.updateProperties(element, {
         name: 'foo'
@@ -1352,13 +1286,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     describe('simple', function() {
 
       it('should set when applying template', inject(
-        function(elementRegistry, modeling) {
-
-          // given
-          const element = elementRegistry.get('Task_1');
+        function(modeling) {
 
           // when
-          changeTemplate(element, chainedConditionsSimpleTemplate);
+          const element = changeTemplate('Task_1', chainedConditionsSimpleTemplate);
 
           // then
           const businessObject = getBusinessObject(element);
@@ -1376,13 +1307,10 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
       it('should set when updating property', inject(
-        function(elementRegistry, modeling) {
+        function(modeling) {
 
           // given
-          const element = elementRegistry.get('Task_1');
-
-          // assume
-          changeTemplate(element, chainedConditionsSimpleTemplate);
+          const element = changeTemplate('Task_1', chainedConditionsSimpleTemplate);
 
           // when
           modeling.updateProperties(element, {
@@ -1405,14 +1333,13 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
       it('should set when updating moddle property', inject(
-        function(elementRegistry, modeling) {
+        function(modeling) {
 
           // given
-          const element = elementRegistry.get('Task_1');
+          const element = changeTemplate(
+            'Task_1', chainedConditionsSimpleTemplate
+          );
           const businessObject = getBusinessObject(element);
-
-          // assume
-          changeTemplate(element, chainedConditionsSimpleTemplate);
 
           // when
           modeling.updateModdleProperties(element, businessObject, {
@@ -1437,13 +1364,12 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     describe('complex', function() {
 
       it('should set when applying template', inject(
-        function(elementRegistry, modeling) {
-
-          // given
-          const element = elementRegistry.get('Task_1');
+        function() {
 
           // when
-          changeTemplate(element, chainedConditionsComplexTemplate);
+          const element = changeTemplate(
+            'Task_1', chainedConditionsComplexTemplate
+          );
 
           // then
           const businessObject = getBusinessObject(element);
@@ -1467,13 +1393,12 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
       it('should set when updating property', inject(
-        function(elementRegistry, modeling) {
+        function(modeling) {
 
           // given
-          const element = elementRegistry.get('Task_1');
-
-          // assume
-          changeTemplate(element, chainedConditionsComplexTemplate);
+          const element = changeTemplate(
+            'Task_1', chainedConditionsComplexTemplate
+          );
 
           // when
           modeling.updateProperties(element, {
@@ -1502,14 +1427,14 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
       it('should set when updating moddle property', inject(
-        function(elementRegistry, modeling) {
+        function(modeling) {
 
           // given
-          const element = elementRegistry.get('Task_1');
-          const businessObject = getBusinessObject(element);
+          const element = changeTemplate(
+            'Task_1', chainedConditionsComplexTemplate
+          );
 
-          // assume
-          changeTemplate(element, chainedConditionsComplexTemplate);
+          const businessObject = getBusinessObject(element);
 
           // when
           modeling.updateModdleProperties(element, businessObject, {
@@ -1540,13 +1465,12 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     describe('shared-binding', function() {
 
       it('should set when applying template', inject(
-        function(elementRegistry, modeling) {
-
-          // given
-          const element = elementRegistry.get('Task_1');
+        function() {
 
           // when
-          changeTemplate(element, chainedConditionsSharedBindingTemplate);
+          const element = changeTemplate(
+            'Task_1', chainedConditionsSharedBindingTemplate
+          );
 
           // then
           const businessObject = getBusinessObject(element);
@@ -1571,13 +1495,12 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
       it('should set when updating property', inject(
-        function(elementRegistry, modeling) {
+        function(modeling) {
 
           // given
-          const element = elementRegistry.get('Task_1');
-
-          // assume
-          changeTemplate(element, chainedConditionsSharedBindingTemplate);
+          const element = changeTemplate(
+            'Task_1', chainedConditionsSharedBindingTemplate
+          );
 
           // when
           modeling.updateProperties(element, {
@@ -1599,14 +1522,11 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
 
       it('should set when updating moddle property', inject(
-        function(elementRegistry, modeling) {
+        function(modeling) {
 
           // given
-          const element = elementRegistry.get('Task_1');
+          const element = changeTemplate('Task_1', chainedConditionsSharedBindingTemplate);
           const businessObject = getBusinessObject(element);
-
-          // assume
-          changeTemplate(element, chainedConditionsSharedBindingTemplate);
 
           // when
           modeling.updateModdleProperties(element, businessObject, {
