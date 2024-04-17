@@ -15,7 +15,6 @@ import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
 
 import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 
-
 import diagramXML from '../fixtures/condition.bpmn';
 import messageDiagramXML from '../fixtures/condition-message.bpmn';
 import messageCorrelationDiagramXML from '../fixtures/message-correlation-key.bpmn';
@@ -25,6 +24,7 @@ import updateTemplates from '../fixtures/condition-update.json';
 import chainedConditionsSimpleTemplate from '../fixtures/condition-chained.json';
 import chainedConditionsComplexTemplate from './ConditionalBehavior.condition-chained.json';
 import chainedConditionsSharedBindingTemplate from './ConditionalBehavior.condition-chained-shared-binding.json';
+import dependentDropdownsTemplate from './ConditionalBehavior.dependent-dropdowns.json';
 
 import messageTemplates from '../fixtures/condition-message.json';
 import messageCorrelationTemplate from '../fixtures/message-correlation-key.json';
@@ -1541,6 +1541,73 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
           expect(businessObject.get('prop3')).to.eql('prop3_b:foo');
 
           expect(businessObject.get('prop4')).not.to.exist;
+        }
+      ));
+
+    });
+
+  });
+
+
+  describe('user input', function() {
+
+    describe('should preserve valid <dropdown> values', function() {
+
+      it('when applying template', inject(
+        function(elementRegistry, modeling) {
+
+          // given
+          const element = elementRegistry.get('ServiceTask_1');
+          const businessObject = getBusinessObject(element);
+
+          modeling.updateModdleProperties(element, businessObject, {
+            root: 'Root B',
+            sub: '/B/2'
+          });
+
+          // assume
+          expect(businessObject.get('root')).to.eql('Root B');
+          expect(businessObject.get('sub')).to.eql('/B/2');
+
+          // when
+          const updatedElement = changeTemplate(element, dependentDropdownsTemplate);
+          const updatedBusinessObject = getBusinessObject(updatedElement);
+
+          // then
+          expect(updatedBusinessObject.get('root')).to.eql('Root B');
+          expect(updatedBusinessObject.get('sub')).to.eql('/B/2');
+        }
+      ));
+
+
+      it('when upgrading template', inject(
+        function(modeling) {
+
+          // given
+          const dependentDropdownsTemplateV2 = {
+            ...dependentDropdownsTemplate,
+            version: 2
+          };
+
+          const element = changeTemplate('ServiceTask_1', dependentDropdownsTemplate);
+          const businessObject = getBusinessObject(element);
+
+          modeling.updateModdleProperties(element, businessObject, {
+            root: 'Root B',
+            sub: '/B/2'
+          });
+
+          // assume
+          expect(businessObject.get('root')).to.eql('Root B');
+          expect(businessObject.get('sub')).to.eql('/B/2');
+
+          // when
+          const updatedElement = changeTemplate(element, dependentDropdownsTemplateV2, dependentDropdownsTemplate);
+          const updatedBusinessObject = getBusinessObject(updatedElement);
+
+          // then
+          expect(updatedBusinessObject.get('root')).to.eql('Root B');
+          expect(updatedBusinessObject.get('sub')).to.eql('/B/2');
         }
       ));
 
