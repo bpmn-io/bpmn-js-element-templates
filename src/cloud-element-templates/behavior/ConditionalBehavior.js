@@ -22,14 +22,19 @@ export default class ConditionalBehavior extends CommandInterceptor {
     this._bpmnFactory = bpmnFactory;
     this._injector = injector;
 
-    // (1) save pre-conditional state
+    // (0) perform template changes always conditionally
+    this.preExecute([
+      'propertiesPanel.zeebe.changeTemplate'
+    ], this._ensureConditional, true, this);
+
+    // (1) save pre-conditional state before updating a property
     this.preExecute([
       'element.updateProperties',
       'element.updateModdleProperties',
       'element.move'
     ], this._saveConditionalState, true, this);
 
-    // (2) so we can check if we need to apply post-conditional updates
+    // (2) check after an update if we need to apply post-conditional updates
     //
     //   if [additional bindings activate] then
     //     re-trigger setting the template
@@ -60,35 +65,54 @@ export default class ConditionalBehavior extends CommandInterceptor {
 
   _applyConditions(context) {
     const {
-      element
+      element,
+      newTemplate,
+      oldTemplateWithConditions
     } = context;
 
     const template = this._elementTemplates.get(element);
 
-    // New Template is persisted before applying default values,
+    // new Template is persisted before applying default values,
     // new conditions might apply after the defaults are present.
-    const oldTemplate = context.oldTemplateWithConditions || context.newTemplate;
+    const oldTemplate = oldTemplateWithConditions || newTemplate;
 
     if (!template || !oldTemplate || template.id !== oldTemplate.id) {
       return;
     }
 
-    const newTemplate = applyConditions(element, template);
+    const newTemplateWithConditions = applyConditions(element, template);
 
     // (3) this is the important check that verifies if we need to apply
     //     additional template properties
-    if (!hasDifferentPropertyBindings(newTemplate, oldTemplate)) {
+    if (!hasDifferentPropertyBindings(newTemplateWithConditions, oldTemplate)) {
       return;
     }
 
     const changeContext = {
       element,
       newTemplate,
-      oldTemplate
+      oldTemplate,
+      newTemplateWithConditions
     };
 
     this._commandStack.execute('propertiesPanel.zeebe.changeTemplate', changeContext);
   }
+
+  _ensureConditional(context) {
+    const {
+      element,
+      newTemplateWithConditions,
+      newTemplate
+    } = context;
+
+    if (!newTemplate && !newTemplateWithConditions) {
+      return;
+    }
+
+    // if we apply a new template ensure we always set it conditionally
+    context.newTemplate = newTemplateWithConditions || applyConditions(element, newTemplate);
+  }
+
 }
 
 
