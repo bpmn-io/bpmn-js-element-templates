@@ -1006,6 +1006,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       ]
     }));
 
+
     it('should update template', inject(function(elementRegistry, elementTemplates) {
 
       // given
@@ -1110,7 +1111,7 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
 
     /*
       These Tests confirm that our assumptions for keeping bindings hold true
-      over differnt scenrios. The basic assumptions are:
+      over different scenrios. The basic assumptions are:
 
        * Existing values will be kept, if they are valid in the new template
        * Hidden values defined in the new template override existing values
@@ -1141,6 +1142,8 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
 
     it('Service Task => Template', inject(
       function(elementRegistry, elementTemplates) {
+
+        // given
         let task = elementRegistry.get('configuredTask');
         const template = elementTemplates.get('templateA', 1);
 
@@ -1188,6 +1191,8 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
 
     it('Template v1 => Template v2', inject(
       function(elementRegistry, elementTemplates) {
+
+        // given
         let task = elementRegistry.get('templateTask');
         const template = elementTemplates.get('templateA', 2);
 
@@ -1239,6 +1244,8 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
 
     it('Template A => Template B', inject(
       function(elementRegistry, elementTemplates) {
+
+        // given
         let task = elementRegistry.get('templateTask');
         const template = elementTemplates.get('templateB');
 
@@ -1290,6 +1297,8 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
 
     it('Template => ServiceTask (unlink)', inject(
       function(elementRegistry, elementTemplates) {
+
+        // given
         let task = elementRegistry.get('templateTask');
 
         // assume
@@ -1340,6 +1349,8 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
 
     it('Template => ServiceTask => Template', inject(
       function(elementRegistry, elementTemplates) {
+
+        // given
         let task = elementRegistry.get('templateTask');
         const template = elementTemplates.get(task);
 
@@ -1373,6 +1384,8 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
 
     it('REST Connector (Basic auth) => REST Connector', inject(
       function(elementRegistry, elementTemplates) {
+
+        // given
         let task = elementRegistry.get('REST_TASK');
         const template = elementTemplates.get('io.camunda.connectors.HttpJson.v2');
 
