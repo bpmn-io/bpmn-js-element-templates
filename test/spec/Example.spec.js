@@ -29,6 +29,11 @@ import { Linter } from '@camunda/linting';
 import ElementTemplateChooserModule from '@bpmn-io/element-template-chooser';
 import ElementTemplatesIconsRenderer from '@bpmn-io/element-template-icon-renderer';
 
+import {
+  CreateAppendAnythingModule,
+  CreateAppendElementTemplatesModule
+} from 'bpmn-js-create-append-anything';
+
 import CamundaBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-platform';
 import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 
@@ -94,6 +99,7 @@ insertCSS('bottom-panel.css', `
   }
 `);
 
+
 describe('<BpmnPropertiesPanelRenderer>', function() {
 
   let modelerContainer;
@@ -120,6 +126,8 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
         BpmnPropertiesPanelModule,
         BpmnPropertiesProviderModule,
         ZeebePropertiesProviderModule,
+        CreateAppendAnythingModule,
+        CreateAppendElementTemplatesModule,
         LintingModule
       ],
       moddleExtensions = {
@@ -188,6 +196,8 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
           CloudElementTemplatesPropertiesProviderModule,
           ElementTemplateChooserModule,
           ElementTemplatesIconsRenderer,
+          CreateAppendAnythingModule,
+          CreateAppendElementTemplatesModule,
           LintingModule
         ],
         moddleExtensions: {
@@ -270,6 +280,7 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
     expect(result.error).not.to.exist;
   });
 
+
   (singleStart === 'templates' ? it.only : it)('should import simple process (templates)', async function() {
 
     // given
@@ -309,6 +320,7 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
     // then
     expect(result.error).not.to.exist;
   });
+
 });
 
 
