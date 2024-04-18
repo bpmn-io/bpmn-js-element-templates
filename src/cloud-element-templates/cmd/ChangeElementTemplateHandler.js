@@ -1009,7 +1009,10 @@ export default class ChangeElementTemplateHandler {
       return element;
     }
 
-    const oldType = oldTemplate && oldTemplate.elementType;
+    // TODO(nre): handle old event definition
+    const oldType = oldTemplate && oldTemplate.elementType || {
+      value: element.type
+    };
 
     // Do not replace if the element type did not change
     if (oldType && oldType.value === newType.value && oldType.eventDefinition === newType.eventDefinition) {
