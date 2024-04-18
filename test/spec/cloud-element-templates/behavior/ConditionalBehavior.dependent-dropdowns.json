@@ -6,9 +6,6 @@
   "appliesTo": [
     "bpmn:Task"
   ],
-  "elementType": {
-    "value": "bpmn:ServiceTask"
-  },
   "properties": [
     {
       "id": "root",
