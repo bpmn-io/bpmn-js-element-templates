@@ -1664,7 +1664,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         function(modeling) {
 
           // given
-          const dependentDropdownsTemplateV2 = {
+          const newTemplate = {
             ...dependentDropdownsTemplate,
             version: 2
           };
@@ -1682,7 +1682,39 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
           expect(businessObject.get('sub')).to.eql('/B/2');
 
           // when
-          const updatedElement = changeTemplate(element, dependentDropdownsTemplateV2, dependentDropdownsTemplate);
+          const updatedElement = changeTemplate(element, newTemplate, dependentDropdownsTemplate);
+          const updatedBusinessObject = getBusinessObject(updatedElement);
+
+          // then
+          expect(updatedBusinessObject.get('root')).to.eql('Root B');
+          expect(updatedBusinessObject.get('sub')).to.eql('/B/2');
+        }
+      ));
+
+
+      it('when changing template', inject(
+        function(modeling) {
+
+          // given
+          const newTemplate = {
+            ...dependentDropdownsTemplate,
+            id: dependentDropdownsTemplate.id + '::v2'
+          };
+
+          const element = changeTemplate('ServiceTask_1', dependentDropdownsTemplate);
+          const businessObject = getBusinessObject(element);
+
+          modeling.updateModdleProperties(element, businessObject, {
+            root: 'Root B',
+            sub: '/B/2'
+          });
+
+          // assume
+          expect(businessObject.get('root')).to.eql('Root B');
+          expect(businessObject.get('sub')).to.eql('/B/2');
+
+          // when
+          const updatedElement = changeTemplate(element, newTemplate, dependentDropdownsTemplate);
           const updatedBusinessObject = getBusinessObject(updatedElement);
 
           // then

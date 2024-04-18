@@ -76,7 +76,7 @@ export default class ConditionalBehavior extends CommandInterceptor {
     // new conditions might apply after the defaults are present.
     const oldTemplate = oldTemplateWithConditions || newTemplate;
 
-    if (!template || !oldTemplate || template.id !== oldTemplate.id) {
+    if (!template || !oldTemplate) {
       return;
     }
 
