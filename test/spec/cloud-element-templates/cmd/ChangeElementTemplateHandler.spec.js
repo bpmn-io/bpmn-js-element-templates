@@ -1133,6 +1133,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
       beforeEach(bootstrap(require('./task.bpmn').default));
 
+
       it('execute', inject(function(elementRegistry) {
 
         // given
@@ -1186,6 +1187,23 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(currentTask).to.equal(task);
         expectElementTemplate(currentTask, 'element-type-template', 1);
         expect(is(currentTask, 'bpmn:UserTask')).to.be.true;
+      }));
+
+
+      it('preserve (no-op)', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('UserTask_1');
+
+        // assume
+        expect(is(task, 'bpmn:UserTask')).to.be.true;
+
+        // when
+        const updatedTask = changeTemplate(task, newTemplate);
+
+        // then
+        // expect identity to be kept (no replace)
+        expect(updatedTask).to.equal(task);
       }));
 
     });
