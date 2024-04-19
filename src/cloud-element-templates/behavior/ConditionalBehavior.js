@@ -87,9 +87,12 @@ export default class ConditionalBehavior extends CommandInterceptor {
       return;
     }
 
+    // do another pass to apply further conditional bindings
+    // newTemplate will always be the original template; it is filtered
+    // at a later step (3)
     const changeContext = {
       element,
-      newTemplate: template, // newTemplate is always the original template
+      newTemplate: template,
       oldTemplate
     };
 
