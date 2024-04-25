@@ -1,0 +1,47 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Condition",
+  "id": "example.com.condition.boolean",
+  "description": "A conditional template for Booleans.",
+  "appliesTo": ["bpmn:Task"],
+  "properties": [
+    {
+      "id": "booleanProp",
+      "type": "Boolean",
+      "label": "Checkbox",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "booleanProp"
+      },
+      "value": false
+    },
+    {
+      "id": "inputForActiveCheckbox",
+      "type": "String",
+      "label": "Input that appears when checkbox is ACTIVE",
+      "binding": {
+        "type": "zeebe:taskHeader",
+        "key": "inputActive"
+      },
+      "value": "active",
+      "condition": {
+        "property": "booleanProp",
+        "equals": true
+      }
+    },
+    {
+      "id": "inputForInactiveCheckbox",
+      "type": "String",
+      "label": "Input that appears when checkbox is INACTIVE",
+      "binding": {
+        "type": "zeebe:taskHeader",
+        "key": "inputInactive"
+      },
+      "value": "inactive",
+      "condition": {
+        "property": "booleanProp",
+        "equals": false
+      }
+    }
+  ]
+}
