@@ -25,6 +25,7 @@ import chainedConditionsSimpleTemplate from '../fixtures/condition-chained.json'
 import chainedConditionsComplexTemplate from './ConditionalBehavior.condition-chained.json';
 import chainedConditionsSharedBindingTemplate from './ConditionalBehavior.condition-chained-shared-binding.json';
 import dependentDropdownsTemplate from './ConditionalBehavior.dependent-dropdowns.json';
+import booleanTemplate from '../fixtures/condition-boolean.json';
 
 import messageTemplates from '../fixtures/condition-message.json';
 import messageCorrelationTemplate from '../fixtures/message-correlation-key.json';
@@ -1644,6 +1645,32 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       ));
 
     });
+
+  });
+
+
+  describe('conditions', function() {
+
+    it('should keep property value when condition property is still active', inject(function(modeling) {
+
+      // given
+      const element = changeTemplate('Task_1', booleanTemplate);
+
+      // assume
+      expectTaskHeaderValue(getBusinessObject(element), 'inactive');
+
+      // whem
+      const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+
+      // when
+      modeling.updateModdleProperties(element, property, {
+        value: true
+      });
+
+      // then
+      expectTaskHeaderValue(getBusinessObject(element), 'active');
+
+    }));
 
   });
 

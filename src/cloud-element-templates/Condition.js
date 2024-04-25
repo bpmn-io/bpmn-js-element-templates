@@ -54,7 +54,7 @@ function isSimpleConditionMet(element, properties, condition) {
 
   const propertyValue = getValue(element, properties, property);
 
-  if (equals) {
+  if (hasProperty(condition, 'equals')) {
     return propertyValue === equals;
   }
 
@@ -89,4 +89,11 @@ function isPropertyAllowed(element, property) {
   }
 
   return true;
+}
+
+
+// helpers //////////////////////
+
+function hasProperty(obj, key) {
+  return Object.prototype.hasOwnProperty.call(obj, key);
 }
