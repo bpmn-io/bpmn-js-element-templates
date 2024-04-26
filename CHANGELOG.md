@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.15.2
+
+* `FIX`: add missing translate to labels ([#51](https://github.com/bpmn-io/bpmn-js-element-templates/issues/51))
+* `FIX`: correct handling of negative boolean conditions ([#84](https://github.com/bpmn-io/bpmn-js-element-templates/issues/84))
+
 ## 1.15.1
 
 * `FIX`: keep existing values when applying or upgrading element template ([#86](https://github.com/bpmn-io/bpmn-js-element-templates/pull/86))
