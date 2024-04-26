@@ -51,7 +51,7 @@ ___Note:__ Yet to be released changes appear here._
 
 ## 1.12.1
 
-* `FIX`: correctly export the core moduel under `/core` ([#53](https://github.com/bpmn-io/bpmn-js-element-templates/pull/53))
+* `FIX`: correctly export the core module under `/core` ([#53](https://github.com/bpmn-io/bpmn-js-element-templates/pull/53))
 
 ## 1.12.0
 
