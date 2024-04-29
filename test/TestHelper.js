@@ -12,8 +12,6 @@ import {
   insertCSS
 } from 'bpmn-js/test/helper';
 
-import semver from 'semver';
-
 import fileDrop from 'file-drops';
 
 import download from 'downloadjs';
@@ -23,25 +21,18 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import BPMNModdle from 'bpmn-moddle';
 import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
-let PROPERTIES_PANEL_CONTAINER;
+import propertiesPanelCSS from '@bpmn-io/properties-panel/dist/assets/properties-panel.css';
 
-global.chai.use(function(chai, utils) {
+import elementTemplatesCSS from '../assets/element-templates.css';
+import elementTemplateChooserCSS from '@bpmn-io/element-template-chooser/dist/element-template-chooser.css';
+import lintingCSS from '@camunda/linting/assets/linting.css';
 
-  utils.addMethod(chai.Assertion.prototype, 'jsonEqual', function(comparison) {
+import testCSS from './test.css';
 
-    var actual = JSON.stringify(this._obj);
-    var expected = JSON.stringify(comparison);
+import diagramCSS from 'bpmn-js/dist/assets/diagram-js.css';
+import bpmnJsCSS from 'bpmn-js/dist/assets/bpmn-js.css';
+import bpmnFontCSS from 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
 
-    this.assert(
-      actual == expected,
-      'expected #{this} to deep equal #{act}',
-      'expected #{this} not to deep equal #{act}',
-      comparison, // expected
-      this._obj, // actual
-      true // show diff
-    );
-  });
-});
 
 export * from 'bpmn-js/test/helper';
 
@@ -49,6 +40,8 @@ export {
   createCanvasEvent,
   createEvent
 } from 'bpmn-js/test/util/MockEvents';
+
+let PROPERTIES_PANEL_CONTAINER;
 
 export function bootstrapPropertiesPanel(diagram, options, locals) {
   return async function() {
@@ -92,94 +85,23 @@ export function clickInput(input) {
 }
 
 export function insertCoreStyles() {
-  insertCSS(
-    'properties-panel.css',
-    require('@bpmn-io/properties-panel/dist/assets/properties-panel.css').default
-  );
+  insertCSS('properties-panel.css', propertiesPanelCSS);
+  insertCSS('element-templates.css', elementTemplatesCSS);
+  insertCSS('element-template-chooser.css', elementTemplateChooserCSS);
+  insertCSS('linting.css', lintingCSS);
 
-  insertCSS(
-    'element-templates.css',
-    require('../assets/element-templates.css').default
-  );
-
-  insertCSS(
-    'test.css',
-    require('./test.css').default
-  );
-
-  insertCSS(
-    'element-template-chooser.css',
-    require('@bpmn-io/element-template-chooser/dist/element-template-chooser.css').default
-  );
-
-  insertCSS('linting.css',
-    require('@camunda/linting/assets/linting.css').default
-  );
-
+  insertCSS('test.css', testCSS);
 }
 
 export function insertBpmnStyles() {
-  insertCSS(
-    'diagram.css',
-    require('bpmn-js/dist/assets/diagram-js.css').default
-  );
+  insertCSS('diagram.css', diagramCSS);
 
-  // @barmac: this fails before bpmn-js@9
-  if (bpmnJsSatisfies('>=9')) {
-    insertCSS(
-      'bpmn-js.css',
-      require('bpmn-js/dist/assets/bpmn-js.css').default
-    );
-  }
-
-  insertCSS(
-    'bpmn-font.css',
-    require('bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css').default
-  );
+  insertCSS('bpmn-js.css', bpmnJsCSS);
+  insertCSS('bpmn-font.css', bpmnFontCSS);
 }
 
 export function bootstrapModeler(diagram, options, locals) {
   return bootstrapBpmnJS(Modeler, diagram, options, locals);
-}
-
-/**
- * Execute test only if currently installed bpmn-js is of given version.
- *
- * @param {string} versionRange
- * @param {boolean} only
- */
-export function withBpmnJs(versionRange, only = false) {
-  if (bpmnJsSatisfies(versionRange)) {
-    return only ? it.only : it;
-  } else {
-    return it.skip;
-  }
-}
-
-function bpmnJsSatisfies(versionRange) {
-  const bpmnJsVersion = require('bpmn-js/package.json').version;
-
-  return semver.satisfies(bpmnJsVersion, versionRange, { includePrerelease: true });
-}
-
-/**
- * Execute test only if currently installed @bpmn-io/properties-panel is of given version.
- *
- * @param {string} versionRange
- * @param {boolean} only
- */
-export function withPropertiesPanel(versionRange, only = false) {
-  if (propertiesPanelSatisfies(versionRange)) {
-    return only ? it.only : it;
-  } else {
-    return it.skip;
-  }
-}
-
-function propertiesPanelSatisfies(versionRange) {
-  const version = require('@bpmn-io/properties-panel/package.json').version;
-
-  return semver.satisfies(version, versionRange, { includePrerelease: true });
 }
 
 export async function setEditorValue(editor, value) {
@@ -284,3 +206,23 @@ export function createProcess(bpmn = '', bpmndi = '') {
     ${ bpmndi }
   `);
 }
+
+// additional chai helpers //////////////
+
+global.chai.use(function(chai, utils) {
+
+  utils.addMethod(chai.Assertion.prototype, 'jsonEqual', function(comparison) {
+
+    var actual = JSON.stringify(this._obj);
+    var expected = JSON.stringify(comparison);
+
+    this.assert(
+      actual == expected,
+      'expected #{this} to deep equal #{act}',
+      'expected #{this} not to deep equal #{act}',
+      comparison, // expected
+      this._obj, // actual
+      true // show diff
+    );
+  });
+});

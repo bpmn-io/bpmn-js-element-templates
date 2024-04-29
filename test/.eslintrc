@@ -5,5 +5,8 @@
   ],
   "globals": {
     "sinon": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020
   }
 }

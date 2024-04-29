@@ -7,15 +7,14 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./core": {
-      "import": "./dist/core.esm.js",
-      "require": "./dist/core.js"
+      "import": "./dist/core.js",
+      "require": "./dist/core.cjs"
     },
     "./dist/assets/*.css": "./dist/assets/*.css",
-    "./dist/*.js": "./dist/*.js",
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -24,10 +23,10 @@
     "build": "run-p bundle",
     "bundle": "rollup -c",
     "bundle:watch": "rollup -c -w",
-    "lint": "eslint .",
+    "lint": "eslint . --ext js,cjs,mjs",
     "dev": "npm test -- --auto-watch --no-single-run",
-    "test": "karma start karma.config.js",
-    "test:build": "mocha --reporter=spec --recursive test/distro/*.spec.js",
+    "test": "karma start karma.config.cjs",
+    "test:build": "mocha --reporter=spec --recursive test/distro/*.spec.c?js",
     "start": "cross-env SINGLE_START=cloud-templates npm run dev",
     "start:templates": "cross-env SINGLE_START=templates npm run dev",
     "prepare": "run-s bundle"
@@ -46,9 +45,9 @@
     "properties-panel",
     "element-templates"
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "umd:main": "dist/bpmn-js-element-templates.umd.js",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "author": {
     "name": "Nico Rehwaldt",
     "url": "https://github.com/nikku"
