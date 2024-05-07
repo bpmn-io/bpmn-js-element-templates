@@ -98,3 +98,7 @@
 .bio-properties-panel-deprecated-template-text {
   width: 216px;
 }
+
+.bio-properties-panel-header-link {
+  color: var(--link-color);
+}
