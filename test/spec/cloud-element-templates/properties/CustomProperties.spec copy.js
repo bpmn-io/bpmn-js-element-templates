@@ -1564,7 +1564,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
                 input = domQuery(selector, entry);
 
           // assume
-          expectError(entry, `${name} - MinLength must have min length 5.`);
+          expectError(entry, `${name} - Field must be at least 5 characters.`);
 
           // when
           changeInput(input, 'FOOOOOOO');
@@ -1589,7 +1589,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
           changeInput(input, 'FOOOOOOO');
 
           // then
-          expectError(entry, `${name} - MaxLength must have max length 5.`);
+          expectError(entry, `${name} - MaxLength Field cannot exceed 5 characters.`);
         });
 
 

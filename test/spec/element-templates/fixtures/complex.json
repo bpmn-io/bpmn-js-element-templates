@@ -391,7 +391,7 @@
       },
       {
         "label": "MaxLength",
-        "description": "Must have max length 5",
+        "description": "Field cannot exceed 5 characters.",
         "type": "String",
         "binding": {
           "type": "camunda:property",

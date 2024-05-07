@@ -356,7 +356,7 @@
       },
       {
         "label": "String - MaxLength",
-        "description": "Must have max length 5",
+        "description": "Field cannot exceed 5 characters.",
         "type": "String",
         "group": "input",
         "binding": {
@@ -440,7 +440,7 @@
       },
       {
         "label": "TextArea - MaxLength",
-        "description": "Must have max length 5",
+        "description": "Field cannot exceed 5 characters.",
         "type": "Text",
         "group": "textarea",
         "binding": {
@@ -530,7 +530,7 @@
       },
       {
         "label": "Select - MaxLength",
-        "description": "Must have max length 5",
+        "description": "Field cannot exceed 5 characters.",
         "type": "Dropdown",
         "group": "select",
         "binding": {

@@ -871,11 +871,11 @@ export function validateProperty(value, property, translate = defaultTranslate) 
   }
 
   if (maxLength && (value || '').length > maxLength) {
-    return `${label} ${translate('must have max length {maxLength}.', { maxLength })}`;
+    return `${label} ${translate('Field cannot exceed {maxLength} characters.', { maxLength })}`;
   }
 
   if (minLength && (value || '').length < minLength) {
-    return `${label} ${translate('must have min length {minLength}.', { minLength })}`;
+    return `${label} ${translate('Field must be at least {minLength} characters.', { minLength })}`;
   }
 
   let { pattern } = constraints;

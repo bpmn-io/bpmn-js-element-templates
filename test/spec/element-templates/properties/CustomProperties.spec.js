@@ -1549,7 +1549,7 @@ describe('provider/element-templates - CustomProperties', function() {
                 input = domQuery(selector, entry);
 
           // assume
-          expectError(entry, 'Must have min length 5.');
+          expectError(entry, 'Field must be at least 5 characters.');
 
           // when
           changeInput(input, 'FOOOOOOO');
@@ -1574,7 +1574,7 @@ describe('provider/element-templates - CustomProperties', function() {
           changeInput(input, 'FOOOOOOO');
 
           // then
-          expectError(entry, 'Must have max length 5.');
+          expectError(entry, 'Field cannot exceed 5 characters.');
         });
 
 
