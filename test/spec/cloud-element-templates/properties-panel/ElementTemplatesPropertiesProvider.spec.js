@@ -24,9 +24,12 @@ import {
   inject
 } from '../../../TestHelper';
 
-import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
+import {
+  BpmnPropertiesPanelModule as BpmnPropertiesPanel,
+  BpmnPropertiesProviderModule as BpmnPropertiesProvider,
+  ZeebePropertiesProviderModule as ZeebePropertiesProvider
+} from 'bpmn-js-properties-panel';
 import elementTemplatesModule from 'src/cloud-element-templates';
-import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
 
 import diagramXML from './ElementTemplatesPropertiesProvider.bpmn';
 import templates from './ElementTemplatesPropertiesProvider.json';
@@ -54,6 +57,7 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
       BpmnPropertiesPanel,
       coreModule,
       BpmnPropertiesProvider,
+      ZeebePropertiesProvider,
       elementTemplatesModule,
       modelingModule
     ],
@@ -190,6 +194,7 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         BpmnPropertiesPanel,
         coreModule,
         BpmnPropertiesProvider,
+        ZeebePropertiesProvider,
         elementTemplatesModule,
         modelingModule
       ],
@@ -201,7 +206,7 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
     }));
 
 
-    it('should show only general and documentation group, and template-related entries when entriesVisible is unset',
+    it('should show only general, documentation, and execution listeners group, and template-related entries when entriesVisible is unset',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -216,13 +221,14 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         expectOnlyGroups(container, [
           'general',
           'documentation',
+          'Zeebe__ExecutionListeners',
           'ElementTemplates__Template'
         ]);
       })
     );
 
 
-    it('should show only general and documentation group, and template-related entries when entriesVisible=false',
+    it('should show only general, documentation, and execution listeners group, and template-related entries when entriesVisible=false',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -237,13 +243,14 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         expectOnlyGroups(container, [
           'general',
           'documentation',
+          'Zeebe__ExecutionListeners',
           'ElementTemplates__Template'
         ]);
       })
     );
 
 
-    it('should show only general and documentation group, and template group when template is unknown',
+    it('should show only general, documentation, and execution listeners group, and template group when template is unknown',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -258,6 +265,7 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         expectOnlyGroups(container, [
           'general',
           'documentation',
+          'Zeebe__ExecutionListeners',
           'ElementTemplates__Template'
         ]);
       })
