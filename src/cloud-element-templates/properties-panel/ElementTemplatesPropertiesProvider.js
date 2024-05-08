@@ -18,7 +18,8 @@ const LOWER_PRIORITY = 300;
 const ALWAYS_DISPLAYED_GROUPS = [
   'general',
   'documentation',
-  'multiInstance'
+  'multiInstance',
+  'Zeebe__ExecutionListeners'
 ];
 
 
