@@ -32,6 +32,8 @@ import diagramXML from './ElementTemplatesPropertiesProvider.bpmn';
 import templates from './ElementTemplatesPropertiesProvider.json';
 import entriesVisibleDiagramXML from './ElementTemplatesPropertiesProvider.entries-visible.bpmn';
 import entriesVisibleTemplates from './ElementTemplatesPropertiesProvider.entries-visible.json';
+import booleanXML from './ElementTemplatesPropertiesProvider.boolean.bpmn';
+import booleanTemplates from './ElementTemplatesPropertiesProvider.boolean.json';
 
 import conditionTemplate from '../fixtures/condition.json';
 import multipleConditionTemplate from '../fixtures/multiple-conditions.json';
@@ -679,6 +681,109 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
 
     });
 
+
+    describe('condition on boolean field', function() {
+
+      beforeEach(bootstrapPropertiesPanel(booleanXML, {
+        container,
+        modules: [
+          BpmnPropertiesPanel,
+          coreModule,
+          elementTemplatesModule,
+          modelingModule
+        ],
+        moddleExtensions: {
+          zeebe: zeebeModdlePackage
+        },
+        debounceInput: false,
+        elementTemplates: booleanTemplates
+      }));
+
+
+      it('should show if condition is met on zeebe:property (true)', inject(async function(elementRegistry, selection) {
+
+        // given
+        const element = elementRegistry.get('Task_1');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('div[data-group-id="group-ElementTemplates__CustomProperties"]', container);
+        const listItems = domQueryAll('.bio-properties-panel-entry', group);
+        expect(listItems).to.have.lengthOf(2);
+
+        const entry = domQuery('[data-entry-id="custom-entry-id-1"]', container);
+        expect(entry).to.exist;
+        expect(domQuery('label', entry)).to.have.property('textContent', 'Input that appears when checkbox is ACTIVE');
+      }));
+
+
+      it('should show if condition is met on zeebe:property (false)', inject(async function(elementRegistry, selection) {
+
+        // given
+        const element = elementRegistry.get('Task_2');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('div[data-group-id="group-ElementTemplates__CustomProperties"]', container);
+        const listItems = domQueryAll('.bio-properties-panel-entry', group);
+        expect(listItems).to.have.lengthOf(2);
+
+        const entry = domQuery('[data-entry-id="custom-entry-id-1"]', container);
+        expect(entry).to.exist;
+        expect(domQuery('label', entry)).to.have.property('textContent', 'Input that appears when checkbox is INACTIVE');
+      }));
+
+
+      it('should show if condition is met on BPMN property (true)', inject(async function(elementRegistry, selection) {
+
+        // given
+        const element = elementRegistry.get('Process_1');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('div[data-group-id="group-ElementTemplates__CustomProperties"]', container);
+        const listItems = domQueryAll('.bio-properties-panel-entry', group);
+        expect(listItems).to.have.lengthOf(2);
+
+        const entry = domQuery('[data-entry-id="custom-entry-process-1"]', container);
+        expect(entry).to.exist;
+        expect(domQuery('label', entry)).to.have.property('textContent', 'Input that appears when checkbox is ACTIVE');
+      }));
+
+
+      it('should show if condition is met on BPMN property (false)', inject(async function(elementRegistry, selection, modeling) {
+
+        // given
+        const element = elementRegistry.get('Process_1');
+
+        // when
+        await act(() => {
+          selection.select(element);
+          modeling.updateProperties(element, { isExecutable: false });
+        });
+
+        // then
+        const group = domQuery('div[data-group-id="group-ElementTemplates__CustomProperties"]', container);
+        const listItems = domQueryAll('.bio-properties-panel-entry', group);
+        expect(listItems).to.have.lengthOf(2);
+
+        const entry = domQuery('[data-entry-id="custom-entry-process-1"]', container);
+        expect(entry).to.exist;
+        expect(domQuery('label', entry)).to.have.property('textContent', 'Input that appears when checkbox is INACTIVE');
+      }));
+    });
   });
 
 
