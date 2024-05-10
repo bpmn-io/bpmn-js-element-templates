@@ -58,6 +58,18 @@ const PRIMITIVE_MODDLE_TYPES = [
 ];
 
 export function getPropertyValue(element, property, scope) {
+  const rawValue = getRawPropertyValue(element, property, scope);
+
+  const { type } = property;
+
+  if (type === 'Boolean') {
+    return getBooleanPropertyValue(rawValue);
+  }
+
+  return rawValue;
+}
+
+function getRawPropertyValue(element, property, scope) {
   let businessObject = getBusinessObject(element);
 
   const defaultValue = '';
@@ -200,6 +212,23 @@ export function getPropertyValue(element, property, scope) {
 
   // should never throw as templates are validated beforehand
   throw unknownBindingError(element, property);
+}
+
+/**
+ * Cast a string value to a boolean if possible. Otherwise return the value.
+ * Cannot always cast due to FEEL expressions.
+ *
+ * @param {string|boolean} value
+ */
+function getBooleanPropertyValue(value) {
+  switch (value) {
+  case 'true':
+    return true;
+  case 'false':
+    return false;
+  }
+
+  return value;
 }
 
 const NO_OP = null;
