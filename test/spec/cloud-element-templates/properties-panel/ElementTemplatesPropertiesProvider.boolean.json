@@ -1,0 +1,98 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "New Connector Template",
+    "id": "id",
+    "version": 1715154218173,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "id": "myBooleanProp",
+        "type": "Boolean",
+        "label": "Checkbox",
+        "value": false,
+        "tooltip": "Hello world! <br><a href='https://google.com'>Link</a>",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "myBooleanProp"
+        }
+      },
+      {
+        "id": "inputForActiveCheckbox",
+        "type": "String",
+        "label": "Input that appears when checkbox is ACTIVE",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "inputActive"
+        },
+        "condition": {
+          "property": "myBooleanProp",
+          "equals": true
+        }
+      },
+      {
+        "id": "inputForInactiveCheckbox",
+        "type": "String",
+        "label": "Input that appears when checkbox is INACTIVE",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "inputInactive"
+        },
+        "condition": {
+          "property": "myBooleanProp",
+          "equals": false
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Process Template",
+    "id": "process",
+    "version": 1715154218173,
+    "appliesTo": [
+      "bpmn:Process"
+    ],
+    "properties": [
+      {
+        "id": "myBooleanProp",
+        "type": "Boolean",
+        "label": "Checkbox",
+        "value": false,
+        "tooltip": "Hello world! <br><a href='https://google.com'>Link</a>",
+        "binding": {
+          "type": "property",
+          "name": "isExecutable"
+        }
+      },
+      {
+        "id": "inputForActiveCheckbox",
+        "type": "String",
+        "label": "Input that appears when checkbox is ACTIVE",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "inputActive"
+        },
+        "condition": {
+          "property": "myBooleanProp",
+          "equals": true
+        }
+      },
+      {
+        "id": "inputForInactiveCheckbox",
+        "type": "String",
+        "label": "Input that appears when checkbox is INACTIVE",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "inputInactive"
+        },
+        "condition": {
+          "property": "myBooleanProp",
+          "equals": false
+        }
+      }
+    ]
+  }
+]
