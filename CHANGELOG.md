@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.15.3
+
+* `FIX`: correctly apply condition depending on boolean on initial load ([#74](https://github.com/bpmn-io/bpmn-js-element-templates/issues/94))
+
 ## 1.15.2
 
 * `FIX`: add missing translate to labels ([#51](https://github.com/bpmn-io/bpmn-js-element-templates/issues/51))
