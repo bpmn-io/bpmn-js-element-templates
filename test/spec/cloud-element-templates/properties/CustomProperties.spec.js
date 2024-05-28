@@ -70,6 +70,9 @@ import groupsElementTemplates from './CustomProperties.groups.json';
 import textLanguageDiagramXML from './CustomProperties.text-language.bpmn';
 import textLanguageElementTemplates from './CustomProperties.text-language.json';
 
+import placeholderDiagramXML from './CustomProperties.placeholder.bpmn';
+import placeholderElementTemplates from './CustomProperties.placeholder.json';
+
 
 describe('provider/cloud-element-templates - CustomProperties', function() {
 
@@ -2153,6 +2156,80 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
   });
 
+
+  describe('placeholder', function() {
+
+    beforeEach(bootstrapPropertiesPanel(placeholderDiagramXML, {
+      container,
+      debounceInput: false,
+      elementTemplates: placeholderElementTemplates,
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      },
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        elementTemplatesModule,
+        modelingModule
+      ]
+    }));
+
+
+    it('should display placeholder (String)', async function() {
+
+      // given
+      await expectSelected('Task_1');
+
+      // when
+      const entry = findEntry('custom-entry-placeholder-0', container),
+            input = findInput('text', entry);
+
+      // then
+      expect(input.placeholder).to.eql('Placeholder');
+    });
+
+
+    it('should display placeholder (Text)', async function() {
+
+      // given
+      await expectSelected('Task_1');
+
+      // when
+      const entry = findEntry('custom-entry-placeholder-1', container),
+            input = findTextarea(entry);
+
+      // then
+      expect(input.placeholder).to.eql('Placeholder');
+    });
+
+
+    it('should display placeholder (FEEL, String)', async function() {
+
+      // given
+      await expectSelected('Task_1');
+
+      // when
+      const entry = findEntry('custom-entry-placeholder-2', container),
+            input = domQuery('.bio-properties-panel-input', entry);
+
+      // then
+      expect(input.textContent).to.eql('Placeholder');
+    });
+
+
+    it('should display placeholder (FEEL, Text)', async function() {
+
+      // given
+      await expectSelected('Task_1');
+
+      // when
+      const entry = findEntry('custom-entry-placeholder-3', container),
+            input = domQuery('.bio-properties-panel-input', entry);
+
+      // then
+      expect(input.textContent).to.eql('Placeholder');
+    });
+  });
 });
 
 

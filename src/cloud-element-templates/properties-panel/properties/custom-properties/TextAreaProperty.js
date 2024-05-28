@@ -21,6 +21,7 @@ export function TextAreaProperty(props) {
     label,
     feel,
     language,
+    placeholder,
     tooltip
   } = property;
 
@@ -35,6 +36,7 @@ export function TextAreaProperty(props) {
     id,
     label,
     feel,
+    placeholder,
     monospace: !!language,
     autoResize: true,
     description: PropertyDescription({ description }),

@@ -1,0 +1,45 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Placeholder",
+    "id": "placeholder",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "binding": {
+          "type": "zeebe:input",
+          "name": "input-1-target"
+        },
+        "placeholder": "Placeholder"
+      },
+      {
+        "type": "Text",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "input-2-target"
+        },
+        "placeholder": "Placeholder"
+      },
+      {
+        "type": "String",
+        "feel": "required",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "input-1-target"
+        },
+        "placeholder": "Placeholder"
+      },
+      {
+        "type": "Text",
+        "feel": "required",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "input-1-target"
+        },
+        "placeholder": "Placeholder"
+      }
+    ]
+  }
+]
