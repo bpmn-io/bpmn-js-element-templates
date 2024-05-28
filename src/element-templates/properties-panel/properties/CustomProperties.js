@@ -332,7 +332,8 @@ function StringProperty(props) {
   const {
     description,
     editable,
-    label
+    label,
+    placeholder
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
@@ -345,6 +346,7 @@ function StringProperty(props) {
     element,
     getValue: propertyGetter(element, property, scope),
     id,
+    placeholder,
     label: label ? translate(label) : label,
     description: PropertyDescription({ description }),
     setValue: propertySetter(bpmnFactory, commandStack, element, property, scope),
@@ -364,7 +366,8 @@ function TextAreaProperty(props) {
   const {
     description,
     editable,
-    label
+    label,
+    placeholder
   } = property;
 
   const bpmnFactory = useService('bpmnFactory'),
@@ -376,6 +379,7 @@ function TextAreaProperty(props) {
     debounce,
     element,
     id,
+    placeholder,
     label: label ? translate(label) : label,
     description: PropertyDescription({ description }),
     getValue: propertyGetter(element, property, scope),

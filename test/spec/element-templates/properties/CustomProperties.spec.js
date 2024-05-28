@@ -52,6 +52,9 @@ import editableElementTemplates from './CustomProperties.editable.json';
 import groupsDiagramXML from './CustomProperties.groups.bpmn';
 import groupsElementTemplates from './CustomProperties.groups.json';
 
+import placeholderDiagramXML from './CustomProperties.placeholder.bpmn';
+import placeholderElementTemplates from './CustomProperties.placeholder.json';
+
 
 describe('provider/element-templates - CustomProperties', function() {
 
@@ -1915,6 +1918,52 @@ describe('provider/element-templates - CustomProperties', function() {
 
   });
 
+
+  describe('placeholder', function() {
+
+    beforeEach(bootstrapPropertiesPanel(placeholderDiagramXML, {
+      container,
+      debounceInput: false,
+      elementTemplates: placeholderElementTemplates,
+      moddleExtensions: {
+        camunda: camundaModdlePackage
+      },
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        elementTemplatesModule,
+        modelingModule
+      ]
+    }));
+
+
+    it('should display placeholder (String)', async function() {
+
+      // given
+      await expectSelected('Task_1');
+
+      // when
+      const entry = findEntry('custom-entry-placeholder-0', container),
+            input = findInput('text', entry);
+
+      // then
+      expect(input.placeholder).to.eql('Placeholder');
+    });
+
+
+    it('should display placeholder (Text)', async function() {
+
+      // given
+      await expectSelected('Task_1');
+
+      // when
+      const entry = findEntry('custom-entry-placeholder-1', container),
+            input = findTextarea(entry);
+
+      // then
+      expect(input.placeholder).to.eql('Placeholder');
+    });
+  });
 });
 
 

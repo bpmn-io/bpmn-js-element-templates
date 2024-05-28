@@ -1,0 +1,27 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Placeholder",
+    "id": "placeholder",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "binding": {
+          "type": "camunda:field",
+          "name": "input-1-target"
+        },
+        "placeholder": "Placeholder"
+      },
+      {
+        "type": "Text",
+        "binding": {
+          "type": "camunda:field",
+          "name": "input-2-target"
+        },
+        "placeholder": "Placeholder"
+      }
+    ]
+  }
+]

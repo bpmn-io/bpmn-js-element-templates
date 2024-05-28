@@ -16,6 +16,7 @@ export function StringProperty(props) {
     editable,
     label,
     feel,
+    placeholder,
     tooltip
   } = property;
 
@@ -31,6 +32,7 @@ export function StringProperty(props) {
     id,
     label,
     feel,
+    placeholder,
     description: PropertyDescription({ description }),
     setValue: propertySetter(bpmnFactory, commandStack, element, property),
     validate: propertyValidator(translate, property),
