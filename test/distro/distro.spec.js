@@ -11,7 +11,6 @@ const EXPORTS = [
   'bpmn-js-element-templates',
   'bpmn-js-element-templates/core',
   'bpmn-js-element-templates/dist/assets/element-templates.css',
-  'bpmn-js-element-templates/dist/bpmn-js-element-templates.umd.js',
   'bpmn-js-element-templates/package.json'
 ];
 
