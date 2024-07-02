@@ -48,7 +48,6 @@
   ],
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
-  "umd:main": "dist/bpmn-js-element-templates.umd.js",
   "author": {
     "name": "Nico Rehwaldt",
     "url": "https://github.com/nikku"
