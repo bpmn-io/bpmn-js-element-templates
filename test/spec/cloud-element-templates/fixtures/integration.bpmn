@@ -31,7 +31,12 @@
         <zeebe:taskHeaders />
       </bpmn:extensionElements>
     </bpmn:serviceTask>
+    <bpmn:startEvent id="startEvent" zeebe:modelerTemplate="io.camunda.connectors.webhook.GithubWebhookConnectorMessageStart.v1">
+      <bpmn:extensionElements />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1fu21eo" messageRef="Message_0v0k34x" />
+    </bpmn:startEvent>
   </bpmn:process>
+  <bpmn:message id="Message_0v0k34x" name="9adab4ff-0531-4a18-aceb-55035944f461" zeebe:modelerTemplate="io.camunda.connectors.webhook.GithubWebhookConnectorMessageStart.v1" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1sefuog">
       <bpmndi:BPMNShape id="templateTask_di" bpmnElement="templateTask">
@@ -45,6 +50,9 @@
       <bpmndi:BPMNShape id="REST_TASK_di" bpmnElement="REST_TASK">
         <dc:Bounds x="160" y="200" width="100" height="80" />
         <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1eswyrb_di" bpmnElement="startEvent">
+        <dc:Bounds x="322" y="222" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

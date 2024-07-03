@@ -29,5 +29,15 @@
         }
       }
     ]
+  },
+  {
+    "$schema" : "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name" : "Intermediate Event",
+    "id" : "blankIntermediateEvent",
+    "appliesTo" : [ "bpmn:IntermediateCatchEvent" ],
+    "elementType" : {
+      "value" : "bpmn:IntermediateCatchEvent"
+    },
+    "properties" : [  ]
   }
 ]

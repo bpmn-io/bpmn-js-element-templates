@@ -54,6 +54,24 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
         expect(getMessages()).to.have.lengthOf(initialMessages.length + 1);
       })
     );
+
+
+    it('should remove message when new template has no message', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        let event = elementRegistry.get('MessageEvent_2');
+        event = elementTemplates.applyTemplate(event, templates[0]);
+        const initialMessages = getMessages();
+
+        // when
+        elementTemplates.applyTemplate(event, templates[1]);
+
+        // then
+        expect(getMessages()).to.have.lengthOf(initialMessages.length - 1);
+      })
+    );
+
   });
 
 

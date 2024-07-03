@@ -785,7 +785,14 @@ export default class ChangeElementTemplateHandler {
       return;
     }
 
-    const message = this._getOrCreateMessage(element, newTemplate);
+    let message = this._getMessage(element);
+
+    // no new properties and no message -> nothing to do
+    if (!newProperties.length && !message) {
+      return;
+    }
+
+    message = this._getOrCreateMessage(element, newTemplate);
     const messageExtensionElements = this._getOrCreateExtensionElements(element, message);
     const zeebeSubscription = this._getSubscription(element, message);
 
