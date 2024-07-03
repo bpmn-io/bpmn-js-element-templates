@@ -80,6 +80,10 @@ export default class ConditionalBehavior extends CommandInterceptor {
       return;
     }
 
+    if (template.id !== oldTemplate.id) {
+      return;
+    }
+
     const newTemplateWithConditions = applyConditions(element, template);
 
     // verify that new bindings were activated

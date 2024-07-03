@@ -1483,6 +1483,22 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
       }
     ));
 
+
+    it('Github message start => Webhook blank-start', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        let startEvent = elementRegistry.get('startEvent');
+        const template = elementTemplates.get('io.camunda.connectors.webhook.WebhookConnector.v1');
+
+        // when
+        const applyTemplate = () => elementTemplates.applyTemplate(startEvent, template);
+
+        // expect
+        expect(applyTemplate).not.to.throw();
+      }
+    ));
+
   });
 
 });

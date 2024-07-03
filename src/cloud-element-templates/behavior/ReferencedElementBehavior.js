@@ -1,4 +1,4 @@
-import { getBusinessObject, isAny } from 'bpmn-js/lib/util/ModelUtil';
+import { getBusinessObject, is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 import { isString } from 'min-dash';
 
@@ -144,10 +144,16 @@ ReferencedElementBehavior.$inject = [
 ];
 
 function canHaveReferencedElement(element) {
+
+  // Blank-Events can't have referenced elements
+  if (is(element, 'bpmn:Event')) {
+    const bo = getBusinessObject(element);
+    return bo.get('eventDefinitions') && bo.get('eventDefinitions')[0];
+  }
+
   return isAny(element, [
     'bpmn:ReceiveTask',
-    'bpmn:SendTask',
-    'bpmn:Event'
+    'bpmn:SendTask'
   ]);
 }
 
