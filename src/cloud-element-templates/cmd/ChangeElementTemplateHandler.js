@@ -1016,13 +1016,9 @@ export default class ChangeElementTemplateHandler {
       return element;
     }
 
-    // TODO(nre): handle old event definition
-    const oldType = oldTemplate && oldTemplate.elementType || {
-      value: element.type
-    };
 
     // Do not replace if the element type did not change
-    if (oldType && oldType.value === newType.value && oldType.eventDefinition === newType.eventDefinition) {
+    if (!shouldUpdateElementType(element, oldTemplate, newType)) {
       return element;
     }
 
@@ -1344,4 +1340,39 @@ function remove(array, item) {
 
 function hasMessageProperties(template) {
   return template.properties.some(p => MESSAGE_BINDING_TYPES.includes(p.binding.type));
+}
+
+function shouldUpdateElementType(element, oldTemplate, newType) {
+
+  // Never reuse existing eventDefinition when applying a new template
+  if (!oldTemplate && newType.eventDefinition) {
+    return true;
+  }
+
+  const oldType = oldTemplate && oldTemplate.elementType || {
+    value: element.type,
+    eventDefinition: getEventDefinitionType(element)
+  };
+
+  // Do not update if the element type did not change
+  if (oldType && oldType.value === newType.value && oldType.eventDefinition === newType.eventDefinition) {
+    return false;
+  }
+
+  return true;
+}
+
+function getEventDefinitionType(element) {
+  const businessObject = getBusinessObject(element);
+  if (!businessObject.eventDefinitions) {
+    return;
+  }
+
+  const eventDefinition = businessObject.eventDefinitions[ 0 ];
+
+  if (!eventDefinition) {
+    return;
+  }
+
+  return eventDefinition.$type;
 }

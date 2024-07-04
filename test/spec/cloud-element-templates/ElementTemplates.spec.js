@@ -699,6 +699,33 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should remove existing event definition', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const templates = require('./fixtures/start-event.json');
+      elementTemplates.set(templates);
+
+      const template = templates[0];
+      const event = elementRegistry.get('MessageStartEvent');
+      const oldMessageEventDefinition = getBusinessObject(event).get('eventDefinitions')[0];
+
+      // assume
+      expect(oldMessageEventDefinition).to.exist;
+      expect(template).to.exist;
+
+      // when
+      const updatedEvent = elementTemplates.applyTemplate(event, template);
+
+      // then
+      expect(updatedEvent).to.exist;
+      expect(elementTemplates.get(updatedEvent)).to.equal(template);
+      expect(is(updatedEvent, 'bpmn:StartEvent')).to.be.true;
+
+      const eventDefinitions = getBusinessObject(updatedEvent).get('eventDefinitions');
+      expect(eventDefinitions).to.have.length(0);
+    }));
+
+
     it('should apply message binding', inject(function(elementRegistry, elementTemplates) {
 
       // given
