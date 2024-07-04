@@ -63,12 +63,17 @@ export default class ConditionalBehavior extends CommandInterceptor {
     context.oldTemplateWithConditions = applyConditions(element, template);
   }
 
-  _applyConditions(context) {
+  _applyConditions(context, event) {
     const {
       element,
       newTemplate,
       oldTemplateWithConditions
     } = context;
+
+    // do not apply conditions if we only update meta information
+    if (isMetaUpdate(event, context)) {
+      return;
+    }
 
     const template = this._elementTemplates.get(element);
 
@@ -77,10 +82,6 @@ export default class ConditionalBehavior extends CommandInterceptor {
     const oldTemplate = oldTemplateWithConditions || newTemplate;
 
     if (!template || !oldTemplate) {
-      return;
-    }
-
-    if (template.id !== oldTemplate.id) {
       return;
     }
 
@@ -215,4 +216,14 @@ function normalizeBinding(binding) {
 
 function equals(a, b) {
   return JSON.stringify(a, normalizeReplacer) === JSON.stringify(b, normalizeReplacer);
+}
+
+/**
+ * Cheks if the event only updates the `zeebe:modelerTemplate` or `zeebe:modelerTemplateVersion` properties.
+ */
+function isMetaUpdate(event, context) {
+  return event === 'element.updateProperties' && (
+    Object.keys(context.properties).every(
+      key => [ 'zeebe:modelerTemplate', 'zeebe:modelerTemplateVersion' ].includes(key)
+    ));
 }
