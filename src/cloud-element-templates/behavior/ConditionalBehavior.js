@@ -13,6 +13,14 @@ import { ZEEBE_TASK_DEFINITION, ZEEBE_TASK_DEFINITION_TYPE_TYPE } from '../util/
  * corresponding properties on the element.
  */
 export default class ConditionalBehavior extends CommandInterceptor {
+
+  /**
+   * @param {import('diagram-js/lib/core/EventBus').default} eventBus
+   * @param {import('../ElementTemplates').default} elementTemplates
+   * @param {import('diagram-js/lib/command/CommandStack').default} commandStack
+   * @param {import('bpmn-js/lib/features/modeling/BpmnFactory').default} bpmnFactory
+   * @param {import('didi').Injector} injector
+   */
   constructor(eventBus, elementTemplates, commandStack, bpmnFactory, injector) {
     super(eventBus);
 
@@ -219,7 +227,15 @@ function equals(a, b) {
 }
 
 /**
- * Cheks if the event only updates the `zeebe:modelerTemplate` or `zeebe:modelerTemplateVersion` properties.
+ * Checks if the event only updates "meta" properties:
+ *
+ *   * `zeebe:modelerTemplate`
+ *   * `zeebe:modelerTemplateVersion`
+ *
+ * @param {string} event
+ * @param {any} context
+ *
+ * @return {boolean}
  */
 function isMetaUpdate(event, context) {
   return event === 'element.updateProperties' && (
