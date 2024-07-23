@@ -6,6 +6,16 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.0.0
+
+* `FIX`: safely remove message when changing template ([#111](https://github.com/bpmn-io/bpmn-js-element-templates/pull/111))
+* `FIX`: remove existing event definition when applying template ([#111](https://github.com/bpmn-io/bpmn-js-element-templates/pull/111))
+* `CHORE`: drop UMD distribution ([#109](https://github.com/bpmn-io/bpmn-js-element-templates/issues/109))
+
+### Breaking Changes
+
+* We [dropped the UMD distribution](https://github.com/bpmn-io/bpmn-js-element-templates/pull/110). Consume this library using ESM.
+
 ## 1.16.0
 
 * `FEAT`: support placeholders on String and Text properties ([#92](https://github.com/bpmn-io/bpmn-js-element-templates/issues/92))
