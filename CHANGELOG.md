@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.1.0
+
+* `FEAT`: always display execution listeners group for Zeebe ([#96](https://github.com/bpmn-io/bpmn-js-element-templates/pull/96))
+
 ## 2.0.0
 
 * `FIX`: safely remove message when changing template ([#111](https://github.com/bpmn-io/bpmn-js-element-templates/pull/111))
