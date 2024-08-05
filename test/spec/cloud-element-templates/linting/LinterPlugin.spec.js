@@ -38,6 +38,27 @@ const valid = [
     config: {
       templates
     }
+  },
+  {
+    name: 'FEEL (Min Length)',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="=FOO" zeebe:modelerTemplate="feel.minLength" />')),
+    config: {
+      templates
+    }
+  },
+  {
+    name: 'FEEL (Max Length)',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="=FOOBAR" zeebe:modelerTemplate="feel.maxLength" />')),
+    config: {
+      templates
+    }
+  },
+  {
+    name: 'FEEL (Pattern)',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="=FOO" zeebe:modelerTemplate="feel.pattern" />')),
+    config: {
+      templates
+    }
   }
 ];
 

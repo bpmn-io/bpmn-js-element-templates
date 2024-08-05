@@ -919,6 +919,10 @@ function propertyValidator(translate, property) {
       return translate('Must not be empty.');
     }
 
+    if (property.feel && isFeel(value)) {
+      return;
+    }
+
     if (maxLength && value.length > maxLength) {
       return translate('Must have max length {maxLength}.', { maxLength });
     }
@@ -989,4 +993,8 @@ function groupByGroupId(properties) {
 
 function findCustomGroup(groups, id) {
   return find(groups, g => g.id === id);
+}
+
+function isFeel(value) {
+  return isString(value) && value.trim().startsWith('=');
 }

@@ -78,5 +78,57 @@
       }
     ],
     "entriesVisible": false
+  },
+  {
+    "name": "Custom FeelTask with Validation",
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "my.custom.FeelTask.Validation",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "A FEEL expression with validation (min length)",
+        "type": "String",
+        "feel": "optional",
+        "editable": true,
+        "binding": {
+          "type": "property",
+          "name": "optionalFeelProp"
+        },
+        "constraints": {
+          "minLength": 5
+        }
+      },
+      {
+        "label": "A FEEL expression with validation (max length)",
+        "type": "String",
+        "feel": "optional",
+        "editable": true,
+        "binding": {
+          "type": "property",
+          "name": "optionalFeelProp"
+        },
+        "constraints": {
+          "maxLength": 5
+        }
+      },
+      {
+        "label": "A FEEL expression with validation (pattern)",
+        "type": "String",
+        "feel": "optional",
+        "editable": true,
+        "binding": {
+          "type": "property",
+          "name": "optionalFeelProp"
+        },
+        "constraints": {
+          "pattern": {
+            "value": "BAR"
+          }
+        }
+      }
+    ],
+    "entriesVisible": false
   }
 ]
