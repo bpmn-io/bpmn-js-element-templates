@@ -150,5 +150,71 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "FEEL - Min Length",
+    "id": "feel.minLength",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "label": "Test Property",
+        "type": "String",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        },
+        "constraints": {
+          "minLength": 5
+        },
+        "feel": "optional"
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "FEEL - Max Length",
+    "id": "feel.maxLength",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "label": "Test Property",
+        "type": "String",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        },
+        "constraints": {
+          "maxLength": 5
+        },
+        "feel": "optional"
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "FEEL - Pattern",
+    "id": "feel.pattern",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "label": "Test Property",
+        "type": "String",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        },
+        "constraints": {
+          "pattern": "OOF"
+        },
+        "feel": "optional"
+      }
+    ]
   }
 ]

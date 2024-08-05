@@ -899,6 +899,10 @@ export function validateProperty(value, property, translate = defaultTranslate) 
     return `${label} ${translate('must not be empty.')}`;
   }
 
+  if (property.feel && isFeel(value)) {
+    return;
+  }
+
   if (maxLength && (value || '').length > maxLength) {
     return `${label} ${translate('must have max length {maxLength}.', { maxLength })}`;
   }
@@ -967,4 +971,8 @@ function defaultTranslate(template, replacements) {
   return template.replace(/{([^}]+)}/g, function(_, key) {
     return replacements[key] || '{' + key + '}';
   });
+}
+
+function isFeel(value) {
+  return isString(value) && value.trim().startsWith('=');
 }

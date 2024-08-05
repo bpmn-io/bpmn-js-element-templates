@@ -1511,6 +1511,7 @@ describe('provider/element-templates - CustomProperties', function() {
 
       expect(input).to.have.property('disabled', true);
     });
+
   });
 
 

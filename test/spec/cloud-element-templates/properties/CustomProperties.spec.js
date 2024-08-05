@@ -2116,6 +2116,73 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(optionalIcon).to.exist;
       });
 
+
+      describe('validation', function() {
+
+        it('should validate minLength', async function() {
+
+          // given
+          await expectSelected('validationTask');
+
+          const entry = findEntry('custom-entry-my.custom.FeelTask.Validation-0', container),
+                input = domQuery('input', entry);
+
+          // assume
+          expectError(entry, 'A FEEL expression with validation (min length) must have min length 5.');
+
+          // when
+          changeInput(input, '=FOO');
+
+          // then
+          expectValid(entry);
+        });
+
+
+        it('should not validate maxLength', async function() {
+
+          // given
+          await expectSelected('validationTask');
+
+          const entry = findEntry('custom-entry-my.custom.FeelTask.Validation-1', container),
+                input = domQuery('input', entry);
+
+          // when
+          changeInput(input, 'FOOBAR');
+
+          // assume
+          expectError(entry, 'A FEEL expression with validation (max length) must have max length 5.');
+
+          // when
+          changeInput(input, '=FOOBAR');
+
+          // then
+          expectValid(entry);
+        });
+
+
+        it('should not validate pattern', async function() {
+
+          // given
+          await expectSelected('validationTask');
+
+          const entry = findEntry('custom-entry-my.custom.FeelTask.Validation-2', container),
+                input = domQuery('input', entry);
+
+          // when
+          changeInput(input, 'FOO');
+
+          // assume
+          expectError(entry, 'A FEEL expression with validation (pattern) must match pattern BAR.');
+
+          // when
+          changeInput(input, '=FOO');
+
+          // then
+          expectValid(entry);
+        });
+
+      });
+
     });
 
 
@@ -2230,6 +2297,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(input.textContent).to.eql('Placeholder');
     });
   });
+
 });
 
 
