@@ -1511,6 +1511,7 @@ describe('provider/element-templates - CustomProperties', function() {
 
       expect(input).to.have.property('disabled', true);
     });
+
   });
 
 
@@ -1635,6 +1636,97 @@ describe('provider/element-templates - CustomProperties', function() {
 
           // then
           expectValid(entry);
+        });
+
+      });
+
+    });
+
+
+    describe('FEEL', function() {
+
+      [
+        [ 'String', 'input' ],
+        [ 'TextArea', 'textarea' ]
+      ].forEach(function([ name, selector ]) {
+
+        describe(name, function() {
+
+          it('should validate nonEmpty', async function() {
+
+            // given
+            await expectSelected('ValidateTask');
+
+            const entry = findEntry(`custom-entry-com.validated-inputs.Task-${selector}-0`, container),
+                  input = domQuery(selector, entry);
+
+            // assume
+            expectError(entry, 'Must not be empty.');
+
+            // when
+            changeInput(input, '=FOO');
+
+            // then
+            expectValid(entry);
+          });
+
+
+          it('should not validate minLength', async function() {
+
+            // given
+            await expectSelected('ValidateTask');
+
+            const entry = findEntry(`custom-entry-com.validated-inputs.Task-${selector}-1`, container),
+                  input = domQuery(selector, entry);
+
+            // assume
+            expectError(entry, 'Must have min length 5.');
+
+            // when
+            changeInput(input, '=FOO');
+
+            // then
+            expectValid(entry);
+          });
+
+
+          it('should not validate maxLength', async function() {
+
+            // given
+            await expectSelected('ValidateTask');
+
+            const entry = findEntry(`custom-entry-com.validated-inputs.Task-${selector}-2`, container),
+                  input = domQuery(selector, entry);
+
+            // assume
+            expectValid(entry);
+
+            // when
+            changeInput(input, '=FOOBAR');
+
+            // then
+            expectValid(entry);
+          });
+
+
+          it('should not validate pattern', async function() {
+
+            // given
+            await expectSelected('ValidateTask');
+
+            const entry = findEntry(`custom-entry-com.validated-inputs.Task-${selector}-3`, container),
+                  input = domQuery(selector, entry);
+
+            // assume
+            expectError(entry, 'Must match pattern A+B.');
+
+            // when
+            changeInput(input, '=FOO');
+
+            // then
+            expectValid(entry);
+          });
+
         });
 
       });
