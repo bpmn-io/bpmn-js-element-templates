@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.2.0
+
+* `FEAT`: do not apply `*length` and `pattern` validation to FEEL expressions ([#115](https://github.com/bpmn-io/bpmn-js-element-templates/pull/115))
+
 ## 2.1.0
 
 * `FEAT`: always display execution listeners group for Zeebe ([#96](https://github.com/bpmn-io/bpmn-js-element-templates/pull/96))
