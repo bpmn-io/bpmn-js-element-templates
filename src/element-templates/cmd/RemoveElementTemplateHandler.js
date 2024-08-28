@@ -146,7 +146,6 @@ export default class RemoveElementTemplateHandler {
    * @param {ModdleElement} targetBusinessObject
    */
   _copyNonTemplateProperties(sourceBusinessObject, targetBusinessObject) {
-    console.log('_copyNonTemplateProperties');
     const copy = this._moddleCopy;
     const bpmnFactory = this._bpmnFactory;
 
