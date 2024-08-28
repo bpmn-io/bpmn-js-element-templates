@@ -533,6 +533,38 @@ describe('provider/element-templates - ElementTemplates', function() {
       expect(taskBo.flowElements).to.have.length(1);
     }));
 
+
+    it('should keep documentation', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      let task = elementRegistry.get('Task_1');
+
+      // assume
+      const bo = getBusinessObject(task);
+      expect(bo.documentation[0].text).to.exist;
+
+      // when
+      task = elementTemplates.removeTemplate(task);
+
+      // then
+      const newBo = getBusinessObject(task);
+      expect(newBo.documentation[0].text).to.exist;
+    }));
+
+
+    it('should keep execution listeners', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      let task = elementRegistry.get('Task_5');
+
+      // when
+      task = elementTemplates.removeTemplate(task);
+
+      // then
+      const bo = getBusinessObject(task);
+      expect(bo.extensionElements.values[0].$type).to.equal('camunda:ExecutionListener');
+    }));
+
   });
 
 
