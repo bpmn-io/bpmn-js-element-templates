@@ -4265,6 +4265,51 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
   });
 
+
+  describe('FEEL Boolean and Numbers', function() {
+
+    beforeEach(bootstrap(require('./casted-values.bpmn').default));
+
+    describe('Boolean', function() {
+
+      const template = require('./casted-values.json')[0];
+
+      it('should apply generated value (uuid)', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        // when
+        task = changeTemplate(task, template);
+
+        // then
+        expect(getZeebeProperty(task, 'StaticBooleanProperty').value).to.eql('=true');
+        expect(getZeebeProperty(task, 'OptionalBooleanProperty').value).to.eql('=true');
+      }));
+
+    });
+
+    describe('Number', function() {
+
+      const template = require('./casted-values.json')[1];
+
+      it('should apply generated value (uuid)', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        // when
+        task = changeTemplate(task, template);
+
+        // then
+        expect(getZeebeProperty(task, 'StaticNumberProperty').value).to.eql('=123');
+        expect(getZeebeProperty(task, 'OptionalNumberProperty').value).to.eql('=123');
+      }));
+
+    });
+
+  });
+
 });
 
 

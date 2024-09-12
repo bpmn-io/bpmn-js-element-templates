@@ -1,5 +1,7 @@
 import { find, groupBy } from 'min-dash';
 import { getPropertyValue, setPropertyValue, validateProperty } from '../../../util/propertyUtil';
+import { isSpecialFeelProperty, toFeelExpression } from '../../../util/feelUtil';
+
 import { useCallback, useState } from '@bpmn-io/properties-panel/preact/hooks';
 
 export function usePropertyAccessors(bpmnFactory, commandStack, element, property) {
@@ -38,26 +40,6 @@ export function usePropertyAccessors(bpmnFactory, commandStack, element, propert
   return [ get, set ];
 }
 
-export const isSpecialFeelProperty = (property) => {
-  return [ 'optional', 'static' ].includes(property.feel) && [ 'Boolean', 'Number' ].includes(property.type);
-};
-
-const toFeelExpression = (value, type) => {
-  if (typeof value === 'string' && value.startsWith('=')) {
-    return value;
-  }
-
-  if (type === 'Boolean') {
-    value = value === 'false' ? false : value;
-    return '=' + !!value;
-  }
-
-  if (typeof value === 'undefined') {
-    return value;
-  }
-
-  return '=' + value.toString();
-};
 
 const fromFeelExpression = (value, type) => {
   if (typeof value === 'undefined') {

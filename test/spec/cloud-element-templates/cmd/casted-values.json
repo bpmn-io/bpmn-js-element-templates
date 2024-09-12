@@ -1,0 +1,62 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "booleanField optional",
+    "id": "booleanField.feel.optional",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "DefaultStaticBooleanProperty",
+        "type": "Boolean",
+        "feel": "static",
+        "value": true,
+        "binding": {
+          "type": "zeebe:property",
+          "name": "StaticBooleanProperty"
+        }
+      },
+      {
+        "label": "DefaultOptionalBooleanProperty",
+        "type": "Boolean",
+        "feel": "optional",
+        "value": true,
+        "binding": {
+          "type": "zeebe:property",
+          "name": "OptionalBooleanProperty"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "FEEL optional",
+    "id": "numberField.feel.optional",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "DefaultStaticNumberProperty",
+        "type": "Number",
+        "feel": "static",
+        "value": 123,
+        "binding": {
+          "type": "zeebe:property",
+          "name": "StaticNumberProperty"
+        }
+      },
+      {
+        "label": "DefaultOptionalNumberProperty",
+        "type": "Number",
+        "feel": "optional",
+        "value": 123,
+        "binding": {
+          "type": "zeebe:property",
+          "name": "OptionalNumberProperty"
+        }
+      }
+    ]
+  }
+]
