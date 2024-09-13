@@ -1,6 +1,6 @@
 import { find, groupBy } from 'min-dash';
 import { getPropertyValue, setPropertyValue, validateProperty } from '../../../util/propertyUtil';
-import { isSpecialFeelProperty, toFeelExpression } from '../../../util/feelUtil';
+import { isSpecialFeelProperty, toFeelExpression } from '../../../util/FeelUtil';
 
 import { useCallback, useState } from '@bpmn-io/properties-panel/preact/hooks';
 

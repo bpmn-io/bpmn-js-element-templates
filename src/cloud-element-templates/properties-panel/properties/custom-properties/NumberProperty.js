@@ -1,7 +1,7 @@
 import { FeelNumberEntry, NumberFieldEntry } from '@bpmn-io/properties-panel';
 import { useService } from 'bpmn-js-properties-panel';
 import { propertyValidator, usePropertyAccessors } from './util';
-import { isSpecialFeelProperty } from '../../../util/feelUtil';
+import { isSpecialFeelProperty } from '../../../util/FeelUtil';
 import { PropertyDescription } from '../../../../components/PropertyDescription';
 import { PropertyTooltip } from '../../components/PropertyTooltip';
 import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';

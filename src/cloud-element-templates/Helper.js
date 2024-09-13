@@ -3,7 +3,7 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 
 import { v4 as uuid } from 'uuid';
-import { isSpecialFeelProperty, toFeelExpression } from './util/feelUtil';
+import { isSpecialFeelProperty, toFeelExpression } from './util/FeelUtil';
 
 /**
  * The BPMN 2.0 extension attribute name under
