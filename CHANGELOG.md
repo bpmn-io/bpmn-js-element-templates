@@ -6,6 +6,12 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.3.0
+
+_No user visible changes._
+
+* `DEPS`: bump to `@bpmn-io/extract-process-variables@1.0.0`
+
 ## 2.2.1
 
 * `FIX`: cast default `number` and `boolean` properties to FEEL ([#121](https://github.com/bpmn-io/bpmn-js-element-templates/pull/121))
