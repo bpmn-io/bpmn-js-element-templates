@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_08adx7k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.11.0">
   <bpmn:process id="Process_1" isExecutable="true" camunda:modelerTemplate="process-template">
-    <bpmn:task id="Task_1" name="Task 1" camunda:modelerTemplate="foo" />
+    <bpmn:task id="Task_1" name="Task 1" camunda:modelerTemplate="foo">
+      <bpmn:documentation>bar</bpmn:documentation>
+    </bpmn:task>
     <bpmn:task id="Task_2" camunda:modelerTemplate="foo" camunda:modelerTemplateVersion="1" />
     <bpmn:task id="Task_3" />
     <bpmn:task id="UnknownTemplateTask" camunda:modelerTemplate="unknown" />
@@ -15,6 +17,16 @@
     <bpmn:subProcess id="SubProcess_1" camunda:modelerTemplate="subprocess-template">
       <bpmn:startEvent id="Event_1giqjyx" />
     </bpmn:subProcess>
+    <bpmn:task id="Task_5" name="Task 5" camunda:modelerTemplate="foo" camunda:modelerTemplateVersion="1">
+      <bpmn:extensionElements>
+        <camunda:executionListener class="Java.foo" event="start">
+          <camunda:field name="foo">
+            <camunda:string>bar</camunda:string>
+          </camunda:field>
+        </camunda:executionListener>
+        <camunda:executionListener expression="bar" event="end" />
+      </bpmn:extensionElements>
+    </bpmn:task>
     <bpmn:group id="Group_1" categoryValueRef="CategoryValue_17hkdy6" camunda:modelerTemplate="qux" />
     <bpmn:textAnnotation id="TextAnnotation_1" camunda:modelerTemplate="qux">
       <bpmn:text>Text Annotation 1</bpmn:text>
@@ -49,6 +61,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0epvb9c" bpmnElement="Task_4">
         <dc:Bounds x="270" y="300" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0swl82e_di" bpmnElement="Task_5">
+        <dc:Bounds x="150" y="400" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="SubProcess_1_di" bpmnElement="SubProcess_1" isExpanded="false">
