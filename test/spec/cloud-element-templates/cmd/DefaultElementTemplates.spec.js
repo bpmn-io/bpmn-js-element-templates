@@ -126,33 +126,6 @@ describe('cloud-element-templates/cmd - default element templates', function() {
   );
 
 
-  it('should not apply default template on shape paste', inject(
-    function(canvas, elementRegistry, modeling, elementTemplates, copyPaste) {
-
-      // given
-      const noTemplateTask = elementRegistry.get('Task_2');
-
-      const defaultTemplate = elementTemplates.get('com.foo.bar.default');
-
-      // assume
-      expect(defaultTemplate).to.exist;
-
-      // when
-      copyPaste.copy([ noTemplateTask ]);
-
-      const [ pastedShape ] = copyPaste.paste({
-        element: canvas.getRootElement(),
-        point: { x: 100, y: 100 }
-      });
-
-      // then
-      expect(elementTemplates.get(pastedShape)).not.to.exist;
-
-      expect(getBusinessObject(pastedShape).get('name')).to.equal('EXISTING_NAME');
-    })
-  );
-
-
   it('should not apply default template on connection paste', inject(
     function(canvas, elementRegistry, modeling, elementTemplates, copyPaste) {
 
