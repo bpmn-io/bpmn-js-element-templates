@@ -77,7 +77,8 @@ export default [
     languageOptions: {
       globals: {
         sinon: true,
-        require: true
+        require: true,
+        global: true
       },
     },
     files: files.test
