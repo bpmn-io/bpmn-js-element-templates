@@ -106,7 +106,9 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
 
   let propertiesContainer;
 
-  afterEach(() => cleanup());
+  afterEach(function() {
+    cleanup();
+  });
 
   let container;
 

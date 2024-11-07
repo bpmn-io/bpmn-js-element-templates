@@ -55,7 +55,7 @@ describe('provider/cloud-element-templates - UpdatePropertiesOrderBehavior', fun
     const elementTemplates = require('./UpdatePropertiesOrderBehavior.template.json');
     const diagramXML = require('./UpdatePropertiesOrderBehavior.bpmn').default;
 
-    beforeEach(() => bootstrapModeler(diagramXML, {
+    beforeEach(bootstrapModeler(diagramXML, {
       container: modelerContainer,
       additionalModules: [
         BpmnPropertiesProviderModule,
@@ -72,7 +72,7 @@ describe('provider/cloud-element-templates - UpdatePropertiesOrderBehavior', fun
         parent: propertiesContainer
       },
       elementTemplates
-    })());
+    }));
 
 
     describe('zeebe:input', function() {
@@ -412,7 +412,7 @@ describe('provider/cloud-element-templates - UpdatePropertiesOrderBehavior', fun
     const elementTemplates = require('./UpdatePropertiesOrderBehavior.template.json');
     const diagramXML = require('./UpdatePropertiesOrderBehavior.wrong-order.bpmn').default;
 
-    beforeEach(() => bootstrapModeler(diagramXML, {
+    beforeEach(bootstrapModeler(diagramXML, {
       container: modelerContainer,
       additionalModules: [
         BpmnPropertiesProviderModule,
@@ -429,7 +429,7 @@ describe('provider/cloud-element-templates - UpdatePropertiesOrderBehavior', fun
         parent: propertiesContainer
       },
       elementTemplates
-    })());
+    }));
 
 
     it('zeebe:input', function() {
