@@ -1227,7 +1227,7 @@ export function findOldProperty(oldTemplate, newProperty) {
 }
 
 /**
- * Check whether the existing property should be keept. This is the case if
+ * Check whether the existing property should be kept. This is the case if
  *  - an old template was set and the value differs from the default
  *  - no template was set but the property was set manually
  *
