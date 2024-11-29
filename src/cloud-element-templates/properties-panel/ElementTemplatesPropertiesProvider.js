@@ -58,7 +58,7 @@ export default class ElementTemplatesPropertiesProvider {
       };
 
       // (1) Add templates group
-      addGroupsAfter(ALWAYS_DISPLAYED_GROUPS, groups, [ templatesGroup ]);
+      addGroupsAfter('documentation', groups, [ templatesGroup ]);
 
       let elementTemplate = this._elementTemplates.get(element);
 

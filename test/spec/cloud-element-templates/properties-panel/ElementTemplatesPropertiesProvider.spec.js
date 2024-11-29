@@ -206,7 +206,7 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
     }));
 
 
-    it('should show only general, documentation, and execution listeners group, and template-related entries when entriesVisible is unset',
+    it('should show only general, documentation, template group and execution listeners group when entriesVisible is unset',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -221,14 +221,14 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         expectOnlyGroups(container, [
           'general',
           'documentation',
-          'Zeebe__ExecutionListeners',
-          'ElementTemplates__Template'
+          'ElementTemplates__Template',
+          'Zeebe__ExecutionListeners'
         ]);
       })
     );
 
 
-    it('should show only general, documentation, and execution listeners group, and template-related entries when entriesVisible=false',
+    it('should show only general, documentation, template group and execution listeners group when entriesVisible=false',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -243,14 +243,14 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         expectOnlyGroups(container, [
           'general',
           'documentation',
-          'Zeebe__ExecutionListeners',
-          'ElementTemplates__Template'
+          'ElementTemplates__Template',
+          'Zeebe__ExecutionListeners'
         ]);
       })
     );
 
 
-    it('should show only general, documentation, and execution listeners group, and template group when template is unknown',
+    it('should show only general, documentation, template group and execution listeners group when template is unknown',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -265,8 +265,8 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         expectOnlyGroups(container, [
           'general',
           'documentation',
-          'Zeebe__ExecutionListeners',
-          'ElementTemplates__Template'
+          'ElementTemplates__Template',
+          'Zeebe__ExecutionListeners'
         ]);
       })
     );
