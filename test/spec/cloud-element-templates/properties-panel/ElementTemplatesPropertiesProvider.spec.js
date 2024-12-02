@@ -206,7 +206,7 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
     }));
 
 
-    it('should show only general, documentation, template group and execution listeners group when entriesVisible is unset',
+    it('should show only always-visible groups when entriesVisible is unset',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -222,13 +222,14 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
           'general',
           'documentation',
           'ElementTemplates__Template',
+          'multiInstance',
           'Zeebe__ExecutionListeners'
         ]);
       })
     );
 
 
-    it('should show only general, documentation, template group and execution listeners group when entriesVisible=false',
+    it('should show only always-visible groups when entriesVisible=false',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -244,13 +245,14 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
           'general',
           'documentation',
           'ElementTemplates__Template',
+          'multiInstance',
           'Zeebe__ExecutionListeners'
         ]);
       })
     );
 
 
-    it('should show only general, documentation, template group and execution listeners group when template is unknown',
+    it('should show only always-visible groups when template is unknown',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -266,13 +268,14 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
           'general',
           'documentation',
           'ElementTemplates__Template',
+          'multiInstance',
           'Zeebe__ExecutionListeners'
         ]);
       })
     );
 
 
-    it('should show all available groups when entriesVisible=true',
+    it('should show all groups when entriesVisible=true',
       inject(async function(elementRegistry, selection) {
 
         // given
@@ -287,10 +290,13 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         const groups = getGroupIds(container);
 
         expect(groups).to.contain('general');
-        expect(groups).to.contain('ElementTemplates__Template');
         expect(groups).to.contain('documentation');
+        expect(groups).to.contain('ElementTemplates__Template');
+        expect(groups).to.contain('Zeebe__ExecutionListeners');
+        expect(groups).to.contain('Zeebe__ExtensionProperties');
       })
     );
+
   });
 
 
