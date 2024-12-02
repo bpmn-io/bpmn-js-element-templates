@@ -1,6 +1,6 @@
 import ChangeElementTemplateHandler from './ChangeElementTemplateHandler';
-import RemoveElementTemplateHandler from './RemoveElementTemplateHandler';
-import MultiCommandHandler from './MultiCommandHandler';
+import RemoveElementTemplateHandler from '../../cmd/RemoveElementTemplateHandler';
+import MultiCommandHandler from '../../cmd/MultiCommandHandler';
 
 export default class ElementTemplatesCommands {
   constructor(commandStack, elementTemplates, eventBus) {
