@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_08adx7k" targetNamespace="http://bpmn.io/schema/bpmn" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" exporter="Camunda Modeler" exporterVersion="4.12.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_08adx7k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.29.0">
   <bpmn:process id="Process_1" isExecutable="true">
-    <bpmn:task id="Task_1" zeebe:modelerTemplate="foo" />
-    <bpmn:task id="Task_2" zeebe:modelerTemplate="foo" zeebe:modelerTemplateVersion="1" />
+    <bpmn:task id="Task_1" zeebe:modelerTemplate="foo">
+      <bpmn:multiInstanceLoopCharacteristics />
+    </bpmn:task>
+    <bpmn:task id="Task_2" zeebe:modelerTemplate="foo" zeebe:modelerTemplateVersion="1">
+      <bpmn:multiInstanceLoopCharacteristics />
+    </bpmn:task>
     <bpmn:task id="Task_3" />
-    <bpmn:task id="UnknownTemplateTask" zeebe:modelerTemplate="unknown" />
-    <bpmn:serviceTask id="ServiceTask" zeebe:modelerTemplate="default" />
+    <bpmn:task id="UnknownTemplateTask" zeebe:modelerTemplate="unknown">
+      <bpmn:multiInstanceLoopCharacteristics />
+    </bpmn:task>
+    <bpmn:serviceTask id="ServiceTask" zeebe:modelerTemplate="default">
+      <bpmn:multiInstanceLoopCharacteristics />
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
