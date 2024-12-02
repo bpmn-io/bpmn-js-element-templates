@@ -15,7 +15,7 @@ import { getPropertyValue } from '../util/propertyUtil';
 
 const LOWER_PRIORITY = 300;
 
-const ALWAYS_DISPLAYED_GROUPS = [
+const ALWAYS_VISIBLE_GROUPS = [
   'general',
   'documentation',
   'multiInstance',
@@ -75,7 +75,7 @@ export default class ElementTemplatesPropertiesProvider {
 
       // (3) apply entries visible
       if (getTemplateId(element)) {
-        groups = filterWithEntriesVisible(elementTemplate || {}, groups);
+        groups = getVisibleGroups(elementTemplate || {}, groups);
       }
 
       return groups;
@@ -145,11 +145,11 @@ function addGroupsAfter(idOrIds, groups, groupsToAdd) {
   }
 }
 
-function filterWithEntriesVisible(template, groups) {
+function getVisibleGroups(template, groups) {
   if (!template.entriesVisible) {
     return groups.filter(group => {
       return (
-        ALWAYS_DISPLAYED_GROUPS.includes(group.id) ||
+        ALWAYS_VISIBLE_GROUPS.includes(group.id) ||
         group.id.startsWith('ElementTemplates__')
       );
     });
