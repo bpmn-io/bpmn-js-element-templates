@@ -33,7 +33,7 @@ import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
 import { findMessage } from 'src/cloud-element-templates/Helper';
 
 
-describe('provider/cloud-element-templates - ElementTemplates', function() {
+describe.only('provider/cloud-element-templates - ElementTemplates', function() {
 
   let container;
 
@@ -53,12 +53,13 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }
   }));
 
-  beforeEach(inject(function(elementTemplates) {
-    elementTemplates.set(templates);
-  }));
-
 
   describe('get', function() {
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(templates);
+    }));
+
 
     it('should get template by ID', inject(function(elementTemplates) {
 
@@ -147,6 +148,11 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   describe('getAll', function() {
 
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(templates);
+    }));
+
+
     it('should get all templates', inject(function(elementTemplates) {
 
       // when
@@ -219,6 +225,11 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
 
   describe('getLatest', function() {
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(templates);
+    }));
+
 
     it('should get all latest templates', inject(function(elementTemplates) {
 
@@ -345,6 +356,11 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
 
   describe('createElement', function() {
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(templates);
+    }));
+
 
     it('should create element', inject(function(elementTemplates) {
 
@@ -527,6 +543,11 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
 
   describe('applyTemplate', function() {
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(templates);
+    }));
+
 
     it('should set template on element', inject(function(elementRegistry, elementTemplates) {
 
@@ -807,6 +828,11 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   describe('unlinkTemplate', function() {
 
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(templates);
+    }));
+
+
     it('should unlink task template', inject(function(elementRegistry, elementTemplates) {
 
       // given
@@ -861,6 +887,11 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
 
   describe('removeTemplate', function() {
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(templates);
+    }));
+
 
     it('should remove task template', inject(function(elementRegistry, elementTemplates) {
 
@@ -1008,29 +1039,11 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   describe('updateTemplate', function() {
 
-    let container;
-
-    beforeEach(function() {
-      container = TestContainer.get(this);
-    });
-
-    beforeEach(bootstrapModeler(diagramXML, {
-      container: container,
-      modules: [
-        coreModule,
-        elementTemplatesCoreModule,
-        modelingModule,
-        {
-          propertiesPanel: [ 'value', { registerProvider() {} } ]
-        }
-      ],
-      moddleExtensions: {
-        zeebe: zeebeModdlePackage
-      },
-      elementTemplates: [
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set([
         ...templates,
         ...messageTemplates
-      ]
+      ]);
     }));
 
 
@@ -1120,6 +1133,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         newTemplate
       });
     }));
+
   });
 
 });
