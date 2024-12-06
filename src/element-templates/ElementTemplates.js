@@ -108,6 +108,9 @@ export default class ElementTemplates {
    * @param {Array<ElementTemplate>} templates
    */
   set(templates) {
+
+    console.log('elementTemplates#set');
+
     this._templates = {};
 
     templates.forEach((template) => {
