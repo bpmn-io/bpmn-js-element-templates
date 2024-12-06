@@ -34,7 +34,7 @@ import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
 import { findMessage } from 'src/cloud-element-templates/Helper';
 
 
-describe.only('provider/cloud-element-templates - ElementTemplates', function() {
+describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   let container;
 
@@ -365,7 +365,7 @@ describe.only('provider/cloud-element-templates - ElementTemplates', function() 
 
           // then
           expect(templates).to.have.length(1);
-          expect(templates[0].version).to.eql(2);
+          expect(templates[0].version).to.eql(3);
         }));
 
 
@@ -402,7 +402,7 @@ describe.only('provider/cloud-element-templates - ElementTemplates', function() 
 
         // then
         expect(templates).to.have.length(1);
-        expect(templates[0].version).to.eql(1);
+        expect(templates[0].version).to.eql(2);
       }));
 
 
@@ -418,7 +418,7 @@ describe.only('provider/cloud-element-templates - ElementTemplates', function() 
 
         // then
         expect(templates).to.have.length(1);
-        expect(templates[0].version).to.eql(0);
+        expect(templates[0].version).to.eql(1);
       }));
 
 
@@ -434,7 +434,7 @@ describe.only('provider/cloud-element-templates - ElementTemplates', function() 
 
           // then
           expect(templates).to.have.length(1);
-          expect(templates[0].version).to.eql(2);
+          expect(templates[0].version).to.eql(3);
         }));
 
 
@@ -448,8 +448,8 @@ describe.only('provider/cloud-element-templates - ElementTemplates', function() 
 
           // then
           // example.engines.test.multiple v2
-          // example.engines.test.basic v2
-          // example.engines.test.broken v0
+          // example.engines.test.basic v3
+          // example.engines.test.broken v1
           expect(templates).to.have.length(3);
         }));
 
@@ -495,7 +495,10 @@ describe.only('provider/cloud-element-templates - ElementTemplates', function() 
 
         // given
         elementTemplates.setEngines({
-          camunda: '--100'
+
+          // Very unfortunate broken version - semver#coerce will fix it to 1.0.0
+          // camunda: '--100'
+          camunda: 'one-hundred'
         });
 
         // when
@@ -504,7 +507,7 @@ describe.only('provider/cloud-element-templates - ElementTemplates', function() 
         // then
         // we ignore the context entry, assume it is not there
         expect(templates).to.have.length(1);
-        expect(templates[0].version).to.eql(2);
+        expect(templates[0].version).to.eql(3);
       }));
 
 
@@ -521,7 +524,7 @@ describe.only('provider/cloud-element-templates - ElementTemplates', function() 
         // then
         // assumption: we still regard such template as a valid template
         expect(templates).to.have.length(1);
-        expect(templates[0].version).to.eql(0);
+        expect(templates[0].version).to.eql(1);
       }));
 
     });

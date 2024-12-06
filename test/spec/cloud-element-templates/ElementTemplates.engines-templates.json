@@ -33,7 +33,7 @@
     "id": "example.engines.test.basic",
     "name": "<engines> Test - Basic",
     "description": "matches when compatible <camunda> run-time is indicated, or property is not provided",
-    "version": 2,
+    "version": 3,
     "engines": {
       "camunda": "^8.6"
     },
@@ -46,7 +46,7 @@
     "id": "example.engines.test.basic",
     "name": "<engines> Test - Basic",
     "description": "matches when compatible <camunda> run-time is indicated, or property is not provided",
-    "version": 1,
+    "version": 2,
     "engines": {
       "camunda": "^8.5"
     },
@@ -59,7 +59,7 @@
     "id": "example.engines.test.basic",
     "name": "<engines> Test - Basic",
     "description": "always matches",
-    "version": 0,
+    "version": 1,
     "appliesTo": [
       "bpmn:Task"
     ],
@@ -70,7 +70,7 @@
     "id": "example.engines.test.broken",
     "name": "<engines> Test - broken Semver range",
     "description": "specifies broken semver range",
-    "version": 0,
+    "version": 1,
     "engines": {
       "camunda": "-foobar"
     },
