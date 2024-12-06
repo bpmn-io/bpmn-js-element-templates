@@ -1,0 +1,82 @@
+[
+  {
+    "id": "example.engines.test.multiple",
+    "name": "<engines> Test - Multiple",
+    "description": "does not match <desktopModeler>, if explicit <desktopModeler>=1> is provided",
+    "version": 2,
+    "engines": {
+      "camunda": "^8.6",
+      "webModeler": "^4.1",
+      "desktopModeler": "^0"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+  {
+    "id": "example.engines.test.multiple",
+    "name": "<engines> Test - Multiple",
+    "description": "matches when compatible <camunda> and/or <webModeler> run-time is indicated, or properties are not provided",
+    "version": 1,
+    "engines": {
+      "camunda": "^8.6",
+      "webModeler": "^4.1"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+
+  {
+    "id": "example.engines.test.basic",
+    "name": "<engines> Test - Basic",
+    "description": "matches when compatible <camunda> run-time is indicated, or property is not provided",
+    "version": 3,
+    "engines": {
+      "camunda": "^8.6"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+  {
+    "id": "example.engines.test.basic",
+    "name": "<engines> Test - Basic",
+    "description": "matches when compatible <camunda> run-time is indicated, or property is not provided",
+    "version": 2,
+    "engines": {
+      "camunda": "^8.5"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+  {
+    "id": "example.engines.test.basic",
+    "name": "<engines> Test - Basic",
+    "description": "always matches",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+
+  {
+    "id": "example.engines.test.broken",
+    "name": "<engines> Test - broken Semver range",
+    "description": "specifies broken semver range",
+    "version": 1,
+    "engines": {
+      "camunda": "-foobar"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  }
+]
