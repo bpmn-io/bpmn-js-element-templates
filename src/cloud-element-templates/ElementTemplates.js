@@ -1,4 +1,9 @@
 import {
+  isArray,
+  isFunction
+} from 'min-dash';
+
+import {
   getTemplateId,
   getTemplateVersion
 } from './Helper';
@@ -9,10 +14,17 @@ import { default as DefaultElementTemplates } from '../element-templates/Element
  * Registry for element templates.
  */
 export default class ElementTemplates extends DefaultElementTemplates {
-  constructor(templateElementFactory, commandStack, eventBus, modeling, injector) {
+  constructor(templateElementFactory, commandStack, eventBus, modeling, injector, config) {
     super(commandStack, eventBus, modeling, injector);
 
     this._templateElementFactory = templateElementFactory;
+    this._config = {};
+    this._engines = {};
+
+    if (!(isArray(this._config) || isFunction(this._config))) {
+      this._config = config || {};
+      this._engines = this._config.engines;
+    }
   }
 
   _getTemplateId(element) {
@@ -75,6 +87,14 @@ export default class ElementTemplates extends DefaultElementTemplates {
 
     return context.element;
   }
+
+  getEngines() {
+    return this._engines;
+  }
+
+  setEngines(engines) {
+    this._engines = engines;
+  }
 }
 
 ElementTemplates.$inject = [
@@ -82,5 +102,6 @@ ElementTemplates.$inject = [
   'commandStack',
   'eventBus',
   'modeling',
-  'injector'
+  'injector',
+  'config.elementTemplates',
 ];

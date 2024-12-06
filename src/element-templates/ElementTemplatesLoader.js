@@ -1,6 +1,7 @@
 import {
   isFunction,
-  isUndefined
+  isUndefined,
+  isArray,
 } from 'min-dash';
 
 import { Validator } from './Validator';
@@ -20,11 +21,19 @@ import { Validator } from './Validator';
  * @param {Moddle} moddle
  */
 export default class ElementTemplatesLoader {
-  constructor(loadTemplates, eventBus, elementTemplates, moddle) {
-    this._loadTemplates = loadTemplates;
+  constructor(config, eventBus, elementTemplates, moddle) {
+    this._loadTemplates;
     this._eventBus = eventBus;
     this._elementTemplates = elementTemplates;
     this._moddle = moddle;
+
+    if (isArray(config) || isFunction(config)) {
+      this._loadTemplates = config;
+    }
+
+    if (config && config.loadTemplates) {
+      this._loadTemplates = config.loadTemplates;
+    }
 
     eventBus.on('diagram.init', () => {
       this.reload();
