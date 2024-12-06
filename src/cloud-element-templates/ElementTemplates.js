@@ -94,6 +94,7 @@ export default class ElementTemplates extends DefaultElementTemplates {
 
   setEngines(engines) {
     this._engines = engines;
+    this.reset();
   }
 }
 

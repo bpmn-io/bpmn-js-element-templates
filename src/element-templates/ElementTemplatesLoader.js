@@ -15,7 +15,7 @@ import { Validator } from './Validator';
  * descriptors or a node style callback to retrieve
  * the templates asynchronously.
  *
- * @param {Array<TemplateDescriptor>|Function} loadTemplates
+ * @param {Array<TemplateDescriptor>|Function} config
  * @param {EventBus} eventBus
  * @param {ElementTemplates} elementTemplates
  * @param {Moddle} moddle
