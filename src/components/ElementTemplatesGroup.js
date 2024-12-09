@@ -258,23 +258,36 @@ function OutdatedTemplate({ element, templateState }) {
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
 
+  const cls = compatible
+    ? 'bio-properties-panel-template-update-available'
+    : 'bio-properties-panel-template-incompatible';
+
+  const text = compatible
+    ? translate('Update available')
+    : translate('Incompatible (update available)');
+
   return (
-    <DropdownButton menuItems={ menuItems } class="bio-properties-panel-template-update-available">
+    <DropdownButton menuItems={ menuItems } class={ cls }>
       <HeaderButton>
-        <span>{ translate('Update available') }</span>
+        <span>{ text }</span>
         <ArrowIcon class="bio-properties-panel-arrow-down" />
       </HeaderButton>
     </DropdownButton>
   );
 }
 
-function UpdateAvailableText({ newerTemplate }) {
+function UpdateAvailableText({ newerTemplate, compatible }) {
   const translate = useService('translate');
 
-  const text = translate(
-    'A new version of the template is available: {templateVersion}',
-    { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
-  );
+  const text = compatible
+    ? translate(
+      'A new version of the template is available: {templateVersion}',
+      { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
+    )
+    : translate(
+      'A version of this template is available that supports your environment: {templateVersion}',
+      { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
+    );
 
   return <div class="bio-properties-panel-template-update-available-text">{text}</div>;
 }
@@ -349,7 +362,7 @@ function IncompatibleText() {
   return (
     <div class="bio-properties-panel-template-incompatible-text">
       { translate(
-        'No version of this template compatible with your environment was found.'
+        'No version of this template that is compatible with your environment was found.'
       ) }
     </div>
   );
