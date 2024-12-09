@@ -2,10 +2,12 @@ import {
   filter,
   find,
   flatten,
+  has,
   isNil,
   isObject,
   isString,
   isUndefined,
+  reduce,
   values
 } from 'min-dash';
 
@@ -16,17 +18,32 @@ import {
 
 import { isAny } from 'bpmn-js/lib/util/ModelUtil';
 
+import {
+  valid as isSemverValid,
+  satisfies as isSemverCompatible,
+  coerce
+} from 'semver';
+
 /**
  * Registry for element templates.
  */
 export default class ElementTemplates {
-  constructor(commandStack, eventBus, modeling, injector) {
+  constructor(commandStack, eventBus, modeling, injector, config) {
     this._commandStack = commandStack;
     this._eventBus = eventBus;
     this._injector = injector;
     this._modeling = modeling;
 
     this._templatesById = {};
+    this._templates = [];
+
+    config = config || {};
+
+    this._engines = this._coerceEngines(config.engines || {});
+
+    eventBus.on('elementTemplates.engines.changed', event => {
+      this.set(this._templates);
+    });
   }
 
   /**
@@ -109,24 +126,94 @@ export default class ElementTemplates {
    */
   set(templates) {
     this._templatesById = {};
+    this._templates = templates;
 
     templates.forEach((template) => {
-      const id = template.id,
-            version = isUndefined(template.version) ? '_' : template.version;
+      const id = template.id;
+      const version = isUndefined(template.version) ? '_' : template.version;
 
       if (!this._templatesById[ id ]) {
-        this._templatesById[ id ] = {
-          latest: template
-        };
+        this._templatesById[ id ] = { };
       }
 
       this._templatesById[ id ][ version ] = template;
 
-      const latestVerions = this._templatesById[ id ].latest.version;
-      if (isUndefined(latestVerions) || template.version > latestVerions) {
-        this._templatesById[ id ].latest = template;
+      const latest = this._templatesById[ id ].latest;
+
+      if (this.isCompatible(template)) {
+        if (!latest || isUndefined(latest.version) || latest.version < version) {
+          this._templatesById[ id ].latest = template;
+        }
       }
     });
+
+    this._fire('changed');
+  }
+
+  getEngines() {
+    return this._engines;
+  }
+
+  setEngines(engines) {
+    this._engines = this._coerceEngines(engines);
+
+    this._fire('engines.changed');
+  }
+
+  /**
+   * Ensures that only valid engines are kept around
+   *
+   * @param { Record<string, string> } engines
+   *
+   * @return { Record<string, string> } filtered, valid engines
+   */
+  _coerceEngines(engines) {
+
+    return reduce(engines, (validEngines, version, engine) => {
+
+      const coercedVersion = coerce(version);
+
+      if (!isSemverValid(coercedVersion)) {
+        console.error(
+          new Error(`Engine <${ engine }> specifies unparseable version <${version}>`)
+        );
+
+        return validEngines;
+      }
+
+      return {
+        ...validEngines,
+        [ engine ]: coercedVersion.raw
+      };
+    }, {});
+  }
+
+  /**
+   * Check if template is compatible with currently set engine version.
+   *
+   * @param {ElementTemplate} template
+   *
+   * @return {boolean} - true if compatible or no engine is set for elementTemplates or template.
+   */
+  isCompatible(template) {
+    const localEngines = this._engines;
+    const templateEngines = template.engines;
+
+    for (const engine in templateEngines) {
+
+      // we check compatibility against all locally provided
+      // engines, hence computing the overlap here.
+
+      if (!has(localEngines, engine)) {
+        continue;
+      }
+
+      if (!isSemverCompatible(localEngines[engine], templateEngines[engine])) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -138,15 +225,15 @@ export default class ElementTemplates {
   _getTemplateVerions(id, options = {}) {
 
     const {
-      latest: latestOnly,
+      latest: includeLatestOnly,
       deprecated: includeDeprecated
     } = options;
 
     const templatesById = this._templatesById;
     const getVersions = (template) => {
       const { latest, ...versions } = template;
-      return latestOnly ? (
-        !includeDeprecated && latest.deprecated ? [] : [ latest ]
+      return includeLatestOnly ? (
+        !includeDeprecated && (latest && latest.deprecated) ? [] : (latest ? [ latest ] : [])
       ) : values(versions) ;
     };
 
@@ -208,9 +295,13 @@ export default class ElementTemplates {
 
     this._commandStack.execute('propertiesPanel.camunda.changeTemplate', context);
 
-    this._eventBus.fire(`elementTemplates.${action}`, payload);
+    this._fire(action, payload);
 
     return context.element;
+  }
+
+  _fire(action, payload) {
+    return this._eventBus.fire(`elementTemplates.${action}`, payload);
   }
 
   /**
@@ -221,9 +312,7 @@ export default class ElementTemplates {
    * @return {djs.model.Base} the updated element
    */
   removeTemplate(element) {
-    const eventBus = this._injector.get('eventBus');
-
-    eventBus.fire('elementTemplates.remove', { element });
+    this._fire('remove', { element });
 
     const context = {
       element
@@ -252,7 +341,6 @@ ElementTemplates.$inject = [
   'commandStack',
   'eventBus',
   'modeling',
-  'injector'
+  'injector',
+  'config.elementTemplates'
 ];
-
-

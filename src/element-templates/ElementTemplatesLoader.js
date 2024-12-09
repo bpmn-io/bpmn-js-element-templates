@@ -32,7 +32,7 @@ export default class ElementTemplatesLoader {
     }
 
     if (config && config.loadTemplates) {
-      this._loadTemplates = config.templates;
+      this._loadTemplates = config.loadTemplates;
     }
 
     eventBus.on('diagram.init', () => {
@@ -54,7 +54,7 @@ export default class ElementTemplatesLoader {
       return loadTemplates((err, templates) => {
 
         if (err) {
-          return this.templateErrors([ err ]);
+          return this._templateErrors([ err ]);
         }
 
         this.setTemplates(templates);
@@ -79,18 +79,12 @@ export default class ElementTemplatesLoader {
     elementTemplates.set(validTemplates);
 
     if (errors.length) {
-      this.templateErrors(errors);
+      this._templateErrors(errors);
     }
-
-    this.templatesChanged();
   }
 
-  templatesChanged() {
-    this._eventBus.fire('elementTemplates.changed');
-  }
-
-  templateErrors(errors) {
-    this._eventBus.fire('elementTemplates.errors', {
+  _templateErrors(errors) {
+    this._elementTemplates._fire('errors', {
       errors: errors
     });
   }

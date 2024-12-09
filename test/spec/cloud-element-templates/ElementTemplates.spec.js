@@ -24,8 +24,10 @@ import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 import diagramXML from './ElementTemplates.bpmn';
 import integrationXML from './fixtures/integration.bpmn';
 import messageTemplates from './ElementTemplates.message-templates.json';
+import enginesTemplates from './ElementTemplates.engines-templates.json';
 
 import templates from './fixtures/simple';
+import falsyVersionTemplate from './fixtures/falsy-version';
 import complexTemplates from './fixtures/complex';
 import integrationTemplates from './fixtures/integration';
 import { findExtensions, findExtension } from 'src/cloud-element-templates/Helper';
@@ -343,6 +345,206 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    describe('<engines> compatibility', function() {
+
+      beforeEach(inject(function(elementTemplates) {
+        elementTemplates.set(enginesTemplates);
+      }));
+
+
+      describe('should retrieve latest compatible', function() {
+
+        it('single template', inject(function(elementTemplates) {
+
+          // given
+          elementTemplates.setEngines({
+            camunda: '8.6.3'
+          });
+
+          // when
+          const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+          // then
+          expect(templates).to.have.length(1);
+          expect(templates[0].version).to.eql(3);
+        }));
+
+
+        it('all templates', inject(function(elementTemplates) {
+
+          // given
+          elementTemplates.setEngines({
+            camunda: '8.6.3'
+          });
+
+          // when
+          const templates = elementTemplates.getLatest();
+
+          // then
+          // expect all compatible templates to be returned
+          // example.engines.test.multiple v2
+          // example.engines.test.basic v2
+          expect(templates).to.have.length(2);
+        }));
+
+      });
+
+
+      it('should retrieve older compatible', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.5'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(2);
+      }));
+
+
+      it('should retrieve fallback (no <engines> meta-data)', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '4'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(1);
+      }));
+
+
+      describe('should handle no context provided', function() {
+
+        it('single template', inject(function(elementTemplates) {
+
+          // given
+          elementTemplates.setEngines({});
+
+          // when
+          const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+          // then
+          expect(templates).to.have.length(1);
+          expect(templates[0].version).to.eql(3);
+        }));
+
+
+        it('list templates', inject(function(elementTemplates) {
+
+          // given
+          elementTemplates.setEngines({});
+
+          // when
+          const templates = elementTemplates.getLatest();
+
+          // then
+          // example.engines.test.multiple v2
+          // example.engines.test.basic v3
+          // example.engines.test.broken v1
+          expect(templates).to.have.length(3);
+        }));
+
+      });
+
+
+      it('should support multiple engines', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.6',
+          webModeler: '4.3'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.multiple');
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(2);
+      }));
+
+
+      it('should exclude engine', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.6',
+          webModeler: '4.3',
+          desktopModeler: '5.4'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.multiple');
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(1);
+      }));
+
+
+      it('should ignore incompatible', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.4'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.multiple');
+
+        // then
+        expect(templates).to.be.empty;
+      }));
+
+
+      it('should handle broken <engines> provided at run-time', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: 'one-hundred'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+        // then
+        // we ignore the context entry, assume it is not there
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(3);
+      }));
+
+
+      it('should handle broken <engines> provided by template', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.6'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.broken');
+
+        // then
+        expect(templates).to.be.empty;
+
+        // and
+        // we still regard such template as a valid template
+        const template = elementTemplates.get('example.engines.test.broken', 1);
+        expect(template).to.exist;
+      }));
+
+    });
+
+
     it('should throw for invalid argument', inject(function(elementTemplates) {
 
       // then
@@ -538,6 +740,84 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         expect(element.parent).to.eql(processElement);
       })
     );
+
+  });
+
+
+  describe('set', function() {
+
+    it('should set templates', inject(function(elementTemplates) {
+
+      // when
+      elementTemplates.set(templates.slice(0, 3));
+
+      // then
+      expect(elementTemplates.getAll()).to.have.length(3);
+    }));
+
+
+    it('should not ignore version set to 0', inject(function(elementTemplates) {
+
+      // when
+      elementTemplates.set(falsyVersionTemplate);
+
+      // then
+      expect(elementTemplates.get(falsyVersionTemplate[0].id, 0)).to.exist;
+    }));
+
+
+    it('should emit <elementTemplates.changed> event', inject(function(elementTemplates, eventBus) {
+
+      // given
+      const spy = sinon.spy();
+
+      eventBus.on('elementTemplates.changed', spy);
+
+      // when
+      elementTemplates.set(templates);
+
+      // then
+      expect(spy).to.have.been.calledOnce;
+    }));
+
+  });
+
+
+  describe('getEngines', function() {
+
+    it('should provide set engines', inject(function(elementTemplates) {
+
+      // when
+      elementTemplates.setEngines({
+        'camunda': '8',
+        'other': '100.5'
+      });
+
+      // then
+      expect(elementTemplates.getEngines()).to.eql({
+        'camunda': '8.0.0',
+        'other': '100.5.0'
+      });
+    }));
+
+  });
+
+
+  describe('setEngines', function() {
+
+    it('should emit event', inject(function(elementTemplates, eventBus) {
+
+      // given
+      const spy = sinon.spy();
+
+      eventBus.on('elementTemplates.engines.changed', spy);
+
+      // when
+      elementTemplates.setEngines({});
+
+      // then
+      expect(spy).to.have.been.calledOnce;
+    }));
 
   });
 
@@ -866,6 +1146,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       expect(getBusinessObject(task).get('zeebe:modelerTemplateIcon')).to.not.exist;
     }));
 
+
     it('should fire elementTemplates.unlink event', inject(function(elementRegistry, elementTemplates, eventBus) {
 
       // given
@@ -1135,6 +1416,117 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
   });
+
+
+  describe('isCompatible', function() {
+
+    const compatibleTemplate = {
+      engines: {
+        camunda: '^8.5'
+      }
+    };
+
+    const incompatibleTemplate = {
+      engines: {
+        camunda: '^8.6'
+      }
+    };
+
+
+    it('should accept compatible', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '8.5'
+      });
+
+      // then
+      expect(elementTemplates.isCompatible(compatibleTemplate)).to.be.true;
+    }));
+
+
+    it('should reject incompatible', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '8.5'
+      });
+
+      // then
+      expect(elementTemplates.isCompatible(incompatibleTemplate)).to.be.false;
+    }));
+
+
+    it('should accept non matching engine', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        nonMatchingEngine: '8.5'
+      });
+
+      // then
+      expect(elementTemplates.isCompatible(compatibleTemplate)).to.be.true;
+      expect(elementTemplates.isCompatible(incompatibleTemplate)).to.be.true;
+    }));
+
+  });
+
+
+  describe('error handling', function() {
+
+    // given
+    const invalidEngines = {
+      camunda: '8.5',
+      invalid: 'not-a-semver'
+    };
+
+    it('should filter invalid <engines> on set', inject(function(elementTemplates) {
+
+      // when
+      elementTemplates.setEngines(invalidEngines);
+
+      // then
+      expect(elementTemplates.getEngines()).to.have.property('camunda');
+      expect(elementTemplates.getEngines()).to.not.have.property('invalid');
+    }));
+  });
+
+});
+
+
+describe('provider/cloud-element-templates - ElementTemplates - error handling on instantiation', function() {
+
+  let container;
+
+  beforeEach(function() {
+    container = TestContainer.get(this);
+  });
+
+  // given
+  const invalidEngines = {
+    camunda: '8.5',
+    invalid: 'not-a-semver'
+  };
+
+  beforeEach(bootstrapModeler(diagramXML, {
+    container: container,
+    modules: [
+      coreModule,
+      modelingModule,
+      elementTemplatesCoreModule,
+    ],
+    elementTemplates: {
+      engines: invalidEngines
+    }
+  }));
+
+
+  it('should filter invalid <engines> on instantiation', inject(function(elementTemplates) {
+
+    // then
+    expect(elementTemplates.getEngines()).to.have.property('camunda', '8.5.0');
+    expect(elementTemplates.getEngines()).to.not.have.property('invalid');
+  }));
 
 });
 
