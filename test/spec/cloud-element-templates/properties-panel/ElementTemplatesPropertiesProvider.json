@@ -94,5 +94,38 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "engines",
+    "name":"Engines 1",
+    "version": 1,
+    "appliesTo": [ "bpmn:Task" ],
+    "engines": {
+      "camunda": "^8.4"
+    },
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "engines",
+    "name":"Engines 2",
+    "version": 2,
+    "appliesTo": [ "bpmn:Task" ],
+    "engines": {
+      "camunda": "^8.5"
+    },
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "engines",
+    "name":"Engines 3",
+    "version": 3,
+    "appliesTo": [ "bpmn:Task" ],
+    "engines": {
+      "camunda": "^8.6"
+    },
+    "properties": []
   }
 ]

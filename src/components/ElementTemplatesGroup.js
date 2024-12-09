@@ -149,6 +149,8 @@ function TemplateGroupButtons({ element, getTemplateId }) {
     return <UnknownTemplate element={ element } />;
   } else if (templateState.type === 'DEPRECATED_TEMPLATE') {
     return <DeprecatedTemplate element={ element } templateState={ templateState } />;
+  } else if (templateState.type === 'INCOMPATIBLE_TEMPLATE') {
+    return <IncompatibleTemplate element={ element } />;
   } else if (templateState.type === 'OUTDATED_TEMPLATE') {
     return (
       <OutdatedTemplate
@@ -320,6 +322,39 @@ function DocumentationIcon() {
   </svg>;
 }
 
+function IncompatibleTemplate({ element }) {
+  const translate = useService('translate'),
+        elementTemplates = useService('elementTemplates');
+
+  const menuItems = [
+    { entry: <IncompatibleText /> },
+    { separator: true },
+    { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
+    { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
+  ];
+
+  return (
+    <DropdownButton menuItems={ menuItems } class="bio-properties-panel-template-incompatible">
+      <HeaderButton>
+        <span>{ translate('Incompatible') }</span>
+        <ArrowIcon class="bio-properties-panel-arrow-down" />
+      </HeaderButton>
+    </DropdownButton>
+  );
+}
+
+function IncompatibleText() {
+  const translate = useService('translate');
+
+  return (
+    <div class="bio-properties-panel-template-incompatible-text">
+      { translate(
+        'No compatible version of this template was found for your execution platform. Deploying and running with an incompatible template can cause errors during runtime. Unlink to access the data.'
+      ) }
+    </div>
+  );
+}
+
 
 // helper //////
 
@@ -348,9 +383,15 @@ function getTemplateState(elementTemplates, element, getTemplateId) {
   }
 
   const newerTemplate = elementTemplates.getLatest(templateId, { deprecated: true })[0];
+  const isNewerCompatible = elementTemplates.isCompatible(newerTemplate);
 
-  if (newerTemplate !== template) {
+  if (newerTemplate !== template && isNewerCompatible) {
     return { type: 'OUTDATED_TEMPLATE', template, newerTemplate };
+  }
+
+  const isCompatible = elementTemplates.isCompatible(template);
+  if (!isCompatible) {
+    return { type: 'INCOMPATIBLE_TEMPLATE', template };
   }
 
   return { type: 'KNOWN_TEMPLATE', template };

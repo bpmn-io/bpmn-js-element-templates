@@ -59,7 +59,8 @@
 
 .bio-properties-panel-template-update-available:last-child,
 .bio-properties-panel-applied-template-button:last-child,
-.bio-properties-panel-template-not-found:last-child {
+.bio-properties-panel-template-not-found:last-child,
+.bio-properties-panel-template-incompatible:last-child {
   margin-right: 32px;
 }
 
@@ -78,23 +79,27 @@
 }
 
 
-.bio-properties-panel-template-not-found .bio-properties-panel-group-header-button {
+.bio-properties-panel-template-not-found .bio-properties-panel-group-header-button,
+.bio-properties-panel-template-incompatible .bio-properties-panel-group-header-button {
   background-color: var(--unknown-template-background-color);
   color: var(--select-template-label-color);
   fill: var(--select-template-fill-color);
 }
 
-.bio-properties-panel-template-not-found .bio-properties-panel-group-header-button:hover {
+.bio-properties-panel-template-not-found .bio-properties-panel-group-header-button:hover,
+.bio-properties-panel-template-incompatible .bio-properties-panel-group-header-button:hover {
   background-color: var(--unknown-template-hover-background-color);
 }
 
 .bio-properties-panel-template-not-found-text,
-.bio-properties-panel-template-update-available-text {
+.bio-properties-panel-template-update-available-text,
+.bio-properties-panel-template-incompatible-text {
   color: var(--select-template-information-text-color);
 }
 
 .bio-properties-panel-template-not-found-text,
 .bio-properties-panel-template-update-available-text,
-.bio-properties-panel-deprecated-template-text {
+.bio-properties-panel-deprecated-template-text,
+.bio-properties-panel-template-incompatible-text {
   width: 216px;
 }
