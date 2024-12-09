@@ -726,6 +726,13 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
   });
 
 
+  describe('set', function() {
+
+    it('should emit <elementTemplates.changed> event');
+
+  });
+
+
   describe('applyTemplate', function() {
 
     beforeEach(inject(function(elementTemplates) {

@@ -137,6 +137,8 @@ export default class ElementTemplates {
         this._templatesById[ id ].latest = template;
       }
     });
+
+    this._fire('changed');
   }
 
   /**
@@ -268,9 +270,13 @@ export default class ElementTemplates {
 
     this._commandStack.execute('propertiesPanel.camunda.changeTemplate', context);
 
-    this._eventBus.fire(`elementTemplates.${action}`, payload);
+    this._fire(action, payload);
 
     return context.element;
+  }
+
+  _fire(action, payload) {
+    return this._eventBus.fire(`elementTemplates.${action}`, payload);
   }
 
   /**
@@ -281,9 +287,7 @@ export default class ElementTemplates {
    * @return {djs.model.Base} the updated element
    */
   removeTemplate(element) {
-    const eventBus = this._injector.get('eventBus');
-
-    eventBus.fire('elementTemplates.remove', { element });
+    this._fire('remove', { element });
 
     const context = {
       element
