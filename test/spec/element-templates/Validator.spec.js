@@ -712,4 +712,42 @@ describe('provider/element-templates - Validator', function() {
 
   });
 
+
+  describe('engines validation', function() {
+
+    it('should accept template with valid semver range', function() {
+
+      // given
+      const templates = new Validator(moddle);
+
+      const templateDescriptor = require('./fixtures/engines');
+
+      // when
+      templates.addAll(templateDescriptor);
+
+      // then
+      expect(errors(templates)).to.be.empty;
+
+      expect(valid(templates)).to.have.length(templateDescriptor.length);
+    });
+
+
+    it('should reject template with invalid semver range', function() {
+
+      // given
+      const templates = new Validator(moddle);
+
+      const templateDescriptor = require('./fixtures/engines-invalid');
+
+      // when
+      templates.addAll(templateDescriptor);
+
+      // then
+      expect(errors(templates)).to.contain('Engine <camunda> specifies invalid semver range <invalid-version>');
+
+      expect(valid(templates)).to.be.empty;
+    });
+
+  });
+
 });

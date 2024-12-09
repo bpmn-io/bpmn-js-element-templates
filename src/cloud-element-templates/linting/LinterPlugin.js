@@ -10,6 +10,8 @@
 
 import StaticResolver from 'bpmnlint/lib/resolver/static-resolver';
 import ElementTemplates from '../ElementTemplates';
+import EventBus from 'diagram-js/lib/core/EventBus';
+
 import { getPropertyValue, validateProperty } from '../util/propertyUtil';
 
 import { applyConditions } from '../Condition';
@@ -30,7 +32,9 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
   // We use the ElementTemplates Module without the required bpmn-js modules
   // As we only use it to facilitate template ID and version lookup,
   // access to commandstack etc. is not required
-  const elementTemplates = new ElementTemplates();
+  const eventBus = new EventBus();
+  const elementTemplates = new ElementTemplates(null, null, eventBus, null, null);
+
   elementTemplates.set(validTemplates);
 
   function check(node, reporter) {
