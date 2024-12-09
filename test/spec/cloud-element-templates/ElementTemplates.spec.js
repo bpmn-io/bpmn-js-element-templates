@@ -492,6 +492,21 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       }));
 
 
+      it('should ignore incompatible', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.4'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.multiple');
+
+        // then
+        expect(templates).to.be.empty;
+      }));
+
+
       it('should handle broken <engines> provided at run-time', inject(function(elementTemplates) {
 
         // given
