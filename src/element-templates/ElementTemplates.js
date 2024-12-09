@@ -16,6 +16,8 @@ import {
 
 import { isAny } from 'bpmn-js/lib/util/ModelUtil';
 
+import { valid, satisfies, validRange, coerce } from 'semver';
+
 /**
  * Registry for element templates.
  */
@@ -27,6 +29,7 @@ export default class ElementTemplates {
     this._modeling = modeling;
 
     this._templatesById = {};
+    this._templates = [];
   }
 
   /**
@@ -109,6 +112,7 @@ export default class ElementTemplates {
    */
   set(templates) {
     this._templatesById = {};
+    this._templates = templates;
 
     templates.forEach((template) => {
       const id = template.id,
@@ -122,11 +126,67 @@ export default class ElementTemplates {
 
       this._templatesById[ id ][ version ] = template;
 
-      const latestVerions = this._templatesById[ id ].latest.version;
-      if (isUndefined(latestVerions) || template.version > latestVerions) {
+      const latest = this._templatesById[ id ].latest;
+
+      const isCompat = this.isCompatible(template);
+      if (!isCompat) {
+        return;
+      }
+
+      if (isUndefined(latest.version) || latest.version < version || !this.isCompatible(latest)) {
         this._templatesById[ id ].latest = template;
       }
     });
+  }
+
+  /**
+   * Call elementTemplates#set with previously loaded templates.
+   */
+  reset() {
+    this.set(this._templates);
+  }
+
+  /**
+   * Check if template is compatible with currently set engine version.
+   *
+   * @param {ElementTemplate} template
+   *
+   * @return {boolean} - true if compatible or no engine is set for elementTemplates or template.
+   */
+  isCompatible(template) {
+    const engines = this._engines;
+
+    const exists = (obj) => obj && Object.keys(obj).length > 0;
+    if (!exists(engines) || !exists(template.engines)) return true;
+
+    // We want the template to be compatible with all provided engines - looking for overlap.
+    const enginesToCheck = Object.keys(template.engines).filter(key => Object.hasOwn(engines, key));
+
+    const compatible = enginesToCheck.reduce((isCompatible, engine) => {
+
+      // If any engine is incompatible, skip further checks.
+      if (!isCompatible) return false;
+
+      const runtimeVersion = engines[engine];
+      const templateVersion = template.engines[engine];
+
+      const runtimeSemver = valid(coerce(engines[engine]));
+      const templateSemver = validRange(template.engines[engine]);
+
+      if (!runtimeSemver) {
+        console.error(`Engine '${engine}' version '${runtimeVersion}' is not valid semver`);
+        return isCompatible;
+      }
+
+      if (!templateSemver) {
+        console.error(`Template ${template.id} engine '${engine}' version '${templateVersion}' is not valid semver`);
+        return true;
+      }
+
+      return satisfies(runtimeSemver, templateSemver);
+    }, true);
+
+    return compatible;
   }
 
   /**
