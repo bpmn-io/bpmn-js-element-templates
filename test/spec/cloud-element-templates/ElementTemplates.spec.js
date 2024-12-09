@@ -728,14 +728,38 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   describe('set', function() {
 
-    it('should emit <elementTemplates.changed> event');
+    it('should emit <elementTemplates.changed> event', inject(function(elementTemplates, eventBus) {
+
+      // given
+      const spy = sinon.spy();
+
+      eventBus.on('elementTemplates.changed', spy);
+
+      // when
+      elementTemplates.set(templates);
+
+      // then
+      expect(spy).to.have.been.called;
+    }));
 
   });
 
 
   describe('setEngines', function() {
 
-    it('should emit event');
+    it('should emit event', inject(function(elementTemplates, eventBus) {
+
+      // given
+      const spy = sinon.spy();
+
+      eventBus.on('elementTemplates.engines.changed', spy);
+
+      // when
+      elementTemplates.setEngines({});
+
+      // then
+      expect(spy).to.have.been.called;
+    }));
 
   });
 
@@ -1392,11 +1416,58 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   describe('error handling', function() {
 
-    it('should filter invalid <engines> on set');
+    // given
+    const invalidEngines = {
+      camunda: '8.5',
+      invalid: 'not-a-semver'
+    };
 
-    it('should filter invalid <engines> on instantiation');
+    it('should filter invalid <engines> on set', inject(function(elementTemplates) {
 
+      // when
+      elementTemplates.setEngines(invalidEngines);
+
+      // then
+      expect(elementTemplates.getEngines()).to.have.property('camunda');
+      expect(elementTemplates.getEngines()).to.not.have.property('invalid');
+    }));
   });
+
+});
+
+describe('error handling on instantiation', function() {
+
+  let container;
+
+  beforeEach(function() {
+    container = TestContainer.get(this);
+  });
+
+  // given
+  const invalidEngines = {
+    camunda: '8.5',
+    invalid: 'not-a-semver'
+  };
+
+  beforeEach(bootstrapModeler(diagramXML, {
+    container: container,
+    modules: [
+      coreModule,
+      modelingModule,
+      elementTemplatesCoreModule,
+    ],
+    elementTemplates: {
+      engines: invalidEngines
+    }
+  }));
+
+
+  it('should filter invalid <engines> on instantiation', inject(function(elementTemplates) {
+
+    // then
+    expect(elementTemplates.getEngines()).to.have.property('camunda');
+    expect(elementTemplates.getEngines()).to.not.have.property('invalid');
+  }));
 
 });
 

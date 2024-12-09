@@ -147,7 +147,7 @@ export class Validator {
 
       if (!isSemverRangeValid(rangeStr)) {
         err = this._logError(new Error(
-          `Engine <${engine}> specifies invalid semver range <${rangeStr}`
+          `Engine <${engine}> specifies invalid semver range <${rangeStr}>`
         ), template);
       }
     });

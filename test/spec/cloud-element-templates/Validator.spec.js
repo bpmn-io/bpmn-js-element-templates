@@ -586,10 +586,4 @@ describe('provider/cloud-element-templates - Validator', function() {
   });
 
 
-  describe('engines validation', function() {
-
-    it('should reject template with invalid semver range');
-
-  });
-
 });

@@ -34,9 +34,54 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
   });
 
 
-  describe('init with config={ templates } object', function() {
+  describe('init with config={ loadTemplates } as Array<TemplateDescriptor>', function() {
 
-    it('should configure elementTemplates service');
+    beforeEach(bootstrapModeler(diagramXML, {
+      container: container,
+      modules,
+      moddleExtensions: {
+        camunda: camundaModdlePackage
+      },
+      elementTemplates: {
+        loadTemplates: templateDescriptors
+      }
+    }));
+
+    it('should configure elementTemplates service', inject(function(elementTemplates) {
+
+      // then
+      expect(elementTemplates.getAll()).to.eql(templateDescriptors);
+    }));
+
+  });
+
+
+  describe('init with config={ loadTemplates } as function', function() {
+
+    let provider = function(done) {
+      done(null, templateDescriptors);
+    };
+
+    const templateProviderFn = function(done) {
+      provider(done);
+    };
+
+    beforeEach(bootstrapModeler(diagramXML, {
+      container: container,
+      modules,
+      moddleExtensions: {
+        camunda: camundaModdlePackage
+      },
+      elementTemplates: {
+        loadTemplates: templateProviderFn
+      }
+    }));
+
+    it('should configure elementTemplates service', inject(function(elementTemplates) {
+
+      // then
+      expect(elementTemplates.getAll()).to.eql(templateDescriptors);
+    }));
 
   });
 
