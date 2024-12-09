@@ -349,7 +349,7 @@ function IncompatibleText() {
   return (
     <div class="bio-properties-panel-template-incompatible-text">
       { translate(
-        'No compatible version of this template was found for your execution platform. Deploying and running with an incompatible template can cause errors during runtime. Unlink to access the data.'
+        'No version of this template compatible with your environment was found.'
       ) }
     </div>
   );
