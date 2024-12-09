@@ -116,6 +116,7 @@
     "karma-webpack": "^5.0.1",
     "mocha": "^10.8.2",
     "mocha-test-container-support": "^0.2.0",
+    "modeler-moddle": "^0.2.0",
     "npm-run-all2": "^7.0.0",
     "puppeteer": "^23.7.0",
     "raw-loader": "^4.0.2",

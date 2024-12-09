@@ -38,7 +38,7 @@ import CamundaBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-platfo
 import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 
 import CamundaModdle from 'camunda-bpmn-moddle/resources/camunda';
-
+import ModelerModdle from 'modeler-moddle/resources/modeler';
 import ZeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
 import CloudElementTemplatesPropertiesProviderModule from 'src/cloud-element-templates';
@@ -50,7 +50,8 @@ const singleStart = window.__env__ && window.__env__.SINGLE_START;
 
 insertCoreStyles();
 insertBpmnStyles();
-insertCSS('bottom-panel.css', `
+
+insertCSS('example.css', `
   .test-container {
     display: flex;
     flex-direction: column;
@@ -75,22 +76,30 @@ insertCSS('bottom-panel.css', `
     display: flex;
     flex-direction: column;
     background-color: #f7f7f8;
-    padding: 5px;
     box-sizing: border-box;
     border-top: solid 1px #ccc;
     font-family: sans-serif;
   }
 
-  .panel .errors {
+  .panel .errorContainer {
     resize: none;
     flex-grow: 1;
     background-color: #f7f7f8;
     border: none;
-    margin-bottom: 5px;
+    padding: 5px;
     font-family: sans-serif;
     line-height: 1.5;
     outline: none;
-    overflow-y: scroll;
+    overflow: auto;
+  }
+
+  .panel .errorItem {
+    cursor: pointer;
+  }
+
+  .panel .footerContainer {
+    border-top: solid 1px #ccc;
+    padding: 5px;
   }
 
   .panel button,
@@ -98,6 +107,34 @@ insertCSS('bottom-panel.css', `
     width: 200px;
   }
 `);
+
+
+const ChangeEnginesModule = {
+
+  __init__: [ function(bpmnjs, eventBus, elementTemplates) {
+
+    eventBus.on([
+      'import.done',
+      'elements.changed'
+    ], function() {
+      const executionPlatformVersion = bpmnjs.getDefinitions().get('executionPlatformVersion');
+
+      elementTemplates.setEngines({
+        camunda: executionPlatformVersion
+      });
+    });
+  } ]
+};
+
+const LogTemplateErrorsModule = {
+
+  __init__: [ function(eventBus) {
+
+    eventBus.on('elementTemplates.errors', function({ errors }) {
+      console.error('element template parse errors', errors);
+    });
+  } ]
+};
 
 
 describe('<BpmnPropertiesPanelRenderer>', function() {
@@ -133,7 +170,8 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
         LintingModule
       ],
       moddleExtensions = {
-        zeebe: ZeebeModdle
+        zeebe: ZeebeModdle,
+        modeler: ModelerModdle
       },
       propertiesPanel = {},
       description = {},
@@ -197,10 +235,13 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
           ElementTemplatesIconsRenderer,
           CreateAppendAnythingModule,
           CreateAppendElementTemplatesModule,
+          ChangeEnginesModule,
+          LogTemplateErrorsModule,
           LintingModule
         ],
         moddleExtensions: {
-          zeebe: ZeebeModdle
+          zeebe: ZeebeModdle,
+          modeler: ModelerModdle
         },
         propertiesPanel: {
           parent: null
@@ -212,71 +253,11 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
       }
     );
 
-    const modeler = result.modeler;
-
-    const linter = new Linter({
-      plugins: [
-        ElementTemplateLinterPlugin(elementTemplates)
-      ]
-
-    });
-
-    const linting = modeler.get('linting');
-    const bpmnjs = modeler.get('bpmnjs');
-    const eventBus = modeler.get('eventBus');
-
-    const lint = () => {
-      const definitions = bpmnjs.getDefinitions();
-
-      linter.lint(definitions).then(reports => {
-        linting.setErrors(reports);
-
-        const errorContainer = panel.querySelector('.errors');
-        errorContainer.innerHTML = '';
-
-        reports.forEach((report) => {
-          let { id, message, node, data } = report;
-          node = node || (data && data.node);
-          const name = node && node.name;
-
-          const errorMessage = `${ name || id }: ${ message }`;
-          const item = domify(`<div>${escapeHtml(errorMessage)}</div>`);
-          item.addEventListener('click', () => {
-            linting.showError(report);
-          });
-
-          errorContainer.appendChild(item);
-        });
-      });
-    };
-
-    lint();
-
-    eventBus.on('elements.changed', lint);
-    linting.activate();
-
-    const propertiesPanelParent = domify('<div class="properties-panel-container"></div>');
-
-    bpmnjs._container.appendChild(propertiesPanelParent);
-
-    modeler.get('propertiesPanel').attachTo(propertiesPanelParent);
-
-    const panel = domify(`
-      <div class="panel">
-        <div class="errors"></div>
-        <div>
-          <label>Execution Platform Version</label>
-          <input type="text" />
-          <button>Deactivate Linting</button>
-        </div>
-      </div>
-    `);
-
-    bpmnjs._container.appendChild(panel);
-
-
     // then
     expect(result.error).not.to.exist;
+
+    // and
+    createTestUI(result.modeler);
   });
 
 
@@ -301,28 +282,117 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
           ElementTemplatesPropertiesProviderModule
         ],
         moddleExtensions: {
-          camunda: CamundaModdle
+          camunda: CamundaModdle,
+          modeler: ModelerModdle
         },
         elementTemplates
       }
     );
 
-    const modeler = result.modeler;
-    const bpmnjs = modeler.get('bpmnjs');
-    const propertiesPanelParent = domify('<div class="properties-panel-container"></div>');
-
-    bpmnjs._container.appendChild(propertiesPanelParent);
-
-    modeler.get('propertiesPanel').attachTo(propertiesPanelParent);
-
-
     // then
     expect(result.error).not.to.exist;
+
+    // and then
+    createTestUI(result.modeler);
   });
 
 });
 
 
-const escapeHtml = (unsafe) => {
+function escapeHTML(unsafe) {
   return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
-};
+}
+
+function createTestUI(modeler) {
+
+  const linting = modeler.get('linting', false);
+  const elementTemplates = modeler.get('elementTemplates', false);
+  const propertiesPanel = modeler.get('propertiesPanel', false);
+
+  const canvas = modeler.get('canvas');
+  const modeling = modeler.get('modeling');
+  const bpmnjs = modeler.get('bpmnjs');
+  const eventBus = modeler.get('eventBus');
+
+  const container = bpmnjs._container;
+
+  if (propertiesPanel) {
+
+    const propertiesPanelParent = domify('<div class="properties-panel-container"></div>');
+
+    container.appendChild(propertiesPanelParent);
+
+    propertiesPanel.attachTo(propertiesPanelParent);
+  }
+
+  if (linting && elementTemplates) {
+    const linter = new Linter({
+      plugins: [
+        ElementTemplateLinterPlugin(elementTemplates.getAll())
+      ]
+    });
+
+    const linterPanel = domify(`
+      <div class="panel">
+        <div class="errorContainer"></div>
+        <div class="footerContainer">
+          <label>Execution Platform Version</label>
+          <input type="text" />
+        </div>
+      </div>
+    `);
+
+    container.appendChild(linterPanel);
+
+    linterPanel.querySelector('input').value = bpmnjs.getDefinitions().get('executionPlatformVersion');
+
+    linterPanel.querySelector('input').addEventListener('input', ({ target }) => {
+      modeling.updateModdleProperties(
+        canvas.getRootElement(),
+        bpmnjs.getDefinitions(),
+        { executionPlatformVersion: target.value }
+      );
+    });
+
+    const lint = () => {
+      const definitions = bpmnjs.getDefinitions();
+
+      linter.lint(definitions).then(reports => {
+        linting.setErrors(reports);
+
+        const errorContainer = linterPanel.querySelector('.errorContainer');
+        errorContainer.innerHTML = '';
+
+        reports.map((report) => {
+          const { id, message, category, rule, documentation } = report;
+
+          if (category === 'rule-error') {
+            return domify(`<div class="errorItem"><strong>${ category }</strong> Rule <${ escapeHTML(rule) }> errored with the following message: ${ escapeHTML(message) }</div>`);
+          }
+
+          const element = domify(`<div class="errorItem"><strong>${ category }</strong> ${ id }: ${escapeHTML(message) } </div>`);
+
+          if (documentation.url) {
+            const documentationLink = domify(`<a href="${ documentation.url }" rel="noopener" target="_blank">ref</a>`);
+
+            documentationLink.addEventListener('click', e => e.stopPropagation());
+
+            element.appendChild(documentationLink);
+          }
+
+          element.addEventListener('click', () => {
+            linting.showError(report);
+          });
+
+          return element;
+        }).forEach(item => errorContainer.appendChild(item));
+      });
+    };
+
+    linting.activate();
+
+    lint();
+
+    eventBus.on('elements.changed', lint);
+  }
+}
