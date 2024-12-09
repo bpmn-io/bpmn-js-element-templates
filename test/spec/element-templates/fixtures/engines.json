@@ -83,7 +83,7 @@
         "value": "property-2-value",
         "binding": {
           "type": "camunda:property",
-          "key": "property-2-key"
+          "name": "property-2-key"
         }
       }
     ]
