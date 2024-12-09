@@ -149,6 +149,8 @@ function TemplateGroupButtons({ element, getTemplateId }) {
     return <UnknownTemplate element={ element } />;
   } else if (templateState.type === 'DEPRECATED_TEMPLATE') {
     return <DeprecatedTemplate element={ element } templateState={ templateState } />;
+  } else if (templateState.type === 'INCOMPATIBLE_TEMPLATE') {
+    return <IncompatibleTemplate element={ element } />;
   } else if (templateState.type === 'OUTDATED_TEMPLATE') {
     return (
       <OutdatedTemplate
@@ -243,36 +245,49 @@ function NotFoundText() {
  * @param {function} updateTemplate
  */
 function OutdatedTemplate({ element, templateState }) {
-  const { newerTemplate } = templateState;
+  const { newerTemplate, compatible } = templateState;
 
   const translate = useService('translate'),
         elementTemplates = useService('elementTemplates');
 
   const menuItems = [
-    { entry: <UpdateAvailableText newerTemplate={ newerTemplate } /> },
+    { entry: <UpdateAvailableText newerTemplate={ newerTemplate } compatible={ compatible } /> },
     { separator: true },
     { entry: translate('Update'), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
 
+  const cls = compatible
+    ? 'bio-properties-panel-template-update-available'
+    : 'bio-properties-panel-template-incompatible';
+
+  const text = compatible
+    ? translate('Update available')
+    : translate('Incompatible');
+
   return (
-    <DropdownButton menuItems={ menuItems } class="bio-properties-panel-template-update-available">
+    <DropdownButton menuItems={ menuItems } class={ cls }>
       <HeaderButton>
-        <span>{ translate('Update available') }</span>
+        <span>{ text }</span>
         <ArrowIcon class="bio-properties-panel-arrow-down" />
       </HeaderButton>
     </DropdownButton>
   );
 }
 
-function UpdateAvailableText({ newerTemplate }) {
+function UpdateAvailableText({ newerTemplate, compatible }) {
   const translate = useService('translate');
 
-  const text = translate(
-    'A new version of the template is available: {templateVersion}',
-    { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
-  );
+  const text = compatible
+    ? translate(
+      'A new version of the template is available: {templateVersion}',
+      { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
+    )
+    : translate(
+      'A version of this template is available that supports your environment: {templateVersion}',
+      { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
+    );
 
   return <div class="bio-properties-panel-template-update-available-text">{text}</div>;
 }
@@ -320,6 +335,39 @@ function DocumentationIcon() {
   </svg>;
 }
 
+function IncompatibleTemplate({ element }) {
+  const translate = useService('translate'),
+        elementTemplates = useService('elementTemplates');
+
+  const menuItems = [
+    { entry: <IncompatibleText /> },
+    { separator: true },
+    { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
+    { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
+  ];
+
+  return (
+    <DropdownButton menuItems={ menuItems } class="bio-properties-panel-template-incompatible">
+      <HeaderButton>
+        <span>{ translate('Incompatible') }</span>
+        <ArrowIcon class="bio-properties-panel-arrow-down" />
+      </HeaderButton>
+    </DropdownButton>
+  );
+}
+
+function IncompatibleText() {
+  const translate = useService('translate');
+
+  return (
+    <div class="bio-properties-panel-template-incompatible-text">
+      { translate(
+        'No compatible version of this template was found for your environment. Unlink to access the template’s data.'
+      ) }
+    </div>
+  );
+}
+
 
 // helper //////
 
@@ -347,10 +395,16 @@ function getTemplateState(elementTemplates, element, getTemplateId) {
     return { type: 'DEPRECATED_TEMPLATE', template };
   }
 
-  const newerTemplate = elementTemplates.getLatest(templateId, { deprecated: true })[0];
+  const compatible = elementTemplates.isCompatible(template);
 
-  if (newerTemplate !== template) {
-    return { type: 'OUTDATED_TEMPLATE', template, newerTemplate };
+  const latestTemplate = elementTemplates.getLatest(templateId, { deprecated: true })[0];
+
+  if (latestTemplate && latestTemplate !== template) {
+    return { type: 'OUTDATED_TEMPLATE', template, newerTemplate: latestTemplate, compatible };
+  }
+
+  if (!compatible) {
+    return { type: 'INCOMPATIBLE_TEMPLATE', template };
   }
 
   return { type: 'KNOWN_TEMPLATE', template };
