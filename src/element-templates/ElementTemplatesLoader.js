@@ -32,7 +32,7 @@ export default class ElementTemplatesLoader {
     }
 
     if (config && config.loadTemplates) {
-      this._loadTemplates = config.templates;
+      this._loadTemplates = config.loadTemplates;
     }
 
     eventBus.on('diagram.init', () => {
