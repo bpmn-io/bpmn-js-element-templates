@@ -495,6 +495,75 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
     );
   });
 
+  describe('engines', function() {
+
+    it('should display update button if latest is compatible', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const element = elementRegistry.get('Task_4');
+
+        // when
+        elementTemplates.setEngines({
+          camunda: '8.6'
+        });
+
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const updateAvailable = domQuery('.bio-properties-panel-template-update-available', container);
+        expect(updateAvailable).to.exist;
+      })
+    );
+
+
+    it('should NOT display update button if latest is incompatible', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const element = elementRegistry.get('Task_4');
+
+        // when
+        elementTemplates.setEngines({
+          camunda: '8.5'
+        });
+
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const updateAvailable = domQuery('.bio-properties-panel-template-update-available', container);
+        expect(updateAvailable).not.to.exist;
+      })
+    );
+
+
+    it('should display incompatible button when template is incompatible', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const element = elementRegistry.get('Task_4');
+
+        // when
+        elementTemplates.setEngines({
+          camunda: '8.0'
+        });
+
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const incompatible = domQuery('.bio-properties-panel-template-incompatible', container);
+        expect(incompatible).to.exist;
+      })
+    );
+
+  });
+
 
   describe('conditional entries', function() {
 
