@@ -1,0 +1,16 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "example.engines.test.basic",
+    "name": "<engines> Test - Basic",
+    "description": "basic template with invalid engines",
+    "version": 3,
+    "engines": {
+      "camunda": "invalid-version"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  }
+]
