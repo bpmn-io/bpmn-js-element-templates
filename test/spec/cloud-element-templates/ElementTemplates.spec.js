@@ -24,6 +24,7 @@ import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 import diagramXML from './ElementTemplates.bpmn';
 import integrationXML from './fixtures/integration.bpmn';
 import messageTemplates from './ElementTemplates.message-templates.json';
+import enginesTemplates from './ElementTemplates.engines-templates.json';
 
 import templates from './fixtures/simple';
 import complexTemplates from './fixtures/complex';
@@ -341,6 +342,189 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         [ 'baz' ]
       ]);
     }));
+
+
+    describe('<engines> compatibility', function() {
+
+      beforeEach(inject(function(elementTemplates) {
+        elementTemplates.set(enginesTemplates);
+      }));
+
+
+      describe('should retrieve latest compatible', function() {
+
+        it('single template', inject(function(elementTemplates) {
+
+          // given
+          elementTemplates.setEngines({
+            camunda: '8.6.3'
+          });
+
+          // when
+          const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+          // then
+          expect(templates).to.have.length(1);
+          expect(templates[0].version).to.eql(3);
+        }));
+
+
+        it('all templates', inject(function(elementTemplates) {
+
+          // given
+          elementTemplates.setEngines({
+            camunda: '8.6.3'
+          });
+
+          // when
+          const templates = elementTemplates.getLatest();
+
+          // then
+          // expect all compatible templates to be returned
+          // example.engines.test.multiple v2
+          // example.engines.test.basic v2
+          // example.engines.test.broken v0
+          expect(templates).to.have.length(3);
+        }));
+
+      });
+
+
+      it('should retrieve older compatible', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.5'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(2);
+      }));
+
+
+      it('should retrieve fallback (no <engines> meta-data)', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '4'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(1);
+      }));
+
+
+      describe('should handle no context provided', function() {
+
+        it('single template', inject(function(elementTemplates) {
+
+          // given
+          elementTemplates.setEngines({});
+
+          // when
+          const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+          // then
+          expect(templates).to.have.length(1);
+          expect(templates[0].version).to.eql(3);
+        }));
+
+
+        it('list templates', inject(function(elementTemplates) {
+
+          // given
+          elementTemplates.setEngines({});
+
+          // when
+          const templates = elementTemplates.getLatest();
+
+          // then
+          // example.engines.test.multiple v2
+          // example.engines.test.basic v3
+          // example.engines.test.broken v1
+          expect(templates).to.have.length(3);
+        }));
+
+      });
+
+
+      it('should support multiple engines', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.6',
+          webModeler: '4.3'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.multiple');
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(2);
+      }));
+
+
+      it('should exclude engine', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.6',
+          webModeler: '4.3',
+          desktopModeler: '5.4'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.multiple');
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(1);
+      }));
+
+
+      it('should handle broken <engines> provided at run-time', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: 'one-hundred'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.basic');
+
+        // then
+        // we ignore the context entry, assume it is not there
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(3);
+      }));
+
+
+      it('should handle broken <engines> provided by template', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.6'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.broken');
+
+        // then
+        // assumption: we still regard such template as a valid template
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(1);
+      }));
+
+    });
 
 
     it('should throw for invalid argument', inject(function(elementTemplates) {
