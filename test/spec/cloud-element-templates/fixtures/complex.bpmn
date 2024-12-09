@@ -94,7 +94,9 @@
           <zeebe:property name="property-3-name" value="property-3-value" />
         </zeebe:properties>
       </bpmn:extensionElements>
-  </bpmn:serviceTask>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1dnqc94" name="incompatible template" zeebe:modelerTemplate="example.engines.test.incompatible">
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0vvlc66">
@@ -138,6 +140,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0xl49z8_di" bpmnElement="Activity_070m932">
         <dc:Bounds x="270" y="690" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0wdqmez" bpmnElement="Activity_1dnqc94">
+        <dc:Bounds x="410" y="690" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0gw5hlt_di" bpmnElement="Flow_0gw5hlt">
         <di:waypoint x="215" y="117" />
