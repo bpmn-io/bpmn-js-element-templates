@@ -26,7 +26,7 @@ export default class ElementTemplates {
     this._injector = injector;
     this._modeling = modeling;
 
-    this._templates = {};
+    this._templatesById = {};
   }
 
   /**
@@ -38,7 +38,7 @@ export default class ElementTemplates {
    * @return {ElementTemplate}
    */
   get(id, version) {
-    const templates = this._templates;
+    const templates = this._templatesById;
 
     let element;
 
@@ -108,23 +108,23 @@ export default class ElementTemplates {
    * @param {Array<ElementTemplate>} templates
    */
   set(templates) {
-    this._templates = {};
+    this._templatesById = {};
 
     templates.forEach((template) => {
       const id = template.id,
             version = isUndefined(template.version) ? '_' : template.version;
 
-      if (!this._templates[ id ]) {
-        this._templates[ id ] = {
+      if (!this._templatesById[ id ]) {
+        this._templatesById[ id ] = {
           latest: template
         };
       }
 
-      this._templates[ id ][ version ] = template;
+      this._templatesById[ id ][ version ] = template;
 
-      const latestVerions = this._templates[ id ].latest.version;
+      const latestVerions = this._templatesById[ id ].latest.version;
       if (isUndefined(latestVerions) || template.version > latestVerions) {
-        this._templates[ id ].latest = template;
+        this._templatesById[ id ].latest = template;
       }
     });
   }
@@ -142,7 +142,7 @@ export default class ElementTemplates {
       deprecated: includeDeprecated
     } = options;
 
-    const templates = this._templates;
+    const templatesById = this._templatesById;
     const getVersions = (template) => {
       const { latest, ...versions } = template;
       return latestOnly ? (
@@ -151,7 +151,7 @@ export default class ElementTemplates {
     };
 
     if (isNil(id)) {
-      return flatten(values(templates).map(getVersions));
+      return flatten(values(templatesById).map(getVersions));
     }
 
     if (isObject(id)) {
@@ -163,7 +163,7 @@ export default class ElementTemplates {
     }
 
     if (isString(id)) {
-      return templates[ id ] && getVersions(templates[ id ]);
+      return templatesById[ id ] && getVersions(templatesById[ id ]);
     }
 
     throw new Error('argument must be of type {string|djs.model.Base|undefined}');
