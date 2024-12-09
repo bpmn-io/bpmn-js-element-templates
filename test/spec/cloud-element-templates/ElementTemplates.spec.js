@@ -384,8 +384,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
           // expect all compatible templates to be returned
           // example.engines.test.multiple v2
           // example.engines.test.basic v2
-          // example.engines.test.broken v0
-          expect(templates).to.have.length(3);
+          expect(templates).to.have.length(2);
         }));
 
       });
@@ -535,9 +534,12 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         const templates = elementTemplates.getLatest('example.engines.test.broken');
 
         // then
-        // assumption: we still regard such template as a valid template
-        expect(templates).to.have.length(1);
-        expect(templates[0].version).to.eql(1);
+        expect(templates).to.be.empty;
+
+        // and
+        // we still regard such template as a valid template
+        const template = elementTemplates.get('example.engines.test.broken', 1);
+        expect(template).to.exist;
       }));
 
     });

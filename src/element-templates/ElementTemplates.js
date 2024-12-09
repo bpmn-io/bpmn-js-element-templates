@@ -129,26 +129,21 @@ export default class ElementTemplates {
     this._templates = templates;
 
     templates.forEach((template) => {
-      const id = template.id,
-            version = isUndefined(template.version) ? '_' : template.version;
+      const id = template.id;
+      const version = isUndefined(template.version) ? '_' : template.version;
 
       if (!this._templatesById[ id ]) {
-        this._templatesById[ id ] = {
-          latest: template
-        };
+        this._templatesById[ id ] = { };
       }
 
       this._templatesById[ id ][ version ] = template;
 
       const latest = this._templatesById[ id ].latest;
 
-      const isCompat = this.isCompatible(template);
-      if (!isCompat) {
-        return;
-      }
-
-      if (isUndefined(latest.version) || latest.version < version || !this.isCompatible(latest)) {
-        this._templatesById[ id ].latest = template;
+      if (this.isCompatible(template)) {
+        if (!latest || isUndefined(latest.version) || latest.version < version) {
+          this._templatesById[ id ].latest = template;
+        }
       }
     });
 
@@ -230,15 +225,15 @@ export default class ElementTemplates {
   _getTemplateVerions(id, options = {}) {
 
     const {
-      latest: latestOnly,
+      latest: includeLatestOnly,
       deprecated: includeDeprecated
     } = options;
 
     const templatesById = this._templatesById;
     const getVersions = (template) => {
       const { latest, ...versions } = template;
-      return latestOnly ? (
-        !includeDeprecated && latest.deprecated ? [] : [ latest ]
+      return includeLatestOnly ? (
+        !includeDeprecated && (latest && latest.deprecated) ? [] : (latest ? [ latest ] : [])
       ) : values(versions) ;
     };
 
