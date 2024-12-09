@@ -61,7 +61,7 @@ insertCSS('example.css', `
     position: absolute;
     top: 0;
     right: 0;
-    width: 250px;
+    width: 300px;
     height: 100%;
     border-left: solid 1px #ccc;
     background-color: #f7f7f8;
