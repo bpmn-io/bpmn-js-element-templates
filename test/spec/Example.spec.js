@@ -57,22 +57,32 @@ insertCSS('example.css', `
     flex-direction: column;
   }
 
+  .test-container {
+    --example-properties-width: 20vw;
+    --example-bottom-height: 30vh;
+  }
+
+  .bjs-container {
+    padding-right: var(--example-properties-width);
+    padding-bottom: var(--example-bottom-height);
+  }
+
   .properties-panel-container {
     position: absolute;
     top: 0;
     right: 0;
-    width: 300px;
+    width: var(--example-properties-width);
     height: 100%;
     border-left: solid 1px #ccc;
     background-color: #f7f7f8;
   }
 
-  .panel {
+  .bottom-panel {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: calc(100% - 250px - 1px);
-    height: 200px;
+    width: calc(100% - var(--example-properties-width) - 1px);
+    height: var(--example-bottom-height);
     display: flex;
     flex-direction: column;
     background-color: #f7f7f8;
@@ -81,7 +91,7 @@ insertCSS('example.css', `
     font-family: sans-serif;
   }
 
-  .panel .errorContainer {
+  .bottom-panel .error-container {
     resize: none;
     flex-grow: 1;
     background-color: #f7f7f8;
@@ -93,17 +103,17 @@ insertCSS('example.css', `
     overflow: auto;
   }
 
-  .panel .errorItem {
+  .bottom-panel .error-item {
     cursor: pointer;
   }
 
-  .panel .footerContainer {
+  .bottom-panel .footer-container {
     border-top: solid 1px #ccc;
     padding: 5px;
   }
 
-  .panel button,
-  .panel input {
+  .bottom-panel button,
+  .bottom-panel input {
     width: 200px;
   }
 `);
@@ -332,21 +342,21 @@ function createTestUI(modeler) {
       ]
     });
 
-    const linterPanel = domify(`
-      <div class="panel">
-        <div class="errorContainer"></div>
-        <div class="footerContainer">
+    const bottomPanel = domify(`
+      <div class="bottom-panel">
+        <div class="error-container"></div>
+        <div class="footer-container">
           <label>Execution Platform Version</label>
           <input type="text" />
         </div>
       </div>
     `);
 
-    container.appendChild(linterPanel);
+    container.appendChild(bottomPanel);
 
-    linterPanel.querySelector('input').value = bpmnjs.getDefinitions().get('executionPlatformVersion');
+    bottomPanel.querySelector('input').value = bpmnjs.getDefinitions().get('executionPlatformVersion');
 
-    linterPanel.querySelector('input').addEventListener('input', ({ target }) => {
+    bottomPanel.querySelector('input').addEventListener('input', ({ target }) => {
       modeling.updateModdleProperties(
         canvas.getRootElement(),
         bpmnjs.getDefinitions(),
@@ -360,17 +370,17 @@ function createTestUI(modeler) {
       linter.lint(definitions).then(reports => {
         linting.setErrors(reports);
 
-        const errorContainer = linterPanel.querySelector('.errorContainer');
+        const errorContainer = bottomPanel.querySelector('.error-container');
         errorContainer.innerHTML = '';
 
         reports.map((report) => {
           const { id, message, category, rule, documentation } = report;
 
           if (category === 'rule-error') {
-            return domify(`<div class="errorItem"><strong>${ category }</strong> Rule <${ escapeHTML(rule) }> errored with the following message: ${ escapeHTML(message) }</div>`);
+            return domify(`<div class="error-item"><strong>${ category }</strong> Rule <${ escapeHTML(rule) }> errored with the following message: ${ escapeHTML(message) }</div>`);
           }
 
-          const element = domify(`<div class="errorItem"><strong>${ category }</strong> ${ id }: ${escapeHTML(message) } </div>`);
+          const element = domify(`<div class="error-item"><strong>${ category }</strong> ${ id }: ${escapeHTML(message) } </div>`);
 
           if (documentation.url) {
             const documentationLink = domify(`<a href="${ documentation.url }" rel="noopener" target="_blank">ref</a>`);
