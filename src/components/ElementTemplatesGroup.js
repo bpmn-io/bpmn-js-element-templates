@@ -382,15 +382,13 @@ function getTemplateState(elementTemplates, element, getTemplateId) {
     return { type: 'DEPRECATED_TEMPLATE', template };
   }
 
-  const newerTemplate = elementTemplates.getLatest(templateId, { deprecated: true })[0];
-  const isNewerCompatible = elementTemplates.isCompatible(newerTemplate);
+  const latestTemplate = elementTemplates.getLatest(templateId, { deprecated: true })[0];
 
-  if (newerTemplate !== template && isNewerCompatible) {
-    return { type: 'OUTDATED_TEMPLATE', template, newerTemplate };
+  if (latestTemplate && latestTemplate !== template) {
+    return { type: 'OUTDATED_TEMPLATE', template, newerTemplate: latestTemplate };
   }
 
-  const isCompatible = elementTemplates.isCompatible(template);
-  if (!isCompatible) {
+  if (!elementTemplates.isCompatible(template)) {
     return { type: 'INCOMPATIBLE_TEMPLATE', template };
   }
 
