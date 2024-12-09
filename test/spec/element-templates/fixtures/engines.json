@@ -1,0 +1,91 @@
+[
+  {
+    "id": "example.engines.test.multiple",
+    "name": "<engines> Test - Multiple",
+    "description": "does not match if { desktopModeler: >=1 } is provided",
+    "version": 2,
+    "engines": {
+      "camunda": "^7.13",
+      "webModeler": "^4.1",
+      "desktopModeler": "^0"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+  {
+    "id": "example.engines.test.multiple",
+    "name": "<engines> Test - Multiple",
+    "description": "matches if { camunda: ^7.13, webModeler: ^4.1 } engine is indicated, or properties are not provided",
+    "version": 1,
+    "engines": {
+      "camunda": "^7.13",
+      "webModeler": "^4.1"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+
+  {
+    "id": "example.engines.test.basic",
+    "name": "<engines> Test - Basic",
+    "description": "matches if { camunda: ^7.13 }, or if no <camunda> engine is provided",
+    "version": 3,
+    "engines": {
+      "camunda": "^7.13"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+  {
+    "id": "example.engines.test.basic",
+    "name": "<engines> Test - Basic",
+    "description": "matches if { camunda: <=7.12 }, or if no <camunda> engine is provided",
+    "version": 2,
+    "engines": {
+      "camunda": "<=7.12"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+  {
+    "id": "example.engines.test.basic",
+    "name": "<engines> Test - Basic",
+    "description": "always matches",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+
+  {
+    "id": "example.engines.test.incompatible",
+    "name": "<engines> Test - incompatible",
+    "description": "incompatible with all camunda versions",
+    "engines": {
+      "camunda": "0"
+    },
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "label": "Custom Property 2",
+        "type": "String",
+        "value": "property-2-value",
+        "binding": {
+          "type": "camunda:property",
+          "name": "property-2-key"
+        }
+      }
+    ]
+  }
+]

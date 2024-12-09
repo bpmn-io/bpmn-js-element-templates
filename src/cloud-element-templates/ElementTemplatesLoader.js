@@ -28,10 +28,8 @@ export default class ElementTemplatesLoader extends TemplatesLoader {
     elementTemplates.set(validTemplates);
 
     if (errors.length) {
-      this.templateErrors(errors);
+      this._templateErrors(errors);
     }
-
-    this.templatesChanged();
   }
 }
 
