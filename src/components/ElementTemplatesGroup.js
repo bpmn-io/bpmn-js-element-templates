@@ -245,13 +245,13 @@ function NotFoundText() {
  * @param {function} updateTemplate
  */
 function OutdatedTemplate({ element, templateState }) {
-  const { newerTemplate } = templateState;
+  const { newerTemplate, compatible } = templateState;
 
   const translate = useService('translate'),
         elementTemplates = useService('elementTemplates');
 
   const menuItems = [
-    { entry: <UpdateAvailableText newerTemplate={ newerTemplate } /> },
+    { entry: <UpdateAvailableText newerTemplate={ newerTemplate } compatible={ compatible } /> },
     { separator: true },
     { entry: translate('Update'), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
@@ -382,13 +382,15 @@ function getTemplateState(elementTemplates, element, getTemplateId) {
     return { type: 'DEPRECATED_TEMPLATE', template };
   }
 
+  const compatible = elementTemplates.isCompatible(template);
+
   const latestTemplate = elementTemplates.getLatest(templateId, { deprecated: true })[0];
 
   if (latestTemplate && latestTemplate !== template) {
-    return { type: 'OUTDATED_TEMPLATE', template, newerTemplate: latestTemplate };
+    return { type: 'OUTDATED_TEMPLATE', template, newerTemplate: latestTemplate, compatible };
   }
 
-  if (!elementTemplates.isCompatible(template)) {
+  if (!compatible) {
     return { type: 'INCOMPATIBLE_TEMPLATE', template };
   }
 
