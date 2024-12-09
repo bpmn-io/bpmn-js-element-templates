@@ -733,6 +733,13 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
   });
 
 
+  describe('setEngines', function() {
+
+    it('should emit event');
+
+  });
+
+
   describe('applyTemplate', function() {
 
     beforeEach(inject(function(elementTemplates) {
@@ -1057,6 +1064,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       expect(getBusinessObject(task).get('zeebe:modelerTemplateIcon')).to.not.exist;
     }));
 
+
     it('should fire elementTemplates.unlink event', inject(function(elementRegistry, elementTemplates, eventBus) {
 
       // given
@@ -1324,6 +1332,69 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         newTemplate
       });
     }));
+
+  });
+
+
+  describe('isCompatible', function() {
+
+    const compatibleTemplate = {
+      engines: {
+        camunda: '^8.5'
+      }
+    };
+
+    const incompatibleTemplate = {
+      engines: {
+        camunda: '^8.6'
+      }
+    };
+
+
+    it('should accept compatible', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '8.5'
+      });
+
+      // then
+      expect(elementTemplates.isCompatible(compatibleTemplate)).to.be.true;
+    }));
+
+
+    it('should reject incompatible', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '8.5'
+      });
+
+      // then
+      expect(elementTemplates.isCompatible(incompatibleTemplate)).to.be.false;
+    }));
+
+
+    it('should accept non matching engine', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        nonMatchingEngine: '8.5'
+      });
+
+      // then
+      expect(elementTemplates.isCompatible(compatibleTemplate)).to.be.true;
+      expect(elementTemplates.isCompatible(incompatibleTemplate)).to.be.true;
+    }));
+
+  });
+
+
+  describe('error handling', function() {
+
+    it('should filter invalid <engines> on set');
+
+    it('should filter invalid <engines> on instantiation');
 
   });
 

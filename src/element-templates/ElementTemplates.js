@@ -2,10 +2,12 @@ import {
   filter,
   find,
   flatten,
+  has,
   isNil,
   isObject,
   isString,
   isUndefined,
+  reduce,
   values
 } from 'min-dash';
 
@@ -16,13 +18,17 @@ import {
 
 import { isAny } from 'bpmn-js/lib/util/ModelUtil';
 
-import { valid, satisfies, validRange, coerce } from 'semver';
+import {
+  valid as isSemverValid,
+  satisfies as isSemverCompatible,
+  coerce
+} from 'semver';
 
 /**
  * Registry for element templates.
  */
 export default class ElementTemplates {
-  constructor(commandStack, eventBus, modeling, injector) {
+  constructor(commandStack, eventBus, modeling, injector, config) {
     this._commandStack = commandStack;
     this._eventBus = eventBus;
     this._injector = injector;
@@ -30,6 +36,14 @@ export default class ElementTemplates {
 
     this._templatesById = {};
     this._templates = [];
+
+    config = config || {};
+
+    this._engines = this._coerceEngines(config.engines || {});
+
+    eventBus.on('elementTemplates.engines.changed', event => {
+      this.set(this._templates);
+    });
   }
 
   /**
@@ -141,11 +155,42 @@ export default class ElementTemplates {
     this._fire('changed');
   }
 
+  getEngines() {
+    return this._engines;
+  }
+
+  setEngines(engines) {
+    this._engines = this._coerceEngines(engines);
+
+    this._fire('engines.changed');
+  }
+
   /**
-   * Call elementTemplates#set with previously loaded templates.
+   * Ensures that only valid engines are kept around
+   *
+   * @param { Record<string, string> } engines
+   *
+   * @return { Record<string, string> } filtered, valid engines
    */
-  reset() {
-    this.set(this._templates);
+  _coerceEngines(engines) {
+
+    return reduce(engines, (validEngines, version, engine) => {
+
+      const coercedVersion = coerce(version);
+
+      if (!isSemverValid(coercedVersion)) {
+        console.error(
+          new Error(`Engine <${ engine }> specifies unparseable version <${version}>`)
+        );
+
+        return validEngines;
+      }
+
+      return {
+        ...validEngines,
+        [ engine ]: coercedVersion
+      };
+    }, {});
   }
 
   /**
@@ -156,39 +201,24 @@ export default class ElementTemplates {
    * @return {boolean} - true if compatible or no engine is set for elementTemplates or template.
    */
   isCompatible(template) {
-    const engines = this._engines;
+    const localEngines = this._engines;
+    const templateEngines = template.engines;
 
-    const exists = (obj) => obj && Object.keys(obj).length > 0;
-    if (!exists(engines) || !exists(template.engines)) return true;
+    for (const engine in templateEngines) {
 
-    // We want the template to be compatible with all provided engines - looking for overlap.
-    const enginesToCheck = Object.keys(template.engines).filter(key => Object.hasOwn(engines, key));
+      // we check compatibility against all locally provided
+      // engines, hence computing the overlap here.
 
-    const compatible = enginesToCheck.reduce((isCompatible, engine) => {
-
-      // If any engine is incompatible, skip further checks.
-      if (!isCompatible) return false;
-
-      const runtimeVersion = engines[engine];
-      const templateVersion = template.engines[engine];
-
-      const runtimeSemver = valid(coerce(engines[engine]));
-      const templateSemver = validRange(template.engines[engine]);
-
-      if (!runtimeSemver) {
-        console.error(`Engine '${engine}' version '${runtimeVersion}' is not valid semver`);
-        return isCompatible;
+      if (!has(localEngines, engine)) {
+        continue;
       }
 
-      if (!templateSemver) {
-        console.error(`Template ${template.id} engine '${engine}' version '${templateVersion}' is not valid semver`);
-        return true;
+      if (!isSemverCompatible(localEngines[engine], templateEngines[engine])) {
+        return false;
       }
+    }
 
-      return satisfies(runtimeSemver, templateSemver);
-    }, true);
-
-    return compatible;
+    return true;
   }
 
   /**
@@ -316,7 +346,6 @@ ElementTemplates.$inject = [
   'commandStack',
   'eventBus',
   'modeling',
-  'injector'
+  'injector',
+  'config.elementTemplates'
 ];
-
-

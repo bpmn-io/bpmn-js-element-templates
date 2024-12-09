@@ -24,6 +24,7 @@ describe('provider/cloud-element-templates - Validator', function() {
     moddle = new BPMNModdle();
   });
 
+
   describe('schema version', function() {
 
     it('should accept when template and library have the same version', function() {
@@ -581,6 +582,13 @@ describe('provider/cloud-element-templates - Validator', function() {
         expect(valid(templates)).to.be.empty;
       });
     });
+
+  });
+
+
+  describe('engines validation', function() {
+
+    it('should reject template with invalid semver range');
 
   });
 

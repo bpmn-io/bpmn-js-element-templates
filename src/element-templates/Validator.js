@@ -1,10 +1,15 @@
 import {
   filter,
+  forEach,
   isArray,
   isString
 } from 'min-dash';
 
 import semverCompare from 'semver-compare';
+
+import {
+  validRange as isSemverRangeValid
+} from 'semver';
 
 import {
   validate as validateAgainstSchema,
@@ -13,6 +18,7 @@ import {
 
 const SUPPORTED_SCHEMA_VERSION = getTemplateSchemaVersion();
 const MORPHABLE_TYPES = [ 'bpmn:Activity', 'bpmn:Event', 'bpmn:Gateway' ];
+
 
 /**
  * A element template validator.
@@ -79,8 +85,6 @@ export class Validator {
    * @return {Error} validation error, if any
    */
   _validateTemplate(template) {
-    let err;
-
     const id = template.id,
           version = template.version || '_',
           schemaVersion = template.$schema && getSchemaVersion(template.$schema);
@@ -110,20 +114,43 @@ export class Validator {
     }
 
     // (4) JSON schema compliance
-    const validationResult = validateAgainstSchema(template);
+    const schemaValidationResult = validateAgainstSchema(template);
 
     const {
-      errors,
+      errors: schemaErrors,
       valid
-    } = validationResult;
+    } = schemaValidationResult;
 
     if (!valid) {
-      err = new Error('invalid template');
-
-      filteredSchemaErrors(errors).forEach((error) => {
+      filteredSchemaErrors(schemaErrors).forEach((error) => {
         this._logError(error.message, template);
       });
+
+      return new Error('invalid template');
     }
+
+    // (5) engines validation
+    const enginesError = this._validateEngines(template);
+
+    if (enginesError) {
+      return enginesError;
+    }
+
+    return null;
+  }
+
+  _validateEngines(template) {
+
+    let err;
+
+    forEach(template.engines, (rangeStr, engine) => {
+
+      if (!isSemverRangeValid(rangeStr)) {
+        err = this._logError(new Error(
+          `Engine <${engine}> specifies invalid semver range <${rangeStr}`
+        ), template);
+      }
+    });
 
     return err;
   }
