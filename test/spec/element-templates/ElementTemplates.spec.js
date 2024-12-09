@@ -378,6 +378,40 @@ describe('provider/element-templates - ElementTemplates', function() {
       expect(elementTemplates.get(falsyVersionTemplate[0].id, 0)).to.exist;
     }));
 
+
+    it('should emit <elementTemplates.changed> event', inject(function(elementTemplates, eventBus) {
+
+      // given
+      const spy = sinon.spy();
+
+      eventBus.on('elementTemplates.changed', spy);
+
+      // when
+      elementTemplates.set(templates);
+
+      // then
+      expect(spy).to.have.been.calledOnce;
+    }));
+
+  });
+
+
+  describe('setEngines', function() {
+
+    it('should emit event', inject(function(elementTemplates, eventBus) {
+
+      // given
+      const spy = sinon.spy();
+
+      eventBus.on('elementTemplates.engines.changed', spy);
+
+      // when
+      elementTemplates.setEngines({});
+
+      // then
+      expect(spy).to.have.been.calledOnce;
+    }));
+
   });
 
 

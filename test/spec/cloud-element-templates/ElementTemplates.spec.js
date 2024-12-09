@@ -27,6 +27,7 @@ import messageTemplates from './ElementTemplates.message-templates.json';
 import enginesTemplates from './ElementTemplates.engines-templates.json';
 
 import templates from './fixtures/simple';
+import falsyVersionTemplate from './fixtures/falsy-version';
 import complexTemplates from './fixtures/complex';
 import integrationTemplates from './fixtures/integration';
 import { findExtensions, findExtension } from 'src/cloud-element-templates/Helper';
@@ -728,6 +729,26 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   describe('set', function() {
 
+    it('should set templates', inject(function(elementTemplates) {
+
+      // when
+      elementTemplates.set(templates.slice(0, 3));
+
+      // then
+      expect(elementTemplates.getAll()).to.have.length(3);
+    }));
+
+
+    it('should not ignore version set to 0', inject(function(elementTemplates) {
+
+      // when
+      elementTemplates.set(falsyVersionTemplate);
+
+      // then
+      expect(elementTemplates.get(falsyVersionTemplate[0].id, 0)).to.exist;
+    }));
+
+
     it('should emit <elementTemplates.changed> event', inject(function(elementTemplates, eventBus) {
 
       // given
@@ -739,7 +760,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       elementTemplates.set(templates);
 
       // then
-      expect(spy).to.have.been.called;
+      expect(spy).to.have.been.calledOnce;
     }));
 
   });
@@ -758,7 +779,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       elementTemplates.setEngines({});
 
       // then
-      expect(spy).to.have.been.called;
+      expect(spy).to.have.been.calledOnce;
     }));
 
   });
