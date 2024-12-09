@@ -34,6 +34,13 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
   });
 
 
+  describe('init with config={ templates } object', function() {
+
+    it('should configure elementTemplates service');
+
+  });
+
+
   describe('init with Array<TemplateDescriptor>', function() {
 
     beforeEach(bootstrapModeler(diagramXML, {
