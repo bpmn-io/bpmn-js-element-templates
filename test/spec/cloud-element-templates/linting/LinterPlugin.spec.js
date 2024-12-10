@@ -59,7 +59,14 @@ const valid = [
     config: {
       templates
     }
-  }
+  },
+  {
+    name: 'Template Compatible',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="compatible" />')),
+    config: {
+      templates
+    }
+  },
 ];
 
 
@@ -73,6 +80,17 @@ const invalid = [
     report: {
       id: 'Task_1',
       message: 'Linked element template not found'
+    }
+  },
+  {
+    name: 'Template Incompatible',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="incompatible" />')),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'This version of element template is not compatible with your execution platform version.'
     }
   },
   {

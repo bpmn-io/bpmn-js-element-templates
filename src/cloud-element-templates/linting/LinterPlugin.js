@@ -37,11 +37,27 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
 
   elementTemplates.set(validTemplates);
 
+  function setEngines(engines) {
+    if (engines == {}) {
+      return;
+    }
+    if (Object.keys(elementTemplates.getEngines()).length) {
+      return;
+    }
+
+    elementTemplates.setEngines(engines);
+  }
+
   function check(node, reporter) {
 
     if (!is(node, 'bpmn:FlowElement')) {
       return;
     }
+
+    const { moddleRoot } = reporter;
+
+    const engines = getEnginesConfig(moddleRoot);
+    setEngines(engines);
 
     let template = elementTemplates.get(node);
 
@@ -61,6 +77,19 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
 
     if (!template) {
       return;
+    }
+
+    // Check compatibility
+    if (template.engines) {
+      if (!elementTemplates.isCompatible(template)) {
+        reporter.report(
+          node.id,
+          'This version of element template is not compatible with your execution platform version.',
+          {
+            name: node.name
+          }
+        );
+      }
     }
 
     template = applyConditions(node, template);
@@ -123,4 +152,25 @@ function getEntryId(property, template) {
 
   path.push(index);
   return path.join('-');
+}
+
+function getEnginesConfig(definitions) {
+  const {
+    executionPlatform,
+    executionPlatformVersion,
+    exporter,
+    exporterVersion
+  } = definitions;
+
+  const engines = {};
+
+  if (executionPlatform === 'Camunda Cloud' && executionPlatformVersion) {
+    engines.camunda = executionPlatformVersion;
+  }
+
+  if (exporter === 'Camunda Modeler' && exporterVersion) {
+    engines.camundaDesktopModeler = exporterVersion;
+  }
+
+  return engines;
 }
