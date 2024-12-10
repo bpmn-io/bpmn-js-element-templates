@@ -8,22 +8,17 @@
  * except in compliance with the MIT License.
  */
 
-import StaticResolver from 'bpmnlint/lib/resolver/static-resolver';
-import ElementTemplates from '../ElementTemplates';
+import ElementTemplates from '../../ElementTemplates';
 import EventBus from 'diagram-js/lib/core/EventBus';
-
-import { getPropertyValue, validateProperty } from '../util/propertyUtil';
-
-import { applyConditions } from '../Condition';
 
 import BpmnModdle from 'bpmn-moddle';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
 
 import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
-import { Validator } from '../Validator';
+import { Validator } from '../../Validator';
 
-export const elementTemplateLintRule = ({ templates = [] }) => {
+export default function({ templates = [] }) {
   const moddle = new BpmnModdle({ zeebe: zeebeModdle });
 
   const validator = new Validator(moddle).addAll(templates);
@@ -72,20 +67,6 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
 
     let template = elementTemplates.get(node);
 
-    const templateId = elementTemplates._getTemplateId(node);
-
-    // Handle missing template
-    if (templateId && !template) {
-      reporter.report(
-        node.id,
-        'Linked element template not found',
-        {
-          name: node.name
-        }
-      );
-      return;
-    }
-
     if (!template) {
       return;
     }
@@ -103,29 +84,6 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
         );
       });
     }
-
-    template = applyConditions(node, template);
-
-    // Check attributes
-    template.properties.forEach((property) => {
-      const value = getPropertyValue(node, property);
-      const error = validateProperty(value, property);
-
-      if (!error) {
-        return;
-      }
-
-      reporter.report(
-        node.id,
-        error,
-        {
-          propertiesPanel: {
-            entryIds: [ getEntryId(property, template) ]
-          },
-          name: node.name
-        }
-      );
-    });
   }
 
   return {
@@ -134,37 +92,7 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
 
 };
 
-
-export const ElementTemplateLinterPlugin = function(templates) {
-  return {
-    config: {
-      rules: {
-        'element-templates/validate': [ 'error', { templates } ]
-      }
-    },
-    resolver: new StaticResolver({
-      'rule:bpmnlint-plugin-element-templates/validate': elementTemplateLintRule
-    })
-  };
-};
-
-
 // helpers //////////////////////
-
-function getEntryId(property, template) {
-  const index = template.properties
-    .filter(p => p.group === property.group)
-    .indexOf(property);
-
-  const path = [ 'custom-entry', template.id ];
-
-  if (property.group) {
-    path.push(property.group);
-  }
-
-  path.push(index);
-  return path.join('-');
-}
 
 function getEnginesConfig(definitions) {
   const {

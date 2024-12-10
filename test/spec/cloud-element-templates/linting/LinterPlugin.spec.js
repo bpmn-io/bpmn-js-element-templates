@@ -1,6 +1,7 @@
 import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 
-import { elementTemplateLintRule } from 'src/cloud-element-templates/linting';
+import validateRule from 'src/cloud-element-templates/linting/rules/element-templates-validate';
+import compatibilityRule from 'src/cloud-element-templates/linting/rules/element-templates-compatibility';
 
 import {
   createDefinitions,
@@ -59,14 +60,7 @@ const valid = [
     config: {
       templates
     }
-  },
-  {
-    name: 'Template Compatible',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="compatible" />')),
-    config: {
-      templates
-    }
-  },
+  }
 ];
 
 
@@ -156,7 +150,21 @@ const invalid = [
       propertiesPanel: { entryIds: [ 'custom-entry-constraints.conditional-1' ] },
       name: 'foo'
     }
+  }
+];
+
+const compatible = [
+  {
+    name: 'Template Compatible',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="compatible" />')),
+    config: {
+      templates
+    }
   },
+
+];
+
+const incompatible = [
   {
     name: 'Template Incompatible',
     moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="incompatible" />')),
@@ -192,9 +200,14 @@ describe('element-templates Linting', function() {
     }
   });
 
-  RuleTester.verify('element-templates', elementTemplateLintRule, {
+  RuleTester.verify('element-templates', validateRule, {
     valid,
-    invalid
+    invalid,
+  });
+
+  RuleTester.verify('element-templates', compatibilityRule, {
+    valid: compatible,
+    invalid: incompatible
   });
 
 });
