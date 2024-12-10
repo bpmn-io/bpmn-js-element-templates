@@ -38,14 +38,25 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
   elementTemplates.set(validTemplates);
 
   function setEngines(engines) {
-    if (engines == {}) {
-      return;
-    }
-    if (Object.keys(elementTemplates.getEngines()).length) {
+
+    const isEmpty = (obj) => Object.keys(obj).length === 0;
+
+    if (isEmpty(engines) || !isEmpty(elementTemplates.getEngines())) {
       return;
     }
 
     elementTemplates.setEngines(engines);
+  }
+
+  function isUpdateAvailable(template) {
+
+    const latestTemplate = elementTemplates.getLatest(template.id, { deprecated: true })[0];
+
+    if (latestTemplate && latestTemplate !== template) {
+      return true;
+    }
+
+    return false;
   }
 
   function check(node, reporter) {
@@ -81,15 +92,16 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
 
     // Check compatibility
     if (template.engines) {
-      if (!elementTemplates.isCompatible(template)) {
+      const incomp = elementTemplates.getIncompatibleEngines(template);
+      Object.keys(incomp).forEach((engine) => {
         reporter.report(
           node.id,
-          'This version of element template is not compatible with your execution platform version.',
+          getIncompatibilityText(engine, incomp[engine], isUpdateAvailable(template)),
           {
             name: node.name
           }
         );
-      }
+      });
     }
 
     template = applyConditions(node, template);
@@ -156,13 +168,14 @@ function getEntryId(property, template) {
 
 function getEnginesConfig(definitions) {
   const {
-    executionPlatform,
-    executionPlatformVersion,
     exporter,
     exporterVersion
   } = definitions;
 
   const engines = {};
+
+  const executionPlatform = definitions.get('modeler:executionPlatform');
+  const executionPlatformVersion = definitions.get('modeler:executionPlatformVersion');
 
   if (executionPlatform === 'Camunda Cloud' && executionPlatformVersion) {
     engines.camunda = executionPlatformVersion;
@@ -173,4 +186,13 @@ function getEnginesConfig(definitions) {
   }
 
   return engines;
+}
+
+function getIncompatibilityText(engine, { localVersion, templateVersion }, updateAvailable) {
+  const message =
+    'Element template incompatible with current environment. ' +
+    `Template requires ${engine} ${templateVersion}; environment is using ${localVersion}. ` +
+    `${updateAvailable ? 'A compatible template version is available.' : ''}`;
+
+  return message.trim();
 }

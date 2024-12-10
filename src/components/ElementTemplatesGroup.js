@@ -264,7 +264,7 @@ function OutdatedTemplate({ element, templateState }) {
 
   const text = compatible
     ? translate('Update available')
-    : translate('Incompatible (update available)');
+    : translate('Incompatible');
 
   return (
     <DropdownButton menuItems={ menuItems } class={ cls }>
@@ -362,7 +362,7 @@ function IncompatibleText() {
   return (
     <div class="bio-properties-panel-template-incompatible-text">
       { translate(
-        'No version of this template that is compatible with your environment was found.'
+        'No compatible version of this template was found for your environment. Unlink to access the template’s data.'
       ) }
     </div>
   );

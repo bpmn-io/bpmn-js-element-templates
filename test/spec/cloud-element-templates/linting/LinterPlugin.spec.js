@@ -83,17 +83,6 @@ const invalid = [
     }
   },
   {
-    name: 'Template Incompatible',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="incompatible" />')),
-    config: {
-      templates
-    },
-    report: {
-      id: 'Task_1',
-      message: 'This version of element template is not compatible with your execution platform version.'
-    }
-  },
-  {
     name: 'Min Length',
     moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="a" zeebe:modelerTemplate="constraints.minLength" />')),
     config: {
@@ -167,7 +156,29 @@ const invalid = [
       propertiesPanel: { entryIds: [ 'custom-entry-constraints.conditional-1' ] },
       name: 'foo'
     }
-  }
+  },
+  {
+    name: 'Template Incompatible',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="incompatible" />')),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Element template incompatible with current environment. Template requires camunda 0; environment is using 8.5.0.'
+    }
+  },
+  {
+    name: 'Template Incompatible with update',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="incompatible-updatable" zeebe:modelerTemplateVersion="1"/>')),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Element template incompatible with current environment. Template requires camunda 0; environment is using 8.5.0. A compatible template version is available.'
+    }
+  },
 ];
 
 
