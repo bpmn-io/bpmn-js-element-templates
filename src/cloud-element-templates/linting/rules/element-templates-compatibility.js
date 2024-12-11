@@ -83,11 +83,6 @@ export default function({ templates = [] }) {
 // helpers //////////////////////
 
 function getEnginesConfig(definitions) {
-  const {
-    exporter,
-    exporterVersion
-  } = definitions;
-
   const engines = {};
 
   const executionPlatform = definitions.get('modeler:executionPlatform');
@@ -95,10 +90,6 @@ function getEnginesConfig(definitions) {
 
   if (executionPlatform === 'Camunda Cloud' && executionPlatformVersion) {
     engines.camunda = executionPlatformVersion;
-  }
-
-  if (exporter === 'Camunda Modeler' && exporterVersion) {
-    engines.camundaDesktopModeler = exporterVersion;
   }
 
   return engines;

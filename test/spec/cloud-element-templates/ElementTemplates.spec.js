@@ -34,6 +34,9 @@ import { findExtensions, findExtension } from 'src/cloud-element-templates/Helpe
 import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
 import { findMessage } from 'src/cloud-element-templates/Helper';
 
+// eslint-disable-next-line no-undef
+const packageVersion = process.env.PKG_VERSION;
+
 
 describe('provider/cloud-element-templates - ElementTemplates', function() {
 
@@ -785,6 +788,15 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   describe('getEngines', function() {
 
+    it('should provide default <elementTemplates> engine', inject(function(elementTemplates) {
+
+      // then
+      expect(
+        elementTemplates.getEngines()
+      ).to.have.property('elementTemplates', packageVersion);
+    }));
+
+
     it('should provide set engines', inject(function(elementTemplates) {
 
       // when
@@ -795,9 +807,11 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       // then
       expect(elementTemplates.getEngines()).to.eql({
+        'elementTemplates': packageVersion,
         'camunda': '8.0.0',
         'other': '100.5.0'
       });
+
     }));
 
   });
@@ -817,6 +831,18 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       // then
       expect(spy).to.have.been.calledOnce;
+    }));
+
+
+    it('should override <elementTemplates> engine', inject(function(elementTemplates) {
+
+      // when
+      elementTemplates.setEngines({
+        elementTemplates: '1.0.0'
+      });
+
+      // then
+      expect(elementTemplates.getEngines()).to.have.property('elementTemplates', '1.0.0');
     }));
 
   });

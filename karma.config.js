@@ -1,6 +1,9 @@
 /* eslint-env node */
 
 const path = require('path');
+
+const pkg = require('./package.json');
+
 const {
   DefinePlugin,
   NormalModuleReplacementPlugin
@@ -92,6 +95,9 @@ module.exports = function(karma) {
       },
       plugins: [
         new DefinePlugin({
+
+          // @nikku needs to be defined
+          'process.env.PKG_VERSION': JSON.stringify(pkg.version),
 
           // @barmac: process.env has to be defined to make @testing-library/preact work
           'process.env': {}
