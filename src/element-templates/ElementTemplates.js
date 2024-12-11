@@ -196,24 +196,35 @@ export default class ElementTemplates {
    * @return {boolean} - true if compatible or no engine is set for elementTemplates or template.
    */
   isCompatible(template) {
+    return !Object.keys(this.getIncompatibleEngines(template)).length;
+  }
+
+  /**
+   * Get engines that are incompatible with the template.
+   *
+   * @param {any} template
+   *
+   * @return { Record<string, { required: string, found: string } } - incompatible engines along with their template and local versions
+   */
+  getIncompatibleEngines(template) {
     const localEngines = this._engines;
     const templateEngines = template.engines;
 
-    for (const engine in templateEngines) {
-
-      // we check compatibility against all locally provided
-      // engines, hence computing the overlap here.
+    return reduce(templateEngines, (result, _, engine) => {
 
       if (!has(localEngines, engine)) {
-        continue;
+        return result;
       }
 
       if (!isSemverCompatible(localEngines[engine], templateEngines[engine])) {
-        return false;
+        result[engine] = {
+          actual: localEngines[engine],
+          required: templateEngines[engine]
+        };
       }
-    }
 
-    return true;
+      return result;
+    }, {});
   }
 
   /**
