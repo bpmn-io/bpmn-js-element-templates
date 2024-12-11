@@ -1491,6 +1491,86 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
   });
 
+
+  describe('getIncompatibleEngines', function() {
+
+    it('should return incompatible engine', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '8.5'
+      });
+
+      const template = {
+        engines: {
+          camunda: '>= 8.6'
+        }
+      };
+
+      // then
+      const result = elementTemplates.getIncompatibleEngines(template);
+
+      expect(result).to.eql({
+        camunda: {
+          actual: '8.5.0',
+          required: '>= 8.6'
+        }
+      });
+    }));
+
+
+    it('should return multiple', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '8.5',
+        desktopModeler: '5.30'
+      });
+
+      const template = {
+        engines: {
+          camunda: '>= 8.6',
+          desktopModeler: '^4.0'
+        }
+      };
+
+      // then
+      const result = elementTemplates.getIncompatibleEngines(template);
+
+      expect(result).to.eql({
+        camunda: {
+          actual: '8.5.0',
+          required: '>= 8.6'
+        },
+        desktopModeler: {
+          actual: '5.30.0',
+          required: '^4.0'
+        }
+      });
+    }));
+
+
+    it('should return empty object if compatible', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        nonMatchingEngine: '8.5'
+      });
+
+      const template = {
+        engines: {
+          camunda: '8.5',
+        }
+      };
+
+      // then
+      const result = elementTemplates.getIncompatibleEngines(template);
+
+      expect(result).to.eql({});
+    }));
+
+  });
+
 });
 
 
@@ -1529,6 +1609,8 @@ describe('provider/cloud-element-templates - ElementTemplates - error handling o
   }));
 
 });
+
+
 
 
 describe('provider/cloud-element-templates - ElementTemplates - integration', function() {
