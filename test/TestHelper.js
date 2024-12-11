@@ -20,9 +20,6 @@ import download from 'downloadjs';
 
 import Modeler from 'bpmn-js/lib/Modeler';
 
-import BPMNModdle from 'bpmn-moddle';
-import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
-
 let PROPERTIES_PANEL_CONTAINER;
 
 global.chai.use(function(chai, utils) {
@@ -232,55 +229,3 @@ document.addEventListener('keydown', function(event) {
     download(result.xml, 'test.bpmn', 'application/xml');
   });
 });
-
-// Moddle helpers //////////////////////
-export async function createModdle(xml) {
-  const moddle = new BPMNModdle({
-    zeebe: zeebeModdle
-  });
-
-  let root, warnings;
-
-  try {
-    ({
-      rootElement: root,
-      warnings = []
-    } = await moddle.fromXML(xml, 'bpmn:Definitions', { lax: true }));
-  } catch (err) {
-    console.log(err);
-  }
-
-  return {
-    root,
-    moddle,
-    context: {
-      warnings
-    },
-    warnings
-  };
-}
-
-export function createDefinitions(xml = '') {
-  return `
-    <bpmn:definitions
-      xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-      xmlns:modeler="http://camunda.org/schema/modeler/1.0"
-      xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
-      id="Definitions_1">
-      ${ xml }
-    </bpmn:definitions>
-  `;
-}
-
-
-export function createProcess(bpmn = '', bpmndi = '') {
-  return createDefinitions(`
-    <bpmn:process id="Process_1" isExecutable="true">
-      ${ bpmn }
-    </bpmn:process>
-    ${ bpmndi }
-  `);
-}

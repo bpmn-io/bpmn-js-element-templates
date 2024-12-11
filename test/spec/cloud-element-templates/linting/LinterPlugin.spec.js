@@ -2,60 +2,58 @@ import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 
 import { elementTemplateLintRule } from 'src/cloud-element-templates/linting';
 
-import {
-  createDefinitions,
-  createModdle,
-  createProcess
-} from '../../../TestHelper';
 
 import templates from './LinterPlugin.json';
+
+import BPMNModdle from 'bpmn-moddle';
+import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
 const valid = [
   {
     name: 'Valid Template',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.empty" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.empty" />'),
     config: {
       templates
     }
   },
   {
     name: 'Conditional Template - property hidden',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.conditional" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.conditional" />'),
     config: {
       templates
     }
   },
   {
     name: 'No Template',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" />'),
     config: {
       templates
     }
   },
   {
     name: 'All Messages',
-    moddleElement: createModdle(createDefinitions('<bpmn:message id="a" name="a" zeebe:modelerTemplate="constraints.minLength" />')),
+    moddleElement: createDefinitions('<bpmn:message id="a" name="a" zeebe:modelerTemplate="constraints.minLength" />'),
     config: {
       templates
     }
   },
   {
     name: 'FEEL (Min Length)',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="=FOO" zeebe:modelerTemplate="feel.minLength" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" name="=FOO" zeebe:modelerTemplate="feel.minLength" />'),
     config: {
       templates
     }
   },
   {
     name: 'FEEL (Max Length)',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="=FOOBAR" zeebe:modelerTemplate="feel.maxLength" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" name="=FOOBAR" zeebe:modelerTemplate="feel.maxLength" />'),
     config: {
       templates
     }
   },
   {
     name: 'FEEL (Pattern)',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="=FOO" zeebe:modelerTemplate="feel.pattern" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" name="=FOO" zeebe:modelerTemplate="feel.pattern" />'),
     config: {
       templates
     }
@@ -66,7 +64,7 @@ const valid = [
 const invalid = [
   {
     name: 'Template Not Found',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="missing-template" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="missing-template" />'),
     config: {
       templates
     },
@@ -77,7 +75,7 @@ const invalid = [
   },
   {
     name: 'Min Length',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="a" zeebe:modelerTemplate="constraints.minLength" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" name="a" zeebe:modelerTemplate="constraints.minLength" />'),
     config: {
       templates
     },
@@ -90,7 +88,7 @@ const invalid = [
   },
   {
     name: 'Max Length',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="Very Long Name" zeebe:modelerTemplate="constraints.maxLength" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" name="Very Long Name" zeebe:modelerTemplate="constraints.maxLength" />'),
     config: {
       templates
     },
@@ -103,7 +101,7 @@ const invalid = [
   },
   {
     name: 'Not Empty',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.notEmpty" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.notEmpty" />'),
     config: {
       templates
     },
@@ -115,7 +113,7 @@ const invalid = [
   },
   {
     name: 'Pattern',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.pattern" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.pattern" />'),
     config: {
       templates
     },
@@ -127,7 +125,7 @@ const invalid = [
   },
   {
     name: 'Pattern (custom message)',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.pattern-custom-message" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.pattern-custom-message" />'),
     config: {
       templates
     },
@@ -139,7 +137,7 @@ const invalid = [
   },
   {
     name: 'Conditional Template - property shown',
-    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" name="foo" zeebe:modelerTemplate="constraints.conditional" />')),
+    moddleElement: createProcess('<bpmn:task id="Task_1" name="foo" zeebe:modelerTemplate="constraints.conditional" />'),
     config: {
       templates
     },
@@ -169,3 +167,62 @@ describe('element-templates Linting', function() {
   });
 
 });
+
+
+// helpers ///////////
+
+async function createModdle(xml) {
+  const moddle = new BPMNModdle({
+    zeebe: zeebeModdle
+  });
+
+  let root, warnings;
+
+  try {
+    ({
+      rootElement: root,
+      warnings = []
+    } = await moddle.fromXML(xml, 'bpmn:Definitions', { lax: true }));
+  } catch (err) {
+    console.log(err);
+  }
+
+  return {
+    root,
+    moddle,
+    context: {
+      warnings
+    },
+    warnings
+  };
+}
+
+function createDefinitions(xml = '', { executionPlatform, executionPlatformVersion } = {
+  executionPlatform: 'Camunda Cloud',
+  executionPlatformVersion: '8.5'
+}) {
+  return createModdle(`
+    <bpmn:definitions
+      xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+      xmlns:modeler="http://camunda.org/schema/modeler/1.0"
+      xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+      ${ executionPlatform ? `modeler:executionPlatform="${executionPlatform}"` : '' }
+      ${ executionPlatformVersion ? `modeler:executionPlatformVersion="${executionPlatformVersion}"` : '' }
+      id="Definitions_1">
+      ${ xml }
+    </bpmn:definitions>
+  `);
+}
+
+
+function createProcess(bpmn = '', bpmndi = '') {
+  return createDefinitions(`
+    <bpmn:process id="Process_1" isExecutable="true">
+      ${ bpmn }
+    </bpmn:process>
+    ${ bpmndi }
+  `);
+}
