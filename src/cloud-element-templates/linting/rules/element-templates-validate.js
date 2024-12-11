@@ -8,20 +8,21 @@
  * except in compliance with the MIT License.
  */
 
-import StaticResolver from 'bpmnlint/lib/resolver/static-resolver';
-import ElementTemplates from '../ElementTemplates';
-import { getPropertyValue, validateProperty } from '../util/propertyUtil';
+import ElementTemplates from '../../ElementTemplates';
+import EventBus from 'diagram-js/lib/core/EventBus';
 
-import { applyConditions } from '../Condition';
+import { getPropertyValue, validateProperty } from '../../util/propertyUtil';
+
+import { applyConditions } from '../../Condition';
 
 import BpmnModdle from 'bpmn-moddle';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
 
 import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
-import { Validator } from '../Validator';
+import { Validator } from '../../Validator';
 
-export const elementTemplateLintRule = ({ templates = [] }) => {
+export default function({ templates = [] }) {
   const moddle = new BpmnModdle({ zeebe: zeebeModdle });
 
   const validator = new Validator(moddle).addAll(templates);
@@ -30,7 +31,9 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
   // We use the ElementTemplates Module without the required bpmn-js modules
   // As we only use it to facilitate template ID and version lookup,
   // access to commandstack etc. is not required
-  const elementTemplates = new ElementTemplates();
+  const eventBus = new EventBus();
+  const elementTemplates = new ElementTemplates(null, null, eventBus, null, null);
+
   elementTemplates.set(validTemplates);
 
   function check(node, reporter) {
@@ -88,21 +91,6 @@ export const elementTemplateLintRule = ({ templates = [] }) => {
   };
 
 };
-
-
-export const ElementTemplateLinterPlugin = function(templates) {
-  return {
-    config: {
-      rules: {
-        'element-templates/validate': [ 'error', { templates } ]
-      }
-    },
-    resolver: new StaticResolver({
-      'rule:bpmnlint-plugin-element-templates/validate': elementTemplateLintRule
-    })
-  };
-};
-
 
 // helpers //////////////////////
 

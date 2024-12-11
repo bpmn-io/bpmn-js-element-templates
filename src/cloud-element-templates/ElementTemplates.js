@@ -9,8 +9,8 @@ import { default as DefaultElementTemplates } from '../element-templates/Element
  * Registry for element templates.
  */
 export default class ElementTemplates extends DefaultElementTemplates {
-  constructor(templateElementFactory, commandStack, eventBus, modeling, injector) {
-    super(commandStack, eventBus, modeling, injector);
+  constructor(templateElementFactory, commandStack, eventBus, modeling, injector, config) {
+    super(commandStack, eventBus, modeling, injector, config);
 
     this._templateElementFactory = templateElementFactory;
   }
@@ -75,6 +75,7 @@ export default class ElementTemplates extends DefaultElementTemplates {
 
     return context.element;
   }
+
 }
 
 ElementTemplates.$inject = [
@@ -82,5 +83,6 @@ ElementTemplates.$inject = [
   'commandStack',
   'eventBus',
   'modeling',
-  'injector'
+  'injector',
+  'config.elementTemplates',
 ];

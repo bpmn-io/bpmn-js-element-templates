@@ -269,6 +269,8 @@ export function createDefinitions(xml = '') {
       xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
       xmlns:modeler="http://camunda.org/schema/modeler/1.0"
       xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+      modeler:executionPlatform="Camunda Cloud" 
+      modeler:executionPlatformVersion="8.5.0"
       id="Definitions_1">
       ${ xml }
     </bpmn:definitions>

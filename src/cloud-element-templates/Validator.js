@@ -7,10 +7,15 @@ import {
 import semverCompare from 'semver-compare';
 
 import {
+  validRange as isSemverRangeValid
+} from 'semver';
+
+import {
   validateZeebe as validateAgainstSchema,
   getZeebeSchemaPackage as getTemplateSchemaPackage,
   getZeebeSchemaVersion as getTemplateSchemaVersion
 } from '@bpmn-io/element-templates-validator';
+import { forEach } from 'min-dash';
 
 const SUPPORTED_SCHEMA_VERSION = getTemplateSchemaVersion();
 const SUPPORTED_SCHEMA_PACKAGE = getTemplateSchemaPackage();
@@ -31,8 +36,6 @@ export class Validator extends BaseValidator {
    * @return {Error} validation error, if any
    */
   _validateTemplate(template) {
-    let err;
-
     const id = template.id,
           version = template.version || '_',
           schema = template.$schema,
@@ -78,25 +81,48 @@ export class Validator extends BaseValidator {
     }
 
     // (5) JSON schema compliance
-    const validationResult = validateAgainstSchema(template);
+    const schemaValidationResult = validateAgainstSchema(template);
 
     const {
-      errors,
+      errors: schemaErrors,
       valid
-    } = validationResult;
+    } = schemaValidationResult;
 
     if (!valid) {
-      err = new Error('invalid template');
-
-      filteredSchemaErrors(errors).forEach((error) => {
+      filteredSchemaErrors(schemaErrors).forEach((error) => {
         this._logError(error.message, template);
       });
+
+      return new Error('invalid template');
     }
 
-    return err;
+    // (6) engines validation
+    const enginesError = this._validateEngines(template);
+
+    if (enginesError) {
+      return enginesError;
+    }
+
+    return null;
   }
 
   isSchemaValid(schema) {
     return schema && schema.includes(SUPPORTED_SCHEMA_PACKAGE);
+  }
+
+  _validateEngines(template) {
+
+    let err;
+
+    forEach(template.engines, (rangeStr, engine) => {
+
+      if (!isSemverRangeValid(rangeStr)) {
+        err = this._logError(new Error(
+          `Engine <${engine}> specifies invalid semver range <${rangeStr}>`
+        ), template);
+      }
+    });
+
+    return err;
   }
 }

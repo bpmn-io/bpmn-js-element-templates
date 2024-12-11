@@ -1,6 +1,7 @@
 import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 
-import { elementTemplateLintRule } from 'src/cloud-element-templates/linting';
+import validateRule from 'src/cloud-element-templates/linting/rules/element-templates-validate';
+import compatibilityRule from 'src/cloud-element-templates/linting/rules/element-templates-compatibility';
 
 import {
   createDefinitions,
@@ -152,6 +153,42 @@ const invalid = [
   }
 ];
 
+const compatible = [
+  {
+    name: 'Template Compatible',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="compatible" />')),
+    config: {
+      templates
+    }
+  },
+
+];
+
+const incompatible = [
+  {
+    name: 'Template Incompatible',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="incompatible" />')),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Element template incompatible with current environment. Template requires camunda 0; environment is using 8.5.0.'
+    }
+  },
+  {
+    name: 'Template Incompatible with update',
+    moddleElement: createModdle(createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="incompatible-updatable" zeebe:modelerTemplateVersion="1"/>')),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Element template incompatible with current environment. Template requires camunda 0; environment is using 8.5.0. A compatible template version is available.'
+    }
+  },
+];
+
 
 describe('element-templates Linting', function() {
 
@@ -163,9 +200,14 @@ describe('element-templates Linting', function() {
     }
   });
 
-  RuleTester.verify('element-templates', elementTemplateLintRule, {
+  RuleTester.verify('element-templates', validateRule, {
     valid,
-    invalid
+    invalid,
+  });
+
+  RuleTester.verify('element-templates', compatibilityRule, {
+    valid: compatible,
+    invalid: incompatible
   });
 
 });

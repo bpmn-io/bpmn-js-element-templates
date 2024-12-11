@@ -60,7 +60,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@bpmn-io/element-templates-validator": "^2.1.0",
+    "@bpmn-io/element-templates-validator": "^2.2.0",
     "@bpmn-io/extract-process-variables": "^1.0.0",
     "bpmnlint": "^10.3.0",
     "classnames": "^2.3.1",
@@ -68,6 +68,7 @@
     "min-dash": "^4.0.0",
     "min-dom": "^4.0.3",
     "preact-markup": "^2.1.1",
+    "semver": "^7.6.3",
     "semver-compare": "^1.0.0",
     "uuid": "^11.0.0"
   },
@@ -115,6 +116,7 @@
     "karma-webpack": "^5.0.1",
     "mocha": "^10.8.2",
     "mocha-test-container-support": "^0.2.0",
+    "modeler-moddle": "^0.2.0",
     "npm-run-all2": "^7.0.0",
     "puppeteer": "^23.7.0",
     "raw-loader": "^4.0.2",
