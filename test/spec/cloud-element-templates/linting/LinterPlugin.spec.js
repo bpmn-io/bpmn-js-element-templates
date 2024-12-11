@@ -1,7 +1,7 @@
 import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 
-import { elementTemplateLintRule } from 'src/cloud-element-templates/linting';
-
+import validateRule from 'src/cloud-element-templates/linting/rules/element-templates-validate';
+import compatibilityRule from 'src/cloud-element-templates/linting/rules/element-templates-compatibility';
 
 import templates from './LinterPlugin.json';
 
@@ -150,8 +150,68 @@ const invalid = [
   }
 ];
 
+const compatible = [
+  {
+    name: 'Template compatible',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="compatible" />'),
+    config: {
+      templates
+    }
+  },
 
-describe('element-templates Linting', function() {
+  {
+    name: 'Template compatible (no execution platform)',
+    moddleElement: createProcess(
+      '<bpmn:task id="Task_1" zeebe:modelerTemplate="compatible" />',
+      '',
+      { executionPlatform: '' }
+    ),
+    config: {
+      templates
+    }
+  },
+
+  {
+    name: 'Template compatible (no execution platform version)',
+    moddleElement: createProcess(
+      '<bpmn:task id="Task_1" zeebe:modelerTemplate="compatible" />',
+      '',
+      { executionPlatform: '8.5' }),
+    config: {
+      templates
+    }
+  },
+];
+
+const incompatible = [
+  {
+    name: 'Template incompatible',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="incompatible" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Element template incompatible with current <camunda> environment. Requires \'camunda 0\'; found \'8.5.0\'.'
+    }
+  },
+  {
+    name: 'Template incompatible with update',
+    moddleElement: createProcess(
+      '<bpmn:task id="Task_1" zeebe:modelerTemplate="incompatible-updatable" zeebe:modelerTemplateVersion="1" />'
+    ),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Element template incompatible with current <camunda> environment. Requires \'camunda 0\'; found \'8.5.0\'. Update available.'
+    }
+  },
+];
+
+
+describe('cloud-element-templates/linting', function() {
 
   before(function() {
 
@@ -161,9 +221,14 @@ describe('element-templates Linting', function() {
     }
   });
 
-  RuleTester.verify('element-templates', elementTemplateLintRule, {
+  RuleTester.verify('element-templates/validate', validateRule, {
     valid,
-    invalid
+    invalid,
+  });
+
+  RuleTester.verify('element-templates/compatibility', compatibilityRule, {
+    valid: compatible,
+    invalid: incompatible
   });
 
 });
@@ -176,16 +241,10 @@ async function createModdle(xml) {
     zeebe: zeebeModdle
   });
 
-  let root, warnings;
-
-  try {
-    ({
-      rootElement: root,
-      warnings = []
-    } = await moddle.fromXML(xml, 'bpmn:Definitions', { lax: true }));
-  } catch (err) {
-    console.log(err);
-  }
+  const {
+    rootElement: root,
+    warnings = []
+  } = await moddle.fromXML(xml, 'bpmn:Definitions', { lax: true });
 
   return {
     root,
@@ -201,6 +260,7 @@ function createDefinitions(xml = '', { executionPlatform, executionPlatformVersi
   executionPlatform: 'Camunda Cloud',
   executionPlatformVersion: '8.5'
 }) {
+
   return createModdle(`
     <bpmn:definitions
       xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
@@ -218,11 +278,11 @@ function createDefinitions(xml = '', { executionPlatform, executionPlatformVersi
 }
 
 
-function createProcess(bpmn = '', bpmndi = '') {
+function createProcess(bpmn = '', bpmndi = '', options) {
   return createDefinitions(`
     <bpmn:process id="Process_1" isExecutable="true">
       ${ bpmn }
     </bpmn:process>
     ${ bpmndi }
-  `);
+  `, options);
 }

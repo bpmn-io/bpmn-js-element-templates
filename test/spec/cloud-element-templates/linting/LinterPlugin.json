@@ -216,5 +216,55 @@
         "feel": "optional"
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "compatible",
+    "id": "compatible",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "engines": {
+      "camunda": ">1.0"
+    },
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "incompatible",
+    "id": "incompatible",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "engines": {
+      "camunda": "0"
+    },
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "incompatible-updatable",
+    "id": "incompatible-updatable",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "engines": {
+      "camunda": "0"
+    },
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "incompatible-updatable",
+    "id": "incompatible-updatable",
+    "version": 2,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "engines": {
+      "camunda": "^8.5"
+    },
+    "properties": []
   }
 ]
