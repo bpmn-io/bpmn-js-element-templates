@@ -4,6 +4,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import copy from 'rollup-plugin-copy';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 
 import {
   readFileSync
@@ -81,6 +82,12 @@ function pgl(plugins = []) {
 function corePlugins(plugins = []) {
   return [
     ...plugins,
+    replace({
+      preventAssignment: true,
+      values: {
+        'process.env.PKG_VERSION': JSON.stringify(pkg.version)
+      }
+    }),
     json(),
     resolve({
       mainFields: [

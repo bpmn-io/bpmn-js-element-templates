@@ -24,6 +24,10 @@ import {
   coerce
 } from 'semver';
 
+// eslint-disable-next-line no-undef
+const packageVersion = process.env.PKG_VERSION;
+
+
 /**
  * Registry for element templates.
  */
@@ -155,6 +159,7 @@ export default class ElementTemplates {
   }
 
   setEngines(engines) {
+
     this._engines = this._coerceEngines(engines);
 
     this._fire('engines.changed');
@@ -168,6 +173,14 @@ export default class ElementTemplates {
    * @return { Record<string, string> } filtered, valid engines
    */
   _coerceEngines(engines) {
+
+    // we provide <elementTemplates> engine with the current
+    // package version; templates may use that engine to declare
+    // compatibility with this library
+    engines = {
+      elementTemplates: packageVersion,
+      ...engines
+    };
 
     return reduce(engines, (validEngines, version, engine) => {
 
