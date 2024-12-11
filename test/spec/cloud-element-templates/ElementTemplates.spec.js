@@ -1471,6 +1471,82 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
   });
 
+  describe('getIncompatibleEngines', function() {
+
+    it('should return incompatible engine', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '8.5'
+      });
+
+      const template = {
+        engines: {
+          camunda: '8.6'
+        }
+      };
+
+      // then
+      const result = elementTemplates.getIncompatibleEngines(template);
+      const length = Object.keys(result).length;
+
+      expect(length).to.be.equal(1);
+
+      expect(result).to.have.nested.property('camunda.localVersion', '8.5.0');
+      expect(result).to.have.nested.property('camunda.templateVersion', '8.6');
+    }));
+
+
+    it('should return multiple', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '8.5',
+        desktopModeler: '5.30'
+      });
+
+      const template = {
+        engines: {
+          camunda: '8.6',
+          desktopModeler: '5.4'
+        }
+      };
+
+      // then
+      const result = elementTemplates.getIncompatibleEngines(template);
+      const length = Object.keys(result).length;
+
+      expect(length).to.be.equal(2);
+
+      expect(result).to.have.nested.property('camunda.localVersion', '8.5.0');
+      expect(result).to.have.nested.property('camunda.templateVersion', '8.6');
+
+      expect(result).to.have.nested.property('desktopModeler.localVersion', '5.30.0');
+      expect(result).to.have.nested.property('desktopModeler.templateVersion', '5.4');
+    }));
+
+
+    it('should return empty object if compatible', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        nonMatchingEngine: '8.5'
+      });
+
+      const template = {
+        engines: {
+          camunda: '8.5',
+        }
+      };
+
+      // then
+      const result = elementTemplates.getIncompatibleEngines(template);
+
+      expect(result).to.be.empty;
+    }));
+
+  });
+
 });
 
 describe('error handling on instantiation', function() {
@@ -1508,6 +1584,8 @@ describe('error handling on instantiation', function() {
   }));
 
 });
+
+
 
 
 describe('provider/cloud-element-templates - ElementTemplates - integration', function() {
