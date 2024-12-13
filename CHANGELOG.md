@@ -9,6 +9,7 @@ ___Note:__ Yet to be released changes appear here._
 ## 2.4.0
 
 * `FEAT`: support element templates runtime compatibility ([#132](https://github.com/bpmn-io/bpmn-js-element-templates/pull/132))
+* `FIX`: move template selector right below documentation group ([#130](https://github.com/bpmn-io/bpmn-js-element-templates/pull/130))
 * `DEPS`: update to `@bpmn-io/element-templates-validator@2.2.0`
 * `DEPS`: update to `bpmnlint@10.3.1`
 
