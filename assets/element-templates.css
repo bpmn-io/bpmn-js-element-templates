@@ -11,6 +11,8 @@
 
   --incompatible-template-background-color: rgb(255, 131, 43);
   --incompatible-template-hover-background-color: hsl(25, 100%, 50%);
+  --incompatible-template-fill-color: var(--color-grey-225-10-15);
+  --incompatible-template-label-color: var(--color-grey-225-10-15);
 
   --select-template-information-text-color: var(--color-grey-225-10-55);
 
@@ -93,8 +95,8 @@
 
 .bio-properties-panel-template-incompatible .bio-properties-panel-group-header-button {
   background-color: var(--incompatible-template-background-color);
-  color: var(--select-template-label-color);
-  fill: var(--select-template-fill-color);
+  color: var(--incompatible-template-label-color);
+  fill: var(--incompatible-template-fill-color);
 }
 
 .bio-properties-panel-template-incompatible .bio-properties-panel-group-header-button:hover {
