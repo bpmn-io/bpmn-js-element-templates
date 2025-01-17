@@ -10,6 +10,7 @@ export const ZEEBE_TASK_HEADER_TYPE = 'zeebe:taskHeader';
 export const MESSAGE_PROPERTY_TYPE = 'bpmn:Message#property';
 export const MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE = 'bpmn:Message#zeebe:subscription#property';
 export const ZEEBE_CALLED_ELEMENT = 'zeebe:calledElement';
+export const ZEEBE_LINKED_RESOURCE_PROPERTY = 'zeebe:linkedResource';
 
 export const EXTENSION_BINDING_TYPES = [
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
@@ -19,7 +20,8 @@ export const EXTENSION_BINDING_TYPES = [
   ZEEBE_TASK_DEFINITION_TYPE_TYPE,
   ZEEBE_TASK_DEFINITION,
   ZEEBE_TASK_HEADER_TYPE,
-  ZEEBE_CALLED_ELEMENT
+  ZEEBE_CALLED_ELEMENT,
+  ZEEBE_LINKED_RESOURCE_PROPERTY
 ];
 
 export const TASK_DEFINITION_TYPES = [

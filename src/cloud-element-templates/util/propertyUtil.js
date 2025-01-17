@@ -22,7 +22,8 @@ import {
   ZEEBE_OUTPUT_TYPE,
   ZEEBE_PROPERTY_TYPE,
   ZEEBE_TASK_HEADER_TYPE,
-  ZEEBE_CALLED_ELEMENT
+  ZEEBE_CALLED_ELEMENT,
+  ZEEBE_LINKED_RESOURCE_PROPERTY
 } from './bindingTypes';
 
 import {
@@ -81,7 +82,8 @@ function getRawPropertyValue(element, property, scope) {
   const {
     name,
     property: bindingProperty,
-    type
+    type,
+    linkName
   } = binding;
 
   // property
@@ -210,6 +212,18 @@ function getRawPropertyValue(element, property, scope) {
     return calledElement ? calledElement.get(bindingProperty) : defaultValue;
   }
 
+  if (type === ZEEBE_LINKED_RESOURCE_PROPERTY) {
+    const linkedResources = findExtension(businessObject, 'zeebe:LinkedResources');
+
+    if (!linkedResources) {
+      return defaultValue;
+    }
+
+    const linkedResource = linkedResources.get('values').find((value) => value.get('linkName') === linkName);
+
+    return linkedResource ? linkedResource.get(bindingProperty) : defaultValue;
+  }
+
   // should never throw as templates are validated beforehand
   throw unknownBindingError(element, property);
 }
@@ -242,7 +256,9 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
 
   const {
     name,
-    type
+    type,
+    property: bindingProperty,
+    linkName
   } = binding;
 
   let extensionElements;
@@ -591,6 +607,47 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
         }
       });
     }
+  }
+
+  if (type === ZEEBE_LINKED_RESOURCE_PROPERTY) {
+    let linkedResources = findExtension(businessObject, 'zeebe:LinkedResources');
+
+    if (!linkedResources) {
+      linkedResources = createElement('zeebe:LinkedResources', null, businessObject, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), linkedResources ] }
+        }
+      });
+    }
+
+    let linkedResource = linkedResources.get('values').find((value) => value.get('linkName') === linkName);
+
+    if (!linkedResource) {
+      linkedResource = createElement('zeebe:LinkedResource', { linkName }, businessObject, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: linkedResources,
+          properties: { values: [ ...linkedResources.get('values'), linkedResource ] }
+        }
+      });
+    }
+
+    commands.push({
+      cmd: 'element.updateModdleProperties',
+      context: {
+        ...context,
+        moddleElement: linkedResource,
+        properties: { [ bindingProperty ]: value }
+      }
+    });
   }
 
   if (commands.length) {
