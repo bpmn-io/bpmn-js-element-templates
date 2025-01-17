@@ -1952,6 +1952,172 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       }));
     });
 
+
+    describe('update zeebe:LinkedElement', function() {
+
+      beforeEach(bootstrap(require('./linked-resource.bpmn').default));
+
+
+      describe('zeebe:LinekedElement specified', function() {
+        const newTemplate = require('./linked-resource.json')[1];
+
+        it('execute', inject(function(elementRegistry) {
+
+          // given
+          let task = elementRegistry.get('noResources');
+
+          // when
+          changeTemplate(task, newTemplate);
+
+          // then
+          task = elementRegistry.get('noResources');
+          expectElementTemplate(task, 'linkedResource');
+
+          const linkedResources = findExtension(task, 'zeebe:LinkedResources');
+
+          expect(linkedResources).to.exist;
+
+          const linkedResource = linkedResources.get('values')[0];
+          expect(linkedResource).to.exist;
+          expect(linkedResource).to.have.property('linkName', 'persistedLink');
+          expect(linkedResource).to.have.property('resourceType', 'RPA');
+          expect(linkedResource).to.have.property('resourceId', 'changed');
+        }));
+
+
+        it('undo', inject(function(commandStack, elementRegistry) {
+
+          // given
+          let task = elementRegistry.get('noResources');
+          changeTemplate(task, newTemplate);
+
+          // when
+          commandStack.undo();
+
+          // then
+          task = elementRegistry.get('noResources');
+          expectNoElementTemplate(task);
+
+          const linkedResources = findExtension(task, 'zeebe:LinkedResources');
+          expect(linkedResources).not.to.exist;
+        }));
+
+
+        it('redo', inject(function(commandStack, elementRegistry) {
+
+          // given
+          let task = elementRegistry.get('noResources');
+          changeTemplate(task, newTemplate);
+
+          // when
+          commandStack.undo();
+          commandStack.redo();
+
+          // then
+          task = elementRegistry.get('noResources');
+          expectElementTemplate(task, 'linkedResource');
+
+          const linkedResources = findExtension(task, 'zeebe:LinkedResources');
+
+          expect(linkedResources).to.exist;
+
+          const linkedResource = linkedResources.get('values')[0];
+          expect(linkedResource).to.exist;
+          expect(linkedResource).to.have.property('linkName', 'persistedLink');
+          expect(linkedResource).to.have.property('resourceType', 'RPA');
+          expect(linkedResource).to.have.property('resourceId', 'changed');
+        }));
+
+
+        it('should keep values', inject(function(elementRegistry) {
+
+          // given
+          let task = elementRegistry.get('withResources');
+
+          // when
+          changeTemplate(task, newTemplate);
+
+          // then
+          task = elementRegistry.get('withResources');
+          expectElementTemplate(task, 'linkedResource');
+
+          const linkedResources = findExtension(task, 'zeebe:LinkedResources');
+
+          expect(linkedResources).to.exist;
+
+          const linkedResource = linkedResources.get('values')[0];
+          expect(linkedResource).to.exist;
+          expect(linkedResource).to.have.property('linkName', 'persistedLink');
+          expect(linkedResource).to.have.property('resourceType', 'originalType');
+          expect(linkedResource).to.have.property('resourceId', 'originalResource');
+        }));
+
+      });
+
+      describe('zeebe:LinkedElement not specified', function() {
+        const newTemplate = require('./task-template-no-properties.json');
+
+        it('execute', inject(function(elementRegistry) {
+
+          // given
+          let task = elementRegistry.get('withResources');
+
+          // when
+          changeTemplate(task, newTemplate);
+
+          // then
+          task = elementRegistry.get('withResources');
+          expectElementTemplate(task, 'task-template-no-properties');
+
+          const linkedResources = findExtension(task, 'zeebe:LinkedResources');
+
+          expect(linkedResources).not.to.exist;
+        }));
+
+
+        it('undo', inject(function(commandStack, elementRegistry) {
+
+          // given
+          let task = elementRegistry.get('withResources');
+          changeTemplate(task, newTemplate);
+
+          // when
+          commandStack.undo();
+
+          // then
+          task = elementRegistry.get('withResources');
+          expectNoElementTemplate(task);
+
+          const linkedResources = findExtension(task, 'zeebe:LinkedResources');
+
+          expect(linkedResources).to.exist;
+        }));
+
+
+        it('redo', inject(function(commandStack, elementRegistry) {
+
+          // given
+          let task = elementRegistry.get('withResources');
+          changeTemplate(task, newTemplate);
+
+          // when
+          commandStack.undo();
+          commandStack.redo();
+
+          // then
+          task = elementRegistry.get('withResources');
+          expectElementTemplate(task, 'task-template-no-properties');
+
+          const linkedResources = findExtension(task, 'zeebe:LinkedResources');
+
+          expect(linkedResources).not.to.exist;
+        }));
+
+
+      });
+
+    });
+
   });
 
 
@@ -4011,6 +4177,210 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('update zeebe:LinkedResource', function() {
+      beforeEach(bootstrap(require('./linked-resource.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given
+        const serviceTask = elementRegistry.get('noResources');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'property-1-old-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'resource1',
+              property: 'resourceId'
+            }
+          },
+          {
+            value: 'property-2-old-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'resource1',
+              property: 'resourceType'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'property-1-new-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'resource1',
+              property: 'resourceId'
+            }
+          },
+          {
+            value: 'property-2-new-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'resource1',
+              property: 'resourceType'
+            }
+          }
+        ]);
+
+        changeTemplate('noResources', oldTemplate);
+
+        let linkedResource = getLinkedResource(serviceTask, 'resource1');
+
+        updateBusinessObject('noResources', linkedResource, {
+          resourceId: 'property-1-changed-value'
+        });
+
+        // when
+        changeTemplate(serviceTask, newTemplate, oldTemplate);
+
+        // then
+        linkedResource = getLinkedResource(serviceTask, 'resource1');
+
+        expect(linkedResource).to.exist;
+        expect(linkedResource).to.jsonEqual(
+          {
+            $type: 'zeebe:LinkedResource',
+            linkName: 'resource1',
+            resourceId: 'property-1-changed-value',
+            resourceType: 'property-2-new-value',
+          }
+        );
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given
+        const serviceTask = elementRegistry.get('noResources');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'property-1-old-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'resource1',
+              property: 'resourceId'
+            }
+          },
+          {
+            value: 'property-2-old-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'resource1',
+              property: 'resourceType'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'property-1-new-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'resource1',
+              property: 'resourceId'
+            }
+          },
+          {
+            value: 'property-2-new-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'resource1',
+              property: 'resourceType'
+            }
+          }
+        ]);
+
+        changeTemplate(serviceTask, oldTemplate);
+
+        // when
+        changeTemplate(serviceTask, newTemplate, oldTemplate);
+
+        // then
+        const linkedResource = getLinkedResource(serviceTask, 'resource1');
+
+        expect(linkedResource).to.exist;
+        expect(linkedResource).to.jsonEqual(
+          {
+            $type: 'zeebe:LinkedResource',
+            linkName: 'resource1',
+            resourceId: 'property-1-new-value',
+            resourceType: 'property-2-new-value',
+          }
+        );
+      }));
+
+
+      it('complex', inject(function(elementRegistry) {
+
+        // given
+        const serviceTask = elementRegistry.get('noResources');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'old-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'changed-resource',
+              property: 'resourceId'
+            }
+          },
+          {
+            value: 'removed-property',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'changed-resource',
+              property: 'resourceType'
+            }
+          },
+          {
+            value: 'removed-resource',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'removed-resource',
+              property: 'resourceType'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'new-value',
+            binding: {
+              type: 'zeebe:linkedResource',
+              linkName: 'changed-resource',
+              property: 'resourceId'
+            }
+          }
+        ]);
+
+        changeTemplate(serviceTask, oldTemplate);
+
+        // when
+        changeTemplate(serviceTask, newTemplate, oldTemplate);
+
+        // then
+        const linkedResources = findExtension(serviceTask, 'zeebe:LinkedResources');
+
+        expect(linkedResources).to.exist;
+        expect(linkedResources.get('values')).to.have.length(1);
+
+        const linkedResource = getLinkedResource(serviceTask, 'changed-resource');
+
+        expect(linkedResource).to.exist;
+        expect(linkedResource).to.jsonEqual(
+          {
+            $type: 'zeebe:LinkedResource',
+            linkName: 'changed-resource',
+            resourceId: 'new-value',
+          }
+        );
+      }));
+
+    });
+
+
     describe('update bpmn:Message', function() {
 
       beforeEach(bootstrap(require('./event.bpmn').default));
@@ -4428,6 +4798,14 @@ function getZeebeProperty(element, name) {
 
   return zeebeProperties.get('properties').find((zeebeProperty) => {
     return zeebeProperty.get('name') === name;
+  });
+}
+
+function getLinkedResource(element, linkName) {
+  const linkedResources = findExtension(element, 'zeebe:LinkedResources');
+
+  return linkedResources.get('values').find((resource) => {
+    return resource.get('linkName') === linkName;
   });
 }
 
