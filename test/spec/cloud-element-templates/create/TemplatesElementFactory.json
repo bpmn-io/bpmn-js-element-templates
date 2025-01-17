@@ -535,5 +535,36 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "linkedResource",
+    "id": "linkedResource",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "foo",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "Link1",
+          "property": "resourceType"
+        }
+      },
+      {
+        "type": "Hidden",
+        "value": "bar",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "Link2",
+          "property": "resourceId"
+        }
+      }
+    ]
   }
 ]

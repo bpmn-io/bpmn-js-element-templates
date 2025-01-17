@@ -2054,6 +2054,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
       });
 
+
       describe('zeebe:LinkedElement not specified', function() {
         const newTemplate = require('./task-template-no-properties.json');
 
@@ -2112,7 +2113,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           expect(linkedResources).not.to.exist;
         }));
-
 
       });
 
@@ -4178,6 +4178,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
 
     describe('update zeebe:LinkedResource', function() {
+
       beforeEach(bootstrap(require('./linked-resource.bpmn').default));
 
       it('property changed', inject(function(elementRegistry) {
