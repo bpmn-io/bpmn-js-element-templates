@@ -1,0 +1,85 @@
+[ 
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "linkedResource",
+    "id": "linkedResource",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "String",
+        "value": "RPA",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "persistedLink",
+          "property": "resourceType"
+        }
+      },
+      {
+        "type": "String",
+        "feel": "optional",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "persistedLink",
+          "property": "resourceId"
+        }
+      },
+      {
+        "type": "String",
+        "value": "latest",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "persistedLink",
+          "property": "bindingType"
+        }
+      },
+      {
+        "type": "String",
+        "value": "RPA",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "removedLink",
+          "property": "resourceType"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "linkedResource v2",
+    "id": "linkedResource",
+    "version": 2,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "String",
+        "value": "RPA",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "persistedLink",
+          "property": "resourceType"
+        }
+      },
+      {
+        "type": "String",
+        "feel": "optional",
+        "value": "changed",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "persistedLink",
+          "property": "resourceId"
+        }
+      }
+    ]
+  }
+]

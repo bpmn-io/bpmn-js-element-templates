@@ -24,7 +24,6 @@ import {
 
 import {
   find,
-  isUndefined,
   without
 } from 'min-dash';
 
@@ -33,7 +32,8 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
-  ZEEBE_CALLED_ELEMENT
+  ZEEBE_CALLED_ELEMENT,
+  ZEEBE_LINKED_RESOURCE_PROPERTY
 } from '../util/bindingTypes';
 
 import {
@@ -107,6 +107,8 @@ export default class ChangeElementTemplateHandler {
       this._updateMessage(element, oldTemplate, newTemplate);
 
       this._updateCalledElement(element, oldTemplate, newTemplate);
+
+      this._updateLinkedResources(element, oldTemplate, newTemplate);
     }
   }
 
@@ -1032,6 +1034,138 @@ export default class ChangeElementTemplateHandler {
 
     return replacedElement;
   }
+
+
+  _updateLinkedResources(element, oldTemplate, newTemplate) {
+    const bpmnFactory = this._bpmnFactory,
+          commandStack = this._commandStack;
+
+    const newLinkedResources = newTemplate.properties.filter((newProperty) => {
+      const newBinding = newProperty.binding,
+            newBindingType = newBinding.type;
+
+      return newBindingType === 'zeebe:linkedResource';
+    });
+
+    const extensionElements = this._getOrCreateExtensionElements(element);
+
+    let linkedResources = findExtension(extensionElements, 'zeebe:LinkedResources');
+
+    // (1) remove linkedResourcess if no new specified
+    if (!newLinkedResources.length) {
+      if (!linkedResources) {
+        return;
+      }
+
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: extensionElements,
+        properties: {
+          values: without(extensionElements.get('values'), linkedResources)
+        }
+      });
+      return;
+    }
+
+    if (!linkedResources) {
+      linkedResources = bpmnFactory.create('zeebe:LinkedResources');
+
+      linkedResources.$parent = extensionElements;
+
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: extensionElements,
+        properties: {
+          values: [ ...extensionElements.get('values'), linkedResources ]
+        }
+      });
+    }
+
+    const unusedLinkedResources = linkedResources.get('values')?.slice() || [];
+    const unusedResourceProperties = oldTemplate?.properties.slice() || [];
+
+    newLinkedResources.forEach((newLinkedResource) => {
+      const oldProperty = findOldProperty(oldTemplate, newLinkedResource),
+            oldLinkedResource = findBusinessObject(extensionElements, newLinkedResource),
+            newPropertyValue = getDefaultValue(newLinkedResource),
+            newBinding = newLinkedResource.binding;
+
+      if (oldProperty) {
+        remove(unusedResourceProperties, oldProperty);
+      }
+
+      // (2) update old LinkesResources
+      if (oldLinkedResource) {
+        if (
+          shouldUpdate(newPropertyValue, newLinkedResource)
+          || shouldKeepValue(oldLinkedResource, oldProperty, newLinkedResource)
+        ) {
+          remove(unusedLinkedResources, oldLinkedResource);
+        }
+
+        if (!shouldKeepValue(oldLinkedResource, oldProperty, newLinkedResource)) {
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: oldLinkedResource,
+            properties: {
+              [newBinding.property]: newPropertyValue
+            }
+          });
+        }
+      }
+
+      // (3) add new linkedResources
+      else if (shouldUpdate(newPropertyValue, newLinkedResource)) {
+        const newProperties = {
+          linkName: newBinding.linkName,
+          [newBinding.property]: newPropertyValue
+        };
+
+        const newLinkedResource = createElement('zeebe:LinkedResource', newProperties, extensionElements, bpmnFactory);
+
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: linkedResources,
+          properties: {
+            values: [ ...linkedResources.get('values'), newLinkedResource ]
+          }
+        });
+      }
+    });
+
+
+    // (4) remove unused linkedResources
+    if (unusedLinkedResources.length) {
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: linkedResources,
+        properties: {
+          values: without(linkedResources.get('values'), linkedResource => unusedLinkedResources.includes(linkedResource))
+        }
+      });
+    }
+
+    // (5) remove unused resource properties
+    unusedResourceProperties.forEach((unusedResourceProperty) => {
+      const oldLinkedResource = findBusinessObject(extensionElements, unusedResourceProperty);
+
+      const oldBinding = unusedResourceProperty.binding;
+
+      // No property was reused and element was removed in previous step
+      if (!oldLinkedResource) {
+        return;
+      }
+
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: oldLinkedResource,
+        properties: {
+          [oldBinding.property]: undefined
+        }
+      });
+    });
+  }
+
 }
 
 ChangeElementTemplateHandler.$inject = [
@@ -1104,6 +1238,18 @@ function findBusinessObject(element, property) {
 
     return zeebeProperties.get('properties').find((value) => {
       return value.get('name') === binding.name;
+    });
+  }
+
+  if (bindingType === ZEEBE_LINKED_RESOURCE_PROPERTY) {
+    const linkedResources = findExtension(businessObject, 'zeebe:LinkedResources');
+
+    if (!linkedResources) {
+      return;
+    }
+
+    return linkedResources.get('values').find((value) => {
+      return value.get('linkName') === binding.linkName;
     });
   }
 }
@@ -1224,6 +1370,19 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBinding.name === newBinding.name;
     });
   }
+
+  if (newBindingType === ZEEBE_LINKED_RESOURCE_PROPERTY) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_LINKED_RESOURCE_PROPERTY) {
+        return;
+      }
+
+      return oldBinding.linkName === newBinding.linkName && oldBinding.property === newBinding.property;
+    });
+  }
 }
 
 /**
@@ -1289,7 +1448,8 @@ function getPropertyValue(element, property) {
 
   const binding = property.binding,
         bindingName = binding.name,
-        bindingType = binding.type;
+        bindingType = binding.type,
+        bindingProperty = binding.property;
 
 
   if (bindingType === 'property') {
@@ -1323,12 +1483,16 @@ function getPropertyValue(element, property) {
   if (bindingType === MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE) {
     return businessObject.get(bindingName);
   }
+
+  if (bindingType === ZEEBE_LINKED_RESOURCE_PROPERTY) {
+    return businessObject.get(bindingProperty);
+  }
 }
 
 function remove(array, item) {
   const index = array.indexOf(item);
 
-  if (isUndefined(index)) {
+  if (index < 0) {
     return array;
   }
 
