@@ -486,6 +486,34 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
         processId: 'paymentProcess'
       });
     }));
+
+
+    it('should handle <zeebe:linkedElement>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('linkedResource');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      const linkedResources = findExtension(element, 'zeebe:LinkedResources');
+      const resources = linkedResources.get('values');
+
+      // then
+      expect(resources).to.exist;
+      expect(resources).to.jsonEqual([
+        {
+          $type: 'zeebe:LinkedResource',
+          linkName: 'Link1',
+          resourceType: 'foo'
+        },
+        {
+          $type: 'zeebe:LinkedResource',
+          linkName: 'Link2',
+          resourceId: 'bar'
+        },
+      ]);
+    }));
   });
 
 
