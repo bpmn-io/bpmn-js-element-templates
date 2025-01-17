@@ -1,6 +1,6 @@
 import { getLabel, setLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
 import { getShapeIdFromPlane, isPlane } from 'bpmn-js/lib/util/DrilldownUtil';
-import { getBusinessObject, is } from 'bpmn-js/lib/util/ModelUtil';
+import { getBusinessObject, is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 
 export default class RemoveElementTemplateHandler {
   constructor(
@@ -10,7 +10,8 @@ export default class RemoveElementTemplateHandler {
       canvas,
       bpmnFactory,
       replace,
-      commandStack
+      commandStack,
+      moddleCopy
   ) {
     this._modeling = modeling;
     this._elementFactory = elementFactory;
@@ -19,6 +20,7 @@ export default class RemoveElementTemplateHandler {
     this._bpmnFactory = bpmnFactory;
     this._replace = replace;
     this._commandStack = commandStack;
+    this._moddleCopy = moddleCopy;
   }
 
   preExecute(context) {
@@ -121,6 +123,8 @@ export default class RemoveElementTemplateHandler {
           newBo = bpmnFactory.create(bo.$type),
           label = getLabel(element);
 
+    this._copyNonTemplateProperties(bo, newBo);
+
     if (!label) {
       return newBo;
     }
@@ -133,6 +137,33 @@ export default class RemoveElementTemplateHandler {
 
     return newBo;
   }
+
+  /**
+   * Copy documentation and execution listeners from source to target business object.
+   *
+   * NOTE: Mutetes the target business object.
+   * @param {ModdleElement} sourceBusinessObject
+   * @param {ModdleElement} targetBusinessObject
+   */
+  _copyNonTemplateProperties(sourceBusinessObject, targetBusinessObject) {
+    const copy = this._moddleCopy;
+    const bpmnFactory = this._bpmnFactory;
+
+    const { documentation, extensionElements } = sourceBusinessObject;
+
+    if (documentation) {
+      const docs = copy.copyProperty(documentation, targetBusinessObject, 'documentation');
+      targetBusinessObject.documentation = docs;
+    }
+
+    if (extensionElements && extensionElements.values) {
+      const exts = copy.copyProperty(extensionElements, targetBusinessObject, 'extensionElements');
+      const executionListenerTypes = [ 'zeebe:ExecutionListeners', 'camunda:ExecutionListener' ];
+      const executionListeners = exts.values.filter((value) => isAny(value, executionListenerTypes));
+
+      targetBusinessObject.extensionElements = bpmnFactory.create('bpmn:ExtensionElements', { values: executionListeners });
+    }
+  }
 }
 
 
@@ -143,5 +174,6 @@ RemoveElementTemplateHandler.$inject = [
   'canvas',
   'bpmnFactory',
   'replace',
-  'commandStack'
+  'commandStack',
+  'moddleCopy'
 ];
