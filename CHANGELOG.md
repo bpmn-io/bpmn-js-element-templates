@@ -6,6 +6,12 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.5.0
+
+* `FEAT`: support binding type `zeebe:linkedResource` ([#137](https://github.com/bpmn-io/bpmn-js-element-templates/issues/137))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.3.0`
+* `DEPS`: update to `zeebe-bpmn-moddle@1.8.0`
+
 ## 2.4.0
 
 * `FEAT`: support element templates runtime compatibility ([#132](https://github.com/bpmn-io/bpmn-js-element-templates/pull/132))
