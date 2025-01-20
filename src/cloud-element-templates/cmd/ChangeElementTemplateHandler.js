@@ -1081,7 +1081,7 @@ export default class ChangeElementTemplateHandler {
       });
     }
 
-    const unusedLinkedResources = linkedResources.get('values')?.slice() || [];
+    const unusedLinkedResources = linkedResources.get('values').slice();
     const unusedResourceProperties = oldTemplate?.properties.slice() || [];
 
     newLinkedResources.forEach((newLinkedResource) => {
