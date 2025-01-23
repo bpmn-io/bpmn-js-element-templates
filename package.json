@@ -60,7 +60,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@bpmn-io/element-templates-validator": "^2.3.0",
+    "@bpmn-io/element-templates-validator": "^2.3.2",
     "@bpmn-io/extract-process-variables": "^1.0.0",
     "bpmnlint": "^11.0.0",
     "classnames": "^2.3.1",
