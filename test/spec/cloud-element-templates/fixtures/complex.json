@@ -1626,33 +1626,43 @@
     ],
     "properties": [
       {
-        "label": "Cardholder",
-        "value": "Jon Doe",
-        "type": "String",
-        "feel": "optional",
-        "binding": {
-          "type": "zeebe:input",
-          "name": "name"
-        }
-      },
-      {
-        "label": "Amount",
+        "label": "Number (optional)",
         "value": "=10",
         "type": "Number",
         "feel": "optional",
         "binding": {
           "type": "zeebe:input",
-          "name": "Amount"
+          "name": "numberOptional"
         }
       },
       {
-        "label": "Capture",
+        "label": "Boolean (optional)",
         "value": "=false",
         "type": "Boolean",
         "feel": "optional",
         "binding": {
           "type": "zeebe:input",
-          "name": "capture"
+          "name": "booleanOptional"
+        }
+      },
+      {
+        "label": "Number (static)",
+        "value": "=10",
+        "type": "Number",
+        "feel": "static",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "numberStatic"
+        }
+      },
+      {
+        "label": "Boolean (static)",
+        "value": "=false",
+        "type": "Boolean",
+        "feel": "static",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "booleanStatic"
         }
       }
     ]
