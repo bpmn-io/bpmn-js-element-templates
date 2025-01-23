@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.5.1
+
+* `FIX`: require `feel` to be `optional` or `static` for `Boolean` and `Number` inputs and outputs ([camunda/element-templates-json-schema#156](https://github.com/camunda/element-templates-json-schema/pull/156))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.3.2`
+
 ## 2.5.0
 
 * `FEAT`: support binding type `zeebe:linkedResource` ([#137](https://github.com/bpmn-io/bpmn-js-element-templates/issues/137))
