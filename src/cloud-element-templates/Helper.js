@@ -3,7 +3,7 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 
 import { v4 as uuid } from 'uuid';
-import { isSpecialFeelProperty, toFeelExpression } from './util/FeelUtil';
+import { shouldCastToFeel, toFeelExpression } from './util/FeelUtil';
 
 /**
  * The BPMN 2.0 extension attribute name under
@@ -179,7 +179,7 @@ export function findZeebeSubscription(message) {
 export function getDefaultValue(property) {
 
   if (
-    isSpecialFeelProperty(property)
+    shouldCastToFeel(property)
   ) {
     return toFeelExpression(property.value, property.type);
   }

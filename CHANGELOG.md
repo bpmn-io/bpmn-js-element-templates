@@ -6,6 +6,15 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.5.2
+
+* `FIX`: make `feel` default value `static` for inputs and outputs ([#142](https://github.com/bpmn-io/bpmn-js-element-templates/pull/142))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.3.3`
+
+### Note
+
+This release reverts the breaking changes introduced via [camunda/element-templates-json-schema#156](https://github.com/camunda/element-templates-json-schema/pull/156). Any `feel` value out of the supported enum is allowed, but `static` is used if the property is missing.
+
 ## 2.5.1
 
 * `FIX`: require `feel` to be `optional` or `static` for `Boolean` and `Number` inputs and outputs ([camunda/element-templates-json-schema#156](https://github.com/camunda/element-templates-json-schema/pull/156))

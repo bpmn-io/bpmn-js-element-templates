@@ -18,6 +18,8 @@ import {
 
 import {
   findExtension,
+  findInputParameter,
+  findOutputParameter,
   findZeebeProperty
 } from 'src/cloud-element-templates/Helper';
 
@@ -94,6 +96,45 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
       expect(errorMessage).not.to.exist;
     });
 
+  });
+
+
+  describe('no feel property - static for input and output', function() {
+
+    let inputEntry, outputEntry;
+
+    beforeEach(async function() {
+      await expectSelected('no-feel');
+      inputEntry = findEntry('custom-entry-numberField.feel.no-feel-0', container);
+      outputEntry = findEntry('custom-entry-numberField.feel.no-feel-1', container);
+    });
+
+    it('should render number field', async function() {
+
+      // then
+      expect(findNumberInput(inputEntry)).to.exist;
+      expect(findNumberInput(outputEntry)).to.exist;
+    });
+
+
+    it('should cast to FEEL expression (zeebe:input)', async function() {
+
+      // when
+      await changeInput(findNumberInput(inputEntry), '123');
+
+      // then
+      expectZeebeInput('no-feel', 'NumberProperty', '=123');
+    });
+
+
+    it('should cast to FEEL expression (zeebe:output)', async function() {
+
+      // when
+      await changeInput(findNumberInput(outputEntry), '123');
+
+      // then
+      expectZeebeOutput('no-feel', 'NumberProperty', '=123');
+    });
   });
 
 
@@ -283,6 +324,34 @@ function expectZeebeProperty(id, name, value) {
   });
 }
 
+function expectZeebeInput(id, name, value) {
+  return getBpmnJS().invoke(function(elementRegistry) {
+    const element = elementRegistry.get(id);
+
+    const bo = getBusinessObject(element);
+
+    const ioMapping = findExtension(bo, 'zeebe:IoMapping'),
+          input = findInputParameter(ioMapping, { name });
+
+    expect(input).to.exist;
+    expect(input.source).to.eql(value);
+  });
+}
+
+function expectZeebeOutput(id, source, value) {
+  return getBpmnJS().invoke(function(elementRegistry) {
+    const element = elementRegistry.get(id);
+
+    const bo = getBusinessObject(element);
+
+    const ioMapping = findExtension(bo, 'zeebe:IoMapping'),
+          output = findOutputParameter(ioMapping, { source });
+
+    expect(output).to.exist;
+    expect(output.target).to.eql(value);
+  });
+}
+
 function expectSelected(id) {
   return getBpmnJS().invoke(async function(elementRegistry, selection) {
     const element = elementRegistry.get(id);
@@ -309,6 +378,10 @@ function findEntry(id, container) {
   expect(container).to.not.be.null;
 
   return domQuery(`[data-entry-id='${ id }']`, container);
+}
+
+function findNumberInput(container) {
+  return findInput('number', container);
 }
 
 function findInput(type, container) {

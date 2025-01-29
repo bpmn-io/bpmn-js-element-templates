@@ -73,5 +73,31 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "FEEL missing - input output",
+    "id": "numberField.feel.no-feel",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "NumberProperty",
+        "type": "Number",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "NumberProperty"
+        }
+      },
+      {
+        "label": "NumberProperty",
+        "type": "Number",
+        "binding": {
+          "type": "zeebe:output",
+          "source": "NumberProperty"
+        }
+      }
+    ]
   }
 ]
