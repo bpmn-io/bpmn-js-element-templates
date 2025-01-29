@@ -17,6 +17,8 @@ import {
 
 import {
   findExtension,
+  findInputParameter,
+  findOutputParameter,
   findZeebeProperty
 } from 'src/cloud-element-templates/Helper';
 
@@ -82,6 +84,45 @@ describe('provider/cloud-element-templates - BooleanProperty', function() {
       expectZeebeProperty('disabled', 'BooleanProperty', true);
     });
 
+  });
+
+
+  describe('no feel property - static for zeebe:input and zeebe:output', function() {
+
+    let inputEntry, outputEntry;
+
+    beforeEach(async function() {
+      await expectSelected('no-feel');
+      inputEntry = findEntry('custom-entry-booleanField.feel.no-feel-0', container);
+      outputEntry = findEntry('custom-entry-booleanField.feel.no-feel-1', container);
+    });
+
+    it('should render boolean field', async function() {
+
+      // then
+      expect(findCheckbox(inputEntry)).to.exist;
+      expect(findCheckbox(outputEntry)).to.exist;
+    });
+
+
+    it('should cast to FEEL expression as in static (zeebe:input)', async function() {
+
+      // when
+      await findCheckbox(inputEntry).click();
+
+      // then
+      expectZeebeInput('no-feel', 'BooleanProperty', '=true');
+    });
+
+
+    it('should cast to FEEL expression as in static (zeebe:output)', async function() {
+
+      // when
+      await findCheckbox(outputEntry).click();
+
+      // then
+      expectZeebeOutput('no-feel', 'BooleanProperty', '=true');
+    });
   });
 
 
@@ -251,6 +292,34 @@ function expectZeebeProperty(id, name, value) {
   });
 }
 
+function expectZeebeInput(id, name, value) {
+  return getBpmnJS().invoke(function(elementRegistry) {
+    const element = elementRegistry.get(id);
+
+    const bo = getBusinessObject(element);
+
+    const ioMapping = findExtension(bo, 'zeebe:IoMapping'),
+          input = findInputParameter(ioMapping, { name });
+
+    expect(input).to.exist;
+    expect(input.source).to.eql(value);
+  });
+}
+
+function expectZeebeOutput(id, source, value) {
+  return getBpmnJS().invoke(function(elementRegistry) {
+    const element = elementRegistry.get(id);
+
+    const bo = getBusinessObject(element);
+
+    const ioMapping = findExtension(bo, 'zeebe:IoMapping'),
+          output = findOutputParameter(ioMapping, { source });
+
+    expect(output).to.exist;
+    expect(output.target).to.eql(value);
+  });
+}
+
 function expectSelected(id) {
   return getBpmnJS().invoke(async function(elementRegistry, selection) {
     const element = elementRegistry.get(id);
@@ -274,4 +343,8 @@ function findInput(type, container) {
   expect(container).to.not.be.null;
 
   return domQuery(`input[type='${ type }']`, container);
+}
+
+function findCheckbox(container) {
+  return findInput('checkbox', container);
 }

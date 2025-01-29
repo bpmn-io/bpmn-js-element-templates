@@ -1,6 +1,6 @@
 import { find, groupBy } from 'min-dash';
 import { getPropertyValue, setPropertyValue, validateProperty } from '../../../util/propertyUtil';
-import { isSpecialFeelProperty, toFeelExpression } from '../../../util/FeelUtil';
+import { shouldCastToFeel, toFeelExpression } from '../../../util/FeelUtil';
 
 import { useCallback, useState } from '@bpmn-io/properties-panel/preact/hooks';
 
@@ -33,7 +33,7 @@ export function usePropertyAccessors(bpmnFactory, commandStack, element, propert
     return fromFeelExpression(directGet(), property.type);
   }, [ directGet, property, isFeelEnabled ]);
 
-  if (!isSpecialFeelProperty(property)) {
+  if (!shouldCastToFeel(property)) {
     return [ directGet, directSet ];
   }
 
@@ -62,7 +62,7 @@ const fromFeelExpression = (value, type) => {
 };
 
 const feelEnabled = (property, value) => {
-  if (!isSpecialFeelProperty(property)) {
+  if (!shouldCastToFeel(property)) {
     return true;
   }
 
