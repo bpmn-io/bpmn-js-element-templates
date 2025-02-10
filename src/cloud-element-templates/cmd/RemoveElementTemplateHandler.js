@@ -10,7 +10,8 @@ export default class RemoveElementTemplateHandler {
       canvas,
       bpmnFactory,
       replace,
-      commandStack
+      commandStack,
+      moddleCopy
   ) {
     this._modeling = modeling;
     this._elementFactory = elementFactory;
@@ -19,6 +20,7 @@ export default class RemoveElementTemplateHandler {
     this._bpmnFactory = bpmnFactory;
     this._replace = replace;
     this._commandStack = commandStack;
+    this._moddleCopy = moddleCopy;
   }
 
   preExecute(context) {
@@ -41,7 +43,7 @@ export default class RemoveElementTemplateHandler {
     const type = businessObject.$type,
           eventDefinitionType = this._getEventDefinitionType(businessObject);
 
-    const newBusinessObject = this._createBlankBusinessObject(element);
+    const newBusinessObject = this._createNewBusinessObject(element);
 
     return replace.replaceElement(element,
       {
@@ -83,7 +85,7 @@ export default class RemoveElementTemplateHandler {
 
     const type = businessObject.$type;
 
-    const newBusinessObject = this._createBlankBusinessObject(element);
+    const newBusinessObject = this._createNewBusinessObject(element);
 
     const newRoot = elementFactory.create('root', {
       type: type,
@@ -114,12 +116,16 @@ export default class RemoveElementTemplateHandler {
     return eventDefinition.$type;
   }
 
-  _createBlankBusinessObject(element) {
+  _createNewBusinessObject(element) {
     const bpmnFactory = this._bpmnFactory;
 
     const bo = getBusinessObject(element),
           newBo = bpmnFactory.create(bo.$type),
           label = getLabel(element);
+
+    // Make we we keep general properties unrelated to the template.
+    this._copyProperties(bo, newBo, [ 'documentation' ]);
+    this._copyExtensionElements(bo, newBo, [ 'zeebe:ExecutionListeners' ]);
 
     if (!label) {
       return newBo;
@@ -133,6 +139,50 @@ export default class RemoveElementTemplateHandler {
 
     return newBo;
   }
+
+  /**
+   * Copy specified properties to the target business object.
+   *
+   * @param {ModdleElement} source
+   * @param {ModdleElement} target
+   * @param {Array<string>} properties
+   */
+  _copyProperties(source, target, properties) {
+    const copy = this._moddleCopy;
+
+    properties.forEach(propertyName => {
+
+      const property = source.get(propertyName);
+
+      if (property) {
+        const propertyCopy = copy.copyProperty(property, target, propertyName);
+        target.set(propertyName, propertyCopy);
+      }
+    });
+  }
+
+  /**
+   * Copy extension elements of specified types to the target business object.
+   *
+   * @param {ModdleElement} source
+   * @param {ModdleElement} target
+   * @param {Array<string>} extensionElements
+   */
+  _copyExtensionElements(source, target, extensionElements) {
+    const bpmnFactory = this._bpmnFactory;
+
+    // No extension elements in the source business object.
+    if (!source.extensionElements || !source.extensionElements.values) return;
+
+    const newExtensionElements = source.extensionElements.values.filter(value =>
+      extensionElements.some(extensionElement => is(value, extensionElement))
+    );
+
+    // Nothing to copy.
+    if (!newExtensionElements.length) return;
+
+    target.extensionElements = bpmnFactory.create('bpmn:ExtensionElements', { values: newExtensionElements });
+  }
 }
 
 
@@ -143,5 +193,6 @@ RemoveElementTemplateHandler.$inject = [
   'canvas',
   'bpmnFactory',
   'replace',
-  'commandStack'
+  'commandStack',
+  'moddleCopy'
 ];
