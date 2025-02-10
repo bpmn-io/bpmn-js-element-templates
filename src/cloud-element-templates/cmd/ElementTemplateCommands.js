@@ -1,5 +1,5 @@
 import ChangeElementTemplateHandler from './ChangeElementTemplateHandler';
-import RemoveElementTemplateHandler from '../../element-templates/cmd/RemoveElementTemplateHandler';
+import RemoveElementTemplateHandler from './RemoveElementTemplateHandler';
 import MultiCommandHandler from '../../element-templates/cmd/MultiCommandHandler';
 
 export default class ElementTemplatesCommands {
