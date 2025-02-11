@@ -6,6 +6,14 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.5.3
+
+* `FIX`: keep documentation and execution listeners when template is removed ([#120](https://github.com/bpmn-io/bpmn-js-element-templates/pull/120))
+* `FIX`: do not remove unrelated properties on linkedResource update ([#143](https://github.com/bpmn-io/bpmn-js-element-templates/pull/143))
+* `DEPS`: bump to `@bpmn-io/extract-process-variables@1.0.1`
+* `CHORE`: separate remove behavior for C7 and C8 ([#120](https://github.com/bpmn-io/bpmn-js-element-templates/pull/120))
+* `CHORE`: update modeling dev dependencies
+
 ## 2.5.2
 
 * `FIX`: make `feel` default value `static` for inputs and outputs ([#142](https://github.com/bpmn-io/bpmn-js-element-templates/pull/142))
