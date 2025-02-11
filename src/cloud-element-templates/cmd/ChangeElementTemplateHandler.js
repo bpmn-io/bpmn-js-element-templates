@@ -1082,7 +1082,8 @@ export default class ChangeElementTemplateHandler {
     }
 
     const unusedLinkedResources = linkedResources.get('values').slice();
-    const unusedResourceProperties = oldTemplate?.properties.slice() || [];
+    const unusedResourceProperties = (oldTemplate?.properties.slice() || [])
+      .filter((property) => property.binding.type === ZEEBE_LINKED_RESOURCE_PROPERTY);
 
     newLinkedResources.forEach((newLinkedResource) => {
       const oldProperty = findOldProperty(oldTemplate, newLinkedResource),

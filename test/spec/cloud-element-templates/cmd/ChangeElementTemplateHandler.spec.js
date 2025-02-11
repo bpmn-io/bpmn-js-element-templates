@@ -4320,6 +4320,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         const oldTemplate = createTemplate([
           {
+            value: 'unrelated',
+            binding: {
+              type: 'zeebe:taskDefinition',
+              property: 'type'
+            }
+          },
+          {
             value: 'old-value',
             binding: {
               type: 'zeebe:linkedResource',
@@ -4346,6 +4353,13 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         ]);
 
         const newTemplate = createTemplate([
+          {
+            value: 'unrelated',
+            binding: {
+              type: 'zeebe:taskDefinition',
+              property: 'type'
+            }
+          },
           {
             value: 'new-value',
             binding: {
@@ -4377,6 +4391,12 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
             resourceId: 'new-value',
           }
         );
+
+        // does not update unrelated properties
+        const taskDefinition = findExtension(serviceTask, 'zeebe:TaskDefinition');
+
+        expect(taskDefinition).to.exist;
+        expect(taskDefinition.get('type')).to.eql('unrelated');
       }));
 
     });
