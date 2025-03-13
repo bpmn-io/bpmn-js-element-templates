@@ -1,0 +1,141 @@
+{
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Condition (Number)",
+    "id": "example.com.condition.number",
+    "description": "A conditional template for Numbers.",
+    "appliesTo": ["bpmn:Task"],
+    "properties": [
+        {
+          "id": "number-static",
+          "type": "Number",
+          "value": "100",
+          "label": "number-static",
+          "binding": {
+            "name": "number-static",
+            "type": "zeebe:property"
+          },
+          "feel": "static"
+        },
+        {
+          "id": "number-optional",
+          "type": "Number",
+          "value": "100",
+          "label": "number-optional",
+          "binding": {
+            "name": "number-optional",
+            "type": "zeebe:property"
+          },
+          "feel": "optional"
+        },
+        {
+          "id": "number-required",
+          "type": "Number",
+          "value": "100",
+          "label": "number-required",
+          "binding": {
+            "name": "number-required",
+            "type": "zeebe:property"
+          },
+          "feel": "required"
+        },
+        {
+          "id": "number-string",
+          "type": "Number",
+          "value": "100",
+          "label": "number-string",
+          "binding": {
+            "name": "number-required",
+            "type": "zeebe:property"
+          }
+        },
+        {
+          "id": "number",
+          "type": "Number",
+          "value": 100,
+          "label": "number",
+          "binding": {
+            "name": "number-required",
+            "type": "zeebe:property"
+          }
+        },
+        {
+          "id": "text-static",
+          "type": "Text",
+          "value": "displayed when static is 100",
+          "binding": {
+            "name": "text-static",
+            "type": "zeebe:property"
+          },
+          "condition": {
+            "property": "number-static",
+            "equals": 100
+          }
+        },
+        {
+          "id": "text-optional",
+          "type": "Text",
+          "value": "displayed when optional is 100",
+          "binding": {
+            "name": "text-optional",
+            "type": "zeebe:property"
+          },
+          "condition": {
+            "property": "number-optional",  
+            "equals": 100
+          }
+        },
+        {
+          "id": "text-required",
+          "type": "Text",
+          "value": "displayed when required is 100",
+          "binding": {
+            "name": "text-required",
+            "type": "zeebe:property"
+          },
+          "condition": {
+            "property": "number-required",  
+            "equals": 100
+          }
+        },
+        {
+          "id": "compare-with-string",
+          "type": "Text",
+          "value": "",
+          "binding": {
+            "name": "compare-with-string",
+            "type": "zeebe:property"
+          },
+          "condition": {
+            "property": "number-string",
+            "equals": "100"
+          }
+        },
+        {
+          "id": "compare-with-number",
+          "type": "Text",
+          "value": "",
+          "binding": {
+            "name": "compare-with-number",
+            "type": "zeebe:property"
+          },
+          "condition": {
+            "property": "number-string",
+            "equals": 100
+          }
+        },
+        {
+          "id": "compare-number-with-number",
+          "type": "Text",
+          "value": "",
+          "binding": {
+            "name": "compare-number-with-number",
+            "type": "zeebe:property"
+          },
+          "condition": {
+            "property": "number",
+            "equals": 100
+          }
+        }
+      ]
+  }
+  
