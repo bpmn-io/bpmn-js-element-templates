@@ -26,6 +26,7 @@ import chainedConditionsComplexTemplate from './ConditionalBehavior.condition-ch
 import chainedConditionsSharedBindingTemplate from './ConditionalBehavior.condition-chained-shared-binding.json';
 import dependentDropdownsTemplate from './ConditionalBehavior.dependent-dropdowns.json';
 import booleanTemplate from '../fixtures/condition-boolean.json';
+import numberTemplate from '../fixtures/condition-number.json';
 
 import messageTemplates from '../fixtures/condition-message.json';
 import messageCorrelationTemplate from '../fixtures/message-correlation-key.json';
@@ -1672,6 +1673,93 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
     }));
 
+
+    describe('feel', function() {
+
+      it('should keep number property value when condition property is feel-static', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', numberTemplate);
+
+        // when
+        const businessObject = getBusinessObject(element);
+
+        // then
+        expectZeebePropertyValueByKey(businessObject, 'text-static');
+      }));
+
+
+      it('should keep number property value when condition property is feel-optional', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', numberTemplate);
+
+        // when
+        const businessObject = getBusinessObject(element);
+
+        // then
+        expectZeebePropertyValueByKey(businessObject, 'text-optional');
+      }));
+
+
+      it('should keep number property value when condition property is feel-required', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', numberTemplate);
+
+        // when
+        const businessObject = getBusinessObject(element);
+
+        // then
+        expectZeebePropertyValueByKey(businessObject, 'text-required');
+      }));
+    });
+
+
+    it('should match when property type is Number but value is a numeric string and condition expects a Number', inject(function() {
+
+      // given
+      const element = changeTemplate('Task_1', numberTemplate);
+
+      // when
+      const businessObject = getBusinessObject(element);
+
+      // then
+      // Even though number-string = "100", its type is Number;
+      // therefore, a compare-with-number property should be considered valid (number-string = 100).
+      expectZeebePropertyValueByKey(businessObject, 'compare-with-number');
+    }));
+
+
+    it('should match number property with number value when condition has numeric value', inject(function() {
+
+      // given
+      const element = changeTemplate('Task_1', numberTemplate);
+
+      // when
+      const businessObject = getBusinessObject(element);
+
+      // then
+      expectZeebePropertyValueByKey(businessObject, 'compare-number-with-number');
+    }));
+
+
+    it('should not match when property type is Number but condition expect string', inject(function() {
+
+      // given
+      const element = changeTemplate('Task_1', numberTemplate);
+
+      // when
+      const businessObject = getBusinessObject(element);
+      const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+      const properties = zeebeProperties.get('zeebe:properties');
+
+      // then
+      // Although number-string has the value "100", its type is Number,
+      // so it should not match a compare-with-string property, which expects the value "100" as a string type.
+      expect(properties.find(p => p.name === 'compare-with-string')).to.not.exist;
+    }));
+
   });
 
 });
@@ -1736,4 +1824,17 @@ function expectZeebePropertyValue(businessObject, value) {
   expect(zeebeProperties).to.exist;
   expect(properties).to.have.lengthOf(1);
   expect(properties[0].value).to.eql(value);
+}
+
+function expectZeebePropertyValueByKey(businessObject ,key, value) {
+  const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+  const properties = zeebeProperties.get('zeebe:properties');
+
+  const property = properties.find(p => p.name === key);
+
+  expect(property).to.exist;
+
+  if (value) {
+    expect(property.value).to.eql(value);
+  }
 }
