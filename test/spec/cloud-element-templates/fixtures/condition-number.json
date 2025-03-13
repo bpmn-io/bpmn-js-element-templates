@@ -1,0 +1,55 @@
+{
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Condition",
+    "id": "example.com.condition.number",
+    "description": "A conditional template for Numbers.",
+    "appliesTo": ["bpmn:Task"],
+    "properties": [
+        {
+          "id": "number-static",
+          "type": "Number",
+          "value": "100",
+          "label": "number-static",
+          "binding": {
+            "name": "number-static",
+            "type": "zeebe:property"
+          },
+          "feel": "static"
+        },
+        {
+          "id": "number-optional",
+          "type": "Number",
+          "value": "100",
+          "label": "number-optional",
+          "binding": {
+            "name": "number-optional",
+            "type": "zeebe:property"
+          },
+          "feel": "optional"
+        },
+        {
+          "id": "number-required",
+          "type": "Number",
+          "value": "100",
+          "label": "number-required",
+          "binding": {
+            "name": "number-required",
+            "type": "zeebe:property"
+          },
+          "feel": "required"
+        },
+        {
+          "type": "Text",
+          "value": "displayed when static is 100",
+          "binding": {
+            "name": "text",
+            "type": "zeebe:property"
+          },
+          "condition": {
+            "property": "number-required",
+            "equals": "100"
+          }
+        }
+      ]
+  }
+  

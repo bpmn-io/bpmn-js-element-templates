@@ -26,6 +26,7 @@ import chainedConditionsComplexTemplate from './ConditionalBehavior.condition-ch
 import chainedConditionsSharedBindingTemplate from './ConditionalBehavior.condition-chained-shared-binding.json';
 import dependentDropdownsTemplate from './ConditionalBehavior.dependent-dropdowns.json';
 import booleanTemplate from '../fixtures/condition-boolean.json';
+import numberTemplate from '../fixtures/condition-number.json';
 
 import messageTemplates from '../fixtures/condition-message.json';
 import messageCorrelationTemplate from '../fixtures/message-correlation-key.json';
@@ -1672,6 +1673,20 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
     }));
 
+
+    it('should keep number property value when condition property is still active', inject(function() {
+
+      // given
+      const element = changeTemplate('Task_1', numberTemplate);
+
+      // when
+      const businessObject = getBusinessObject(element);
+
+      // then
+      expectZeebePropertyValues(businessObject, 'number-static', 100);
+      expectZeebePropertyValues(businessObject, 'text');
+    }));
+
   });
 
 });
@@ -1736,4 +1751,17 @@ function expectZeebePropertyValue(businessObject, value) {
   expect(zeebeProperties).to.exist;
   expect(properties).to.have.lengthOf(1);
   expect(properties[0].value).to.eql(value);
+}
+
+function expectZeebePropertyValues(businessObject ,key, value) {
+  const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+  const properties = zeebeProperties.get('zeebe:properties');
+
+  const property = properties.find(p => p.name === key);
+
+  expect(property).to.exist;
+
+  if (value) {
+    expect(property.value).to.eql(value);
+  }
 }
