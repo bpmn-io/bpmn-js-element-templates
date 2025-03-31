@@ -707,6 +707,10 @@
     "elementType": {
       "value": "bpmn:ServiceTask"
     },
+    "keywords": [
+      "Hello World",
+      "Create Issue"
+    ],
     "groups": [
       {
         "id": "endpoint",

@@ -21,6 +21,11 @@ export function TemplateProps({ element, elementTemplates }) {
       template
     },
     {
+      id: 'template-keywords',
+      component: TemplateKeywords,
+      template
+    },
+    {
       id: 'template-description',
       component: TemplateDescription,
       template
@@ -49,6 +54,16 @@ function TemplateDescription({ id, template }) {
 
   return description ?
     <TextEntry id={ id } label={ translate('Description') } content={ template.description } /> :
+    null;
+}
+
+function TemplateKeywords({ id,template }) {
+  const translate = useService('translate');
+
+  const keywords = template.keywords;
+
+  return keywords && keywords.length > 0 ?
+    <TextEntry id={ id } label={ translate('Keywords') } content={ keywords.join(', ') } /> :
     null;
 }
 
