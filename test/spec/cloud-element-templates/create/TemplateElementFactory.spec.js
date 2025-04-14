@@ -514,6 +514,22 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
         },
       ]);
     }));
+
+
+    it('should handle <zeebe:userTask>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('zeebeUserTask');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      const userTask = findExtension(element, 'zeebe:UserTask');
+
+      // then
+      expect(userTask).to.exist;
+    }));
+
   });
 
 
