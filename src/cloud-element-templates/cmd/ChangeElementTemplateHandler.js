@@ -109,6 +109,8 @@ export default class ChangeElementTemplateHandler {
       this._updateCalledElement(element, oldTemplate, newTemplate);
 
       this._updateLinkedResources(element, oldTemplate, newTemplate);
+
+      this._updateZeebeUserTask(element, newTemplate);
     }
   }
 
@@ -1166,6 +1168,40 @@ export default class ChangeElementTemplateHandler {
       });
     });
   }
+
+  _updateZeebeUserTask = function(element, newTemplate) {
+
+    // (1) check if template has zeebe:userTask property
+    const hasUserTask = newTemplate.properties.some((newProperty) =>
+      newProperty.binding.type === 'zeebe:userTask');
+
+    if (!hasUserTask) {
+      return;
+    }
+
+    const bpmnFactory = this._bpmnFactory;
+    const commandStack = this._commandStack;
+
+    // (2) check if element has zeebe:UserTask extension element
+    const extensionElements = this._getOrCreateExtensionElements(element);
+    let userTaskExtension = findExtension(extensionElements, 'zeebe:UserTask');
+
+    if (userTaskExtension) {
+      return;
+    }
+
+    // (3) create new zeebe:UserTask extension element
+    userTaskExtension = bpmnFactory.create('zeebe:UserTask');
+    userTaskExtension.$parent = extensionElements;
+
+    commandStack.execute('element.updateModdleProperties', {
+      element,
+      moddleElement: extensionElements,
+      properties: {
+        values: [ ...extensionElements.get('values'), userTaskExtension ]
+      }
+    });
+  };
 
 }
 

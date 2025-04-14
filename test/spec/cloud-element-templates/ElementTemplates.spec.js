@@ -682,6 +682,27 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should create element with zeebe:UserTask', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const templates = require('./fixtures/user-task.json');
+      elementTemplates.set(templates);
+
+      const template = templates[0];
+      const task = elementRegistry.get('Task_3');
+
+      // assume
+      expect(template).to.exist;
+
+      // when
+      const updatedTask = elementTemplates.applyTemplate(task, template);
+
+      // then
+      const userTask = findExtensions(updatedTask, [ 'zeebe:UserTask' ]);
+      expect(userTask).to.have.length(1);
+    }));
+
+
     it('should not create conditional properties', inject(function(elementTemplates) {
 
       // given
