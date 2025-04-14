@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Zeebe User Task",
+  "id": "cloud.element.templates.zeebe.user.task",
+  "appliesTo": [
+    "bpmn:Task"
+  ],
+  "elementType": {
+    "value": "bpmn:UserTask"
+  },
+  "properties": [
+    {
+      "type": "Hidden",
+      "binding": {
+        "type": "zeebe:userTask"
+      }
+    }
+  ]
+}

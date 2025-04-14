@@ -23,7 +23,8 @@ import {
   ZEEBE_PROPERTY_TYPE,
   ZEEBE_TASK_HEADER_TYPE,
   ZEEBE_CALLED_ELEMENT,
-  ZEEBE_LINKED_RESOURCE_PROPERTY
+  ZEEBE_LINKED_RESOURCE_PROPERTY,
+  ZEEBE_USER_TASK
 } from './bindingTypes';
 
 import {
@@ -222,6 +223,13 @@ function getRawPropertyValue(element, property, scope) {
     const linkedResource = linkedResources.get('values').find((value) => value.get('linkName') === linkName);
 
     return linkedResource ? linkedResource.get(bindingProperty) : defaultValue;
+  }
+
+  // zeebe:userTask
+  if (type === ZEEBE_USER_TASK) {
+    const userTask = findExtension(businessObject, 'zeebe:userTask');
+
+    return userTask ? userTask.get(bindingProperty) : defaultValue;
   }
 
   // should never throw as templates are validated beforehand

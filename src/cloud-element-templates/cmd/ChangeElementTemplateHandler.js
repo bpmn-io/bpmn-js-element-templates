@@ -33,7 +33,8 @@ import {
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
   ZEEBE_CALLED_ELEMENT,
-  ZEEBE_LINKED_RESOURCE_PROPERTY
+  ZEEBE_LINKED_RESOURCE_PROPERTY,
+  ZEEBE_USER_TASK
 } from '../util/bindingTypes';
 
 import {
@@ -109,6 +110,8 @@ export default class ChangeElementTemplateHandler {
       this._updateCalledElement(element, oldTemplate, newTemplate);
 
       this._updateLinkedResources(element, oldTemplate, newTemplate);
+
+      this._updateZeebeUserTask(element, newTemplate);
     }
   }
 
@@ -1166,6 +1169,54 @@ export default class ChangeElementTemplateHandler {
       });
     });
   }
+
+  _updateZeebeUserTask = function(element, newTemplate) {
+
+    const commandStack = this._commandStack;
+    const bpmnFactory = this._bpmnFactory;
+
+    // check if template has zeebe:userTask binding property
+    const hasBinding = newTemplate.properties.some((property) =>
+      property.binding.type === ZEEBE_USER_TASK);
+
+    // check if element has zeebe:UserTask extension element
+    const extensionElements = getBusinessObject(element).get('extensionElements');
+    const userTaskExtension = findExtension(element, 'zeebe:UserTask');
+
+    if (newTemplate.elementType?.value !== 'bpmn:UserTask') {
+      return;
+    }
+
+    // remove zeebe:UserTask if no binding
+    if (userTaskExtension) {
+
+      !hasBinding && commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: extensionElements,
+        properties: {
+          values: without(extensionElements.get('values'), userTaskExtension)
+        }
+      });
+
+      return;
+    }
+
+    if (!hasBinding) {
+      return;
+    }
+
+    // create new zeebe:UserTask extension element
+    const zeebeUserTask = bpmnFactory.create('zeebe:UserTask');
+    zeebeUserTask.$parent = extensionElements;
+
+    commandStack.execute('element.updateModdleProperties', {
+      element,
+      moddleElement: extensionElements,
+      properties: {
+        values: [ ...extensionElements.get('values'), zeebeUserTask ]
+      }
+    });
+  };
 
 }
 

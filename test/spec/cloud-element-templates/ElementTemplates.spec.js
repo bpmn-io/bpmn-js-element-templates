@@ -682,6 +682,20 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should create element with zeebe:UserTask', inject(function(elementTemplates) {
+
+      // given
+      const template = require('./fixtures/user-task.json');
+
+      // when
+      const element = elementTemplates.createElement(template);
+
+      // then
+      const userTask = findExtension(element, 'zeebe:UserTask');
+      expect(userTask).to.exist;
+    }));
+
+
     it('should not create conditional properties', inject(function(elementTemplates) {
 
       // given
@@ -1107,6 +1121,82 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       const subscription = findExtension(message, 'zeebe:Subscription');
       expect(subscription).to.exist;
       expect(subscription.get('correlationKey')).to.eql('=correlationKey');
+    }));
+
+
+    it('should apply zeebe:userTask binding', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const template = require('./fixtures/user-task.json');
+      elementTemplates.set([ template ]);
+
+      const task = elementRegistry.get('Task_3');
+
+      // when
+      const updatedTask = elementTemplates.applyTemplate(task, template);
+
+      // then
+      const userTask = findExtension(updatedTask, 'zeebe:UserTask');
+      expect(userTask).to.exist;
+    }));
+
+
+    it('should not create <zeebe:UserTask> if it exists', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const template = require('./fixtures/user-task.json');
+      elementTemplates.set([ template ]);
+
+      const task = elementRegistry.get('UserTask_1');
+
+      // assume
+      const userTask = findExtension(task, 'zeebe:UserTask');
+      expect(userTask).to.exist;
+
+      // when
+      const updatedTask = elementTemplates.applyTemplate(task, template);
+
+      // then
+      const updatedUserTask = findExtensions(updatedTask, [ 'zeebe:UserTask' ]);
+      expect(updatedUserTask).to.have.length(1);
+    }));
+
+
+    it('should not create <zeebe:UserTask> if template has no binding', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const template = require('./fixtures/user-task-no-binding.json');
+
+      // when
+      const task = elementTemplates.createElement(template);
+
+      // then
+      const updatedUserTask = findExtension(task, 'zeebe:UserTask');
+      expect(updatedUserTask).to.not.exist;
+    }));
+
+
+    it('should remove <zeebe:UserTask> if new template has no binding', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const templates = [
+        require('./fixtures/user-task.json'),
+        require('./fixtures/user-task-no-binding.json')
+      ];
+      elementTemplates.set(templates);
+
+      // when
+      const task = elementTemplates.createElement(templates[0]);
+
+      // assume
+      expect(findExtension(task, 'zeebe:UserTask')).to.exist;
+
+      // when
+      const updatedTask = elementTemplates.applyTemplate(task, templates[1]);
+
+      // then
+      const updatedUserTask = findExtension(updatedTask, 'zeebe:UserTask');
+      expect(updatedUserTask).to.not.exist;
     }));
 
 
