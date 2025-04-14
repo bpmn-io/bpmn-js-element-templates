@@ -14,6 +14,7 @@ import { MessagePropertyBindingProvider } from './MessagePropertyBindingProvider
 import { MessageZeebeSubscriptionBindingProvider } from './MessageZeebeSubscriptionBindingProvider';
 import { CalledElementBindingProvider } from './CalledElementBindingProvider';
 import LinkedResourcePropertyBindingProvider from './LinkedResourceProvider';
+import ZeebeUserTaskBindingProvider from './ZeebeUserTaskBindingProvider';
 
 import {
   MESSAGE_PROPERTY_TYPE,
@@ -26,7 +27,8 @@ import {
   ZEEBE_TASK_HEADER_TYPE,
   ZEBBE_PROPERTY_TYPE,
   ZEEBE_CALLED_ELEMENT,
-  ZEEBE_LINKED_RESOURCE_PROPERTY
+  ZEEBE_LINKED_RESOURCE_PROPERTY,
+  ZEEBE_USER_TASK
 } from '../util/bindingTypes';
 
 import {
@@ -50,7 +52,8 @@ export default class TemplateElementFactory {
       [MESSAGE_PROPERTY_TYPE]: MessagePropertyBindingProvider,
       [MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE]: MessageZeebeSubscriptionBindingProvider,
       [ZEEBE_CALLED_ELEMENT]: CalledElementBindingProvider,
-      [ZEEBE_LINKED_RESOURCE_PROPERTY]: LinkedResourcePropertyBindingProvider
+      [ZEEBE_LINKED_RESOURCE_PROPERTY]: LinkedResourcePropertyBindingProvider,
+      [ZEEBE_USER_TASK]: ZeebeUserTaskBindingProvider
     };
   }
 
