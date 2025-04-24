@@ -63,7 +63,7 @@
     "@bpmn-io/element-templates-validator": "^2.3.3",
     "@bpmn-io/extract-process-variables": "^1.0.1",
     "bpmnlint": "^11.4.2",
-    "classnames": "^2.3.1",
+    "classnames": "^2.5.1",
     "ids": "^1.0.0",
     "min-dash": "^4.0.0",
     "min-dom": "^4.0.3",
