@@ -68,7 +68,7 @@
     "min-dash": "^4.0.0",
     "min-dom": "^4.0.3",
     "preact-markup": "^2.1.1",
-    "semver": "^7.6.3",
+    "semver": "^7.7.1",
     "semver-compare": "^1.0.0",
     "uuid": "^11.0.0"
   },
