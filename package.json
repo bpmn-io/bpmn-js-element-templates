@@ -119,7 +119,7 @@
     "mocha-test-container-support": "^0.2.0",
     "modeler-moddle": "^0.2.0",
     "npm-run-all2": "^7.0.0",
-    "puppeteer": "^24.0.0",
+    "puppeteer": "~24.5.0",
     "raw-loader": "^4.0.2",
     "rollup": "^4.40.0",
     "rollup-plugin-copy": "^3.5.0",
