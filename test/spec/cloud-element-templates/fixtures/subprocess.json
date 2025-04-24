@@ -1,0 +1,13 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "subprocess",
+    "name":"SubProcess",
+    "version": 1,
+    "appliesTo": [ "bpmn:SubProcess" ],
+    "properties": [],
+    "icon": {
+      "contents": "data:image/svg+xml,%3Csvg%20height%3D%22100%22%20width%3D%22100%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Ccircle%20r%3D%2245%22%20cx%3D%2250%22%20cy%3D%2250%22%20fill%3D%22green%22%20%2F%3E%3C%2Fsvg%3E"
+    }
+  }
+]
