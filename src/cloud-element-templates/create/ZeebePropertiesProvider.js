@@ -6,6 +6,10 @@ import {
 import { getDefaultValue } from '../Helper';
 
 
+/**
+ * A provider that sets up the `zeebe:property` binding
+ * on a newly created moddle element.
+ */
 export default class ZeebePropertiesProvider {
   static create(element, options) {
     const {
