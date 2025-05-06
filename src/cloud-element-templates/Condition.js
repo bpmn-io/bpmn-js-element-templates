@@ -1,6 +1,7 @@
 import { isEventSubProcess } from 'bpmn-js/lib/util/DiUtil';
 import { getPropertyValue } from './util/propertyUtil';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
+import { shouldCastToFeel } from './util/FeelUtil';
 
 /**
  * Based on conditions, remove properties from the template.
@@ -52,27 +53,36 @@ function isSimpleConditionMet(element, properties, condition) {
     return isActive ? isConditionMet(element, properties, relatedCondition) : !isConditionMet(element, properties, relatedCondition);
   }
 
-  const propertyValue = getValue(element, properties, property);
+  const propertyObject = getProperty(properties, property);
 
-  if (hasProperty(condition, 'equals')) {
-    return propertyValue === equals;
-  }
+  if (propertyObject) {
 
-  if (oneOf) {
-    return oneOf.includes(propertyValue);
+    // if the property is a [optional, static] property, we need to get the value removing the '='
+
+    const propertyValue = shouldCastToFeel(propertyObject) ?
+      getPropertyValue(element, propertyObject).slice(1) :
+      getPropertyValue(element, propertyObject);
+
+    if (hasProperty(condition, 'equals')) {
+      return compareProperty(propertyObject, propertyValue, equals);
+    }
+
+    if (oneOf) {
+      return oneOf.includes(propertyValue);
+    }
   }
 
   return false;
 }
 
-export function getValue(element, properties, propertyId) {
+export function getProperty(properties, propertyId) {
   const property = properties.find(p => p.id === propertyId);
 
   if (!property) {
     return;
   }
 
-  return getPropertyValue(element, property);
+  return property;
 }
 
 function isPropertyAllowed(element, property) {
@@ -91,6 +101,20 @@ function isPropertyAllowed(element, property) {
   return true;
 }
 
+function compareProperty(propertyObj, propertyValue, value) {
+
+  // Number
+  if (propertyObj.type === 'Number') {
+    return Number(propertyValue) === value;
+  }
+
+  // Boolean
+  else if (propertyObj.type === 'Boolean') {
+    return Boolean(propertyValue) === value;
+  }
+
+  return propertyValue === value;
+}
 
 // helpers //////////////////////
 
