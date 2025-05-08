@@ -48,6 +48,11 @@
     <bpmn:startEvent id="MessageStartEvent">
       <bpmn:messageEventDefinition id="MessageEventDefinition_1jjph4o" messageRef="Message" />
     </bpmn:startEvent>
+    <bpmn:userTask id="UserTask_1">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+    </bpmn:userTask>
     <bpmn:group id="Group_1" categoryValueRef="CategoryValue_025ggwq" />
     <bpmn:textAnnotation id="TextAnnotation_1">
       <bpmn:text>Text Annotation</bpmn:text>
@@ -74,6 +79,9 @@
       <bpmndi:BPMNShape id="Activity_1m5rz19_di" bpmnElement="Task_3">
         <dc:Bounds x="400" y="160" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_05tjg7w" bpmnElement="Task_5">
+        <dc:Bounds x="160" y="520" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="UnknownTemplateTask_di" bpmnElement="UnknownTemplateTask">
         <dc:Bounds x="400" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -98,8 +106,11 @@
       <bpmndi:BPMNShape id="Event_0rxdmt7_di" bpmnElement="MessageEvent">
         <dc:Bounds x="262" y="422" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_05tjg7w" bpmnElement="Task_5">
-        <dc:Bounds x="160" y="520" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_1iahht4_di" bpmnElement="UserTask_1">
+        <dc:Bounds x="160" y="620" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0sitnpj_di" bpmnElement="SubProcess_1" isExpanded="false">
+        <dc:Bounds x="400" y="520" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_04x2ssk_di" bpmnElement="Gateway_1" isMarkerVisible="true">
         <dc:Bounds x="185" y="70" width="50" height="50" />
@@ -107,13 +118,6 @@
       <bpmndi:BPMNShape id="Event_0nu49eb_di" bpmnElement="MessageStartEvent">
         <dc:Bounds x="262" y="362" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0sitnpj_di" bpmnElement="SubProcess_1" isExpanded="false">
-        <dc:Bounds x="400" y="520" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Association_1sxgene_di" bpmnElement="Association_1sxgene">
-        <di:waypoint x="850" y="160" />
-        <di:waypoint x="896" y="110" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Group_1_di" bpmnElement="Group_1">
         <dc:Bounds x="560" y="160" width="300" height="300" />
         <bpmndi:BPMNLabel>
@@ -124,6 +128,10 @@
         <dc:Bounds x="860" y="80" width="100" height="30" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1sxgene_di" bpmnElement="Association_1sxgene">
+        <di:waypoint x="850" y="160" />
+        <di:waypoint x="896" y="110" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
   <bpmndi:BPMNDiagram id="BPMNDiagram_0h3d15h">
