@@ -48,7 +48,7 @@
       <bpmn:messageEventDefinition messageRef="SubscriptionMessage_3" />
     </bpmn:intermediateCatchEvent>
   </bpmn:process>
-  <bpmn:message id="Message_1" name="one"></bpmn:message>
+  <bpmn:message id="Message_1" name="one" zeebe:modelerTemplate="example.com.condition"></bpmn:message>
   <bpmn:message id="Message_2" name="two"></bpmn:message>
   <bpmn:message id="Message_3"></bpmn:message>
   <bpmn:message id="Message_4" name="one"></bpmn:message>

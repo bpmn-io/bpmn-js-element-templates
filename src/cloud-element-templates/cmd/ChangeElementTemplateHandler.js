@@ -740,7 +740,7 @@ export default class ChangeElementTemplateHandler {
       return;
     }
 
-    message = this._getOrCreateMessage(element, newTemplate);
+    message = this._ensureMessage(element, newTemplate);
 
     newProperties.forEach((newProperty) => {
       const oldProperty = findOldProperty(oldTemplate, newProperty),
@@ -794,7 +794,8 @@ export default class ChangeElementTemplateHandler {
       return;
     }
 
-    message = this._getOrCreateMessage(element, newTemplate);
+    message = this._ensureMessage(element, newTemplate);
+
     const messageExtensionElements = this._getOrCreateExtensionElements(element, message);
     const zeebeSubscription = this._getSubscription(element, message);
 
@@ -870,10 +871,6 @@ export default class ChangeElementTemplateHandler {
     }
   }
 
-  _getOrCreateMessage(element, template) {
-    return this._getMessage(element) || this._createMessage(element, template);
-  }
-
   _createMessage(element, template) {
     let bo = getBusinessObject(element);
 
@@ -900,6 +897,46 @@ export default class ChangeElementTemplateHandler {
     return bo && bo.get('messageRef');
   }
 
+  _ensureMessage(element, template) {
+
+    const message = this._getMessage(element);
+
+    // message is already templated, so we use it
+    if (message && message.get('zeebe:modelerTemplate')) {
+      return message;
+    }
+
+    const newMessage = this._createMessage(element, template);
+
+    // no message is set on the element, so no properties to copy
+    if (!message) {
+      return newMessage;
+    }
+
+    // copy name property
+    const name = message.get('name');
+    if (name) {
+      this._modeling.updateModdleProperties(
+        newMessage,
+        getBusinessObject(newMessage),
+        {
+          name
+        });
+    }
+
+    // copy extension elements
+    const extensionElements = message.get('extensionElements');
+    if (extensionElements?.get('values').length) {
+      this._modeling.updateModdleProperties(
+        newMessage,
+        this._getOrCreateExtensionElements(newMessage),
+        {
+          values: extensionElements.get('values')
+        });
+    }
+
+    return newMessage;
+  }
 
 
   /**

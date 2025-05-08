@@ -1597,6 +1597,25 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(message).not.to.exist;
       }));
 
+
+      it('should reuse bpmn:Message name property', inject(function(elementRegistry) {
+
+        // given
+        const template = require('./event-template-3.json');
+
+        let event = elementRegistry.get('Event_4');
+
+        // when
+        changeTemplate(event, template);
+
+        // then
+        event = elementRegistry.get('Event_4');
+
+        const message = findMessage(getBusinessObject(event));
+
+        expect(message.get('name')).to.equal('message_1');
+      }));
+
     });
 
 
@@ -1713,6 +1732,26 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         expect(message).to.exist;
         expect(subscription).not.to.exist;
+      }));
+
+
+      it('should reuse zeebe:subscription correlationKey property', inject(function(elementRegistry) {
+
+        // given
+        const template = require('./event-template-3.json');
+
+        let event = elementRegistry.get('Event_4');
+
+        // when
+        changeTemplate(event, template);
+
+        // then
+        event = elementRegistry.get('Event_4');
+
+        const message = findMessage(getBusinessObject(event));
+        const subscription = findZeebeSubscription(message);
+
+        expect(subscription.get('correlationKey')).to.equal('=correlationKey');
       }));
 
     });

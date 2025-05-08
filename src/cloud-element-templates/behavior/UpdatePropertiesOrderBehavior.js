@@ -28,7 +28,7 @@ export default class UpdateTemplatePropertiesOrder extends CommandInterceptor {
     } = context;
 
     const template = this._elementTemplates.get(element);
-    const businessObject = element.businessObject;
+    const businessObject = element.businessObject || element;
     const commands = [];
 
     if (!template) {
