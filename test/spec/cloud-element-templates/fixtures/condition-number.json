@@ -44,7 +44,7 @@
           "value": "100",
           "label": "number-string",
           "binding": {
-            "name": "number-required",
+            "name": "number-string",
             "type": "zeebe:property"
           }
         },
@@ -54,7 +54,7 @@
           "value": 100,
           "label": "number",
           "binding": {
-            "name": "number-required",
+            "name": "number",
             "type": "zeebe:property"
           }
         },
@@ -100,7 +100,7 @@
         {
           "id": "compare-with-string",
           "type": "Text",
-          "value": "",
+          "value": "Displayed when number-string is 100 (compare with string)",
           "binding": {
             "name": "compare-with-string",
             "type": "zeebe:property"
@@ -113,7 +113,7 @@
         {
           "id": "compare-with-number",
           "type": "Text",
-          "value": "",
+          "value": "Displayed when number-string is 100 (compare with number)",
           "binding": {
             "name": "compare-with-number",
             "type": "zeebe:property"
@@ -126,7 +126,7 @@
         {
           "id": "compare-number-with-number",
           "type": "Text",
-          "value": "",
+          "value": "Displayed when number is 100",
           "binding": {
             "name": "compare-number-with-number",
             "type": "zeebe:property"
