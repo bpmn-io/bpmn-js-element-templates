@@ -51,11 +51,12 @@ import { removeMessage } from '../util/rootElementUtil';
  * `zeebe:modelerTemplateVersion`.
  */
 export default class ChangeElementTemplateHandler {
-  constructor(bpmnFactory, bpmnReplace, commandStack, modeling, injector) {
+  constructor(bpmnFactory, bpmnReplace, commandStack, modeling, moddleCopy, injector) {
     this._bpmnFactory = bpmnFactory;
     this._bpmnReplace = bpmnReplace;
 
     this._modeling = modeling;
+    this._moddleCopy = moddleCopy;
     this._commandStack = commandStack;
 
     this._injector = injector;
@@ -913,29 +914,7 @@ export default class ChangeElementTemplateHandler {
       return newMessage;
     }
 
-    // copy name property
-    const name = message.get('name');
-    if (name) {
-      this._modeling.updateModdleProperties(
-        newMessage,
-        getBusinessObject(newMessage),
-        {
-          name
-        });
-    }
-
-    // copy extension elements
-    const extensionElements = message.get('extensionElements');
-    if (extensionElements?.get('values').length) {
-      this._modeling.updateModdleProperties(
-        newMessage,
-        this._getOrCreateExtensionElements(newMessage),
-        {
-          values: extensionElements.get('values')
-        });
-    }
-
-    return newMessage;
+    return this._moddleCopy.copyElement(message, newMessage, [ 'name', 'extensionElements' ]);
   }
 
 
@@ -1211,6 +1190,7 @@ ChangeElementTemplateHandler.$inject = [
   'bpmnReplace',
   'commandStack',
   'modeling',
+  'moddleCopy',
   'injector'
 ];
 
