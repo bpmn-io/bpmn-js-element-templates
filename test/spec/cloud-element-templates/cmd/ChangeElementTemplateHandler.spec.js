@@ -1,7 +1,8 @@
 import {
   bootstrapModeler,
   getBpmnJS,
-  inject
+  inject,
+  withBpmnJs
 } from 'test/TestHelper';
 
 import TestContainer from 'mocha-test-container-support';
@@ -1598,7 +1599,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       }));
 
 
-      it('should reuse bpmn:Message name property', inject(function(elementRegistry) {
+      withBpmnJs('>=18.0.0')('should reuse bpmn:Message name property', inject(function(elementRegistry) {
 
         // given
         const template = require('./event-template-3.json');
@@ -1735,7 +1736,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       }));
 
 
-      it('should reuse zeebe:subscription correlationKey property', inject(function(elementRegistry) {
+      withBpmnJs('>=18.0.0')('should reuse zeebe:subscription correlationKey property', inject(function(elementRegistry) {
 
         // given
         const template = require('./event-template-3.json');
