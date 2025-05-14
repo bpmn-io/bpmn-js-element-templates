@@ -20,12 +20,16 @@
       <bpmn:extensionElements />
       <bpmn:messageEventDefinition id="MessageEventDefinition_12aq1bm" messageRef="Message_1z0d818" />
     </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="Event_2">
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0xfkxwd" messageRef="Message_0sq2r3e" />
+    </bpmn:intermediateCatchEvent>
   </bpmn:process>
   <bpmn:message id="Message_1z0d818" name="c21469ab-0f36-4caa-9550-d8be365d6f78" zeebe:modelerTemplate="example.com.generated">
     <bpmn:extensionElements>
       <zeebe:subscription correlationKey="62277ddf-d1d1-4324-8f0f-f8076858b798" />
     </bpmn:extensionElements>
   </bpmn:message>
+  <bpmn:message id="Message_0sq2r3e" name="Message_0sq2r3e" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
       <bpmndi:BPMNShape id="Activity_0idy629_di" bpmnElement="Task_1">
@@ -33,6 +37,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0hw8398_di" bpmnElement="Event_1">
         <dc:Bounds x="192" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1mak2aw_di" bpmnElement="Event_2">
+        <dc:Bounds x="252" y="82" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
