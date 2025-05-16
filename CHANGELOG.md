@@ -6,6 +6,12 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.6.0
+
+* `FEAT`: support `zeebe:userTask` binding property ([#147](https://github.com/bpmn-io/bpmn-js-element-templates/pull/147))
+* `FIX`: correctly reuse `bpmn:Message` properties when changing templates ([#154](https://github.com/bpmn-io/bpmn-js-element-templates/pull/154))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.4.0`
+
 ## 2.5.3
 
 * `FIX`: keep documentation and execution listeners when template is removed ([#120](https://github.com/bpmn-io/bpmn-js-element-templates/pull/120))
