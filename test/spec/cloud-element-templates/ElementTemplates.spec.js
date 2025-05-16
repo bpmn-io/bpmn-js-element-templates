@@ -25,6 +25,7 @@ import diagramXML from './ElementTemplates.bpmn';
 import integrationXML from './fixtures/integration.bpmn';
 import messageTemplates from './ElementTemplates.message-templates.json';
 import enginesTemplates from './ElementTemplates.engines-templates.json';
+import completionConditionTemplates from './fixtures/completion-condition.json';
 
 import templates from './fixtures/simple';
 import falsyVersionTemplate from './fixtures/falsy-version';
@@ -1218,6 +1219,33 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         element: task,
         newTemplate
       });
+    }));
+
+
+    it('should apply a template with a completion condition', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const templates = completionConditionTemplates;
+      elementTemplates.set(templates);
+
+      const template = templates[0];
+      const task = elementRegistry.get('Task_1');
+
+      // assume
+      expect(template).to.exist;
+
+      // when
+      const updatedTask = elementTemplates.applyTemplate(task, template);
+
+      // then
+      expect(updatedTask).to.exist;
+      expect(elementTemplates.get(updatedTask)).to.equal(template);
+
+      const businessObject = getBusinessObject(updatedTask);
+      const completionCondition = businessObject.get('completionCondition');
+
+      expect(completionCondition).to.exist;
+      expect(is(completionCondition, 'bpmn:Expression'), 'should be a BPMN expression').to.be.true;
     }));
   });
 

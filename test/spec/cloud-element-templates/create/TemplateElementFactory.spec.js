@@ -8,7 +8,8 @@ import {
 import { find } from 'min-dash';
 
 import {
-  getBusinessObject
+  getBusinessObject,
+  is
 } from 'bpmn-js/lib/util/ModelUtil';
 
 import coreModule from 'bpmn-js/lib/core';
@@ -32,6 +33,8 @@ import diagramXML from '../fixtures/simple.bpmn';
 import templates from './TemplatesElementFactory.json';
 
 import conditionTemplates from './TemplateElementFactory.conditions.json';
+
+import completionConditionTemplates from '../fixtures/completion-condition.json';
 
 
 describe('provider/cloud-element-templates - TemplateElementFactory', function() {
@@ -706,6 +709,25 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
 
       const subscription = findZeebeSubscription(message);
       expect(subscription.get('correlationKey')).to.match(uuidRegex, 'correlation key is not a uuid');
+    }));
+  });
+
+
+  describe('completion condition', function() {
+
+    it('should create element with completion condition', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = completionConditionTemplates[0];
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+      const businessObject = getBusinessObject(element);
+
+      // then
+      const completionCondition = businessObject.get('completionCondition');
+      expect(completionCondition).to.exist;
+      expect(is(completionCondition, 'bpmn:Expression'), 'should be a BPMN expression').to.be.true;
     }));
   });
 
