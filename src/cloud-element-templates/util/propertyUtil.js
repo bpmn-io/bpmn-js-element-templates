@@ -55,12 +55,20 @@ import {
 } from '../CreateHelper';
 
 import { createElement } from '../../utils/ElementUtil';
+import { getExpressionValue, isExpression, createExpression } from './bpmnExpressionUtil';
 
 const PRIMITIVE_MODDLE_TYPES = [
   'Boolean',
   'Integer',
   'String'
 ];
+
+const EXPRESSION_TYPES = [
+  'bpmn:Expression',
+  'bpmn:FormalExpression'
+];
+
+const ALLOWED_PROPERTY_TYPES = PRIMITIVE_MODDLE_TYPES.concat(EXPRESSION_TYPES);
 
 export function getPropertyValue(element, property, scope) {
   const rawValue = getRawPropertyValue(element, property, scope);
@@ -92,7 +100,7 @@ function getRawPropertyValue(element, property, scope) {
 
   // property
   if (type === 'property') {
-    const value = businessObject.get(name);
+    const value = isExpression(element, name) ? getExpressionValue(element, name) : businessObject.get(name);
 
     if (!isUndefined(value)) {
       return value;
@@ -355,22 +363,22 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
 
     const propertyDescriptor = businessObject.$descriptor.propertiesByName[ name ];
 
-    // if property not created yet
+    // if property does not exist on a type
     if (!propertyDescriptor) {
 
       // make sure we create the property
       propertyValue = value || '';
-    }
+    } else {
+      const propertyType = propertyDescriptor.type;
 
-    else {
-      const { type: propertyType } = propertyDescriptor;
-
-      // do not override non-primitive types
-      if (!PRIMITIVE_MODDLE_TYPES.includes(propertyType)) {
+      // unsupported non-primitive types cannot be set
+      if (!ALLOWED_PROPERTY_TYPES.includes(propertyType)) {
         throw new Error(`cannot set property of type <${ propertyType }>`);
       }
 
-      if (propertyType === 'Boolean') {
+      if (EXPRESSION_TYPES.includes(propertyType)) {
+        propertyValue = createExpression(value, businessObject, bpmnFactory);
+      } else if (propertyType === 'Boolean') {
         propertyValue = !!value;
       } else if (propertyType === 'Integer') {
         propertyValue = parseInt(value, 10);

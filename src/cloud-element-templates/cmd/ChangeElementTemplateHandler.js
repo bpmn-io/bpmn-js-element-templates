@@ -47,6 +47,7 @@ import {
   getRoot
 } from '../../utils/ElementUtil';
 import { removeMessage } from '../util/rootElementUtil';
+import { isExpression, createExpression } from '../util/bpmnExpressionUtil';
 
 /**
  * Applies an element template to an element. Sets `zeebe:modelerTemplate` and
@@ -220,7 +221,12 @@ export default class ChangeElementTemplateHandler {
         return;
       }
 
-      properties[ newBindingName ] = newPropertyValue;
+      let assignedValue = newPropertyValue;
+      if (isExpression(businessObject, newBindingName)) {
+        assignedValue = createExpression(newPropertyValue, businessObject, this._bpmnFactory);
+      }
+
+      properties[ newBindingName ] = assignedValue;
 
       commandStack.execute('element.updateModdleProperties', {
         element,

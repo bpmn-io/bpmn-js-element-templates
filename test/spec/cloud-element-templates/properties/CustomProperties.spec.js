@@ -24,6 +24,8 @@ import {
   queryAll as domQueryAll
 } from 'min-dom';
 
+import { is } from 'bpmn-js/lib/util/ModelUtil';
+
 import {
   findExtension,
   findInputParameter,
@@ -72,6 +74,9 @@ import textLanguageElementTemplates from './CustomProperties.text-language.json'
 
 import placeholderDiagramXML from './CustomProperties.placeholder.bpmn';
 import placeholderElementTemplates from './CustomProperties.placeholder.json';
+
+import bpmnExpressionXML from './CustomProperties.bpmn-expression.bpmn';
+import bpmnExpressionTemplates from '../fixtures/completion-condition.json';
 
 
 describe('provider/cloud-element-templates - CustomProperties', function() {
@@ -152,6 +157,61 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(businessObject.get('name')).to.be.eql('');
     });
 
+  });
+
+
+  describe('property (bpmn:Expression)', function() {
+
+    beforeEach(bootstrapPropertiesPanel(bpmnExpressionXML, {
+      container,
+      debounceInput: false,
+      elementTemplates: bpmnExpressionTemplates,
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      },
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        elementTemplatesModule,
+        modelingModule
+      ]
+    }));
+
+
+    it('should display property of type bpmn:Expression', async function() {
+
+      // when
+      await expectSelected('AdHocSubProcess');
+
+      // then
+      const entry = findEntry('custom-entry-completion-condition-0', container);
+
+      expect(entry).to.exist;
+      expectEditor(entry, 'foo');
+    });
+
+
+    it('should change property of type bpmn:Expression and use bpmn:FormalExpression', async function() {
+
+      // given
+      const task = await expectSelected('AdHocSubProcess'),
+            businessObject = getBusinessObject(task);
+
+      // when
+      const entry = findEntry('custom-entry-completion-condition-0', container),
+            editor = findEditor(entry);
+
+      await act(() => {
+        editor.textContent = 'bar';
+      });
+
+      // then
+      const expression = businessObject.get('completionCondition');
+
+      expect(expression).to.exist;
+      expect(is(expression, 'bpmn:FormalExpression')).to.be.true;
+      expect(expression.get('body')).to.equal('=bar');
+    });
   });
 
 
@@ -2585,4 +2645,15 @@ function findTextarea(container) {
   expect(container).to.not.be.null;
 
   return domQuery('textarea', container);
+}
+
+function findEditor(entry) {
+  return domQuery('[role="textbox"]', entry);
+}
+
+function expectEditor(entry, value) {
+  const editor = findEditor(entry);
+
+  expect(editor).to.exist;
+  expect(editor.textContent).to.eql(value);
 }

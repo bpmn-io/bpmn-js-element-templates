@@ -1,0 +1,27 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Completion condition template",
+    "id": "completion-condition",
+    "version": 1,
+    "description": "",
+    "appliesTo": [
+      "bpmn:Activity"
+    ],
+    "elementType": {
+      "value": "bpmn:AdHocSubProcess"
+    },
+    "properties": [
+      {
+        "type": "String",
+        "value": "=foo",
+        "binding": {
+          "type": "property",
+          "name": "completionCondition"
+        },
+        "feel": "required",
+        "label": "completion condition"
+      }
+    ]
+  }
+]
