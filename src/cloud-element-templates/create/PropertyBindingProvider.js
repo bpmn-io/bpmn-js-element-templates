@@ -1,10 +1,12 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { getDefaultValue } from '../Helper';
+import { isExpression, createExpression } from '../util/bpmnExpressionUtil';
 
 
 export default class PropertyBindingProvider {
   static create(element, options) {
     const {
+      bpmnFactory,
       property
     } = options;
 
@@ -16,9 +18,15 @@ export default class PropertyBindingProvider {
       name
     } = binding;
 
-    const value = getDefaultValue(property);
+    let value = getDefaultValue(property);
 
     const businessObject = getBusinessObject(element);
+
+    if (isExpression(businessObject, name)) {
+      const expression = createExpression(value, businessObject, bpmnFactory);
+
+      value = expression;
+    }
 
     businessObject[name] = value;
   }
