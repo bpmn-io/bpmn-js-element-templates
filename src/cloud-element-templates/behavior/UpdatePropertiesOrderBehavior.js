@@ -3,6 +3,7 @@ import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 import { isObject } from 'min-dash';
 import { applyConditions } from '../Condition';
 import { findExtension } from '../Helper';
+import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 /**
  * Restores the original order of the template properties
@@ -28,7 +29,7 @@ export default class UpdateTemplatePropertiesOrder extends CommandInterceptor {
     } = context;
 
     const template = this._elementTemplates.get(element);
-    const businessObject = element.businessObject;
+    const businessObject = getBusinessObject(element);
     const commands = [];
 
     if (!template) {

@@ -129,4 +129,25 @@ describe('provider/cloud-element-templates - GeneratedValueBehavior', function()
       expect(correlationKey).not.to.eql(oldSubscription.get('correlationKey'));
     }));
   });
+
+  describe('apply template', function() {
+
+    it('should regenerate uuid on message', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const uuidRegex = /^[\w\d]{8}(-[\w\d]{4}){3}-[\w\d]{12}$/;
+      const element = elementRegistry.get('Event_2');
+      const oldMessage = findMessage(getBusinessObject(element));
+
+      // when
+      const newElement = elementTemplates.applyTemplate(element, templates[1]);
+
+      // then
+      const newMessage = findMessage(getBusinessObject(newElement));
+      const name = newMessage.get('name');
+      expect(name).to.match(uuidRegex);
+      expect(name).not.to.eql(oldMessage.get('name'));
+    }));
+
+  });
 });
