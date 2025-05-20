@@ -13,6 +13,7 @@ import {
 } from '../Helper';
 
 import {
+  createCalledDecision,
   createCalledElement,
   createInputParameter,
   createOutputParameter,
@@ -32,6 +33,7 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
+  ZEEBE_CALLED_DECISION,
   ZEEBE_CALLED_ELEMENT,
   ZEEBE_LINKED_RESOURCE_PROPERTY,
   ZEEBE_USER_TASK
@@ -113,6 +115,8 @@ export default class ChangeElementTemplateHandler {
       this._updateLinkedResources(element, oldTemplate, newTemplate);
 
       this._updateZeebeUserTask(element, newTemplate);
+
+      this._updateCalledDecision(element, oldTemplate, newTemplate);
     }
   }
 
@@ -1016,6 +1020,106 @@ export default class ChangeElementTemplateHandler {
       commandStack.execute('element.updateModdleProperties', {
         element,
         moddleElement: calledElement,
+        properties
+      });
+    });
+  }
+
+  /**
+   * Update `zeebe:CalledDecision` properties of specified business object. This
+   * can only exist in `bpmn:ExtensionElements`.
+   *
+   * @param {djs.model.Base} element
+   * @param {Object} oldTemplate
+   * @param {Object} newTemplate
+   */
+  _updateCalledDecision(element, oldTemplate, newTemplate) {
+    const bpmnFactory = this._bpmnFactory,
+          commandStack = this._commandStack;
+
+    const newProperties = newTemplate.properties.filter((newProperty) => {
+      const newBinding = newProperty.binding,
+            newBindingType = newBinding.type;
+
+      return newBindingType === ZEEBE_CALLED_DECISION;
+    });
+
+    const businessObject = this._getOrCreateExtensionElements(element);
+    let calledDecision = findExtension(businessObject, 'zeebe:CalledDecision');
+
+    // (1) remove old called element if no new properties specified
+    if (!newProperties.length) {
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: businessObject,
+        properties: {
+          values: without(businessObject.get('values'), calledDecision)
+        }
+      });
+
+      return;
+    }
+
+
+    newProperties.forEach((newProperty) => {
+      const oldProperty = findOldProperty(oldTemplate, newProperty),
+            newPropertyValue = getDefaultValue(newProperty),
+            propertyName = newProperty.binding.property;
+
+      // (2) update old called element
+      if (calledDecision) {
+
+        if (!shouldKeepValue(calledDecision, oldProperty, newProperty)) {
+          const properties = {
+            [propertyName]: newPropertyValue
+          };
+
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: calledDecision,
+            properties
+          });
+        }
+      }
+
+      // (3) add new called element
+      else {
+        const properties = {
+          [propertyName]: newPropertyValue
+        };
+
+        calledDecision = createCalledDecision(properties, bpmnFactory);
+
+        calledDecision.$parent = businessObject;
+
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: businessObject,
+          properties: {
+            values: [ ...businessObject.get('values'), calledDecision ]
+          }
+        });
+      }
+    });
+
+    // (4) remove properties no longer templated
+    const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      return oldBindingType === ZEEBE_CALLED_DECISION && !newProperties.find(
+        (newProperty) => newProperty.binding.property === oldProperty.binding.property
+      );
+    }) || [];
+
+    oldProperties.forEach((oldProperty) => {
+      const properties = {
+        [oldProperty.binding.property]: undefined
+      };
+
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: calledDecision,
         properties
       });
     });
