@@ -110,6 +110,18 @@ export function createCalledElement(attrs = {}, bpmnFactory) {
 }
 
 /**
+ * Create a called decision representing the given value.
+ *
+ * @param {object} attrs
+ * @param {BpmnFactory} bpmnFactory
+ *
+ * @return {ModdleElement}
+ */
+export function createCalledDecision(attrs = {}, bpmnFactory) {
+  return bpmnFactory.create('zeebe:CalledDecision', attrs);
+}
+
+/**
  * Retrieves whether an element should be updated for a given property.
  *
  * That matches once

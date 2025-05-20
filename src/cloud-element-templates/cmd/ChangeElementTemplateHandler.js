@@ -30,6 +30,7 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
+  ZEEBE_CALLED_DECISION,
   ZEEBE_CALLED_ELEMENT,
   ZEEBE_LINKED_RESOURCE_PROPERTY,
   ZEEBE_USER_TASK
@@ -111,6 +112,8 @@ export default class ChangeElementTemplateHandler {
       this._updateLinkedResources(element, oldTemplate, newTemplate);
 
       this._updateZeebeUserTask(element, newTemplate);
+
+      this._updateCalledDecision(element, oldTemplate, newTemplate);
     }
   }
 
@@ -862,6 +865,27 @@ export default class ChangeElementTemplateHandler {
   }
 
   /**
+   * Update `zeebe:CalledDecision` properties of specified business object. This
+   * can only exist in `bpmn:ExtensionElements`.
+   *
+   * @param {djs.model.Base} element
+   * @param {Object} oldTemplate
+   * @param {Object} newTemplate
+   */
+  _updateCalledDecision(element, oldTemplate, newTemplate) {
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: [ ZEEBE_CALLED_DECISION ],
+        extensionType: 'zeebe:CalledDecision',
+        getPropertyName: (binding) => binding.property
+      }
+    );
+  }
+
+  /**
    * Replaces the element with the specified elementType.
    * Takes into account the eventDefinition for events.
    *
@@ -1419,6 +1443,19 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBinding.linkName === newBinding.linkName && oldBinding.property === newBinding.property;
     });
   }
+
+  if (newBindingType === ZEEBE_CALLED_DECISION) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_CALLED_DECISION) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
 }
 
 /**
@@ -1521,6 +1558,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_LINKED_RESOURCE_PROPERTY) {
+    return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === ZEEBE_CALLED_DECISION) {
     return businessObject.get(bindingProperty);
   }
 }

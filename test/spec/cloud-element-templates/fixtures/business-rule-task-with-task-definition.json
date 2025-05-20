@@ -1,0 +1,32 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Decision with Task Definition",
+  "id": "io.camunda.examples.decisionWithTaskDefinition",
+  "description": "A reusable rule template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:Task",
+    "bpmn:BusinessRuleTask"
+  ],
+  "elementType": {
+    "value": "bpmn:BusinessRuleTask"
+  },
+  "properties": [
+    {
+      "label": "Retries",
+      "type": "Number",
+      "binding": {
+        "type": "zeebe:taskDefinition",
+        "property": "retries"
+      }
+    },
+    {
+      "label": "Type",
+      "type": "String",
+      "binding": {
+        "type": "zeebe:taskDefinition",
+        "property": "type"
+      }
+    }
+  ]
+}
