@@ -384,7 +384,7 @@ function createTestUI(modeler) {
 
           const element = domify(`<div class="error-item"><strong>${ category }</strong> ${ id }: ${escapeHTML(message) } </div>`);
 
-          if (documentation.url) {
+          if (documentation?.url) {
             const documentationLink = domify(`<a href="${ documentation.url }" rel="noopener" target="_blank">ref</a>`);
 
             documentationLink.addEventListener('click', e => e.stopPropagation());

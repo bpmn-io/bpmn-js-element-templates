@@ -69,6 +69,17 @@
       </bpmn:extensionElements>
     </bpmn:callActivity>
     <bpmn:callActivity id="CalledElement_empty" name="Called Element empty" zeebe:modelerTemplate="calledElement" />
+    <bpmn:businessRuleTask id="BusinessRuleTask_called_decision" name="Business Rule Task Called Decision" zeebe:modelerTemplate="calledDecision">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="aReusableRule" resultVariable="aResultVariableName"/>
+      </bpmn:extensionElements>
+    </bpmn:businessRuleTask>
+    <bpmn:businessRuleTask id="BusinessRuleTask_empty" name="Business Rule Task empty" />
+    <bpmn:businessRuleTask id="BusinessRuleTask_task_definition" name="Business Rule Task Task Definition">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="decision-job" retries="1" />
+      </bpmn:extensionElements>
+    </bpmn:businessRuleTask>
   </bpmn:process>
   <bpmn:message id="Message" name="name">
     <bpmn:extensionElements>
@@ -144,6 +155,18 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_di" bpmnElement="CalledElement_empty">
         <dc:Bounds x="480" y="630" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02u8j70_di" bpmnElement="BusinessRuleTask_called_decision">
+        <dc:Bounds x="360" y="760" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_03sg3f9" bpmnElement="BusinessRuleTask_empty">
+        <dc:Bounds x="480" y="760" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1nwo7tk" bpmnElement="BusinessRuleTask_task_definition">
+        <dc:Bounds x="600" y="760" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

@@ -585,5 +585,37 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "http://localhost:8000/@camunda/zeebe-element-templates-json-schema/schema.json",
+    "name": "Called Decision",
+    "id": "calledDecision",
+    "description": "A called decision",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task",
+      "bpmn:BusinessRuleTask"
+    ],
+    "elementType": {
+      "value": "bpmn:BusinessRuleTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "aDecisionId",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "decisionId"
+        }
+      },
+      {
+        "value": "aResultVariableName",
+        "type": "Hidden",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "resultVariable"
+        }
+      }
+    ]
   }
 ]

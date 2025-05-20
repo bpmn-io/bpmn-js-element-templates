@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_066436i" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0-nightly.20250407" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.7.0">
+  <bpmn:process id="Process_1s5ztju" isExecutable="true">
+    <bpmn:businessRuleTask id="withCalledDecision">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="aDecisionID" resultVariable="aResultVariable" />
+      </bpmn:extensionElements>
+    </bpmn:businessRuleTask>
+    <bpmn:businessRuleTask id="withTaskDefinition">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="aJobType" retries="3" />
+      </bpmn:extensionElements>
+    </bpmn:businessRuleTask>
+    <bpmn:businessRuleTask id="withoutImplementation">
+      <bpmn:extensionElements />
+    </bpmn:businessRuleTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1s5ztju">
+      <bpmndi:BPMNShape id="Activity_1qo474y_di" bpmnElement="withCalledDecision">
+        <dc:Bounds x="160" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1apns87" bpmnElement="withTaskDefinition">
+        <dc:Bounds x="300" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0hzjlg5" bpmnElement="withoutImplementation">
+        <dc:Bounds x="430" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -2306,6 +2306,157 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     });
 
+    describe('update zeebe:calledDecision', function() {
+
+      beforeEach(bootstrap(require('./business-rule-tasks.bpmn').default));
+
+      const newTemplate = require('./called-decision.json');
+
+
+      it('execute', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('withoutImplementation');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        task = elementRegistry.get('withoutImplementation');
+        expectElementTemplate(task, 'calledDecision');
+
+        const calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        expect(calledDecision).to.exist;
+        expect(calledDecision).to.have.property('decisionId', 'aDecisionId');
+        expect(calledDecision).to.have.property('resultVariable', 'aDefaultResultVariable');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('withoutImplementation');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        task = elementRegistry.get('withoutImplementation');
+        expectNoElementTemplate(task);
+
+        const calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        expect(calledDecision).not.to.exist;
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('withoutImplementation');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        task = elementRegistry.get('withoutImplementation');
+        expectElementTemplate(task, 'calledDecision');
+
+        const calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        expect(calledDecision).to.exist;
+        expect(calledDecision).to.have.property('decisionId', 'aDecisionId');
+        expect(calledDecision).to.have.property('resultVariable', 'aDefaultResultVariable');
+      }));
+
+
+      it('should not override existing', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('withCalledDecision');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        expectElementTemplate(task, 'calledDecision');
+
+        const calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        expect(calledDecision).to.exist;
+
+        // Should keep the old values, not override with newTemplate's values
+        expect(calledDecision).to.have.property('decisionId', 'aDecisionId');
+        expect(calledDecision).to.have.property('resultVariable', 'aResultVariable');
+      }));
+
+
+      it('discards `taskDefinition` without template', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('withTaskDefinition');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        expectElementTemplate(task, 'calledDecision');
+
+        const calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        expect(calledDecision).to.exist;
+
+        const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+        expect(taskDefinition).to.not.exist;
+      }));
+
+
+      it('discards `taskDefinition` with template', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('withTaskDefinition');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'unrelated',
+            binding: {
+              type: 'zeebe:taskDefinition',
+              property: 'type'
+            }
+          },
+          {
+            value: 3,
+            binding: {
+              type: 'zeebe:taskDefinition',
+              property: 'retries'
+            }
+          }
+        ]);
+
+        task = changeTemplate(task, oldTemplate);
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        expectElementTemplate(task, 'calledDecision');
+
+        const calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        expect(calledDecision).to.exist;
+
+        const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+        expect(taskDefinition).to.not.exist;
+      }));
+    });
   });
 
 
@@ -4611,6 +4762,124 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         const message = findMessage(getBusinessObject(event));
         expect(message).to.exist;
         expect(message.get('zeebe:modelerTemplate')).to.eql(newTemplate.id);
+      }));
+    });
+
+
+    describe('update zeebe:CalledDecision', function() {
+
+      beforeEach(bootstrap(require('./business-rule-tasks.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given a user applies a template and updates a property
+        let task = elementRegistry.get('withoutImplementation');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'aDecisionID-old',
+            binding: {
+              type: 'zeebe:calledDecision',
+              property: 'decisionId'
+            }
+          },
+          {
+            value: 'aResultVariable-old',
+            binding: {
+              type: 'zeebe:calledDecision',
+              property: 'resultVariable'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'aDecisionID-new',
+            binding: {
+              type: 'zeebe:calledDecision',
+              property: 'decisionId'
+            }
+          },
+          {
+            value: 'aResultVariable-new',
+            binding: {
+              type: 'zeebe:calledDecision',
+              property: 'resultVariable'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('withoutImplementation');
+        let calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        updateBusinessObject('withoutImplementation', calledDecision, {
+          resultVariable: 'aResultVariable-changed'
+        });
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        expect(calledDecision).to.exist;
+        expect(calledDecision.get('decisionId')).to.equal('aDecisionID-new');
+        expect(calledDecision.get('resultVariable')).to.equal('aResultVariable-changed');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('withoutImplementation');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'aDecisionID-old',
+            binding: {
+              type: 'zeebe:calledDecision',
+              property: 'decisionId'
+            }
+          },
+          {
+            value: 'aResultVariable-old',
+            binding: {
+              type: 'zeebe:calledDecision',
+              property: 'resultVariable'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'aDecisionID-new',
+            binding: {
+              type: 'zeebe:calledDecision',
+              property: 'decisionId'
+            }
+          },
+          {
+            value: 'aResultVariable-new',
+            binding: {
+              type: 'zeebe:calledDecision',
+              property: 'resultVariable'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        const calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        expect(calledDecision).to.exist;
+        expect(calledDecision.get('decisionId')).to.equal('aDecisionID-new');
+        expect(calledDecision.get('resultVariable')).to.equal('aResultVariable-new');
       }));
     });
 

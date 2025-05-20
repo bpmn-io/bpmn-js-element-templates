@@ -24,7 +24,8 @@ export default class ElementTemplates extends DefaultElementTemplates {
   }
 
   /**
-   * Create an element based on an element template.
+   * Create an element based on an element template. This is, for example,
+   * called from the create-append anything menu.
    *
    * @param {ElementTemplate} template
    * @returns {djs.model.Base}
