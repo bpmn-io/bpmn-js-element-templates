@@ -1,0 +1,35 @@
+{
+  "$schema": "http://localhost:8000/@camunda/zeebe-element-templates-json-schema/schema.json",
+  "name": "Reusable Rule Template with zeebe:calledDecision implementation",
+  "id": "io.camunda.examples.Decision",
+  "description": "A reusable rule template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:Task",
+    "bpmn:BusinessRuleTask"
+  ],
+  "elementType": {
+    "value": "bpmn:BusinessRuleTask"
+  },
+  "properties": [
+    {
+      "type": "Hidden",
+      "value": "aReusableRule",
+      "binding": {
+        "type": "zeebe:calledDecision",
+        "property": "decisionId"
+      }
+    },
+    {
+      "label": "Result Variable",
+      "type": "String",
+      "binding": {
+        "type": "zeebe:calledDecision",
+        "property": "resultVariable"
+      },
+      "constraints": {
+        "notEmpty": true
+      }
+    }
+  ]
+}
