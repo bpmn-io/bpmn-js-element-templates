@@ -1132,7 +1132,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
-    it.only('should apply a template with a completion condition', inject(function(elementRegistry, elementTemplates) {
+    it('should apply a template with a completion condition', inject(function(elementRegistry, elementTemplates) {
 
       // given
       const templates = completionConditionTemplates;

@@ -638,7 +638,7 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
 
   describe('completion condition', function() {
 
-    it.only('should create element with completion condition', inject(function(templateElementFactory) {
+    it('should create element with completion condition', inject(function(templateElementFactory) {
 
       // given
       const elementTemplate = completionConditionTemplates[0];

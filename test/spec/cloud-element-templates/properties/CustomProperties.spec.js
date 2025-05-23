@@ -73,6 +73,9 @@ import textLanguageElementTemplates from './CustomProperties.text-language.json'
 import placeholderDiagramXML from './CustomProperties.placeholder.bpmn';
 import placeholderElementTemplates from './CustomProperties.placeholder.json';
 
+import bpmnExpressionXML from './CustomProperties.bpmn-expression.bpmn';
+import bpmnExpressionTemplates from '../fixtures/completion-condition.json';
+
 
 describe('provider/cloud-element-templates - CustomProperties', function() {
 
@@ -152,6 +155,60 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(businessObject.get('name')).to.be.eql('');
     });
 
+  });
+
+
+  describe('property (bpmn:Expression)', function() {
+
+    beforeEach(bootstrapPropertiesPanel(bpmnExpressionXML, {
+      container,
+      debounceInput: false,
+      elementTemplates: bpmnExpressionTemplates,
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      },
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        elementTemplatesModule,
+        modelingModule
+      ]
+    }));
+
+
+    it.only('should display property of type bpmn:Expression', async function() {
+
+      // when
+      await expectSelected('AdHocSubProcess');
+
+      // then
+      const entry = findEntry('custom-entry-completion-condition-0', container);
+
+      expect(entry).to.exist;
+
+      const input = findInput('text', entry);
+
+      expect(input).to.exist;
+      expect(input.value).to.equal('My task');
+    });
+
+
+    it.only('should change property of type bpmn:Expression', async function() {
+
+      // given
+      const task = await expectSelected('AdHocSubProcess'),
+            businessObject = getBusinessObject(task);
+
+      // when
+      const entry = findEntry('custom-entry-completion-condition-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'foo');
+
+      // then
+      expect(input.value).to.equal('foo');
+      expect(businessObject.get('name')).to.equal('foo');
+    });
   });
 
 
