@@ -57,9 +57,10 @@ function isSimpleConditionMet(element, properties, condition) {
 
   if (propertyObject) {
 
-    // if the property is a [optional, static] property, we need to get the value removing the '='
+    // if the property is a FEEL [optional, static, required] property,
+    // we need to get the value removing the '='
 
-    const propertyValue = shouldCastToFeel(propertyObject) ?
+    const propertyValue = shouldCastToFeel(propertyObject) || propertyObject.feel === 'required' ?
       getPropertyValue(element, propertyObject).slice(1) :
       getPropertyValue(element, propertyObject);
 
