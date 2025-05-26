@@ -25,7 +25,8 @@ import {
   ZEEBE_CALLED_ELEMENT,
   ZEEBE_LINKED_RESOURCE_PROPERTY,
   ZEEBE_USER_TASK,
-  ZEEBE_CALLED_DECISION
+  ZEEBE_CALLED_DECISION,
+  ZEEBE_SCRIPT_TASK
 } from './bindingTypes';
 
 import {
@@ -239,6 +240,14 @@ function getRawPropertyValue(element, property, scope) {
     const calledDecision = findExtension(businessObject, 'zeebe:CalledDecision');
 
     return calledDecision ? calledDecision.get(bindingProperty) : defaultValue;
+  }
+
+  // zeebe:script
+  if (type === ZEEBE_SCRIPT_TASK) {
+
+    const scriptTask = findExtension(businessObject, 'zeebe:Script');
+
+    return scriptTask ? scriptTask.get(bindingProperty) : defaultValue;
   }
 
   // should never throw as templates are validated beforehand
@@ -694,6 +703,38 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
           ...context,
           moddleElement: extensionElements,
           properties: { values: [ ...extensionElements.get('values'), calledDecision ] }
+        }
+      });
+    }
+  }
+
+  // zeebe:script
+  if (type === ZEEBE_SCRIPT_TASK) {
+    let scriptTask = findExtension(element, 'zeebe:Script');
+    const propertyName = binding.property;
+
+    const properties = {
+      [ propertyName ]: value || ''
+    };
+
+    if (scriptTask) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: scriptTask
+        }
+      });
+    } else {
+      scriptTask = createElement('zeebe:Script', properties, extensionElements, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), scriptTask ] }
         }
       });
     }
