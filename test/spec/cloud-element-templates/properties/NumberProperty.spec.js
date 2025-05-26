@@ -16,6 +16,8 @@ import {
   query as domQuery
 } from 'min-dom';
 
+import { isString } from 'min-dash';
+
 import {
   findExtension,
   findInputParameter,
@@ -140,10 +142,10 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
 
   describe('feel required', function() {
 
-    let entry, input;
+    let entry, input, element;
 
     beforeEach(async function() {
-      await expectSelected('required');
+      element = await expectSelected('required');
       entry = findEntry('custom-entry-numberField.feel.required-0', container);
       input = domQuery('.bio-properties-panel-feel-editor-container', entry);
     });
@@ -153,6 +155,17 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
       // then
       expect(input).to.exist;
 
+    });
+
+
+    it('should be FEEL expression by default', async function() {
+
+      // when
+      // we have default value of 100 in the schema
+      changeTemplate(element, templates.find(x => x.id === 'numberField.feel.required'));
+
+      // then
+      expectZeebeProperty('required', 'NumberProperty', '=100');
     });
 
   });
@@ -388,4 +401,23 @@ function findInput(type, container) {
   expect(container).to.not.be.null;
 
   return domQuery(`input[type='${ type }']`, container);
+}
+
+function changeTemplate(element, newTemplate, oldTemplate) {
+  const templates = [];
+
+  newTemplate && templates.push(newTemplate);
+  oldTemplate && templates.push(oldTemplate);
+
+  return getBpmnJS().invoke(function(elementTemplates, elementRegistry) {
+    if (isString(element)) {
+      element = elementRegistry.get(element);
+    }
+
+    expect(element).to.exist;
+
+    elementTemplates.set(templates);
+
+    return elementTemplates.applyTemplate(element, newTemplate);
+  });
 }

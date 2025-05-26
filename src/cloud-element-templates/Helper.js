@@ -179,7 +179,7 @@ export function findZeebeSubscription(message) {
 export function getDefaultValue(property) {
 
   if (
-    shouldCastToFeel(property)
+    shouldCastToFeel(property) || property.feel === 'required'
   ) {
     return toFeelExpression(property.value, property.type);
   }
