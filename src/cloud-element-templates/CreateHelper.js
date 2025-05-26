@@ -98,6 +98,42 @@ export function createZeebeProperty(binding, value = '', bpmnFactory) {
 }
 
 /**
+ * Create a called element representing the given value.
+ *
+ * @param {object} attrs
+ * @param {BpmnFactory} bpmnFactory
+ *
+ * @return {ModdleElement}
+ */
+export function createCalledElement(attrs = {}, bpmnFactory) {
+  return bpmnFactory.create('zeebe:CalledElement', attrs);
+}
+
+/**
+ * Create a called decision representing the given value.
+ *
+ * @param {object} attrs
+ * @param {BpmnFactory} bpmnFactory
+ *
+ * @return {ModdleElement}
+ */
+export function createCalledDecision(attrs = {}, bpmnFactory) {
+  return bpmnFactory.create('zeebe:CalledDecision', attrs);
+}
+
+/**
+ * Create a script task representing the given value.
+ *
+ * @param {object} attrs
+ * @param {BpmnFactory} bpmnFactory
+ *
+ * @return {ModdleElement}
+ */
+export function createScriptTask(attrs = {}, bpmnFactory) {
+  return bpmnFactory.create('zeebe:Script', attrs);
+}
+
+/**
  * Retrieves whether an element should be updated for a given property.
  *
  * That matches once
