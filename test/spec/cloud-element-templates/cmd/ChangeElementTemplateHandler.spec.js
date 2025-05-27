@@ -2582,7 +2582,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
       const newTemplate = require('./script-task.json');
 
-
       it('execute', inject(function(elementRegistry) {
 
         // given

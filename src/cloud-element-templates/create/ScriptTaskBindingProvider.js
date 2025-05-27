@@ -23,8 +23,6 @@ export class ScriptTaskBindingProvider {
 
     const scriptTask = ensureExtension(element, 'zeebe:Script', bpmnFactory);
 
-    // todo set all properties -> this seems to be done automatically? Each property is called here individually
-
     scriptTask.set(propertyName, value);
   }
 }
