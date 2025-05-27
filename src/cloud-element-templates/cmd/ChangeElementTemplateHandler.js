@@ -15,7 +15,8 @@ import {
 import {
   createCalledElement,
   createInputParameter,
-  createOutputParameter, createScriptTask,
+  createOutputParameter,
+  createScriptTask,
   createTaskDefinition,
   createTaskHeader,
   createZeebeProperty,
@@ -33,7 +34,8 @@ import {
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
   ZEEBE_CALLED_ELEMENT,
-  ZEEBE_LINKED_RESOURCE_PROPERTY, ZEEBE_SCRIPT_TASK,
+  ZEEBE_LINKED_RESOURCE_PROPERTY,
+  ZEEBE_SCRIPT_TASK,
   ZEEBE_USER_TASK
 } from '../util/bindingTypes';
 
@@ -1045,7 +1047,7 @@ export default class ChangeElementTemplateHandler {
     const businessObject = this._getOrCreateExtensionElements(element);
     let scriptTask = findExtension(businessObject, 'zeebe:Script');
 
-    // (1) remove old called element if no new properties specified
+    // (1) remove old script task if no new properties specified
     if (!newProperties.length) {
       commandStack.execute('element.updateModdleProperties', {
         element,
@@ -1063,7 +1065,7 @@ export default class ChangeElementTemplateHandler {
             newPropertyValue = getDefaultValue(newProperty),
             propertyName = newProperty.binding.property;
 
-      // (2) update old called element
+      // (2) update old script task
       if (scriptTask) {
 
         if (!shouldKeepValue(scriptTask, oldProperty, newProperty)) {
@@ -1079,7 +1081,7 @@ export default class ChangeElementTemplateHandler {
         }
       }
 
-      // (3) add new called element
+      // (3) add new script task
       else {
         const properties = {
           [propertyName]: newPropertyValue
@@ -1097,27 +1099,27 @@ export default class ChangeElementTemplateHandler {
           }
         });
       }
-    });
 
-    // (4) remove properties no longer templated
-    const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
-      const oldBinding = oldProperty.binding,
-            oldBindingType = oldBinding.type;
+      // (4) remove properties no longer templated
+      const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
+        const oldBinding = oldProperty.binding,
+              oldBindingType = oldBinding.type;
 
-      return oldBindingType === ZEEBE_SCRIPT_TASK && !newProperties.find(
-        (newProperty) => newProperty.binding.property === oldProperty.binding.property
-      );
-    }) || [];
+        return oldBindingType === ZEEBE_SCRIPT_TASK && !newProperties.find(
+          (newProperty) => newProperty.binding.property === oldProperty.binding.property
+        );
+      }) || [];
 
-    oldProperties.forEach((oldProperty) => {
-      const properties = {
-        [oldProperty.binding.property]: undefined
-      };
+      oldProperties.forEach((oldProperty) => {
+        const properties = {
+          [oldProperty.binding.property]: undefined
+        };
 
-      commandStack.execute('element.updateModdleProperties', {
-        element,
-        moddleElement: scriptTask,
-        properties
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: scriptTask,
+          properties
+        });
       });
     });
   }

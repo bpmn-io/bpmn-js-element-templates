@@ -24,7 +24,8 @@ import {
   ZEEBE_TASK_HEADER_TYPE,
   ZEEBE_CALLED_ELEMENT,
   ZEEBE_LINKED_RESOURCE_PROPERTY,
-  ZEEBE_USER_TASK, ZEEBE_SCRIPT_TASK
+  ZEEBE_USER_TASK,
+  ZEEBE_SCRIPT_TASK
 } from './bindingTypes';
 
 import {
@@ -234,8 +235,8 @@ function getRawPropertyValue(element, property, scope) {
 
   // zeebe:script
   if (type === ZEEBE_SCRIPT_TASK) {
+    const scriptTask = findExtension(businessObject, 'zeebe:S/cript');
 
-    const scriptTask = findExtension(businessObject, 'zeebe:Script');
     return scriptTask ? scriptTask.get(bindingProperty) : defaultValue;
   }
 
