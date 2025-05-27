@@ -860,8 +860,8 @@ export default class ChangeElementTemplateHandler {
       oldTemplate,
       newTemplate,
       {
-        bindingTypes: [ ZEEBE_SCRIPT_TASK ],
-        extensionType: 'zeebe:Script',
+        bindingTypes: [ ZEEBE_CALLED_ELEMENT ],
+        extensionType: 'zeebe:CalledElement',
         getPropertyName: (binding) => binding.property
       }
     );
@@ -902,8 +902,8 @@ export default class ChangeElementTemplateHandler {
       oldTemplate,
       newTemplate,
       {
-        bindingTypes: [ ZEEBE_CALLED_DECISION ],
-        extensionType: 'zeebe:CalledDecision',
+        bindingTypes: [ ZEEBE_SCRIPT_TASK ],
+        extensionType: 'zeebe:Script',
         getPropertyName: (binding) => binding.property
       }
     );
@@ -1484,7 +1484,7 @@ export function findOldProperty(oldTemplate, newProperty) {
   if (newBindingType === ZEEBE_SCRIPT_TASK) {
     return oldProperties.find(oldProperty => {
       const oldBinding = oldProperty.binding,
-        oldBindingType = oldBinding.type;
+            oldBindingType = oldBinding.type;
 
       if (oldBindingType !== ZEEBE_SCRIPT_TASK) {
         return;
