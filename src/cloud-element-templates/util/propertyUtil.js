@@ -236,7 +236,6 @@ function getRawPropertyValue(element, property, scope) {
   // zeebe:calledDecision
   if (type === ZEEBE_CALLED_DECISION) {
 
-    // todo @yT0n1 understand lowercase vs upper case?
     const calledDecision = findExtension(businessObject, 'zeebe:CalledDecision');
 
     return calledDecision ? calledDecision.get(bindingProperty) : defaultValue;
@@ -267,6 +266,7 @@ const NO_OP = null;
 
 export function setPropertyValue(bpmnFactory, commandStack, element, property, value) {
   let businessObject = getBusinessObject(element);
+
   const {
     binding,
   } = property;

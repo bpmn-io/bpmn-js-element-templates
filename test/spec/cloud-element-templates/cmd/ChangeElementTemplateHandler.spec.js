@@ -2227,8 +2227,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(calledDecision).to.have.property('resultVariable', 'aResultVariableName');
       }));
     });
-
-
   });
 
 

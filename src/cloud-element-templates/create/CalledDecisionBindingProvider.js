@@ -23,8 +23,6 @@ export class CalledDecisionBindingProvider {
 
     const calledDecision = ensureExtension(element, 'zeebe:CalledDecision', bpmnFactory);
 
-    // todo set all properties -> this seems to be done automatically? Each property is called here individually
-
     calledDecision.set(propertyName, value);
   }
 }
