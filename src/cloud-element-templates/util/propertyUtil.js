@@ -209,6 +209,8 @@ function getRawPropertyValue(element, property, scope) {
 
   // zeebe:calledElement
   if (type === ZEEBE_CALLED_ELEMENT) {
+    console.warn('heehehe');
+    debugger;
     const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
 
     return calledElement ? calledElement.get(bindingProperty) : defaultValue;

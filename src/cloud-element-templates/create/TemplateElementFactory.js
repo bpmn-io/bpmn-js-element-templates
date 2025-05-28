@@ -67,6 +67,7 @@ export default class TemplateElementFactory {
    * @returns {djs.model.Base}
    */
   create(template) {
+
     const {
       properties
     } = template;
@@ -218,7 +219,7 @@ export default class TemplateElementFactory {
       bpmnFactory: this._bpmnFactory
     });
   }
-};
+}
 
 TemplateElementFactory.$inject = [ 'bpmnFactory', 'elementFactory' ];
 

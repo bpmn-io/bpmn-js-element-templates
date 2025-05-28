@@ -1,5 +1,5 @@
 {
-  "$schema": "http://localhost:8000/@camunda/zeebe-element-templates-json-schema/schema.json",
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
   "name": "Called Decision",
   "id": "calledDecision",
   "description": "A called decision",

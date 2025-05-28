@@ -1010,6 +1010,12 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
   });
 
+  describe('zeebe:CalledDecision', function() {
+
+  });
+
+  // todo @yT0n1 include tests for called decision similar to called element tests
+
 
   describe('types', function() {
 

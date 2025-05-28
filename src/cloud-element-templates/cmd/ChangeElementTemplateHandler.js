@@ -1047,7 +1047,7 @@ export default class ChangeElementTemplateHandler {
     const businessObject = this._getOrCreateExtensionElements(element);
     let calledDecision = findExtension(businessObject, 'zeebe:CalledDecision');
 
-    // (1) remove old called element if no new properties specified
+    // (1) remove old called decision if no new properties specified
     if (!newProperties.length) {
       commandStack.execute('element.updateModdleProperties', {
         element,
@@ -1066,7 +1066,7 @@ export default class ChangeElementTemplateHandler {
             newPropertyValue = getDefaultValue(newProperty),
             propertyName = newProperty.binding.property;
 
-      // (2) update old called element
+      // (2) update old called decision
       if (calledDecision) {
 
         if (!shouldKeepValue(calledDecision, oldProperty, newProperty)) {
@@ -1082,7 +1082,7 @@ export default class ChangeElementTemplateHandler {
         }
       }
 
-      // (3) add new called element
+      // (3) add new called decision
       else {
         const properties = {
           [propertyName]: newPropertyValue
