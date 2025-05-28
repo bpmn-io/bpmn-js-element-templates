@@ -1010,6 +1010,75 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
   });
 
+  describe('zeebe:CalledDecision', function() {
+    it('should display', async function() {
+
+      // when
+      await expectSelected('BusinessRuleTask_called_decision');
+
+      // then
+      const entry = findEntry('custom-entry-calledDecision-1', container),
+            input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('aResultVariableName');
+    });
+
+    it('should change, setting `resultVariable`', async function() {
+
+      // given
+      const element = await expectSelected('BusinessRuleTask_called_decision'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-calledDecision-1', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'aNewResultVariableName');
+
+      // then
+      const calledDecision = findExtension(businessObject, 'zeebe:CalledDecision');
+      expect(calledDecision).to.exist;
+      expect(calledDecision).to.have.property('resultVariable', 'aNewResultVariableName');
+
+    });
+
+    it('should change, creating zeebe:CalledDecision if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const element = await expectSelected('BusinessRuleTask_empty'),
+            businessObject = getBusinessObject(element);
+      const template = templates.find(t => t.id === 'calledDecision');
+      const task = elementRegistry.get('BusinessRuleTask_empty');
+
+
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+
+      const entry = findEntry('custom-entry-calledDecision-1', container),
+            input = findInput('text', entry);
+
+      // then
+      const calledDecision = findExtension(businessObject, 'zeebe:CalledDecision');
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('aResultVariableName');
+      expect(calledDecision).to.exist;
+      expect(calledDecision).to.have.property('resultVariable', 'aResultVariableName');
+      expect(calledDecision).to.have.property('decisionId', 'aReusableRule');
+    })
+    );
+
+
+  });
+
+  // todo @yT0n1 include tests for called decision similar to called element tests
+
 
   describe('types', function() {
 
@@ -1243,11 +1312,11 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(description).to.exist;
       expect(description.innerHTML).to.eql(
         '<div class="markup">' +
-          '<div xmlns="http://www.w3.org/1999/xhtml">' +
-            'By the way, you can use ' +
-            '<a href="https://freemarker.apache.org/" target="_blank" rel="noopener">freemarker templates</a> ' +
-            'here' +
-          '</div>' +
+        '<div xmlns="http://www.w3.org/1999/xhtml">' +
+        'By the way, you can use ' +
+        '<a href="https://freemarker.apache.org/" target="_blank" rel="noopener">freemarker templates</a> ' +
+        'here' +
+        '</div>' +
         '</div>'
       );
     });
@@ -1409,11 +1478,11 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(tooltip).to.exist;
       expect(tooltip.innerHTML).to.eql(
         '<div class="markup">' +
-          '<div xmlns="http://www.w3.org/1999/xhtml">' +
-            'By the way, you can use ' +
-            '<a href="https://freemarker.apache.org/" target="_blank" rel="noopener">freemarker templates</a> ' +
-            'here' +
-          '</div>' +
+        '<div xmlns="http://www.w3.org/1999/xhtml">' +
+        'By the way, you can use ' +
+        '<a href="https://freemarker.apache.org/" target="_blank" rel="noopener">freemarker templates</a> ' +
+        'here' +
+        '</div>' +
         '</div>'
       );
     });
@@ -1932,7 +2001,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         [ getGroupById('ElementTemplates__CustomProperties-collapsed', container), false ],
         [ getGroupById('ElementTemplates__CustomProperties-open', container), true ],
         [ getGroupById('ElementTemplates__CustomProperties-unspecified', container), true ],
-        [ getGroupById('ElementTemplates__CustomProperties', container),true ]
+        [ getGroupById('ElementTemplates__CustomProperties', container), true ]
       ];
 
       // then
@@ -2371,13 +2440,13 @@ function withoutPrefix(groupId) {
 function findEntry(id, container) {
   expect(container).to.not.be.null;
 
-  return domQuery(`[data-entry-id='${ id }']`, container);
+  return domQuery(`[data-entry-id='${id}']`, container);
 }
 
 function findInput(type, container) {
   expect(container).to.not.be.null;
 
-  return domQuery(`input[type='${ type }']`, container);
+  return domQuery(`input[type='${type}']`, container);
 }
 
 function findSelect(container) {

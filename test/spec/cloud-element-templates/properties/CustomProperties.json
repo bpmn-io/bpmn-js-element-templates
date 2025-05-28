@@ -742,5 +742,40 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Decision with zeebe:calledDecision",
+    "id": "calledDecision",
+    "description": "A reusable rule template",
+    "appliesTo": [
+      "bpmn:Task",
+      "bpmn:BusinessRuleTask"
+    ],
+    "elementType": {
+      "value": "bpmn:BusinessRuleTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "aReusableRule",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "decisionId"
+        }
+      },
+      {
+        "label": "Result Variable",
+        "type": "String",
+        "value": "aResultVariableName",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "resultVariable"
+        },
+        "constraints": {
+          "notEmpty": true
+        }
+      }
+    ]
   }
 ]
