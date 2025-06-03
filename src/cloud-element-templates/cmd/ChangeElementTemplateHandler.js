@@ -1556,6 +1556,19 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBinding.linkName === newBinding.linkName && oldBinding.property === newBinding.property;
     });
   }
+
+  if (newBindingType === ZEEBE_CALLED_DECISION) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_CALLED_DECISION) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
 }
 
 /**
@@ -1658,6 +1671,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_LINKED_RESOURCE_PROPERTY) {
+    return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === ZEEBE_CALLED_DECISION) {
     return businessObject.get(bindingProperty);
   }
 }

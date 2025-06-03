@@ -21,8 +21,8 @@
       }
     },
     {
-      "value": "aResultVariableName",
-      "type": "Hidden",
+      "value": "aDefaultResultVariable",
+      "type": "String",
       "binding": {
         "type": "zeebe:calledDecision",
         "property": "resultVariable"
