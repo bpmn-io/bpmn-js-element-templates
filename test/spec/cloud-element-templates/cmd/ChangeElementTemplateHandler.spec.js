@@ -42,7 +42,6 @@ import {
   isString,
   isUndefined
 } from 'min-dash';
-import newTemplate from './called-decision.json';
 
 const modules = [
   CoreModule,
@@ -4582,8 +4581,8 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
       it('property changed', inject(function(elementRegistry) {
 
-        // given
-        const task = elementRegistry.get('withoutImplementation');
+        // given a user applies a template and updates a property
+        let task = elementRegistry.get('withoutImplementation');
 
         const oldTemplate = createTemplate([
           {
@@ -4619,23 +4618,23 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           }
         ]);
 
+        changeTemplate(task, oldTemplate);
 
-
-        // when
-        changeTemplate(task, newTemplate, oldTemplate);
-
+        task = elementRegistry.get('withoutImplementation');
         let calledDecision = findExtension(task, 'zeebe:CalledDecision');
 
         updateBusinessObject('withoutImplementation', calledDecision, {
-          decisionId: 'aDecisionID-changed',
           resultVariable: 'aResultVariable-changed'
         });
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
 
         // then
         calledDecision = findExtension(task, 'zeebe:CalledDecision');
 
         expect(calledDecision).to.exist;
-        expect(calledDecision.get('decisionId')).to.equal('aDecisionID-changed');
+        expect(calledDecision.get('decisionId')).to.equal('aDecisionID-new');
         expect(calledDecision.get('resultVariable')).to.equal('aResultVariable-changed');
       }));
 
