@@ -1010,6 +1010,72 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
   });
 
+  describe('zeebe:CalledDecision', function() {
+    it('should display', async function() {
+
+      // when
+      await expectSelected('BusinessRuleTask_called_decision');
+
+      // then
+      const entry = findEntry('custom-entry-calledDecision-1', container),
+            input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('aResultVariableName');
+    });
+
+    it('should change, setting `resultVariable`', async function() {
+
+      // given
+      const element = await expectSelected('BusinessRuleTask_called_decision'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-calledDecision-1', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'aNewResultVariableName');
+
+      // then
+      const calledDecision = findExtension(businessObject, 'zeebe:CalledDecision');
+      expect(calledDecision).to.exist;
+      expect(calledDecision).to.have.property('resultVariable', 'aNewResultVariableName');
+
+    });
+
+    it('should change, creating zeebe:CalledDecision if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const element = await expectSelected('BusinessRuleTask_empty'),
+            businessObject = getBusinessObject(element);
+      const template = templates.find(t => t.id === 'calledDecision');
+      const task = elementRegistry.get('BusinessRuleTask_empty');
+
+
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+
+      const entry = findEntry('custom-entry-calledDecision-1', container),
+            input = findInput('text', entry);
+
+      // then
+      const calledDecision = findExtension(businessObject, 'zeebe:CalledDecision');
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('aResultVariableName');
+      expect(calledDecision).to.exist;
+      expect(calledDecision).to.have.property('resultVariable', 'aResultVariableName');
+      expect(calledDecision).to.have.property('decisionId', 'aReusableRule');
+    })
+    );
+
+
+  });
 
   describe('types', function() {
 
@@ -1932,7 +1998,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         [ getGroupById('ElementTemplates__CustomProperties-collapsed', container), false ],
         [ getGroupById('ElementTemplates__CustomProperties-open', container), true ],
         [ getGroupById('ElementTemplates__CustomProperties-unspecified', container), true ],
-        [ getGroupById('ElementTemplates__CustomProperties', container),true ]
+        [ getGroupById('ElementTemplates__CustomProperties', container), true ]
       ];
 
       // then
