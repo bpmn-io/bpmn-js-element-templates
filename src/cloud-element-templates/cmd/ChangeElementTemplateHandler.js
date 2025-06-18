@@ -17,6 +17,7 @@ import {
   createOutputParameter,
   createTaskHeader,
   createZeebeProperty,
+  createFormDefinition,
   shouldUpdate
 } from '../CreateHelper';
 
@@ -33,7 +34,8 @@ import {
   ZEEBE_CALLED_DECISION,
   ZEEBE_CALLED_ELEMENT,
   ZEEBE_LINKED_RESOURCE_PROPERTY,
-  ZEEBE_USER_TASK
+  ZEEBE_USER_TASK,
+  ZEEBE_FORM_DEFINITION
 } from '../util/bindingTypes';
 
 import {
@@ -114,6 +116,8 @@ export default class ChangeElementTemplateHandler {
       this._updateZeebeUserTask(element, newTemplate);
 
       this._updateCalledDecision(element, oldTemplate, newTemplate);
+
+      this._updateZeebeFormDefinition(element, oldTemplate, newTemplate);
     }
   }
 
@@ -1099,6 +1103,103 @@ export default class ChangeElementTemplateHandler {
   };
 
   /**
+   * @param {djs.model.Base} element
+   * @param {Object} oldTemplate
+   * @param {Object} newTemplate
+   */
+  _updateZeebeFormDefinition = function(element, oldTemplate, newTemplate) {
+    const bpmnFactory = this._bpmnFactory,
+          commandStack = this._commandStack;
+
+    const newProperties = newTemplate.properties.filter((newProperty) => {
+      const newBinding = newProperty.binding,
+            newBindingType = newBinding.type;
+
+      return newBindingType === ZEEBE_FORM_DEFINITION;
+    });
+
+    const businessObject = this._getOrCreateExtensionElements(element);
+    let formDefinition = findExtension(businessObject, 'zeebe:FormDefinition');
+
+    // (1) remove old form definition if no new properties specified
+    if (!newProperties.length) {
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: businessObject,
+        properties: {
+          values: without(businessObject.get('values'), formDefinition)
+        }
+      });
+
+      return;
+    }
+
+
+    newProperties.forEach((newProperty) => {
+      const oldProperty = findOldProperty(oldTemplate, newProperty),
+            newPropertyValue = getDefaultValue(newProperty),
+            propertyName = newProperty.binding.property;
+
+      // (2) update old form definition
+      if (formDefinition) {
+
+        if (!shouldKeepValue(formDefinition, oldProperty, newProperty)) {
+          const properties = {
+            [propertyName]: newPropertyValue
+          };
+
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: formDefinition,
+            properties
+          });
+        }
+      }
+
+      // (3) add new form definition
+      else {
+        const properties = {
+          [propertyName]: newPropertyValue
+        };
+
+        formDefinition = createFormDefinition(bpmnFactory, properties);
+
+        formDefinition.$parent = businessObject;
+
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: businessObject,
+          properties: {
+            values: [ ...businessObject.get('values'), formDefinition ]
+          }
+        });
+      }
+    });
+
+    // (4) remove properties no longer templated
+    const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      return oldBindingType === ZEEBE_FORM_DEFINITION && !newProperties.find(
+        (newProperty) => newProperty.binding.property === oldProperty.binding.property
+      );
+    }) || [];
+
+    oldProperties.forEach((oldProperty) => {
+      const properties = {
+        [oldProperty.binding.property]: undefined
+      };
+
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: formDefinition,
+        properties
+      });
+    });
+  };
+
+  /**
    * Generic handler for updating extension elements that are single instances with properties.
    *
    * @example
@@ -1456,6 +1557,19 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
     });
   }
+
+  if (newBindingType === ZEEBE_FORM_DEFINITION) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_FORM_DEFINITION) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
 }
 
 /**
@@ -1562,6 +1676,11 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_CALLED_DECISION) {
+    return businessObject.get(bindingProperty);
+  }
+
+  // todo: why is this not defined for called elements?
+  if (bindingType === ZEEBE_FORM_DEFINITION) {
     return businessObject.get(bindingProperty);
   }
 }

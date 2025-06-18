@@ -1114,10 +1114,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     it('should change, creating zeebe:FormDefinition if non-existing', inject(async function(elementTemplates, elementRegistry) {
 
       // given
-      const element = await expectSelected('Task_1'),
-            businessObject = getBusinessObject(element);
       const template = templates.find(t => t.id === 'form-definition-template');
-      const task = elementRegistry.get('Task_1');
+      let task = elementRegistry.get('Task_1');
 
 
 
@@ -1129,8 +1127,10 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-form-definition-template-1', container),
             input = findInput('text', entry);
 
+      task = elementRegistry.get('Task_1');
+      const formDefinition = findExtension(getBusinessObject(task), 'zeebe:FormDefinition');
+
       // then
-      const formDefinition = findExtension(businessObject, 'zeebe:FormDefinition');
 
       expect(entry).to.exist;
       expect(input).to.exist;

@@ -109,6 +109,10 @@ export function createCalledElement(attrs = {}, bpmnFactory) {
   return bpmnFactory.create('zeebe:CalledElement', attrs);
 }
 
+export function createFormDefinition(bpmnFactor, attrs = {}) {
+  return bpmnFactor.create('zeebe:FormDefinition', attrs);
+}
+
 /**
  * Create a called decision representing the given value.
  *

@@ -5005,7 +5005,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         let formDefinition = findExtension(task, 'zeebe:FormDefinition');
 
         updateBusinessObject('Camunda_user_Task_no_implementation', formDefinition, {
-          resultVariable: 'anExternalFormReference-changed'
+          externalReference: 'anExternalFormReference-changed'
         });
 
         // when
