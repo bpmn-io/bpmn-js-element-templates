@@ -1,0 +1,42 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Visa Application Form",
+  "id": "visa-application-user-task",
+  "category": {
+    "id": "custom-user-tasks",
+    "name": "Custom User Tasks"
+  },
+  "appliesTo": [
+    "bpmn:Task"
+  ],
+  "elementType": {
+    "value": "bpmn:UserTask"
+  },
+  "properties": [
+    {
+      "type": "Hidden",
+      "binding": {
+        "type": "zeebe:userTask"
+      }
+    },
+    {
+      "label": "Application Form Type",
+      "type": "Dropdown",
+      "choices": [
+        {
+          "name": "ESTA",
+          "value": "esta"
+        },
+        {
+          "name": "Generic Visa Application",
+          "value": "genericVisaApplication"
+        }
+      ],
+      "value": "esta",
+      "binding": {
+        "type": "zeebe:formDefinition",
+        "property": "formId"
+      }
+    }
+  ]
+}
