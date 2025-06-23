@@ -1182,14 +1182,16 @@ export default class ChangeElementTemplateHandler {
     // (4) Remove properties no longer templated
     const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
       const oldBinding = oldProperty.binding,
-            oldBindingType = oldBinding.type;
+            oldBindingType = oldBinding.type,
+            oldPropertyName = getPropertyName(oldBinding);
+
       return bindingTypes.includes(oldBindingType) &&
-        !newProperties.find((newProperty) => newProperty.binding.property === oldProperty.binding.property);
+        !newProperties.find((newProperty) => oldPropertyName === getPropertyName(newProperty.binding));
     }) || [];
 
     oldProperties.forEach((oldProperty) => {
       const properties = {
-        [oldProperty.binding.property]: undefined
+        [getPropertyName(oldProperty.binding)]: undefined
       };
 
       commandStack.execute('element.updateModdleProperties', {

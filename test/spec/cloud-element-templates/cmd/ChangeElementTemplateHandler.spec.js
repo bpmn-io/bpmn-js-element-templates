@@ -352,7 +352,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(taskDefinition.$parent).to.equal(getBusinessObject(task).get('extensionElements'));
         }));
 
-        it('should handle zeebe:taskDefinition to zeebe:taskDefinition:type change', inject(function(elementRegistry) {
+        it('should handle `zeebe:taskDefinition:type` to `zeebe:taskDefinition` change', inject(function(elementRegistry) {
           const oldTemplate = createTemplate({
             type: 'Hidden',
             value: 'task-def-without-type',
