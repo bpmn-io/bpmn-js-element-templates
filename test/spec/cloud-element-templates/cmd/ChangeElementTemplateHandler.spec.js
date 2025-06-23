@@ -352,21 +352,21 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(taskDefinition.$parent).to.equal(getBusinessObject(task).get('extensionElements'));
         }));
 
-        it('should remove zeebe:taskDefinition:type', inject(function(elementRegistry) {
+        it('should handle zeebe:taskDefinition to zeebe:taskDefinition:type change', inject(function(elementRegistry) {
           const oldTemplate = createTemplate({
-            type: 'String',
-            value: 'task-def-with-type',
+            type: 'Hidden',
+            value: 'task-def-without-type',
             binding: {
-              type: 'zeebe:taskDefinition:type'
+              type: 'zeebe:taskDefinition',
+              property: 'type'
             }
           });
 
           const newTemplate = createTemplate({
-            type: 'String',
-            value: 'task-def-without-type',
+            type: 'Hidden',
+            value: 'task-def-with-type',
             binding: {
-              type: 'zeebe:property',
-              name: 'id'
+              type: 'zeebe:taskDefinition:type',
             }
           });
 
@@ -380,7 +380,9 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           // then
           const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
 
-          expect(taskDefinition).to.not.exist;
+          expect(taskDefinition).to.exist;
+          expect(taskDefinition.get('type')).to.equal('task-def-with-type');
+
 
         }));
 
