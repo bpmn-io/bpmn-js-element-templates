@@ -44,6 +44,7 @@ export function NumberProperty(props) {
     debounce,
     element,
     getValue,
+    step: 'any',
     id,
     label,
     description: PropertyDescription({ description }),
