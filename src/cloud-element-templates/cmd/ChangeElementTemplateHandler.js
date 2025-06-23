@@ -109,6 +109,8 @@ export default class ChangeElementTemplateHandler {
       this._updateCalledElement(element, oldTemplate, newTemplate);
 
       this._updateLinkedResources(element, oldTemplate, newTemplate);
+
+      this._updateZeebeUserTask(element, newTemplate);
     }
   }
 
@@ -1166,6 +1168,28 @@ export default class ChangeElementTemplateHandler {
       });
     });
   }
+
+  _updateZeebeUserTask = function(element, newTemplate) {
+
+    const commandStack = this._commandStack;
+
+    // check if element has zeebe:UserTask extension element
+    const extensionElements = getBusinessObject(element).get('extensionElements');
+    const userTaskExtension = findExtension(element, 'zeebe:UserTask');
+
+    // remove zeebe:UserTask (not supported in v2.5.x)
+    if (userTaskExtension) {
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: extensionElements,
+        properties: {
+          values: without(extensionElements.get('values'), userTaskExtension)
+        }
+      });
+
+      return;
+    }
+  };
 
 }
 
