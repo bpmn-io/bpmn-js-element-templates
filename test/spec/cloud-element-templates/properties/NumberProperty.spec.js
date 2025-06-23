@@ -198,6 +198,16 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
     });
 
 
+    it('should allow decimal values', async function() {
+
+      // when
+      await changeInput(input, '123.34');
+
+      // then
+      expectZeebeProperty('static', 'NumberProperty', '=123.34');
+    });
+
+
     it('should not accept scientific notation', async function() {
 
       // when
