@@ -1110,13 +1110,21 @@ export default class ChangeElementTemplateHandler {
    */
   _updateSingleExtensionElement(element, oldTemplate, newTemplate, opts) {
     const { bindingTypes, extensionType, getPropertyName } = opts;
-    const commandStack = this._commandStack;
-    const businessObject = this._getOrCreateExtensionElements(element);
+    const bpmnFactory = this._bpmnFactory,
+          commandStack = this._commandStack;
 
-    const newProperties = newTemplate.properties.filter((newProperty) => bindingTypes.includes(newProperty.binding.type));
+    const newProperties = newTemplate.properties.filter((newProperty) => {
+      const newBinding = newProperty.binding,
+            newBindingType = newBinding.type;
+
+      return bindingTypes.includes(newBindingType);
+    });
+
+    const businessObject = this._getOrCreateExtensionElements(element);
     let extension = findExtension(businessObject, extensionType);
 
     // (1) Remove extension if no new properties
+
     if (!newProperties.length) {
       commandStack.execute('element.updateModdleProperties', {
         element,
@@ -1133,12 +1141,16 @@ export default class ChangeElementTemplateHandler {
     newProperties.forEach((newProperty) => {
       const oldProperty = findOldProperty(oldTemplate, newProperty),
             newPropertyValue = getDefaultValue(newProperty),
-            propertyName = getPropertyName(newProperty.binding);
+            newBinding = newProperty.binding,
+            propertyName = getPropertyName(newBinding);
 
       // (2) Update old extension with new property values
       if (extension) {
+
         if (!shouldKeepValue(extension, oldProperty, newProperty)) {
-          const properties = { [propertyName]: newPropertyValue };
+          const properties = {
+            [propertyName]: newPropertyValue
+          };
           commandStack.execute('element.updateModdleProperties', {
             element,
             moddleElement: extension,
@@ -1149,9 +1161,14 @@ export default class ChangeElementTemplateHandler {
 
       // (3) Add new extension with properties if it does not exist
       else {
-        const properties = { [propertyName]: newPropertyValue };
-        extension = this._bpmnFactory.create(extensionType, properties);
+        const properties = {
+          [propertyName]: newPropertyValue
+        };
+
+        extension = bpmnFactory.create(extensionType, properties);
+
         extension.$parent = businessObject;
+
         commandStack.execute('element.updateModdleProperties', {
           element,
           moddleElement: businessObject,
@@ -1164,13 +1181,17 @@ export default class ChangeElementTemplateHandler {
 
     // (4) Remove properties no longer templated
     const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
-      const oldBinding = oldProperty.binding;
-      return bindingTypes.includes(oldBinding.type) &&
-        !newProperties.find((newProperty) => getPropertyName(newProperty.binding) === getPropertyName(oldBinding));
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+      return bindingTypes.includes(oldBindingType) &&
+        !newProperties.find((newProperty) => newProperty.binding.property === oldProperty.binding.property);
     }) || [];
 
     oldProperties.forEach((oldProperty) => {
-      const properties = { [getPropertyName(oldProperty.binding)]: undefined };
+      const properties = {
+        [oldProperty.binding.property]: undefined
+      };
+
       commandStack.execute('element.updateModdleProperties', {
         element,
         moddleElement: extension,
@@ -1178,7 +1199,6 @@ export default class ChangeElementTemplateHandler {
       });
     });
   }
-
 }
 
 ChangeElementTemplateHandler.$inject = [
