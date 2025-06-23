@@ -1078,6 +1078,30 @@ export default class ChangeElementTemplateHandler {
 
   /**
    * Generic handler for updating extension elements that are single instances with properties.
+   *
+   * @example
+   * For this template
+   * ```json
+   * {
+   *   properties: [
+   *    { binding: { type: 'zeebe:taskDefinition', property: 'type' ]}, value: 'myTaskType' },
+   *    {binding: { type: 'zeebe:taskDefinition', property: 'retries' }, value: 3
+   *   ]
+   * }
+   *```
+   * `getPropertyName` should return `binding.property`.
+   *
+   * `bindingTypes` should be an array of binding types to consider, e.g. `['zeebe:taskDefinition']`.
+   *
+   * `extensionType` should be the type of the extension element to update, e.g. `'zeebe:TaskDefinition'`.
+   *
+   * The resulting XML will look like this:
+   *
+   * ```xml
+   * <bpmn:extensionElements>
+   *   <zeebe:taskDefinition type="myTaskType" retries="3" />
+   * </bpmn:extensionElements>
+   *```
    * @param {djs.model.Base} element
    * @param {Object} oldTemplate
    * @param {Object} newTemplate
