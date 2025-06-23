@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.5.4
+
+* `FIX`: disable default Camunda user task implementation in templates ([#159](https://github.com/bpmn-io/bpmn-js-element-templates/pull/159))
+
 ## 2.5.3
 
 * `FIX`: keep documentation and execution listeners when template is removed ([#120](https://github.com/bpmn-io/bpmn-js-element-templates/pull/120))

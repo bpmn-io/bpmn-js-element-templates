@@ -1110,6 +1110,38 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should not create <zeebe:UserTask> for a templated element', inject(function(elementTemplates) {
+
+      // given
+      const template = require('./fixtures/user-task-no-binding.json');
+
+      // when
+      const task = elementTemplates.createElement(template);
+
+      // then
+      const updatedUserTask = findExtension(task, 'zeebe:UserTask');
+      expect(updatedUserTask).to.not.exist;
+    }));
+
+
+    it('should remove <zeebe:UserTask> when template is applied', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const templates = [
+        require('./fixtures/user-task-no-binding.json')
+      ];
+      elementTemplates.set(templates);
+      const task = elementRegistry.get('UserTask_1');
+
+      // when
+      const updatedTask = elementTemplates.applyTemplate(task, templates[0]);
+
+      // then
+      const updatedUserTask = findExtension(updatedTask, 'zeebe:UserTask');
+      expect(updatedUserTask).to.not.exist;
+    }));
+
+
     it('should fire elementTemplates.apply event', inject(function(elementRegistry, elementTemplates, eventBus) {
 
       // given
