@@ -13,10 +13,8 @@ import {
 } from '../Helper';
 
 import {
-  createCalledElement,
   createInputParameter,
   createOutputParameter,
-  createTaskDefinition,
   createTaskHeader,
   createZeebeProperty,
   shouldUpdate
