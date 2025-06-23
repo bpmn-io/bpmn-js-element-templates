@@ -1113,7 +1113,7 @@ export default class ChangeElementTemplateHandler {
     const commandStack = this._commandStack;
     const businessObject = this._getOrCreateExtensionElements(element);
 
-    const newProperties = newTemplate.properties.filter((newProperties) => bindingTypes.includes(newProperties.binding.type));
+    const newProperties = newTemplate.properties.filter((newProperty) => bindingTypes.includes(newProperty.binding.type));
     let extension = findExtension(businessObject, extensionType);
 
     // (1) Remove extension if no new properties
