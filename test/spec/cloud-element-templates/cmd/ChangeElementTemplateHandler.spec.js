@@ -386,6 +386,76 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         }));
 
+        it('should remove zeebe:taskDefinition:type', inject(function(elementRegistry) {
+          const oldTemplate = createTemplate({
+            type: 'Hidden',
+            value: 'task-def-with-type',
+            binding: {
+              type: 'zeebe:taskDefinition:type'
+            }
+          });
+
+          const newTemplate = createTemplate([]);
+
+          let task = elementRegistry.get('Task_1');
+
+          // when
+          task = changeTemplate(task, oldTemplate);
+
+          task = changeTemplate(task, newTemplate, oldTemplate);
+
+          // then
+          const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+          expect(taskDefinition).not.to.exist;
+
+        }));
+
+        it('should remove unused properties', inject(function(elementRegistry) {
+          const oldTemplate = createTemplate([
+            {
+              type: 'Hidden',
+              value: 5,
+              binding: {
+                type: 'zeebe:taskDefinition',
+                property: 'retries'
+              }
+            },
+            {
+              type: 'Hidden',
+              value: 'a-task-type',
+              binding: {
+                type: 'zeebe:taskDefinition',
+                property: 'taskType'
+              }
+            }
+          ]);
+
+          const newTemplate = createTemplate(
+            {
+              type: 'Hidden',
+              value: 'a-new-task-type',
+              binding: {
+                type: 'zeebe:taskDefinition',
+                property: 'taskType'
+              }
+            });
+
+          let task = elementRegistry.get('Task_1');
+
+          // when
+          task = changeTemplate(task, oldTemplate);
+
+          task = changeTemplate(task, newTemplate, oldTemplate);
+
+          // then
+          const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+          expect(taskDefinition).to.exist;
+          expect(taskDefinition.get('retries')).to.not.exist;
+          expect(taskDefinition.get('taskType')).to.equal('a-new-task-type');
+        }));
+
+
       });
 
 
