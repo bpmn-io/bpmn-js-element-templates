@@ -1082,8 +1082,8 @@ export default class ChangeElementTemplateHandler {
    * ```json
    * {
    *   properties: [
-   *    { binding: { type: 'zeebe:taskDefinition', property: 'type' ]}, value: 'myTaskType' },
-   *    {binding: { type: 'zeebe:taskDefinition', property: 'retries' }, value: 3
+   *    { binding: { type: 'zeebe:taskDefinition', property: 'type' }, value: 'myTaskType' },
+   *    {binding: { type: 'zeebe:taskDefinition', property: 'retries' }, value: 3}
    *   ]
    * }
    *```
@@ -1121,7 +1121,7 @@ export default class ChangeElementTemplateHandler {
     });
 
     const businessObject = this._getOrCreateExtensionElements(element);
-    let extension = findExtension(businessObject, extensionType);
+    let extensionElement = findExtension(businessObject, extensionType);
 
     // (1) Remove extension if no new properties
 
@@ -1130,7 +1130,7 @@ export default class ChangeElementTemplateHandler {
         element,
         moddleElement: businessObject,
         properties: {
-          values: without(businessObject.get('values'), extension)
+          values: without(businessObject.get('values'), extensionElement)
         }
       });
 
@@ -1145,15 +1145,15 @@ export default class ChangeElementTemplateHandler {
             propertyName = getPropertyName(newBinding);
 
       // (2) Update old extension with new property values
-      if (extension) {
+      if (extensionElement) {
 
-        if (!shouldKeepValue(extension, oldProperty, newProperty)) {
+        if (!shouldKeepValue(extensionElement, oldProperty, newProperty)) {
           const properties = {
             [propertyName]: newPropertyValue
           };
           commandStack.execute('element.updateModdleProperties', {
             element,
-            moddleElement: extension,
+            moddleElement: extensionElement,
             properties
           });
         }
@@ -1165,15 +1165,15 @@ export default class ChangeElementTemplateHandler {
           [propertyName]: newPropertyValue
         };
 
-        extension = bpmnFactory.create(extensionType, properties);
+        extensionElement = bpmnFactory.create(extensionType, properties);
 
-        extension.$parent = businessObject;
+        extensionElement.$parent = businessObject;
 
         commandStack.execute('element.updateModdleProperties', {
           element,
           moddleElement: businessObject,
           properties: {
-            values: [ ...businessObject.get('values'), extension ]
+            values: [ ...businessObject.get('values'), extensionElement ]
           }
         });
       }
@@ -1196,7 +1196,7 @@ export default class ChangeElementTemplateHandler {
 
       commandStack.execute('element.updateModdleProperties', {
         element,
-        moddleElement: extension,
+        moddleElement: extensionElement,
         properties
       });
     });
