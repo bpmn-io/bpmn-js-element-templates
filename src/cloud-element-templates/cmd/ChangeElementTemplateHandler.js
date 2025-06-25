@@ -13,10 +13,8 @@ import {
 } from '../Helper';
 
 import {
-  createCalledElement,
   createInputParameter,
   createOutputParameter,
-  createTaskDefinition,
   createTaskHeader,
   createZeebeProperty,
   shouldUpdate
@@ -232,95 +230,16 @@ export default class ChangeElementTemplateHandler {
    * @param {Object} newTemplate
    */
   _updateZeebeTaskDefinition(element, oldTemplate, newTemplate) {
-    const bpmnFactory = this._bpmnFactory,
-          commandStack = this._commandStack;
-
-    const newProperties = newTemplate.properties.filter((newProperty) => {
-      const newBinding = newProperty.binding,
-            newBindingType = newBinding.type;
-
-      return TASK_DEFINITION_TYPES.includes(newBindingType);
-    });
-
-    const businessObject = this._getOrCreateExtensionElements(element);
-    let taskDefinition = findExtension(businessObject, 'zeebe:TaskDefinition');
-
-    // (1) remove old task definition if no new properties specified
-
-    if (!newProperties.length) {
-      commandStack.execute('element.updateModdleProperties', {
-        element,
-        moddleElement: businessObject,
-        properties: {
-          values: without(businessObject.get('values'), taskDefinition)
-        }
-      });
-
-      return;
-    }
-
-
-    newProperties.forEach((newProperty) => {
-      const oldProperty = findOldProperty(oldTemplate, newProperty),
-            newPropertyValue = getDefaultValue(newProperty),
-            newBinding = newProperty.binding,
-            propertyName = getTaskDefinitionPropertyName(newBinding);
-
-      // (2) update old task definition
-      if (taskDefinition) {
-
-        if (!shouldKeepValue(taskDefinition, oldProperty, newProperty)) {
-          const properties = {
-            [propertyName]: newPropertyValue
-          };
-
-          commandStack.execute('element.updateModdleProperties', {
-            element,
-            moddleElement: taskDefinition,
-            properties
-          });
-        }
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: TASK_DEFINITION_TYPES,
+        extensionType: 'zeebe:TaskDefinition',
+        getPropertyName: getTaskDefinitionPropertyName
       }
-
-      // (3) add new task definition
-      else {
-        const properties = {
-          [propertyName]: newPropertyValue
-        };
-
-        taskDefinition = createTaskDefinition(properties, bpmnFactory);
-
-        taskDefinition.$parent = businessObject;
-
-        commandStack.execute('element.updateModdleProperties', {
-          element,
-          moddleElement: businessObject,
-          properties: {
-            values: [ ...businessObject.get('values'), taskDefinition ]
-          }
-        });
-      }
-    });
-
-    // (4) remove properties no longer templated
-    const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
-      const oldBinding = oldProperty.binding,
-            oldBindingType = oldBinding.type;
-
-      return TASK_DEFINITION_TYPES.includes(oldBindingType) && !newProperties.find((newProperty) => newProperty.binding.property === oldProperty.binding.property);
-    }) || [];
-
-    oldProperties.forEach((oldProperty) => {
-      const properties = {
-        [oldProperty.binding.property]: undefined
-      };
-
-      commandStack.execute('element.updateModdleProperties', {
-        element,
-        moddleElement: taskDefinition,
-        properties
-      });
-    });
+    );
   }
 
   /**
@@ -930,95 +849,16 @@ export default class ChangeElementTemplateHandler {
    * @param {Object} newTemplate
    */
   _updateCalledElement(element, oldTemplate, newTemplate) {
-    const bpmnFactory = this._bpmnFactory,
-          commandStack = this._commandStack;
-
-    const newProperties = newTemplate.properties.filter((newProperty) => {
-      const newBinding = newProperty.binding,
-            newBindingType = newBinding.type;
-
-      return newBindingType === ZEEBE_CALLED_ELEMENT;
-    });
-
-    const businessObject = this._getOrCreateExtensionElements(element);
-    let calledElement = findExtension(businessObject, 'zeebe:CalledElement');
-
-    // (1) remove old called element if no new properties specified
-    if (!newProperties.length) {
-      commandStack.execute('element.updateModdleProperties', {
-        element,
-        moddleElement: businessObject,
-        properties: {
-          values: without(businessObject.get('values'), calledElement)
-        }
-      });
-
-      return;
-    }
-
-
-    newProperties.forEach((newProperty) => {
-      const oldProperty = findOldProperty(oldTemplate, newProperty),
-            newPropertyValue = getDefaultValue(newProperty),
-            propertyName = newProperty.binding.property;
-
-      // (2) update old called element
-      if (calledElement) {
-
-        if (!shouldKeepValue(calledElement, oldProperty, newProperty)) {
-          const properties = {
-            [propertyName]: newPropertyValue
-          };
-
-          commandStack.execute('element.updateModdleProperties', {
-            element,
-            moddleElement: calledElement,
-            properties
-          });
-        }
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: [ ZEEBE_CALLED_ELEMENT ],
+        extensionType: 'zeebe:CalledElement',
+        getPropertyName: (binding) => binding.property
       }
-
-      // (3) add new called element
-      else {
-        const properties = {
-          [propertyName]: newPropertyValue
-        };
-
-        calledElement = createCalledElement(properties, bpmnFactory);
-
-        calledElement.$parent = businessObject;
-
-        commandStack.execute('element.updateModdleProperties', {
-          element,
-          moddleElement: businessObject,
-          properties: {
-            values: [ ...businessObject.get('values'), calledElement ]
-          }
-        });
-      }
-    });
-
-    // (4) remove properties no longer templated
-    const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
-      const oldBinding = oldProperty.binding,
-            oldBindingType = oldBinding.type;
-
-      return oldBindingType === ZEEBE_CALLED_ELEMENT && !newProperties.find(
-        (newProperty) => newProperty.binding.property === oldProperty.binding.property
-      );
-    }) || [];
-
-    oldProperties.forEach((oldProperty) => {
-      const properties = {
-        [oldProperty.binding.property]: undefined
-      };
-
-      commandStack.execute('element.updateModdleProperties', {
-        element,
-        moddleElement: calledElement,
-        properties
-      });
-    });
+    );
   }
 
   /**
@@ -1234,6 +1074,133 @@ export default class ChangeElementTemplateHandler {
     });
   };
 
+  /**
+   * Generic handler for updating extension elements that are single instances with properties.
+   *
+   * @example
+   * For this template
+   * ```json
+   * {
+   *   properties: [
+   *    { binding: { type: 'zeebe:taskDefinition', property: 'type' }, value: 'myTaskType' },
+   *    {binding: { type: 'zeebe:taskDefinition', property: 'retries' }, value: 3}
+   *   ]
+   * }
+   *```
+   * `getPropertyName` should return `binding.property`.
+   *
+   * `bindingTypes` should be an array of binding types to consider, e.g. `['zeebe:taskDefinition']`.
+   *
+   * `extensionType` should be the type of the extension element to update, e.g. `'zeebe:TaskDefinition'`.
+   *
+   * The resulting XML will look like this:
+   *
+   * ```xml
+   * <bpmn:extensionElements>
+   *   <zeebe:taskDefinition type="myTaskType" retries="3" />
+   * </bpmn:extensionElements>
+   *```
+   * @param {djs.model.Base} element
+   * @param {Object} oldTemplate
+   * @param {Object} newTemplate
+   * @param {Object} opts
+   * @param {Array<string>} opts.bindingTypes - binding types to consider
+   * @param {string} opts.extensionType - type of the extension element to update
+   * @param {(binding:object) => string} opts.getPropertyName - function to get the property name for the binding
+   */
+  _updateSingleExtensionElement(element, oldTemplate, newTemplate, opts) {
+    const { bindingTypes, extensionType, getPropertyName } = opts;
+    const bpmnFactory = this._bpmnFactory,
+          commandStack = this._commandStack;
+
+    const newProperties = newTemplate.properties.filter((newProperty) => {
+      const newBinding = newProperty.binding,
+            newBindingType = newBinding.type;
+
+      return bindingTypes.includes(newBindingType);
+    });
+
+    const businessObject = this._getOrCreateExtensionElements(element);
+    let extensionElement = findExtension(businessObject, extensionType);
+
+    // (1) Remove extension if no new properties
+
+    if (!newProperties.length) {
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: businessObject,
+        properties: {
+          values: without(businessObject.get('values'), extensionElement)
+        }
+      });
+
+      return;
+    }
+
+    // If there are new properties:
+    newProperties.forEach((newProperty) => {
+      const oldProperty = findOldProperty(oldTemplate, newProperty),
+            newPropertyValue = getDefaultValue(newProperty),
+            newBinding = newProperty.binding,
+            propertyName = getPropertyName(newBinding);
+
+      // (2) Update old extension with new property values
+      if (extensionElement) {
+
+        if (!shouldKeepValue(extensionElement, oldProperty, newProperty)) {
+          const properties = {
+            [propertyName]: newPropertyValue
+          };
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: extensionElement,
+            properties
+          });
+        }
+      }
+
+      // (3) Add new extension with properties if it does not exist
+      else {
+        const properties = {
+          [propertyName]: newPropertyValue
+        };
+
+        extensionElement = bpmnFactory.create(extensionType, properties);
+
+        extensionElement.$parent = businessObject;
+
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: businessObject,
+          properties: {
+            values: [ ...businessObject.get('values'), extensionElement ]
+          }
+        });
+      }
+    });
+
+    // (4) Remove properties no longer templated
+    const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type,
+            oldPropertyName = getPropertyName(oldBinding);
+
+      return bindingTypes.includes(oldBindingType) &&
+        !newProperties.find((newProperty) => oldPropertyName === getPropertyName(newProperty.binding));
+    }) || [];
+
+    oldProperties.forEach((oldProperty) => {
+      const properties = {
+        [ getPropertyName(oldProperty.binding) ]: undefined
+      };
+
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: extensionElement,
+        properties
+      });
+    });
+  }
 }
 
 ChangeElementTemplateHandler.$inject = [
