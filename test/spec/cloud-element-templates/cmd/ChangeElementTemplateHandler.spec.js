@@ -352,7 +352,10 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(taskDefinition.$parent).to.equal(getBusinessObject(task).get('extensionElements'));
         }));
 
+
         it('should handle `zeebe:taskDefinition:type` to `zeebe:taskDefinition` change', inject(function(elementRegistry) {
+
+          // given
           const oldTemplate = createTemplate({
             type: 'Hidden',
             value: 'task-def-without-type',
@@ -382,11 +385,12 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           expect(taskDefinition).to.exist;
           expect(taskDefinition.get('type')).to.equal('task-def-with-type');
-
-
         }));
 
+
         it('should remove zeebe:taskDefinition:type', inject(function(elementRegistry) {
+
+          // given
           const oldTemplate = createTemplate({
             type: 'Hidden',
             value: 'task-def-with-type',
@@ -408,10 +412,12 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
 
           expect(taskDefinition).not.to.exist;
-
         }));
 
+
         it('should remove unused properties', inject(function(elementRegistry) {
+
+          // given
           const oldTemplate = createTemplate([
             {
               type: 'Hidden',
@@ -454,8 +460,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(taskDefinition.get('retries')).to.not.exist;
           expect(taskDefinition.get('taskType')).to.equal('a-new-task-type');
         }));
-
-
       });
 
 

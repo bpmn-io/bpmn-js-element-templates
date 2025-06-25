@@ -1191,7 +1191,7 @@ export default class ChangeElementTemplateHandler {
 
     oldProperties.forEach((oldProperty) => {
       const properties = {
-        [getPropertyName(oldProperty.binding)]: undefined
+        [ getPropertyName(oldProperty.binding) ]: undefined
       };
 
       commandStack.execute('element.updateModdleProperties', {
