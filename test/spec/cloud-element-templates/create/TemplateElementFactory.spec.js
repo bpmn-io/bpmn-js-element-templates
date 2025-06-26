@@ -530,6 +530,27 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       expect(userTask).to.exist;
     }));
 
+    it('should handle <zeebe:calledDecision>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('calledDecision');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const calledDecision = findExtension(bo, 'zeebe:CalledDecision');
+
+      expect(calledDecision).to.exist;
+      expect(calledDecision).to.jsonEqual({
+        $type: 'zeebe:CalledDecision',
+        decisionId: 'aDecisionId',
+        resultVariable: 'aResultVariableName',
+      });
+    }));
+
+
   });
 
 
