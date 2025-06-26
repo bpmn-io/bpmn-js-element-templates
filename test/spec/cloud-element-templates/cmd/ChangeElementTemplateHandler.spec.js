@@ -2395,13 +2395,52 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(calledDecision).to.have.property('resultVariable', 'aResultVariable');
       }));
 
-      it('should discard', inject(function(elementRegistry) {
+      it('discards `taskDefinition` without template', inject(function(elementRegistry) {
 
         // given
         const task = elementRegistry.get('withTaskDefinition');
 
         // when
         changeTemplate(task, newTemplate);
+
+        // then
+        expectElementTemplate(task, 'calledDecision');
+
+        const calledDecision = findExtension(task, 'zeebe:CalledDecision');
+
+        expect(calledDecision).to.exist;
+
+        const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+        expect(taskDefinition).to.not.exist;
+      }));
+
+      it('discards `taskDefinition` with template', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('withTaskDefinition');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'unrelated',
+            binding: {
+              type: 'zeebe:taskDefinition',
+              property: 'type'
+            }
+          },
+          {
+            value: 3,
+            binding: {
+              type: 'zeebe:taskDefinition',
+              property: 'retries'
+            }
+          }
+        ]);
+
+        task = changeTemplate(task, oldTemplate);
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
 
         // then
         expectElementTemplate(task, 'calledDecision');
