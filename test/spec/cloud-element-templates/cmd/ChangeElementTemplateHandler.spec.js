@@ -352,6 +352,114 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(taskDefinition.$parent).to.equal(getBusinessObject(task).get('extensionElements'));
         }));
 
+
+        it('should handle `zeebe:taskDefinition:type` to `zeebe:taskDefinition` change', inject(function(elementRegistry) {
+
+          // given
+          const oldTemplate = createTemplate({
+            type: 'Hidden',
+            value: 'task-def-without-type',
+            binding: {
+              type: 'zeebe:taskDefinition',
+              property: 'type'
+            }
+          });
+
+          const newTemplate = createTemplate({
+            type: 'Hidden',
+            value: 'task-def-with-type',
+            binding: {
+              type: 'zeebe:taskDefinition:type',
+            }
+          });
+
+          let task = elementRegistry.get('Task_1');
+
+          // when
+          task = changeTemplate(task, oldTemplate);
+
+          task = changeTemplate(task, newTemplate, oldTemplate);
+
+          // then
+          const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+          expect(taskDefinition).to.exist;
+          expect(taskDefinition.get('type')).to.equal('task-def-with-type');
+        }));
+
+
+        it('should remove zeebe:taskDefinition:type', inject(function(elementRegistry) {
+
+          // given
+          const oldTemplate = createTemplate({
+            type: 'Hidden',
+            value: 'task-def-with-type',
+            binding: {
+              type: 'zeebe:taskDefinition:type'
+            }
+          });
+
+          const newTemplate = createTemplate([]);
+
+          let task = elementRegistry.get('Task_1');
+
+          // when
+          task = changeTemplate(task, oldTemplate);
+
+          task = changeTemplate(task, newTemplate, oldTemplate);
+
+          // then
+          const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+          expect(taskDefinition).not.to.exist;
+        }));
+
+
+        it('should remove unused properties', inject(function(elementRegistry) {
+
+          // given
+          const oldTemplate = createTemplate([
+            {
+              type: 'Hidden',
+              value: 5,
+              binding: {
+                type: 'zeebe:taskDefinition',
+                property: 'retries'
+              }
+            },
+            {
+              type: 'Hidden',
+              value: 'a-task-type',
+              binding: {
+                type: 'zeebe:taskDefinition',
+                property: 'taskType'
+              }
+            }
+          ]);
+
+          const newTemplate = createTemplate(
+            {
+              type: 'Hidden',
+              value: 'a-new-task-type',
+              binding: {
+                type: 'zeebe:taskDefinition',
+                property: 'taskType'
+              }
+            });
+
+          let task = elementRegistry.get('Task_1');
+
+          // when
+          task = changeTemplate(task, oldTemplate);
+
+          task = changeTemplate(task, newTemplate, oldTemplate);
+
+          // then
+          const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+          expect(taskDefinition).to.exist;
+          expect(taskDefinition.get('retries')).to.not.exist;
+          expect(taskDefinition.get('taskType')).to.equal('a-new-task-type');
+        }));
       });
 
 
@@ -463,6 +571,46 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
               target: 'output-2-target'
             }
           ]);
+        }));
+
+      });
+
+      describe('zeebe:taskDefinition:type and zeebe:taskDefinition', function() {
+
+        beforeEach(bootstrap(require('./task.bpmn').default));
+
+        it('should handle zeebe:taskDefinition:type and zeebe:taskDefinition', inject(function(elementRegistry) {
+          const oldTemplate = createTemplate({
+            type: 'String',
+            value: 'task-def-with-type',
+            binding: {
+              type: 'zeebe:taskDefinition:type'
+            }
+          });
+
+          const newTemplate = createTemplate({
+            type: 'String',
+            value: 'task-def-without-type',
+            binding: {
+              type: 'zeebe:taskDefinition',
+              property: 'type'
+            }
+          });
+
+          let task = elementRegistry.get('Task_1');
+
+          // when
+          task = changeTemplate(task, oldTemplate);
+
+          task = changeTemplate(task, newTemplate, oldTemplate);
+
+          // then
+          const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+          expect(taskDefinition).to.exist;
+          expect(taskDefinition.get('type')).to.equal('task-def-without-type');
+
+
         }));
 
       });

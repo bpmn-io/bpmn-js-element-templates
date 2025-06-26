@@ -29,6 +29,7 @@
         "label": "NumberProperty",
         "type": "Number",
         "feel": "required",
+        "value": "100",
         "binding": {
           "type": "zeebe:property",
           "name": "NumberProperty"
