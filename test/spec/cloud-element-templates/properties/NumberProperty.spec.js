@@ -61,6 +61,44 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
   }));
 
 
+  describe('property', function() {
+    let entry, input;
+
+    beforeEach(async function() {
+      await expectSelected('property');
+      entry = findEntry('custom-entry-numberField.property-0', container);
+      input = findInput('number', entry);
+    });
+
+    it('should render number field', async function() {
+
+      // then
+      expect(input).to.exist;
+    });
+
+
+    it('should be editable', async function() {
+
+      // when
+      await changeInput(input, '123');
+
+      // then
+      expectProperty('property', 'completionQuantity', 123);
+    });
+
+
+    it('should accept scientific notation', async function() {
+
+      // when
+      await changeInput(input, '1.23e100');
+
+      // then
+      const errorMessage = domQuery('.bio-properties-panel-error', entry);
+      expect(errorMessage).not.to.exist;
+    });
+  });
+
+
   describe('feel disabled', function() {
 
     let entry, input;
@@ -332,6 +370,17 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
 
 // helpers //////////
 
+function expectProperty(id, name, value) {
+  return getBpmnJS().invoke(function(elementRegistry) {
+    const element = elementRegistry.get(id);
+
+    const bo = getBusinessObject(element);
+
+    const property = bo.get(name);
+
+    expect(property).to.eql(value);
+  });
+}
 
 function expectZeebeProperty(id, name, value) {
   return getBpmnJS().invoke(function(elementRegistry) {
