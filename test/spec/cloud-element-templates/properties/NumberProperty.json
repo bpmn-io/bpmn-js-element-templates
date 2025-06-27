@@ -100,5 +100,23 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "property",
+    "id": "numberField.property",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "NumberProperty",
+        "type": "Number",
+        "binding": {
+          "type": "property",
+          "name": "completionQuantity"
+        }
+      }
+    ]
   }
 ]
