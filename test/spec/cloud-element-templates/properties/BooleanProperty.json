@@ -99,5 +99,27 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "booleanField.property",
+    "id": "booleanField.property",
+    "description": "",
+    "appliesTo": [
+      "bpmn:Activity"
+    ],
+    "elementType": {
+      "value": "bpmn:AdHocSubProcess"
+    },
+    "properties": [
+      {
+        "type": "Boolean",
+        "binding": {
+          "type": "property",
+          "name": "cancelRemainingInstances"
+        },
+        "label": "cancel remaining instances"
+      }
+    ]
   }
 ]

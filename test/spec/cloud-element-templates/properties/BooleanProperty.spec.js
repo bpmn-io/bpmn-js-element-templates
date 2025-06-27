@@ -58,6 +58,34 @@ describe('provider/cloud-element-templates - BooleanProperty', function() {
   }));
 
 
+  describe('property', function() {
+
+    let entry, input;
+
+    beforeEach(async function() {
+      await expectSelected('property');
+      entry = findEntry('custom-entry-booleanField.property-0', container);
+      input = findInput('checkbox', entry);
+    });
+
+    it('should render boolean field', async function() {
+
+      // then
+      expect(input).to.exist;
+    });
+
+
+    it('should be editable', async function() {
+
+      // when
+      await input.click();
+
+      // then
+      expectProperty('property', 'cancelRemainingInstances', true);
+    });
+  });
+
+
   describe('feel disabled', function() {
 
     let entry, input;
@@ -277,6 +305,17 @@ describe('provider/cloud-element-templates - BooleanProperty', function() {
 
 // helpers //////////
 
+function expectProperty(id, name, value) {
+  return getBpmnJS().invoke(function(elementRegistry) {
+    const element = elementRegistry.get(id);
+
+    const bo = getBusinessObject(element);
+
+    const property = bo.get(name);
+
+    expect(property).to.eql(value);
+  });
+}
 
 function expectZeebeProperty(id, name, value) {
   return getBpmnJS().invoke(function(elementRegistry) {
