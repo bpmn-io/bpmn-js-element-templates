@@ -52,11 +52,11 @@ import {
 } from '../CreateHelper';
 
 import { createElement } from '../../utils/ElementUtil';
+import { getExpressionValue, isExpression, createExpression } from './bpmnExpressionUtil';
 
-const PRIMITIVE_MODDLE_TYPES = [
-  'Boolean',
-  'Integer',
-  'String'
+const EXPRESSION_TYPES = [
+  'bpmn:Expression',
+  'bpmn:FormalExpression'
 ];
 
 export function getPropertyValue(element, property, scope) {
@@ -89,7 +89,7 @@ function getRawPropertyValue(element, property, scope) {
 
   // property
   if (type === 'property') {
-    const value = businessObject.get(name);
+    const value = isExpression(element, name) ? getExpressionValue(element, name) : businessObject.get(name);
 
     if (!isUndefined(value)) {
       return value;
@@ -327,38 +327,39 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
   // property
   if (PROPERTY_BINDING_TYPES.includes(type)) {
 
-    const propertyDescriptor = businessObject.$descriptor.propertiesByName[ name ];
+    const propertyType = businessObject.$descriptor.propertiesByName[ name ]?.type;
+    let updatedProperty = name;
 
-    // if property not created yet
-    if (!propertyDescriptor) {
+    if (!propertyType || propertyType === 'String') {
 
-      // make sure we create the property
+      // make sure we create and don't remove the property
       propertyValue = value || '';
-    }
+    } else if (propertyType === 'Boolean') {
+      propertyValue = !!value;
+    } else if (propertyType === 'Integer') {
+      propertyValue = parseInt(value, 10);
 
-    else {
-      const { type: propertyType } = propertyDescriptor;
+      if (isNaN(propertyValue)) {
 
-      // do not override non-primitive types
-      if (!PRIMITIVE_MODDLE_TYPES.includes(propertyType)) {
-        throw new Error(`cannot set property of type <${ propertyType }>`);
+        // do not set NaN value
+        propertyValue = undefined;
       }
+    } else if (EXPRESSION_TYPES.includes(propertyType)) {
+      const existingExpression = businessObject.get(name);
 
-      if (propertyType === 'Boolean') {
-        propertyValue = !!value;
-      } else if (propertyType === 'Integer') {
-        propertyValue = parseInt(value, 10);
+      if (existingExpression && is(existingExpression, 'bpmn:FormalExpression')) {
 
-        if (isNaN(propertyValue)) {
-
-          // do not set NaN value
-          propertyValue = undefined;
-        }
-      } else {
-
-        // make sure we don't remove the property
+        // re-use existing expression
+        businessObject = existingExpression;
+        updatedProperty = 'body';
         propertyValue = value || '';
+      } else {
+        propertyValue = createExpression(value, businessObject, bpmnFactory);
       }
+    } else {
+
+      // unsupported non-primitive types cannot be set
+      throw new Error(`cannot set property of type <${ propertyType }>`);
     }
 
     if (!isUndefined(propertyValue)) {
@@ -367,13 +368,12 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
         context: {
           ...context,
           moddleElement: businessObject,
-          properties: { [ name ]: propertyValue }
+          properties: { [ updatedProperty ]: propertyValue }
         }
       });
     } else {
       commands.push(NO_OP);
     }
-
   }
 
   // zeebe:taskDefinition
