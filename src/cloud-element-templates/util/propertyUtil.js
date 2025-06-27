@@ -371,7 +371,17 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
         propertyValue = undefined;
       }
     } else if (EXPRESSION_TYPES.includes(propertyType)) {
-      propertyValue = createExpression(value, businessObject, bpmnFactory);
+      const existingExpression = businessObject.get(name);
+
+      if (existingExpression && is(existingExpression, 'bpmn:FormalExpression')) {
+
+        // re-use existing expression
+        businessObject = existingExpression;
+        updatedProperty = 'body';
+        propertyValue = value || '';
+      } else {
+        propertyValue = createExpression(value, businessObject, bpmnFactory);
+      }
     } else {
 
       // unsupported non-primitive types cannot be set
