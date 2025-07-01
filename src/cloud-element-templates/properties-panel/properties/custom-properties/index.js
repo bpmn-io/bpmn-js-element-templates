@@ -93,7 +93,7 @@ function addCustomGroup(groups, props) {
     element,
     id,
     label,
-    openByDefault = true,
+    openByDefault = false,
     properties,
     templateId,
     tooltip
