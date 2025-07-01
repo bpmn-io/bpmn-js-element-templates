@@ -1108,95 +1108,16 @@ export default class ChangeElementTemplateHandler {
    * @param {Object} newTemplate
    */
   _updateZeebeFormDefinition = function(element, oldTemplate, newTemplate) {
-    const bpmnFactory = this._bpmnFactory,
-          commandStack = this._commandStack;
-
-    const newProperties = newTemplate.properties.filter((newProperty) => {
-      const newBinding = newProperty.binding,
-            newBindingType = newBinding.type;
-
-      return newBindingType === ZEEBE_FORM_DEFINITION;
-    });
-
-    const businessObject = this._getOrCreateExtensionElements(element);
-    let formDefinition = findExtension(businessObject, 'zeebe:FormDefinition');
-
-    // (1) remove old form definition if no new properties specified
-    if (!newProperties.length) {
-      commandStack.execute('element.updateModdleProperties', {
-        element,
-        moddleElement: businessObject,
-        properties: {
-          values: without(businessObject.get('values'), formDefinition)
-        }
-      });
-
-      return;
-    }
-
-
-    newProperties.forEach((newProperty) => {
-      const oldProperty = findOldProperty(oldTemplate, newProperty),
-            newPropertyValue = getDefaultValue(newProperty),
-            propertyName = newProperty.binding.property;
-
-      // (2) update old form definition
-      if (formDefinition) {
-
-        if (!shouldKeepValue(formDefinition, oldProperty, newProperty)) {
-          const properties = {
-            [propertyName]: newPropertyValue
-          };
-
-          commandStack.execute('element.updateModdleProperties', {
-            element,
-            moddleElement: formDefinition,
-            properties
-          });
-        }
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: [ ZEEBE_FORM_DEFINITION ],
+        extensionType: 'zeebe:FormDefinition',
+        getPropertyName: (binding) => binding.property
       }
-
-      // (3) add new form definition
-      else {
-        const properties = {
-          [propertyName]: newPropertyValue
-        };
-
-        formDefinition = createFormDefinition(bpmnFactory, properties);
-
-        formDefinition.$parent = businessObject;
-
-        commandStack.execute('element.updateModdleProperties', {
-          element,
-          moddleElement: businessObject,
-          properties: {
-            values: [ ...businessObject.get('values'), formDefinition ]
-          }
-        });
-      }
-    });
-
-    // (4) remove properties no longer templated
-    const oldProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
-      const oldBinding = oldProperty.binding,
-            oldBindingType = oldBinding.type;
-
-      return oldBindingType === ZEEBE_FORM_DEFINITION && !newProperties.find(
-        (newProperty) => newProperty.binding.property === oldProperty.binding.property
-      );
-    }) || [];
-
-    oldProperties.forEach((oldProperty) => {
-      const properties = {
-        [oldProperty.binding.property]: undefined
-      };
-
-      commandStack.execute('element.updateModdleProperties', {
-        element,
-        moddleElement: formDefinition,
-        properties
-      });
-    });
+    );
   };
 
   /**
