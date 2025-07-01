@@ -160,7 +160,7 @@ function addCustomGroup(groups, props) {
     label,
     component: Group,
     entries: [],
-    shouldOpen: true
+    shouldOpen: false
   };
 
   properties.forEach((property, index) => {
