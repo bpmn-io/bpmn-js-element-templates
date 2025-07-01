@@ -33,7 +33,8 @@ import {
   ZEEBE_CALLED_DECISION,
   ZEEBE_CALLED_ELEMENT,
   ZEEBE_LINKED_RESOURCE_PROPERTY,
-  ZEEBE_USER_TASK
+  ZEEBE_USER_TASK,
+  ZEEBE_FORM_DEFINITION
 } from '../util/bindingTypes';
 
 import {
@@ -114,6 +115,8 @@ export default class ChangeElementTemplateHandler {
       this._updateZeebeUserTask(element, newTemplate);
 
       this._updateCalledDecision(element, oldTemplate, newTemplate);
+
+      this._updateZeebeFormDefinition(element, oldTemplate, newTemplate);
     }
   }
 
@@ -1099,6 +1102,24 @@ export default class ChangeElementTemplateHandler {
   };
 
   /**
+   * @param {djs.model.Base} element
+   * @param {Object} oldTemplate
+   * @param {Object} newTemplate
+   */
+  _updateZeebeFormDefinition = function(element, oldTemplate, newTemplate) {
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: [ ZEEBE_FORM_DEFINITION ],
+        extensionType: 'zeebe:FormDefinition',
+        getPropertyName: (binding) => binding.property
+      }
+    );
+  };
+
+  /**
    * Generic handler for updating extension elements that are single instances with properties.
    *
    * @example
@@ -1456,6 +1477,19 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
     });
   }
+
+  if (newBindingType === ZEEBE_FORM_DEFINITION) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_FORM_DEFINITION) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
 }
 
 /**
@@ -1562,6 +1596,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_CALLED_DECISION) {
+    return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === ZEEBE_FORM_DEFINITION) {
     return businessObject.get(bindingProperty);
   }
 }

@@ -69,6 +69,12 @@
       </bpmn:extensionElements>
     </bpmn:callActivity>
     <bpmn:callActivity id="CalledElement_empty" name="Called Element empty" zeebe:modelerTemplate="calledElement" />
+    <bpmn:userTask id="CamundaUserTask" name="Camunda User Task" zeebe:modelerTemplate="form-definition-template">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="aFormId" />
+      </bpmn:extensionElements>
+    </bpmn:userTask>
     <bpmn:businessRuleTask id="BusinessRuleTask_called_decision" name="Business Rule Task Called Decision" zeebe:modelerTemplate="calledDecision">
       <bpmn:extensionElements>
         <zeebe:calledDecision decisionId="aReusableRule" resultVariable="aResultVariableName"/>
@@ -167,6 +173,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1nwo7tk" bpmnElement="BusinessRuleTask_task_definition">
         <dc:Bounds x="600" y="760" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1kv4zcr_di" bpmnElement="CamundaUserTask">
+        <dc:Bounds x="160" y="830" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

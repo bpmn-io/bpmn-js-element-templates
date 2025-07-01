@@ -13,6 +13,7 @@ export const ZEEBE_CALLED_ELEMENT = 'zeebe:calledElement';
 export const ZEEBE_LINKED_RESOURCE_PROPERTY = 'zeebe:linkedResource';
 export const ZEEBE_USER_TASK = 'zeebe:userTask';
 export const ZEEBE_CALLED_DECISION = 'zeebe:calledDecision';
+export const ZEEBE_FORM_DEFINITION = 'zeebe:formDefinition';
 
 export const EXTENSION_BINDING_TYPES = [
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
@@ -24,7 +25,8 @@ export const EXTENSION_BINDING_TYPES = [
   ZEEBE_TASK_HEADER_TYPE,
   ZEEBE_CALLED_ELEMENT,
   ZEEBE_LINKED_RESOURCE_PROPERTY,
-  ZEEBE_CALLED_DECISION
+  ZEEBE_CALLED_DECISION,
+  ZEEBE_FORM_DEFINITION
 ];
 
 export const TASK_DEFINITION_TYPES = [
