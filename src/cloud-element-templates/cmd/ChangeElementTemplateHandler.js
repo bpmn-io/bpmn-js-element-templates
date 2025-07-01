@@ -17,7 +17,6 @@ import {
   createOutputParameter,
   createTaskHeader,
   createZeebeProperty,
-  createFormDefinition,
   shouldUpdate
 } from '../CreateHelper';
 
