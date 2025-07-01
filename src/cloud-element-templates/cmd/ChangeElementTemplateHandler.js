@@ -1599,7 +1599,6 @@ function getPropertyValue(element, property) {
     return businessObject.get(bindingProperty);
   }
 
-  // todo: why is this not defined for called elements?
   if (bindingType === ZEEBE_FORM_DEFINITION) {
     return businessObject.get(bindingProperty);
   }

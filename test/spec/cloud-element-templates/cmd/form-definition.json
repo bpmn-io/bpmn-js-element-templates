@@ -18,7 +18,7 @@
     },
     {
       "type": "Dropdown",
-        "value": "complexFormId",
+      "value": "complexFormId",
       "choices" : [
         {
           "name": "Complex Form",

@@ -2543,6 +2543,34 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(formDefinition).to.not.have.property('formKey', 'formKey');
       }));
 
+      it('should not override existing', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('Camunda_user_task_form_id');
+        const newTemplate = createTemplate([
+          {
+            'type': 'String',
+            'value': 'someNewFormId',
+            'binding': {
+              'type': 'zeebe:formDefinition',
+              'property': 'formId'
+            }
+          }
+        ]);
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        const formDefinition = findExtension(task, 'zeebe:FormDefinition');
+
+        expect(formDefinition).to.exist;
+
+        // Should keep the old values, not override with newTemplate's values
+        expect(formDefinition).to.have.property('formId', 'someId');
+
+      }));
+
     });
   });
 
