@@ -1988,7 +1988,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     });
 
 
-    it('should open custom groups by default', async function() {
+    it('should not open custom groups by default', async function() {
 
       // given
       await expectSelected('ServiceTask_groupsCollapsed');
@@ -1997,8 +1997,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       var customGroups = [
         [ getGroupById('ElementTemplates__CustomProperties-collapsed', container), false ],
         [ getGroupById('ElementTemplates__CustomProperties-open', container), true ],
-        [ getGroupById('ElementTemplates__CustomProperties-unspecified', container), true ],
-        [ getGroupById('ElementTemplates__CustomProperties', container), true ]
+        [ getGroupById('ElementTemplates__CustomProperties-unspecified', container), false ],
+        [ getGroupById('ElementTemplates__CustomProperties', container), false ]
       ];
 
       // then
@@ -2057,19 +2057,19 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     });
 
 
-    it('should open default group', async function() {
+    it('should not open default group', async function() {
 
       // given
       await expectSelected('ServiceTask_noGroups');
 
       // when
-      var tempalteGroup = getGroupById('ElementTemplates__Template', container);
+      var templateGroup = getGroupById('ElementTemplates__Template', container);
       var customPropertiesGroup = getGroupById('ElementTemplates__CustomProperties', container);
 
 
       // then
-      expectGroupOpen(tempalteGroup, false);
-      expectGroupOpen(customPropertiesGroup, true);
+      expectGroupOpen(templateGroup, false);
+      expectGroupOpen(customPropertiesGroup, false);
     });
 
 
