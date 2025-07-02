@@ -1,7 +1,7 @@
 {
   "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
   "name": "Acme Script Task",
-  "id": "script-task-1",
+  "id": "script-task-2",
   "description": "some description",
   "version": 1,
   "appliesTo": [
@@ -12,19 +12,27 @@
   },
   "properties": [
     {
-      "type": "Hidden",
-      "value": "=1 + 1",
+      "type": "String",
+      "value": "anExternalScript",
       "binding": {
-        "type": "zeebe:script",
-        "property": "expression"
+        "type": "zeebe:taskDefinition",
+        "property": "type"
+      }
+    },
+    {
+      "type": "Number",
+      "value": 4,
+      "binding": {
+        "type": "zeebe:taskDefinition",
+        "property": "retries"
       }
     },
     {
       "type": "String",
-      "value": "aResultVariable",
+      "value": "header-1-value",
       "binding": {
-        "type": "zeebe:script",
-        "property": "resultVariable"
+        "type": "zeebe:taskHeader",
+        "key": "header-1-key"
       }
     }
   ]
