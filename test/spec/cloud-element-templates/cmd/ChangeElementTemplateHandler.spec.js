@@ -42,7 +42,6 @@ import {
   isString,
   isUndefined
 } from 'min-dash';
-import newTemplate from './called-decision.json';
 
 const modules = [
   CoreModule,
