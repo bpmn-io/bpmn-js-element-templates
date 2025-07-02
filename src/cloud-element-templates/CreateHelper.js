@@ -122,18 +122,6 @@ export function createCalledDecision(attrs = {}, bpmnFactory) {
 }
 
 /**
- * Create a script task representing the given value.
- *
- * @param {object} attrs
- * @param {BpmnFactory} bpmnFactory
- *
- * @return {ModdleElement}
- */
-export function createScriptTask(attrs = {}, bpmnFactory) {
-  return bpmnFactory.create('zeebe:Script', attrs);
-}
-
-/**
  * Retrieves whether an element should be updated for a given property.
  *
  * That matches once
