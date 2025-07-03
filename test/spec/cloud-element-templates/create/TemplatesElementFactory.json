@@ -654,5 +654,36 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Acme Script Task",
+    "id": "script-task-1",
+    "description": "some description",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ScriptTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "= \"aString\" + \"aSecondString\"",
+        "binding": {
+          "type": "zeebe:script",
+          "property": "expression"
+        }
+      },
+      {
+        "type": "String",
+        "value": "aResultVariable",
+        "binding": {
+          "type": "zeebe:script",
+          "property": "resultVariable"
+        }
+      }
+    ]
   }
 ]

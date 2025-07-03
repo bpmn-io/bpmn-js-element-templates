@@ -550,6 +550,26 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       });
     }));
 
+    it('should handle <zeebe:script>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('script-task-1');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const script = findExtension(bo, 'zeebe:Script');
+
+      expect(script).to.exist;
+      expect(script).to.jsonEqual({
+        $type: 'zeebe:Script',
+        expression: '= "aString" + "aSecondString"',
+        resultVariable: 'aResultVariable',
+      });
+    }));
+
 
     it('should handle <zeebe:formDefinition>', inject(function(templateElementFactory) {
 
