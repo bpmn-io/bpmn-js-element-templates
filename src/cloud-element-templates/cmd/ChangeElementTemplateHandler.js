@@ -33,6 +33,7 @@ import {
   ZEEBE_CALLED_DECISION,
   ZEEBE_CALLED_ELEMENT,
   ZEEBE_LINKED_RESOURCE_PROPERTY,
+  ZEEBE_SCRIPT_TASK,
   ZEEBE_USER_TASK
 } from '../util/bindingTypes';
 
@@ -114,6 +115,8 @@ export default class ChangeElementTemplateHandler {
       this._updateZeebeUserTask(element, newTemplate);
 
       this._updateCalledDecision(element, oldTemplate, newTemplate);
+
+      this._updateScriptTask(element, oldTemplate, newTemplate);
     }
   }
 
@@ -886,6 +889,27 @@ export default class ChangeElementTemplateHandler {
   }
 
   /**
+   * Update `zeebe:Script` properties of specified business object. This
+   * can only exist in `bpmn:ExtensionElements`.
+   *
+   * @param {djs.model.Base} element
+   * @param {Object} oldTemplate
+   * @param {Object} newTemplate
+   */
+  _updateScriptTask(element, oldTemplate, newTemplate) {
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: [ ZEEBE_SCRIPT_TASK ],
+        extensionType: 'zeebe:Script',
+        getPropertyName: (binding) => binding.property
+      }
+    );
+  }
+
+  /**
    * Replaces the element with the specified elementType.
    * Takes into account the eventDefinition for events.
    *
@@ -1456,6 +1480,19 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
     });
   }
+
+  if (newBindingType === ZEEBE_SCRIPT_TASK) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_SCRIPT_TASK) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
 }
 
 /**
@@ -1562,6 +1599,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_CALLED_DECISION) {
+    return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === ZEEBE_SCRIPT_TASK) {
     return businessObject.get(bindingProperty);
   }
 }
