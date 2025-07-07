@@ -2482,6 +2482,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(formDefinition).to.have.property('formId', 'complexFormId');
       }));
 
+
       it('undo', inject(function(commandStack, elementRegistry) {
 
         // given
@@ -2524,6 +2525,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(formDefinition).to.have.property('formId', 'complexFormId');
       }));
 
+
       it('should discard', inject(function(elementRegistry) {
 
         // given
@@ -2542,6 +2544,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(formDefinition).to.have.property('formId', 'complexFormId');
         expect(formDefinition).to.not.have.property('formKey', 'formKey');
       }));
+
 
       it('should not override existing', inject(function(elementRegistry) {
 
@@ -4998,6 +5001,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       }));
     });
 
+
     describe('update zeebe:FormDefinition', function() {
 
       beforeEach(bootstrap(require('./form-definition.bpmn').default));
@@ -5045,6 +5049,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(formDefinition).to.exist;
         expect(formDefinition.get('externalReference')).to.equal('anExternalFormReference-changed');
       }));
+
 
       it('property unchanged', inject(function(elementRegistry) {
 

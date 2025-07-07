@@ -1077,7 +1077,9 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
   });
 
+
   describe('zeebe:formDefinition', function() {
+
     it('should display', async function() {
 
       // when
@@ -1091,6 +1093,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(input).to.exist;
       expect(input.value).to.equal('aFormId');
     });
+
 
     it('should change, setting `formId`', async function() {
 
@@ -1108,16 +1111,14 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const formDefinition = findExtension(businessObject, 'zeebe:FormDefinition');
       expect(formDefinition).to.exist;
       expect(formDefinition).to.have.property('formId', 'aNewFormId');
-
     });
+
 
     it('should change, creating zeebe:FormDefinition if non-existing', inject(async function(elementTemplates, elementRegistry) {
 
       // given
       const template = templates.find(t => t.id === 'form-definition-template');
       let task = elementRegistry.get('Task_1');
-
-
 
       // when
       await act(() => {
@@ -1137,10 +1138,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(input.value).to.equal('aFormId');
       expect(formDefinition).to.exist;
       expect(formDefinition).to.have.property('formId', 'aFormId');
-    })
-    );
-
-
+    }));
   });
 
 
