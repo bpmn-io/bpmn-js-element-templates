@@ -25,7 +25,8 @@ import {
   ZEEBE_CALLED_ELEMENT,
   ZEEBE_LINKED_RESOURCE_PROPERTY,
   ZEEBE_USER_TASK,
-  ZEEBE_CALLED_DECISION
+  ZEEBE_CALLED_DECISION,
+  ZEEBE_FORM_DEFINITION
 } from './bindingTypes';
 
 import {
@@ -239,6 +240,13 @@ function getRawPropertyValue(element, property, scope) {
     const calledDecision = findExtension(businessObject, 'zeebe:CalledDecision');
 
     return calledDecision ? calledDecision.get(bindingProperty) : defaultValue;
+  }
+
+  // zeebe:formDefinition
+  if (type === ZEEBE_FORM_DEFINITION) {
+    const formDefinition = findExtension(businessObject, 'zeebe:FormDefinition');
+
+    return formDefinition ? formDefinition.get(bindingProperty) : defaultValue;
   }
 
   // should never throw as templates are validated beforehand
@@ -699,6 +707,37 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     }
   }
 
+
+  if (type === ZEEBE_FORM_DEFINITION) {
+    let formDefinition = findExtension(element, 'zeebe:FormDefinition');
+    const propertyName = binding.property;
+
+    const properties = {
+      [ propertyName ]: value || ''
+    };
+
+    if (formDefinition) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: formDefinition
+        }
+      });
+    } else {
+      formDefinition = createElement('zeebe:FormDefinition', properties, extensionElements, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), formDefinition ] }
+        }
+      });
+    }
+  }
 
   if (commands.length) {
     const commandsToExecute = commands.filter((command) => command !== NO_OP);

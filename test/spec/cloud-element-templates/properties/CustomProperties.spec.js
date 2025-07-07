@@ -1077,6 +1077,71 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
   });
 
+
+  describe('zeebe:formDefinition', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('CamundaUserTask');
+
+      // then
+      const entry = findEntry('custom-entry-form-definition-template-1', container),
+            input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('aFormId');
+    });
+
+
+    it('should change, setting `formId`', async function() {
+
+      // given
+      const element = await expectSelected('CamundaUserTask'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-form-definition-template-1', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'aNewFormId');
+
+      // then
+      const formDefinition = findExtension(businessObject, 'zeebe:FormDefinition');
+      expect(formDefinition).to.exist;
+      expect(formDefinition).to.have.property('formId', 'aNewFormId');
+    });
+
+
+    it('should change, creating zeebe:FormDefinition if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const template = templates.find(t => t.id === 'form-definition-template');
+      let task = elementRegistry.get('Task_1');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+
+      const entry = findEntry('custom-entry-form-definition-template-1', container),
+            input = findInput('text', entry);
+
+      task = elementRegistry.get('Task_1');
+      const formDefinition = findExtension(getBusinessObject(task), 'zeebe:FormDefinition');
+
+      // then
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('aFormId');
+      expect(formDefinition).to.exist;
+      expect(formDefinition).to.have.property('formId', 'aFormId');
+    }));
+  });
+
+
   describe('types', function() {
 
     describe('Dropdown', function() {

@@ -551,6 +551,25 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
     }));
 
 
+    it('should handle <zeebe:formDefinition>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('form-definition-template');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const formDefinition = findExtension(bo, 'zeebe:FormDefinition');
+
+      expect(formDefinition).to.exist;
+      expect(formDefinition).to.jsonEqual({
+        $type: 'zeebe:FormDefinition',
+        formId: 'complexFormId',
+      });
+    }));
+
   });
 
 

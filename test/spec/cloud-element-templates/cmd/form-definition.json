@@ -1,0 +1,38 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "form-definition-template",
+  "id": "form-definition-template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:Task"
+  ],
+  "elementType": {
+    "value": "bpmn:UserTask"
+  },
+  "properties": [
+    {
+      "type": "Hidden",
+      "binding": {
+        "type": "zeebe:userTask"
+      }
+    },
+    {
+      "type": "Dropdown",
+      "value": "complexFormId",
+      "choices" : [
+        {
+          "name": "Complex Form",
+            "value": "complexFormId"
+        },
+        {
+          "name": "Simple Form",
+          "value": "simpleFormId"
+        }
+      ],
+      "binding": {
+        "type": "zeebe:formDefinition",
+        "property": "formId"
+      }
+    }
+  ]
+}

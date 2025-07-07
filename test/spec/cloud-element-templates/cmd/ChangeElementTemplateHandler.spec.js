@@ -2457,6 +2457,124 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(taskDefinition).to.not.exist;
       }));
     });
+
+
+    describe('zeebe:formDefinition', function() {
+      beforeEach(bootstrap(require('./form-definition.bpmn').default));
+
+      const newTemplate = require('./form-definition.json');
+
+      it('should execute', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Camunda_user_Task_no_implementation');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        task = elementRegistry.get('Camunda_user_Task_no_implementation');
+        expectElementTemplate(task, 'form-definition-template');
+
+        const formDefinition = findExtension(task, 'zeebe:FormDefinition');
+
+        expect(formDefinition).to.exist;
+        expect(formDefinition).to.have.property('formId', 'complexFormId');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Camunda_user_Task_no_implementation');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        task = elementRegistry.get('Camunda_user_Task_no_implementation');
+        expectNoElementTemplate(task);
+
+        const formDefinition = findExtension(task, 'zeebe:FormDefinition');
+
+        expect(formDefinition).not.to.exist;
+
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Camunda_user_Task_no_implementation');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        task = elementRegistry.get('Camunda_user_Task_no_implementation');
+        expectElementTemplate(task, 'form-definition-template');
+
+        const formDefinition = findExtension(task, 'zeebe:FormDefinition');
+
+        expect(formDefinition).to.exist;
+        expect(formDefinition).to.have.property('formId', 'complexFormId');
+      }));
+
+
+      it('should discard', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('Job_worker_user_task_form_key');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        expectElementTemplate(task, 'form-definition-template');
+
+        const formDefinition = findExtension(task, 'zeebe:FormDefinition');
+
+        expect(formDefinition).to.exist;
+
+        expect(formDefinition).to.have.property('formId', 'complexFormId');
+        expect(formDefinition).to.not.have.property('formKey', 'formKey');
+      }));
+
+
+      it('should not override existing', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('Camunda_user_task_form_id');
+        const newTemplate = createTemplate([
+          {
+            'type': 'String',
+            'value': 'someNewFormId',
+            'binding': {
+              'type': 'zeebe:formDefinition',
+              'property': 'formId'
+            }
+          }
+        ]);
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        const formDefinition = findExtension(task, 'zeebe:FormDefinition');
+
+        expect(formDefinition).to.exist;
+
+        // Should keep the old values, not override with newTemplate's values
+        expect(formDefinition).to.have.property('formId', 'someId');
+
+      }));
+
+    });
   });
 
 
@@ -4882,6 +5000,98 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(calledDecision.get('resultVariable')).to.equal('aResultVariable-new');
       }));
     });
+
+
+    describe('update zeebe:FormDefinition', function() {
+
+      beforeEach(bootstrap(require('./form-definition.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given a user applies a template and updates a property
+        let task = elementRegistry.get('Camunda_user_Task_no_implementation');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'anExternalFormReference-old',
+            binding: {
+              type: 'zeebe:formDefinition',
+              property: 'externalReference'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'anExternalFormReference-new',
+            binding: {
+              type: 'zeebe:formDefinition',
+              property: 'externalReference'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('Camunda_user_Task_no_implementation');
+        let formDefinition = findExtension(task, 'zeebe:FormDefinition');
+
+        updateBusinessObject('Camunda_user_Task_no_implementation', formDefinition, {
+          externalReference: 'anExternalFormReference-changed'
+        });
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        formDefinition = findExtension(task, 'zeebe:FormDefinition');
+
+        expect(formDefinition).to.exist;
+        expect(formDefinition.get('externalReference')).to.equal('anExternalFormReference-changed');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given a user applies a template and does not update a property
+        let task = elementRegistry.get('Camunda_user_Task_no_implementation');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'anExternalFormReference-old',
+            binding: {
+              type: 'zeebe:formDefinition',
+              property: 'externalReference'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'anExternalFormReference-new',
+            binding: {
+              type: 'zeebe:formDefinition',
+              property: 'externalReference'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('Camunda_user_Task_no_implementation');
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        const formDefinition = findExtension(task, 'zeebe:FormDefinition');
+
+        expect(formDefinition).to.exist;
+        expect(formDefinition.get('externalReference')).to.equal('anExternalFormReference-new');
+
+      }));
+    });
+
 
   });
 
