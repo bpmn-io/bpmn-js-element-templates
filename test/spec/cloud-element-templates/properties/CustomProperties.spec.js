@@ -1142,6 +1142,70 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('zeebe:script', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('ScriptTask_script');
+
+      // then
+      const entry = findEntry('custom-entry-script-task-script-1', container),
+            input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('aResultVariable');
+    });
+
+    it('should change, setting `resultVariable`', async function() {
+
+      // given
+      const element = await expectSelected('ScriptTask_script'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-script-task-script-1', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'aNewResultVariable');
+
+      // then
+      const script = findExtension(businessObject, 'zeebe:Script');
+      expect(script).to.exist;
+      expect(script).to.have.property('resultVariable', 'aNewResultVariable');
+
+    });
+
+
+    it('should change, creating zeebe:script if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const element = await expectSelected('ScriptTask_taskDefinition'),
+            businessObject = getBusinessObject(element);
+      const template = templates.find(t => t.id === 'script-task-script');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+
+      const entry = findEntry('custom-entry-script-task-script-1', container),
+            input = findInput('text', entry);
+
+
+      // then
+      const script = findExtension(businessObject, 'zeebe:Script');
+
+      expect(input.value).to.equal('aResultVariable');
+      expect(script).to.exist;
+      expect(script).to.have.property('resultVariable', 'aResultVariable');
+      expect(script).to.have.property('expression', '= 1 + 1');
+    }));
+
+  });
+
   describe('types', function() {
 
     describe('Dropdown', function() {

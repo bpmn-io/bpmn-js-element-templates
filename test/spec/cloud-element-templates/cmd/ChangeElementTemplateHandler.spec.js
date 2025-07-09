@@ -2575,6 +2575,101 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       }));
 
     });
+
+
+    describe('update zeebe:script', function() {
+
+      beforeEach(bootstrap(require('./task.bpmn').default));
+
+      const newTemplate = require('./script-task.json');
+
+      it('execute', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        task = elementRegistry.get('Task_1');
+
+        expectElementTemplate(task, 'script-task-1');
+
+        const scriptTask = findExtension(task, 'zeebe:Script');
+
+        expect(scriptTask).to.exist;
+        expect(scriptTask).to.have.property('expression', '=1 + 1');
+        expect(scriptTask).to.have.property('resultVariable', 'aResultVariable');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        task = elementRegistry.get('Task_1');
+        expectNoElementTemplate(task);
+
+        const scriptTask = findExtension(task, 'zeebe:Script');
+
+        expect(scriptTask).not.to.exist;
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        task = elementRegistry.get('Task_1');
+        expectElementTemplate(task, 'script-task-1');
+
+        const scriptTask = findExtension(task, 'zeebe:Script');
+
+        expect(scriptTask).to.exist;
+        expect(scriptTask).to.have.property('expression', '=1 + 1');
+        expect(scriptTask).to.have.property('resultVariable', 'aResultVariable');
+      }));
+
+
+      it('discards `taskDefinition`', inject(function(elementRegistry) {
+
+        // given
+        bootstrap(require('./task-definition.bpmn').default);
+        let task = elementRegistry.get('Task_1');
+
+        // when
+        task = changeTemplate(task, newTemplate);
+
+        // then
+        expectElementTemplate(task, 'script-task-1');
+
+        const script = findExtension(task, 'zeebe:Script');
+
+        expect(script).to.exist;
+
+        const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+        expect(taskDefinition).to.not.exist;
+      }));
+
+    });
+
   });
 
 
@@ -4998,6 +5093,153 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(calledDecision).to.exist;
         expect(calledDecision.get('decisionId')).to.equal('aDecisionID-new');
         expect(calledDecision.get('resultVariable')).to.equal('aResultVariable-new');
+      }));
+    });
+
+
+    describe('update zeebe:script', function() {
+
+      beforeEach(bootstrap(require('./task.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given a user applies a template and updates a property
+        let task = elementRegistry.get('Task_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'aResultVariable-old',
+            binding: {
+              type: 'zeebe:script',
+              property: 'resultVariable'
+            }
+          },
+          {
+            value: '= get value({oldVal: 123}, "oldVal")',
+            binding: {
+              type: 'zeebe:script',
+              property: 'expression'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'aResultVariable-new',
+            binding: {
+              type: 'zeebe:script',
+              property: 'resultVariable'
+            }
+          },
+          {
+            value: '= get value({newVal: 123}, "newVal")',
+            binding: {
+              type: 'zeebe:script',
+              property: 'expression'
+            }
+          }
+        ]);
+
+        task = changeTemplate(task, oldTemplate);
+
+        let script = findExtension(task, 'zeebe:Script');
+
+        updateBusinessObject('Task_1', script, {
+          resultVariable: 'aResultVariable-changed'
+        });
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        script = findExtension(task, 'zeebe:Script');
+
+        expect(script).to.exist;
+        expect(script.get('expression')).to.equal('= get value({newVal: 123}, "newVal")');
+        expect(script.get('resultVariable')).to.equal('aResultVariable-changed');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'aResultVariable-old',
+            binding: {
+              type: 'zeebe:script',
+              property: 'resultVariable'
+            }
+          },
+          {
+            value: '= get value({oldVal: 123}, "oldVal")',
+            binding: {
+              type: 'zeebe:script',
+              property: 'expression'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'aResultVariable-new',
+            binding: {
+              type: 'zeebe:script',
+              property: 'resultVariable'
+            }
+          },
+          {
+            value: '= get value({newVal: 123}, "newVal")',
+            binding: {
+              type: 'zeebe:script',
+              property: 'expression'
+            }
+          }
+        ]);
+
+        task = changeTemplate(task, oldTemplate);
+
+        // when
+        task = changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        const script = findExtension(task, 'zeebe:Script');
+
+        expect(script).to.exist;
+        expect(script.get('expression')).to.equal('= get value({newVal: 123}, "newVal")');
+        expect(script.get('resultVariable')).to.equal('aResultVariable-new');
+      }));
+
+
+      it('discards `taskDefinition`', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        const oldTemplate = require('./script-task-task-definition.json');
+        const newTemplate = require('./script-task.json');
+
+        task = changeTemplate(task, oldTemplate);
+
+        // when
+        task = changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        expectElementTemplate(task, 'script-task-1');
+
+        const script = findExtension(task, 'zeebe:Script');
+
+        expect(script).to.exist;
+
+        const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+        expect(taskDefinition).to.not.exist;
+
+        const taskHeaders = findExtension(task, 'zeebe:TaskHeaders');
+
+        expect(taskHeaders).to.not.exist;
       }));
     });
 
