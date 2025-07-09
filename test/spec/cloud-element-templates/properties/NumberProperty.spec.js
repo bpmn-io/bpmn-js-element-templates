@@ -103,6 +103,18 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
       const errorMessage = domQuery('.bio-properties-panel-error', entry);
       expect(errorMessage).not.to.exist;
     });
+
+
+    it('should NOT accept NaN', async function() {
+
+      const initialValue = 1;
+
+      // when
+      await changeInput(input, 'NaN');
+
+      // then
+      expectProperty('property', 'completionQuantity', initialValue);
+    });
   });
 
 
