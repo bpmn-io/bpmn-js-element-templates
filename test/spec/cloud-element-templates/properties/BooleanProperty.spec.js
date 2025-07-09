@@ -2,7 +2,8 @@ import TestContainer from 'mocha-test-container-support';
 
 import {
   bootstrapPropertiesPanel,
-  getBpmnJS
+  getBpmnJS,
+  inject
 } from 'test/TestHelper';
 
 import {
@@ -62,11 +63,17 @@ describe('provider/cloud-element-templates - BooleanProperty', function() {
 
     let entry, input;
 
-    beforeEach(async function() {
-      await expectSelected('property');
+    beforeEach(inject(async function(elementTemplates) {
+      const element = await expectSelected('property');
+      const template = templates.find(t => t.id === 'booleanField.property');
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
       entry = findEntry('custom-entry-booleanField.property-0', container);
       input = findInput('checkbox', entry);
-    });
+    }));
 
     it('should render boolean field', async function() {
 
@@ -78,7 +85,7 @@ describe('provider/cloud-element-templates - BooleanProperty', function() {
     it('should be editable', async function() {
 
       // when
-      await input.click();
+      await act(() => input.click());
 
       // then
       expectProperty('property', 'cancelRemainingInstances', true);
