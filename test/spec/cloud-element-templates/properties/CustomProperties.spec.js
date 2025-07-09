@@ -236,6 +236,33 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       expect(expression === initialExpression, 'should reuse expression').to.be.true;
     });
+
+
+    it('should create bpmn:FormalExpression if non-existing', inject(async function(elementTemplates) {
+
+      // given
+      const task = await expectSelected('AdHocSubProcess_empty'),
+            businessObject = getBusinessObject(task);
+
+      await act(() => {
+        elementTemplates.applyTemplate(task, bpmnExpressionTemplates[0]);
+      });
+
+      // when
+      const entry = findEntry('custom-entry-completion-condition-0', container),
+            editor = findEditor(entry);
+
+      await act(() => {
+        editor.textContent = 'bar';
+      });
+
+      // then
+      const expression = businessObject.get('completionCondition');
+
+      expect(expression).to.exist;
+      expect(is(expression, 'bpmn:FormalExpression')).to.be.true;
+      expect(expression.get('body')).to.equal('=bar');
+    }));
   });
 
 

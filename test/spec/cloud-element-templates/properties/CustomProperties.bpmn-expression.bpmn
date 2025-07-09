@@ -4,11 +4,15 @@
     <bpmn:adHocSubProcess id="AdHocSubProcess" name="completion-condition" zeebe:modelerTemplate="completion-condition" zeebe:modelerTemplateVersion="1">
       <bpmn:completionCondition xsi:type="bpmn:tFormalExpression">=foo</bpmn:completionCondition>
     </bpmn:adHocSubProcess>
+    <bpmn:adHocSubProcess id="AdHocSubProcess_empty" name="no-expression" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
       <bpmndi:BPMNShape id="Activity_1d5ac68_di" bpmnElement="AdHocSubProcess">
         <dc:Bounds x="160" y="80" width="400" height="400" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_di" bpmnElement="AdHocSubProcess_empty">
+        <dc:Bounds x="160" y="580" width="400" height="400" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
