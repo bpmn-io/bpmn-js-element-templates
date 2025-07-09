@@ -6,7 +6,15 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.7.0
+
+* `FEAT`: support properties of type `bpmn:Expression` ([#161](https://github.com/bpmn-io/bpmn-js-element-templates/pull/161))
 * `FEAT`: support `zeebe:formDefinition` binding property ([#158](https://github.com/bpmn-io/bpmn-js-element-templates/pull/158))
+* `FEAT`: support `zeebe:calledDecision` binding property ([#155](https://github.com/bpmn-io/bpmn-js-element-templates/pull/155))
+* `FEAT`: support `zeebe:scriptTask` binding property ([#156](https://github.com/bpmn-io/bpmn-js-element-templates/pull/156))
+* `FIX`: correctly handle numeric conditions ([#69](https://github.com/bpmn-io/bpmn-js-element-templates/issues/69))
+* `FIX`: keep groups closed when template is first applied ([#162](https://github.com/bpmn-io/bpmn-js-element-templates/pull/162))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.6.0`
 
 ## 2.6.0
 
