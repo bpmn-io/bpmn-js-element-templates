@@ -3,7 +3,8 @@ import TestContainer from 'mocha-test-container-support';
 import {
   bootstrapPropertiesPanel,
   changeInput,
-  getBpmnJS
+  getBpmnJS,
+  inject
 } from 'test/TestHelper';
 
 import {
@@ -64,11 +65,17 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
   describe('property', function() {
     let entry, input;
 
-    beforeEach(async function() {
-      await expectSelected('property');
+    beforeEach(inject(async function(elementTemplates) {
+      const element = await expectSelected('property');
+      const template = templates.find(t => t.id === 'numberField.property');
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
       entry = findEntry('custom-entry-numberField.property-0', container);
       input = findInput('number', entry);
-    });
+    }));
 
     it('should render number field', async function() {
 
