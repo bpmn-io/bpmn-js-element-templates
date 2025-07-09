@@ -113,6 +113,7 @@
     },
     "properties": [
       {
+        "value": false,
         "type": "Boolean",
         "binding": {
           "type": "property",

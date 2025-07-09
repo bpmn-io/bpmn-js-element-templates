@@ -6,7 +6,7 @@
     <bpmn:serviceTask id="optional" name="feel optional" zeebe:modelerTemplate="booleanField.feel.optional" />
     <bpmn:serviceTask id="static" name="feel static" zeebe:modelerTemplate="booleanField.feel.static" />
     <bpmn:serviceTask id="no-feel" name="no feel" zeebe:modelerTemplate="booleanField.feel.no-feel" />
-    <bpmn:adHocSubProcess id="property" name="property" cancelRemainingInstances="false" zeebe:modelerTemplate="booleanField.property" />
+    <bpmn:adHocSubProcess id="property" name="property" cancelRemainingInstances="false" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1gpk8uz">
