@@ -550,6 +550,7 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       });
     }));
 
+
     it('should handle <zeebe:script>', inject(function(templateElementFactory) {
 
       // given

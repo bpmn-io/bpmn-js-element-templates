@@ -2576,6 +2576,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     });
 
+
     describe('update zeebe:script', function() {
 
       beforeEach(bootstrap(require('./task.bpmn').default));
@@ -2644,6 +2645,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(scriptTask).to.have.property('expression', '=1 + 1');
         expect(scriptTask).to.have.property('resultVariable', 'aResultVariable');
       }));
+
 
       it('discards `taskDefinition`', inject(function(elementRegistry) {
 
@@ -5094,6 +5096,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       }));
     });
 
+
     describe('update zeebe:script', function() {
 
       beforeEach(bootstrap(require('./task.bpmn').default));
@@ -5208,6 +5211,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(script.get('expression')).to.equal('= get value({newVal: 123}, "newVal")');
         expect(script.get('resultVariable')).to.equal('aResultVariable-new');
       }));
+
 
       it('discards `taskDefinition`', inject(function(elementRegistry) {
 

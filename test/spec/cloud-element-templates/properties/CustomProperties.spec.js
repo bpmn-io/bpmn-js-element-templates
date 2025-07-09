@@ -1143,6 +1143,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
 
   describe('zeebe:script', function() {
+
     it('should display', async function() {
 
       // when
@@ -1176,6 +1177,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
     });
 
+
     it('should change, creating zeebe:script if non-existing', inject(async function(elementTemplates, elementRegistry) {
 
       // given
@@ -1200,8 +1202,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(script).to.exist;
       expect(script).to.have.property('resultVariable', 'aResultVariable');
       expect(script).to.have.property('expression', '= 1 + 1');
-    })
-    );
+    }));
 
   });
 
