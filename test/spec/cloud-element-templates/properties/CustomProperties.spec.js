@@ -78,6 +78,8 @@ import placeholderElementTemplates from './CustomProperties.placeholder.json';
 import bpmnExpressionXML from './CustomProperties.bpmn-expression.bpmn';
 import bpmnExpressionTemplates from '../fixtures/completion-condition.json';
 
+import complexPropertyTemplates from './CustomProperties.complex-property.json';
+
 
 describe('provider/cloud-element-templates - CustomProperties', function() {
 
@@ -234,6 +236,44 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       expect(expression === initialExpression, 'should reuse expression').to.be.true;
     });
+  });
+
+
+  describe('property (complex)', function() {
+
+    let errorHandler;
+
+    beforeEach(function() {
+      errorHandler = window.onerror;
+    });
+
+    afterEach(function() {
+      window.onerror = errorHandler;
+    });
+
+    it('should fail to change', inject(async function(elementTemplates) {
+
+      // given
+      const task = await expectSelected('Task_1');
+      elementTemplates.set(complexPropertyTemplates);
+      await act(() => {
+        elementTemplates.applyTemplate(task, complexPropertyTemplates[0]);
+      });
+      const initialValue = task.businessObject.get('extensionElements');
+      const entry = findEntry('custom-entry-my.custom.ComplexProperty-0', container),
+            input = findInput('text', entry);
+
+      // input event causes an uncaught error which cannot be caught in try/catch
+      const spy = sinon.spy();
+      window.onerror = spy;
+
+      // when
+      changeInput(input, 'foo');
+
+      // then
+      expect(spy).to.have.been.calledOnce;
+      expect(task.businessObject.get('extensionElements')).to.equal(initialValue);
+    }));
   });
 
 
