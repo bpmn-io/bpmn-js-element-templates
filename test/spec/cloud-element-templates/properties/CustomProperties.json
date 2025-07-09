@@ -862,5 +862,23 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Non-existing property",
+    "id": "my.example.non-existing-property",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "type": "String",
+        "value": "my Task",
+        "binding": {
+          "type": "property",
+          "name": "test"
+        }
+      }
+    ]
   }
 ]

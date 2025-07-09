@@ -96,6 +96,7 @@
         <zeebe:taskDefinition type="aType" retries="1" />
       </bpmn:extensionElements>
     </bpmn:scriptTask>
+    <bpmn:task id="nonexisting" name="non-existing propert" zeebe:modelerTemplate="my.example.non-existing-property" test="value" />
   </bpmn:process>
   <bpmn:message id="Message" name="name">
     <bpmn:extensionElements>
@@ -196,6 +197,9 @@
       <bpmndi:BPMNShape id="BPMNShape_02sbchp" bpmnElement="ScriptTask_taskDefinition">
         <dc:Bounds x="480" y="1020" width="100" height="80" />
         <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nonexisting_di" bpmnElement="nonexisting">
+        <dc:Bounds x="30" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

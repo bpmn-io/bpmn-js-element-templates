@@ -277,6 +277,62 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('property (non-existing)', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('nonexisting');
+
+      // then
+      const entry = findEntry('custom-entry-my.example.non-existing-property-0', container);
+
+      expect(entry).to.exist;
+
+      const input = findInput('text', entry);
+
+      expect(input).to.exist;
+      expect(input.value).to.equal('value');
+    });
+
+
+    it('should change', async function() {
+
+      // given
+      const task = await expectSelected('nonexisting'),
+            businessObject = getBusinessObject(task);
+
+      // when
+      const entry = findEntry('custom-entry-my.example.non-existing-property-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'foo');
+
+      // then
+      expect(input.value).to.equal('foo');
+      expect(businessObject.get('test')).to.equal('foo');
+    });
+
+
+    it('should change String property to empty string when erased', async function() {
+
+      // given
+      const task = await expectSelected('nonexisting'),
+            businessObject = getBusinessObject(task);
+
+      // when
+      const entry = findEntry('custom-entry-my.example.non-existing-property-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, '');
+
+      // then
+      expect(input.value).to.eql('');
+      expect(businessObject.get('test')).to.be.eql('');
+    });
+  });
+
+
   describe('zeebe:taskDefinition:type', function() {
 
     it('should display', async function() {
