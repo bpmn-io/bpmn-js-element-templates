@@ -354,7 +354,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
   if (PROPERTY_BINDING_TYPES.includes(type)) {
 
     const propertyType = businessObject.$descriptor.propertiesByName[ name ]?.type;
-    let updatedProperty = name;
+    let propertyName = name;
 
     if (!propertyType || propertyType === 'String') {
 
@@ -377,7 +377,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
 
         // re-use existing expression
         businessObject = existingExpression;
-        updatedProperty = 'body';
+        propertyName = 'body';
         propertyValue = value || '';
       } else {
         propertyValue = createExpression(value, businessObject, bpmnFactory);
@@ -394,7 +394,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
         context: {
           ...context,
           moddleElement: businessObject,
-          properties: { [ updatedProperty ]: propertyValue }
+          properties: { [ propertyName ]: propertyValue }
         }
       });
     } else {
