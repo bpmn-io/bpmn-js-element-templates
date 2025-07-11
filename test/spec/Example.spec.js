@@ -148,6 +148,15 @@ const LogTemplateErrorsModule = {
   } ]
 };
 
+const ElementTemplateChangedModule = {
+
+  __init__: [ function(eventBus) {
+
+    eventBus.on('commandStack.propertiesPanel.zeebe.changeTemplate.postExecute', function() {
+      console.log('commandStack.propertiesPanel.zeebe.changeTemplate.postExecute handler executed');
+    });
+  } ]
+};
 
 describe('<BpmnPropertiesPanelRenderer>', function() {
 
@@ -249,7 +258,8 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
           CreateAppendElementTemplatesModule,
           ChangeEnginesModule,
           LogTemplateErrorsModule,
-          LintingModule
+          LintingModule,
+          ElementTemplateChangedModule
         ],
         moddleExtensions: {
           zeebe: ZeebeModdle,
