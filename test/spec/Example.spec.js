@@ -153,7 +153,7 @@ const ElementTemplateChangedModule = {
   __init__: [ function(eventBus) {
 
     eventBus.on('commandStack.propertiesPanel.zeebe.changeTemplate.postExecute', function() {
-      console.log('commandStack.propertiesPanel.zeebe.changeTemplate.postExecute handler executed');
+      console.error('commandStack.propertiesPanel.zeebe.changeTemplate.postExecute', new Error('handler executed'));
     });
   } ]
 };
