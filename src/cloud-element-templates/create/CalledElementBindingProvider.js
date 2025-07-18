@@ -27,6 +27,7 @@ export class CalledElementBindingProvider {
     ensureNoPropagation(calledElement);
 
     calledElement.set(propertyName, value);
+    console.log('a called element', calledElement);
   }
 }
 

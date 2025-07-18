@@ -1410,7 +1410,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
   });
 
-  describe('bindingType', function() {
+  describe('bindingType for calledDecision', function() {
 
     it('should display', inject(async function(elementTemplates) {
 
@@ -1544,6 +1544,148 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
 
   });
+
+  describe('bindingType for calledElement', function() {
+
+    it('should display', inject(async function(elementTemplates) {
+
+      // given
+      const element = await expectSelected('Called_Element_no_template');
+      const template = templates.find(t => t.id === 'io.camunda.examples.CallActivity.BindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // then
+      'custom-entry-io.camunda.examples.CallActivity.BindingType-1';
+      const entry = findEntry('custom-entry-io.camunda.examples.CallActivity.BindingType-1', container);
+      const select = findSelect(entry);
+      const options = Array.from(select.options).map(({ selected, value }) => ({ selected, value }));
+
+      expect(entry).to.exist;
+      expect(select).to.exist;
+      expect(options).to.eql([
+        { value: 'latest', selected: false },
+        { value: 'deployment', selected: true },
+        { value: 'versionTag', selected: false }
+      ]);
+    }));
+
+    it('should change, setting bindingType', inject(async function(elementTemplates) {
+
+      // given
+      const element = await expectSelected('Called_Element_no_template');
+      const template = templates.find(t => t.id === 'io.camunda.examples.CallActivity.BindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // when
+      const entry = findEntry('custom-entry-io.camunda.examples.CallActivity.BindingType-1', container);
+      const select = findSelect(entry);
+      changeInput(select, 'latest');
+
+      // then
+      expect(select.value).to.equal('latest');
+      const calledElement = findExtension(getBusinessObject(element), 'zeebe:CalledElement');
+      expect(calledElement).to.exist;
+      expect(calledElement).to.have.property('bindingType', 'latest');
+      expect(calledElement).to.not.have.property('versionTag');
+    }));
+
+    it('should change, setting versionTag', inject(async function(elementTemplates) {
+
+      // given
+      const element = await expectSelected('Called_Element_no_template');
+      const template = templates.find(t => t.id === 'io.camunda.examples.CallActivity.BindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // when
+      const entry = findEntry('custom-entry-io.camunda.examples.CallActivity.BindingType-1', container);
+      const select = findSelect(entry);
+      await act(() => {
+        changeInput(select, 'versionTag');});
+
+      // this breaks as there is some sort of infinit loop due to the call activity behavior firing on every change which in turn
+      // makes the updateCalledElement fire again and for some reason old and new template then get switched around.
+      const versionTagEntry = findEntry('custom-entry-io.camunda.examples.CallActivity.BindingType-2', container);
+      const versionInput = findInput('text', versionTagEntry);
+      changeInput(versionInput, 'v1');
+
+      // then
+      expect(versionInput.value).to.equal('v1');
+      const calledElement = findExtension(getBusinessObject(element), 'zeebe:CalledElement');
+      expect(calledElement).to.exist;
+      expect(calledElement).to.have.property('bindingType', 'versionTag');
+      expect(calledElement).to.have.property('versionTag', 'v1');
+    }));
+
+
+    it('should change, removing versionTag when changing bindingType', inject(async function(elementTemplates) {
+
+      // given
+      const element = await expectSelected('Called_Element_no_template');
+      const template = templates.find(t => t.id === 'io.camunda.examples.CallActivity.BindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // when
+      const entry = findEntry('custom-entry-io.camunda.examples.CallActivity.BindingType-1', container);
+      const select = findSelect(entry);
+      changeInput(select, 'versionTag');
+
+      let versionTagEntry = findEntry('custom-entry-io.camunda.examples.CallActivity.BindingType-2', container);
+      const versionInput = findInput('text', versionTagEntry);
+      changeInput(versionInput, 'v1');
+
+      changeInput(select, 'latest');
+
+      // then
+      versionTagEntry = findEntry('custom-entry-calledDecisionWithBindingType-3', container);
+      expect(versionTagEntry).to.not.exist;
+
+      const calledElement = findExtension(getBusinessObject(element), 'zeebe:CalledElement');
+      expect(calledElement).to.exist;
+      expect(calledElement).to.not.have.property('bindingType', 'versionTag');
+      expect(calledElement).to.not.have.property('versionTag');
+      expect(calledElement).to.have.property('bindingType', 'latest');
+    }));
+
+    it('should remove, removing bindingType and versionTag', inject(async function(elementTemplates) {
+
+      // given
+      let element = await expectSelected('Called_Element_no_template');
+      const template = templates.find(t => t.id === 'io.camunda.examples.CallActivity.BindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // when
+      const entry = findEntry('custom-entry-io.camunda.examples.CallActivity.BindingType-1', container);
+      const select = findSelect(entry);
+      changeInput(select, 'versionTag');
+
+      let versionTagEntry = findEntry('custom-entry-io.camunda.examples.CallActivity.BindingType-2', container);
+      const versionInput = findInput('text', versionTagEntry);
+      changeInput(versionInput, 'v1');
+
+      await act(() => {
+        elementTemplates.removeTemplate(element);
+      });
+      element = await expectSelected('Called_Element_no_template');
+
+      // then
+      const calledElement = findExtension(getBusinessObject(element), 'zeebe:CalledElement');
+      expect(calledElement).to.not.exist;
+      expect(calledElement).to.not.have.property('bindingType');
+      expect(calledElement).to.not.have.property('versionTag');
+    }));
+
+  });
+
 
   describe('types', function() {
 
