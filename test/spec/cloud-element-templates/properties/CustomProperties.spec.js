@@ -1346,7 +1346,6 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
   });
 
-
   describe('zeebe:script', function() {
 
     it('should display', async function() {
@@ -1407,6 +1406,141 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(script).to.exist;
       expect(script).to.have.property('resultVariable', 'aResultVariable');
       expect(script).to.have.property('expression', '= 1 + 1');
+    }));
+
+  });
+
+  describe('bindingType', function() {
+
+    it('should display', inject(async function(elementTemplates) {
+
+      // given
+      const element = await expectSelected('BusinessRuleTask_empty');
+      const template = templates.find(t => t.id === 'calledDecisionWithBindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // then
+      const entry = findEntry('custom-entry-calledDecisionWithBindingType-2', container);
+      const select = findSelect(entry);
+      const options = Array.from(select.options).map(({ selected, value }) => ({ selected, value }));
+
+      expect(entry).to.exist;
+      expect(select).to.exist;
+      expect(options).to.eql([
+        { value: 'latest', selected: true },
+        { value: 'deployment', selected: false },
+        { value: 'versionTag', selected: false }
+      ]);
+    }));
+
+    it('should change, setting bindingType', inject(async function(elementTemplates) {
+
+      // given
+      const element = await expectSelected('BusinessRuleTask_empty');
+      const template = templates.find(t => t.id === 'calledDecisionWithBindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // when
+      const entry = findEntry('custom-entry-calledDecisionWithBindingType-2', container);
+      const select = findSelect(entry);
+      changeInput(select, 'deployment');
+
+      // then
+      expect(select.value).to.equal('deployment');
+      const calledDecision = findExtension(getBusinessObject(element), 'zeebe:CalledDecision');
+      expect(calledDecision).to.exist;
+      expect(calledDecision).to.have.property('bindingType', 'deployment');
+      expect(calledDecision).to.not.have.property('versionTag');
+    }));
+
+    it('should change, setting versionTag', inject(async function(elementTemplates) {
+
+      // given
+      const element = await expectSelected('BusinessRuleTask_empty');
+      const template = templates.find(t => t.id === 'calledDecisionWithBindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // when
+      const entry = findEntry('custom-entry-calledDecisionWithBindingType-2', container);
+      const select = findSelect(entry);
+      changeInput(select, 'versionTag');
+
+      const verstionTagEntry = findEntry('custom-entry-calledDecisionWithBindingType-3', container);
+      const versionInput = findInput('text', verstionTagEntry);
+      changeInput(versionInput, 'v1');
+
+      // then
+      expect(versionInput.value).to.equal('v1');
+      const calledDecision = findExtension(getBusinessObject(element), 'zeebe:CalledDecision');
+      expect(calledDecision).to.exist;
+      expect(calledDecision).to.have.property('bindingType', 'versionTag');
+      expect(calledDecision).to.have.property('versionTag', 'v1');
+    }));
+
+
+    it('should change, removing versionTag when changing bindingType', inject(async function(elementTemplates) {
+
+      // given
+      const element = await expectSelected('BusinessRuleTask_empty');
+      const template = templates.find(t => t.id === 'calledDecisionWithBindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // when
+      const entry = findEntry('custom-entry-calledDecisionWithBindingType-2', container);
+      const select = findSelect(entry);
+      changeInput(select, 'versionTag');
+
+      let versionTagEntry = findEntry('custom-entry-calledDecisionWithBindingType-3', container);
+      const versionInput = findInput('text', versionTagEntry);
+      changeInput(versionInput, 'v1');
+
+      changeInput(select, 'latest');
+
+      // then
+      versionTagEntry = findEntry('custom-entry-calledDecisionWithBindingType-3', container);
+      expect(versionTagEntry).to.not.exist;
+
+      const calledDecision = findExtension(getBusinessObject(element), 'zeebe:CalledDecision');
+      expect(calledDecision).to.exist;
+      expect(calledDecision).to.not.have.property('bindingType', 'versionTag');
+      expect(calledDecision).to.not.have.property('versionTag');
+      expect(calledDecision).to.have.property('bindingType', 'latest');
+    }));
+
+    it('should remove, removing bindingType and versionTag', inject(async function(elementTemplates) {
+
+      // given
+      let element = await expectSelected('BusinessRuleTask_called_decision');
+      const template = templates.find(t => t.id === 'calledDecisionWithBindingType');
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // when
+      const entry = findEntry('custom-entry-calledDecisionWithBindingType-2', container);
+      const select = findSelect(entry);
+      changeInput(select, 'versionTag');
+
+      let versionTagEntry = findEntry('custom-entry-calledDecisionWithBindingType-3', container);
+      const versionInput = findInput('text', versionTagEntry);
+      changeInput(versionInput, 'v1');
+
+      await act(() => {
+        elementTemplates.removeTemplate(element);
+      });
+      element = await expectSelected('BusinessRuleTask_called_decision');
+
+      // then
+      const calledDecision = findExtension(getBusinessObject(element), 'zeebe:CalledDecision');
+      expect(calledDecision).to.not.exist;
     }));
 
   });

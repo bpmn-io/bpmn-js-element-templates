@@ -880,5 +880,71 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "calledDecisionWithBindingType",
+    "name": "Called Decision Template with bindingType",
+    "version": 3,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:BusinessRuleTask"
+    },
+    "properties": [
+      {
+        "label": "Decision ID",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "decisionId"
+        }
+      },{
+        "label": "Result Variable",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "resultVariable"
+        }
+      },
+      {
+        "type": "Dropdown",
+        "label": "Binding",
+        "id": "bindingType",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "bindingType"
+        },
+        "choices": [
+          {
+            "name": "Latest",
+            "value": "latest"
+          },
+          {
+            "name": "Deployment",
+            "value": "deployment"
+          },
+          {
+            "name": "Version Tag",
+            "value": "versionTag"
+          }
+        ],
+        "value": "latest"
+      },
+      {
+        "type": "String",
+        "label": "Version tag",
+        "value": "v1",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "versionTag"
+        },
+        "condition": {
+          "property": "bindingType",
+          "equals": "versionTag"
+        }
+      }
+    ]
   }
 ]
