@@ -1,0 +1,288 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Reusable Rule Template with Binding Type",
+    "id": "io.camunda.examples.Decision.BindingType",
+    "appliesTo": [
+      "bpmn:Task",
+      "bpmn:BusinessRuleTask"
+    ],
+    "category": {
+      "name": "With binding type",
+      "id": "with-binding-type"
+    },
+    "elementType": {
+      "value": "bpmn:BusinessRuleTask"
+    },
+    "properties": [
+      {
+        "type": "String",
+        "value": "aReusableRule",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "decisionId"
+        }
+      },
+      {
+        "type": "String",
+        "value": "aResultVariable",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "resultVariable"
+        }
+      },
+      {
+        "type": "Dropdown",
+        "label": "Binding",
+        "id": "bindingType",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "bindingType"
+        },
+        "choices": [
+          {
+            "name": "Latest",
+            "value": "latest"
+          },
+          {
+            "name": "Deployment",
+            "value": "deployment"
+          },
+          {
+            "name": "Version Tag",
+            "value": "versionTag"
+          }
+        ],
+        "value": "latest"
+      },
+      {
+        "type": "String",
+        "label": "Version tag",
+        "value": "v1",
+        "binding": {
+          "type": "zeebe:calledDecision",
+          "property": "versionTag"
+        },
+        "condition": {
+          "property": "bindingType",
+          "equals": "versionTag"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Call Activity Template with Binding Type",
+    "id": "io.camunda.examples.CallActivity.BindingType",
+    "appliesTo": [
+      "bpmn:Activity"
+    ],
+    "category": {
+      "name": "With binding type",
+      "id": "with-binding-type"
+    },
+    "elementType": {
+      "value": "bpmn:CallActivity"
+    },
+    "properties": [
+      {
+        "type": "String",
+        "value": "aProcessId",
+        "binding": {
+          "type": "zeebe:calledElement",
+          "property": "processId"
+        }
+      },
+      {
+        "type": "Dropdown",
+        "label": "Binding",
+        "id": "bindingType",
+        "binding": {
+          "type": "zeebe:calledElement",
+          "property": "bindingType"
+        },
+        "choices": [
+          {
+            "name": "Latest",
+            "value": "latest"
+          },
+          {
+            "name": "Deployment",
+            "value": "deployment"
+          },
+          {
+            "name": "Version Tag",
+            "value": "versionTag"
+          }
+        ],
+        "value": "deployment"
+      },
+      {
+        "type": "String",
+        "label": "Version tag",
+        "value": "v1",
+        "binding": {
+          "type": "zeebe:calledElement",
+          "property": "versionTag"
+        },
+        "condition": {
+          "property": "bindingType",
+          "equals": "versionTag"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Form Definition Template with Binding Type",
+    "id": "io.camunda.examples.FormDefinition.BindingType",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "category": {
+      "name": "With binding type",
+      "id": "with-binding-type"
+    },
+    "elementType": {
+      "value": "bpmn:UserTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "binding": {
+          "type": "zeebe:userTask"
+        }
+      },
+      {
+        "type": "String",
+        "value": "aFormId",
+        "binding": {
+          "type": "zeebe:formDefinition",
+          "property": "formId"
+        }
+      },
+      {
+        "type": "Dropdown",
+        "label": "Binding",
+        "id": "bindingType",
+        "binding": {
+          "type": "zeebe:formDefinition",
+          "property": "bindingType"
+        },
+        "choices": [
+          {
+            "name": "Latest",
+            "value": "latest"
+          },
+          {
+            "name": "Deployment",
+            "value": "deployment"
+          },
+          {
+            "name": "Version Tag",
+            "value": "versionTag"
+          }
+        ],
+        "value": "latest"
+      },
+      {
+        "type": "String",
+        "label": "Version tag",
+        "value": "v1",
+        "binding": {
+          "type": "zeebe:formDefinition",
+          "property": "versionTag"
+        },
+        "condition": {
+          "property": "bindingType",
+          "equals": "versionTag"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Linked resources template with Binding Type",
+    "id": "io.camunda.examples.LinkedResource.BindingType",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "category": {
+      "name": "With binding type",
+      "id": "with-binding-type"
+    },
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "camunda:RPA",
+        "binding": {
+          "type": "zeebe:taskDefinition:type"
+        }
+      },
+      {
+        "type": "Hidden",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "property": "resourceType",
+          "linkName": "RPAScript"
+        },
+        "value": "RPA"
+      },
+      {
+        "type": "String",
+        "feel": "optional",
+        "label": "Script ID",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "RPAScript",
+          "property": "resourceId"
+        },
+        "constraints": {
+          "notEmpty": true
+        }
+      },
+      {
+        "type": "Dropdown",
+        "label": "Binding",
+        "id": "bindingType",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "RPAScript",
+          "property": "bindingType"
+        },
+        "choices": [
+          {
+            "name": "Latest",
+            "value": "latest"
+          },
+          {
+            "name": "Deployment",
+            "value": "deployment"
+          },
+          {
+            "name": "Version Tag",
+            "value": "versionTag"
+          }
+        ],
+        "value": "latest"
+      },
+      {
+        "type": "String",
+        "label": "Version tag",
+        "value": "v1",
+        "binding": {
+          "type": "zeebe:linkedResource",
+          "linkName": "RPAScript",
+          "property": "versionTag"
+        },
+        "condition": {
+          "property": "bindingType",
+          "equals": "versionTag"
+        }
+      }
+    ]
+  }
+]

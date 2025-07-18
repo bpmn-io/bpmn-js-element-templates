@@ -1201,6 +1201,10 @@ export default class ChangeElementTemplateHandler {
     // (1) Remove extension if no new properties
 
     if (!newProperties.length) {
+      if (!extensionElement) {
+        return;
+      }
+
       commandStack.execute('element.updateModdleProperties', {
         element,
         moddleElement: businessObject,
@@ -1639,6 +1643,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_CALLED_DECISION) {
+    return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === ZEEBE_CALLED_ELEMENT) {
     return businessObject.get(bindingProperty);
   }
 

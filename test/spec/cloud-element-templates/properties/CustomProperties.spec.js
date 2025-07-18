@@ -1411,6 +1411,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
   });
 
+
   describe('types', function() {
 
     describe('Dropdown', function() {
