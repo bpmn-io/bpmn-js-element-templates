@@ -594,6 +594,27 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       });
     }));
 
+
+    it('should handle <zeebe:assignmentDefinition>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('com.camunda.example.AssignmentDefinition');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const assignmentDefinition = findExtension(bo, 'zeebe:AssignmentDefinition');
+
+      expect(assignmentDefinition).to.exist;
+      expect(assignmentDefinition).to.jsonEqual({
+        $type: 'zeebe:AssignmentDefinition',
+        assignee: 'anAssignee',
+        candidateGroups: 'aCandidateGroup, anotherCandidateGroup',
+        candidateUsers: 'aCandidateUser'
+      });
+    }));
   });
 
 

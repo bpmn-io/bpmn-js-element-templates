@@ -1363,6 +1363,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(input.value).to.equal('aResultVariable');
     });
 
+
     it('should change, setting `resultVariable`', async function() {
 
       // given
@@ -1409,6 +1410,94 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(script).to.have.property('expression', '= 1 + 1');
     }));
 
+  });
+
+  describe('zeebe:assignmentDefinition', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('UserTask_assignment');
+
+      // then
+      let entry = findEntry('custom-entry-com.camunda.example.AssignmentDefinition-1', container),
+          input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('anAssignee');
+
+      entry = findEntry('custom-entry-com.camunda.example.AssignmentDefinition-2', container);
+      input = findTextarea(entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('aCandidateGroup, anotherCandidateGroup');
+
+      entry = findEntry('custom-entry-com.camunda.example.AssignmentDefinition-3', container);
+      input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('aCandidateUser');
+    });
+
+
+    it('should change, setting properties`', async function() {
+
+      // given
+      const element = await expectSelected('UserTask_assignment'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      let entry = findEntry('custom-entry-com.camunda.example.AssignmentDefinition-1', container),
+          input = findInput('text', entry);
+
+      changeInput(input, 'aNewAssignee');
+
+      entry = findEntry('custom-entry-com.camunda.example.AssignmentDefinition-2', container);
+      input = findTextarea(entry);
+
+      changeInput(input, 'aNewCandidateGroup');
+
+      entry = findEntry('custom-entry-com.camunda.example.AssignmentDefinition-3', container);
+      input = findInput('text', entry);
+
+      changeInput(input, 'aNewCandidateUser');
+
+      // then
+      const assignmentDefinition = findExtension(businessObject, 'zeebe:AssignmentDefinition');
+      expect(assignmentDefinition).to.have.property('assignee', 'aNewAssignee');
+      expect(assignmentDefinition).to.have.property('candidateGroups', 'aNewCandidateGroup');
+      expect(assignmentDefinition).to.have.property('candidateUsers', 'aNewCandidateUser');
+    });
+
+
+    it('should change, creating zeebe:assignmentDefinition if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const template = templates.find(t => t.id === 'com.camunda.example.AssignmentDefinition');
+      let task = elementRegistry.get('Task_1');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+
+      // then
+      task = elementRegistry.get('Task_1');
+      const assignmentDefinition = findExtension(getBusinessObject(task), 'zeebe:AssignmentDefinition');
+
+      const entry = findEntry('custom-entry-com.camunda.example.AssignmentDefinition-1', container),
+            input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('anAssignee');
+      expect(assignmentDefinition).to.have.property('assignee', 'anAssignee');
+      expect(assignmentDefinition).to.have.property('candidateGroups', 'aCandidateGroup, anotherCandidateGroup');
+      expect(assignmentDefinition).to.have.property('candidateUsers', 'aCandidateUser');
+    }));
   });
 
 

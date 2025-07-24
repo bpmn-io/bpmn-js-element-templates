@@ -685,5 +685,50 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "AssignmentDefinition",
+    "id": "com.camunda.example.AssignmentDefinition",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:UserTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "binding": {
+          "type": "zeebe:userTask"
+        }
+      },
+      {
+        "label": "Assignee",
+        "description": "Assignee for user task",
+        "type": "String",
+        "value": "anAssignee",
+        "binding": {
+          "type": "zeebe:assignmentDefinition",
+          "property": "assignee"
+        }
+      },
+      {
+        "type": "Text",
+        "value": "aCandidateGroup, anotherCandidateGroup",
+        "binding": {
+          "type": "zeebe:assignmentDefinition",
+          "property": "candidateGroups"
+        }
+      },
+      {
+        "type": "String",
+        "value": "aCandidateUser",
+        "binding": {
+          "type": "zeebe:assignmentDefinition",
+          "property": "candidateUsers"
+        }
+      }
+    ]
   }
 ]

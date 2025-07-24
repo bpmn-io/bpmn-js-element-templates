@@ -2672,6 +2672,94 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
   });
 
+  describe('zeebe:assignmentDefinition', function() {
+    beforeEach(bootstrap(require('./assignment-definition.bpmn').default));
+
+    const newTemplate = require('./assignment-definition.json');
+
+    it('should execute', inject(function(elementRegistry) {
+
+      // given
+      let task = elementRegistry.get('UserTask_1');
+
+      // when
+      changeTemplate(task, newTemplate);
+
+      // then
+      expectElementTemplate(task, 'com.camunda.example.AssignmentDefinition');
+
+      const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+      expect(assignmentDefinition).to.exist;
+      expect(assignmentDefinition).to.have.property('assignee', 'anAssignee');
+    }));
+
+
+    it('undo', inject(function(commandStack, elementRegistry) {
+
+      // given
+      let task = elementRegistry.get('UserTask_1');
+
+      changeTemplate(task, newTemplate);
+
+      // when
+      commandStack.undo();
+
+      // then
+      task = elementRegistry.get('UserTask_1');
+      expectNoElementTemplate(task);
+
+      const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+      expect(assignmentDefinition).not.to.exist;
+
+    }));
+
+
+    it('redo', inject(function(commandStack, elementRegistry) {
+
+      // given
+      let task = elementRegistry.get('UserTask_1');
+
+      changeTemplate(task, newTemplate);
+
+      // when
+      commandStack.undo();
+      commandStack.redo();
+
+      // then
+      task = elementRegistry.get('UserTask_1');
+      expectElementTemplate(task, 'com.camunda.example.AssignmentDefinition');
+
+      const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+      expect(assignmentDefinition).to.exist;
+      expect(assignmentDefinition).to.have.property('assignee', 'anAssignee');
+    }));
+
+
+    it('should not override existing', inject(function(elementRegistry) {
+
+      // given
+      const task = elementRegistry.get('UserTask_assignmentDefinition');
+
+      // when
+      changeTemplate(task, newTemplate);
+
+      // then
+      const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+      expect(assignmentDefinition).to.exist;
+
+      // Should keep the old values, not override with newTemplate's values
+      expect(assignmentDefinition).to.have.property('assignee', 'aCustomAssignee');
+      expect(assignmentDefinition).to.have.property('candidateGroups', 'aCandidateGroup, anotherCandidateGroup');
+
+    }));
+
+  });
+
+
 
   describe('change template (new and old template specified)', function() {
 
