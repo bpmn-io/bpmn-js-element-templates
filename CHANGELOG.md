@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.8.0
+
+* `FEAT`: support `bindingType` property ([#165](https://github.com/bpmn-io/bpmn-js-element-templates/pull/165))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.6.0`
+
 ## 2.7.0
 
 * `FEAT`: support properties of type `bpmn:Expression` ([#161](https://github.com/bpmn-io/bpmn-js-element-templates/pull/161))
