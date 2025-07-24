@@ -27,7 +27,7 @@ import {
   ZEEBE_USER_TASK,
   ZEEBE_CALLED_DECISION,
   ZEEBE_FORM_DEFINITION,
-  ZEEBE_SCRIPT_TASK
+  ZEEBE_SCRIPT_TASK, ZEEBE_ASSIGNMENT_DEFINITION
 } from './bindingTypes';
 
 import {
@@ -256,6 +256,12 @@ function getRawPropertyValue(element, property, scope) {
     const scriptTask = findExtension(businessObject, 'zeebe:Script');
 
     return scriptTask ? scriptTask.get(bindingProperty) : defaultValue;
+  }
+
+  if (type === ZEEBE_ASSIGNMENT_DEFINITION) {
+    const assignmentDefinition = findExtension(businessObject, 'zeebe:AssignmentDefinition');
+
+    return assignmentDefinition ? assignmentDefinition.get(bindingProperty) : defaultValue;
   }
 
   // should never throw as templates are validated beforehand
@@ -779,6 +785,40 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
       });
     }
   }
+
+  // zeebe:assignmentDefinition
+  if (type === ZEEBE_ASSIGNMENT_DEFINITION) {
+    let assignmentDefinition = findExtension(element, 'zeebe:AssignmentDefinition');
+    const propertyName = binding.property;
+
+    const properties = {
+      [ propertyName ]: value || ''
+    };
+
+    if (assignmentDefinition) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: assignmentDefinition
+        }
+      });
+    } else {
+      assignmentDefinition = createElement('zeebe:AssignmentDefinition', properties, extensionElements, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), assignmentDefinition ] }
+        }
+      });
+    }
+  }
+
+
 
   if (commands.length) {
     const commandsToExecute = commands.filter((command) => command !== NO_OP);

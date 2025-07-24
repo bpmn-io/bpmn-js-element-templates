@@ -18,6 +18,7 @@ import ZeebeUserTaskBindingProvider from './ZeebeUserTaskBindingProvider';
 import { CalledDecisionBindingProvider } from './CalledDecisionBindingProvider';
 import { ScriptTaskBindingProvider } from './ScriptTaskBindingProvider';
 import ZeebeFormDefinitionBindingProvider from './FormDefinitionBindingProvider';
+import ZeebeAssignmentDefinitionBindingProvider from './AssignmentDefinitionBindingProvider';
 
 import {
   MESSAGE_PROPERTY_TYPE,
@@ -34,7 +35,7 @@ import {
   ZEEBE_USER_TASK,
   ZEEBE_CALLED_DECISION,
   ZEEBE_FORM_DEFINITION,
-  ZEEBE_SCRIPT_TASK
+  ZEEBE_SCRIPT_TASK, ZEEBE_ASSIGNMENT_DEFINITION
 } from '../util/bindingTypes';
 
 import {
@@ -62,7 +63,8 @@ export default class TemplateElementFactory {
       [ZEEBE_USER_TASK]: ZeebeUserTaskBindingProvider,
       [ZEEBE_CALLED_DECISION]: CalledDecisionBindingProvider,
       [ZEEBE_FORM_DEFINITION]: ZeebeFormDefinitionBindingProvider,
-      [ZEEBE_SCRIPT_TASK]: ScriptTaskBindingProvider
+      [ZEEBE_SCRIPT_TASK]: ScriptTaskBindingProvider,
+      [ZEEBE_ASSIGNMENT_DEFINITION]: ZeebeAssignmentDefinitionBindingProvider
     };
   }
 

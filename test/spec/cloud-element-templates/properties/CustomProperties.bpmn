@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_00cqa19" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.36.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_00cqa19" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.37.0">
   <bpmn:process id="Process_1" isExecutable="true">
     <bpmn:serviceTask id="RestTask" name="REST Task" zeebe:modelerTemplate="com.example.rest">
       <bpmn:extensionElements>
@@ -97,6 +97,13 @@
       </bpmn:extensionElements>
     </bpmn:scriptTask>
     <bpmn:task id="nonexisting" name="non-existing propert" zeebe:modelerTemplate="my.example.non-existing-property" test="value" />
+    <bpmn:userTask id="UserTask_assignment" name="assignment" zeebe:modelerTemplate="com.camunda.example.AssignmentDefinition">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="" />
+        <zeebe:assignmentDefinition assignee="anAssignee" candidateGroups="aCandidateGroup, anotherCandidateGroup" candidateUsers="aCandidateUser" />
+      </bpmn:extensionElements>
+    </bpmn:userTask>
   </bpmn:process>
   <bpmn:message id="Message" name="name">
     <bpmn:extensionElements>
@@ -111,95 +118,99 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
       <bpmndi:BPMNShape id="Activity_1d5ac68_di" bpmnElement="RestTask">
-        <dc:Bounds x="160" y="80" width="100" height="80" />
+        <dc:Bounds x="290" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0tip4qx_di" bpmnElement="Task_1">
-        <dc:Bounds x="160" y="200" width="100" height="80" />
+        <dc:Bounds x="290" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0sxtp96_di" bpmnElement="DropdownTask">
-        <dc:Bounds x="220" y="480" width="100" height="80" />
+        <dc:Bounds x="350" y="480" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0p6pet6_di" bpmnElement="ValidateTask">
-        <dc:Bounds x="310" y="200" width="100" height="80" />
+        <dc:Bounds x="440" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1hbryo1_di" bpmnElement="RestTask_noData">
-        <dc:Bounds x="300" y="80" width="100" height="80" />
+        <dc:Bounds x="430" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0sz43pp_di" bpmnElement="RestTask_hidden">
-        <dc:Bounds x="470" y="80" width="100" height="80" />
+        <dc:Bounds x="600" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="RestTask_optional_di" bpmnElement="RestTask_optional">
-        <dc:Bounds x="470" y="200" width="100" height="80" />
+        <dc:Bounds x="600" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0c7o61d_di" bpmnElement="DropdownNoSelection">
-        <dc:Bounds x="360" y="480" width="100" height="80" />
+        <dc:Bounds x="490" y="480" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0v9dgs2" bpmnElement="OptionalDropdownTask">
-        <dc:Bounds x="500" y="480" width="100" height="80" />
+        <dc:Bounds x="630" y="480" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0s72lq5_di" bpmnElement="MessageEvent">
-        <dc:Bounds x="132" y="652" width="36" height="36" />
+        <dc:Bounds x="262" y="652" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="126" y="695" width="49" height="14" />
+          <dc:Bounds x="256" y="695" width="49" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0kkwpp4" bpmnElement="MessageEvent_hidden">
-        <dc:Bounds x="192" y="652" width="36" height="36" />
+        <dc:Bounds x="322" y="652" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="193" y="695" width="35" height="14" />
+          <dc:Bounds x="323" y="695" width="35" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1upeqbd" bpmnElement="MessageEvent_noData">
-        <dc:Bounds x="132" y="722" width="36" height="36" />
+        <dc:Bounds x="262" y="722" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="131" y="765" width="39" height="14" />
+          <dc:Bounds x="261" y="765" width="39" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0c7o61daaa_di" bpmnElement="ValidatedConditionalTask">
-        <dc:Bounds x="760" y="480" width="100" height="80" />
+        <dc:Bounds x="890" y="480" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0tg2czn_di" bpmnElement="TaskDefinition">
-        <dc:Bounds x="620" y="80" width="100" height="80" />
+        <dc:Bounds x="750" y="80" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1nfgyhn_di" bpmnElement="CalledElement">
-        <dc:Bounds x="360" y="630" width="100" height="80" />
+        <dc:Bounds x="490" y="630" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_di" bpmnElement="CalledElement_empty">
-        <dc:Bounds x="480" y="630" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_02u8j70_di" bpmnElement="BusinessRuleTask_called_decision">
-        <dc:Bounds x="360" y="760" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_03sg3f9" bpmnElement="BusinessRuleTask_empty">
-        <dc:Bounds x="480" y="760" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_1nwo7tk" bpmnElement="BusinessRuleTask_task_definition">
-        <dc:Bounds x="600" y="760" width="100" height="80" />
+        <dc:Bounds x="610" y="630" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1kv4zcr_di" bpmnElement="CamundaUserTask">
-        <dc:Bounds x="160" y="830" width="100" height="80" />
+        <dc:Bounds x="290" y="830" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02u8j70_di" bpmnElement="BusinessRuleTask_called_decision">
+        <dc:Bounds x="490" y="760" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_03sg3f9" bpmnElement="BusinessRuleTask_empty">
+        <dc:Bounds x="610" y="760" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1nwo7tk" bpmnElement="BusinessRuleTask_task_definition">
+        <dc:Bounds x="730" y="760" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0mey0xd_di" bpmnElement="ScriptTask_script">
-        <dc:Bounds x="360" y="1020" width="100" height="80" />
+        <dc:Bounds x="490" y="1020" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_02sbchp" bpmnElement="ScriptTask_taskDefinition">
-        <dc:Bounds x="480" y="1020" width="100" height="80" />
+        <dc:Bounds x="610" y="1020" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="nonexisting_di" bpmnElement="nonexisting">
-        <dc:Bounds x="30" y="200" width="100" height="80" />
+        <dc:Bounds x="160" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ga4eg7_di" bpmnElement="UserTask_assignment">
+        <dc:Bounds x="290" y="930" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

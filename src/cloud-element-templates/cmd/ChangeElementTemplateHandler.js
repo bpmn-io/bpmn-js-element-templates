@@ -35,7 +35,8 @@ import {
   ZEEBE_LINKED_RESOURCE_PROPERTY,
   ZEEBE_SCRIPT_TASK,
   ZEEBE_USER_TASK,
-  ZEEBE_FORM_DEFINITION
+  ZEEBE_FORM_DEFINITION,
+  ZEEBE_ASSIGNMENT_DEFINITION
 } from '../util/bindingTypes';
 
 import {
@@ -121,6 +122,8 @@ export default class ChangeElementTemplateHandler {
       this._updateZeebeFormDefinition(element, oldTemplate, newTemplate);
 
       this._updateScriptTask(element, oldTemplate, newTemplate);
+
+      this._updateZeebeAssignmentDefinition(element, oldTemplate, newTemplate);
     }
   }
 
@@ -918,6 +921,19 @@ export default class ChangeElementTemplateHandler {
     );
   }
 
+  _updateZeebeAssignmentDefinition(element, oldTemplate, newTemplate) {
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: [ ZEEBE_ASSIGNMENT_DEFINITION ],
+        extensionType: 'zeebe:AssignmentDefinition',
+        getPropertyName: (binding) => binding.property
+      }
+    );
+  }
+
   /**
    * Replaces the element with the specified elementType.
    * Takes into account the eventDefinition for events.
@@ -1537,6 +1553,19 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
     });
   }
+
+  if (newBindingType === ZEEBE_ASSIGNMENT_DEFINITION) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_ASSIGNMENT_DEFINITION) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
 }
 
 /**
@@ -1655,6 +1684,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_SCRIPT_TASK) {
+    return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === ZEEBE_ASSIGNMENT_DEFINITION) {
     return businessObject.get(bindingProperty);
   }
 }

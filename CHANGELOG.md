@@ -5,6 +5,7 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 ## Unreleased
 
 ___Note:__ Yet to be released changes appear here._
+* `FEAT`: support `zeebe:assignmentDefinition` binding property
 
 ## 2.8.0
 
