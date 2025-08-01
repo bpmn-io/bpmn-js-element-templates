@@ -1,6 +1,6 @@
 {
   "name": "bpmn-js-element-templates",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "Element templates for bpmn-js",
   "files": [
     "dist"
