@@ -28,35 +28,35 @@
   position: initial;
 }
 
-.bio-properties-panel-templates-group .bio-properties-panel-group-header-button:not(.bio-properties-panel-arrow) {
+.bio-properties-panel-templates-group .bio-properties-panel-group-header-buttons .bio-properties-panel-group-header-button:not(.bio-properties-panel-arrow) {
   padding-right: 6px;
   padding-left: 9px;
   border-radius: 11px;
 }
 
-.bio-properties-panel-applied-template-button .bio-properties-panel-group-header-button,
-.bio-properties-panel-template-update-available .bio-properties-panel-group-header-button,
-.bio-properties-panel-group-header-button.bio-properties-panel-select-template-button {
+.bio-properties-panel-group-header-buttons .bio-properties-panel-applied-template-button .bio-properties-panel-group-header-button,
+.bio-properties-panel-group-header-buttons .bio-properties-panel-template-update-available .bio-properties-panel-group-header-button,
+.bio-properties-panel-group-header-buttons .bio-properties-panel-group-header-button.bio-properties-panel-select-template-button {
   background-color: var(--select-template-background-color);
   color: var(--select-template-label-color);
   fill: var(--select-template-fill-color);
 }
 
-.bio-properties-panel-applied-template-button .bio-properties-panel-group-header-button:hover,
-.bio-properties-panel-template-update-available .bio-properties-panel-group-header-button:hover,
-.bio-properties-panel-group-header-button.bio-properties-panel-select-template-button:hover {
+.bio-properties-panel-group-header-buttons .bio-properties-panel-applied-template-button .bio-properties-panel-group-header-button:hover,
+.bio-properties-panel-group-header-buttons .bio-properties-panel-template-update-available .bio-properties-panel-group-header-button:hover,
+.bio-properties-panel-group-header-buttons .bio-properties-panel-group-header-button.bio-properties-panel-select-template-button:hover {
   background-color: var(--select-template-hover-background-color);
 }
 
-.bio-properties-panel-templates-group .bio-properties-panel-group-header-button * {
+.bio-properties-panel-templates-group .bio-properties-panel-group-header-buttons .bio-properties-panel-group-header-button * {
   color: inherit;
 }
 
-.bio-properties-panel-templates-group .bio-properties-panel-group-header-button * + * {
+.bio-properties-panel-templates-group .bio-properties-panel-group-header-buttons .bio-properties-panel-group-header-button * + * {
   margin-left: 2px;
 }
 
-.bio-properties-panel-group-header-button.bio-properties-panel-select-template-button:last-child {
+.bio-properties-panel-group-header-buttons .bio-properties-panel-group-header-button.bio-properties-panel-select-template-button:last-child {
   padding-right: 9px;
   padding-left: 6px;
   margin-right: 22px;
@@ -73,33 +73,33 @@
   color: var(--text-error-color);
 }
 
-.bio-properties-panel-deprecated-template-button .bio-properties-panel-group-header-button {
+.bio-properties-panel-group-header-buttons .bio-properties-panel-deprecated-template-button .bio-properties-panel-group-header-button {
   background-color: var(--deprecated-template-background-color);
   color: var(--select-template-label-color);
   fill: var(--select-template-fill-color);
 }
 
-.bio-properties-panel-deprecated-template-button:hover .bio-properties-panel-group-header-button:hover {
+.bio-properties-panel-group-header-buttons .bio-properties-panel-deprecated-template-button:hover .bio-properties-panel-group-header-button:hover {
   background-color: var(--deprecated-template-hover-background-color);
 }
 
-.bio-properties-panel-template-not-found .bio-properties-panel-group-header-button {
+.bio-properties-panel-group-header-buttons .bio-properties-panel-template-not-found .bio-properties-panel-group-header-button {
   background-color: var(--unknown-template-background-color);
   color: var(--select-template-label-color);
   fill: var(--select-template-fill-color);
 }
 
-.bio-properties-panel-template-not-found .bio-properties-panel-group-header-button:hover {
+.bio-properties-panel-group-header-buttons .bio-properties-panel-template-not-found .bio-properties-panel-group-header-button:hover {
   background-color: var(--unknown-template-hover-background-color);
 }
 
-.bio-properties-panel-template-incompatible .bio-properties-panel-group-header-button {
+.bio-properties-panel-group-header-buttons .bio-properties-panel-template-incompatible .bio-properties-panel-group-header-button {
   background-color: var(--incompatible-template-background-color);
   color: var(--incompatible-template-label-color);
   fill: var(--incompatible-template-fill-color);
 }
 
-.bio-properties-panel-template-incompatible .bio-properties-panel-group-header-button:hover {
+.bio-properties-panel-group-header-buttons .bio-properties-panel-template-incompatible .bio-properties-panel-group-header-button:hover {
   background-color: var(--incompatible-template-hover-background-color);
 }
 
