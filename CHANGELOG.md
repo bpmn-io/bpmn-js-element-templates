@@ -5,12 +5,16 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 ## Unreleased
 
 ___Note:__ Yet to be released changes appear here._
+
+## 2.9.0
+
 * `FEAT`: support `zeebe:assignmentDefinition` binding property
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.9.0`
 
 ## 2.8.0
 
 * `FEAT`: support `bindingType` property ([#165](https://github.com/bpmn-io/bpmn-js-element-templates/pull/165))
-* `DEPS`: update to `@bpmn-io/element-templates-validator@2.6.0`
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.7.0`
 
 ## 2.7.0
 
