@@ -11,7 +11,8 @@ import {
 import {
   act,
   cleanup,
-  fireEvent
+  fireEvent,
+  waitFor
 } from '@testing-library/preact';
 
 import {
@@ -65,6 +66,9 @@ import defaultTypesElementTemplates from './CustomProperties.default-types.json'
 
 import defaultValuesDiagramXML from './CustomProperties.default-values.bpmn';
 import defaultValuesElementTemplates from './CustomProperties.default-values.json';
+
+import generatedValuesDiagramXML from './CustomProperties.generated-values.bpmn';
+import generatedValuesElementTemplates from './CustomProperties.generated-values.json';
 
 import groupsDiagramXML from './CustomProperties.groups.bpmn';
 import groupsElementTemplates from './CustomProperties.groups.json';
@@ -2292,89 +2296,135 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
 
 
-    it('should display empty String - property', async function() {
+    beforeEach(inject(async function(elementTemplates) {
 
       // given
-      await expectSelected('RestTask');
+      const task = await expectSelected('Task');
+      const template = defaultValuesElementTemplates[0];
 
-      const entry = findEntry('custom-entry-com.example.default-types-0', container),
-            input = findInput('text', entry);
+      await act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+    }));
+
+
+    it('should NOT be marked as edited if property value is same as default value', async function() {
+
+      // when
+      const group = getGroupById('group-ElementTemplates__CustomProperties-default-values');
 
       // then
-      expect(input).to.exist;
-      expect(input.value).to.eql('');
+      await waitFor(() => {
+        expect(domQuery('.bio-properties-panel-dot', group)).to.not.exist;
+      });
+
     });
 
 
-    it('should display String as default - zeebe:taskDefinition:type', async function() {
+    it('should be marked as edited if property value is changed', function() {
 
-      // given
-      await expectSelected('RestTask');
+      const entry = findEntry('custom-entry-com.example.default-values-default-values-0', container),
+            input = findInput('text', entry),
+            group = getGroupById('group-ElementTemplates__CustomProperties-default-values');
 
-      const entry = findEntry('custom-entry-com.example.default-types-1', container),
-            input = findInput('text', entry);
+      // when
+      changeInput(input, 'foo');
 
       // then
-      expect(input).to.exist;
-      expect(input.value).to.eql('');
+      return waitFor(() => {
+        expect(domQuery('.bio-properties-panel-dot', group)).to.exist;
+      });
     });
 
 
-    it('should display String as default - zeebe:taskHeader', async function() {
+    it('should NOT be marked as edited if there is no default value', function() {
 
-      // given
-      await expectSelected('RestTask');
-
-      const entry = findEntry('custom-entry-com.example.default-types-2', container),
-            input = findInput('text', entry);
+      // when
+      const group = getGroupById('group-ElementTemplates__CustomProperties-no-default-values');
 
       // then
-      expect(input).to.exist;
-      expect(input.value).to.eql('');
+      return waitFor(() => {
+        expect(domQuery('.bio-properties-panel-dot', group)).to.not.exist;
+      });
     });
 
 
-    it('should display String as default - zeebe:input', async function() {
+    it('should be marked as edited when property is changed to empty property', function() {
 
       // given
-      await expectSelected('RestTask');
-
-      const entry = findEntry('custom-entry-com.example.default-types-3', container),
+      const entry = findEntry('custom-entry-com.example.default-values-default-values-0', container),
             input = findInput('text', entry);
 
+      // when
+      changeInput(input, '');
+      const group = getGroupById('group-ElementTemplates__CustomProperties-default-values');
+
       // then
-      expect(input).to.exist;
-      expect(input.value).to.eql('');
+      return waitFor(() => {
+        expect(domQuery('.bio-properties-panel-dot', group)).to.exist;
+      });
+    });
+  });
+
+
+  describe('generated values', function() {
+
+    beforeEach(bootstrapPropertiesPanel(generatedValuesDiagramXML, {
+      container,
+      debounceInput: false,
+      elementTemplates: generatedValuesElementTemplates,
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      },
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        elementTemplatesModule,
+        modelingModule
+      ]
+    }));
+
+
+    beforeEach(inject(async function(elementTemplates) {
+
+      // given
+      const task = await expectSelected('Task');
+      const template = generatedValuesElementTemplates[0];
+
+      return act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+    }));
+
+
+    it('should be marked as edited for generated values', function() {
+
+      // when
+      const group = getGroupById('ElementTemplates__CustomProperties');
+
+      // then
+      return waitFor(() => {
+        expect(domQuery('.bio-properties-panel-dot', group)).to.exist;
+      });
     });
 
 
-    it('should display String as default - zeebe:output', async function() {
+
+    it('should be marked as edited for generated values when input is cleared', function() {
 
       // given
-      await expectSelected('RestTask');
+      const entry = findEntry('custom-entry-com.example.generated-values-0', container),
+            input = findTextarea(entry);
 
-      const entry = findEntry('custom-entry-com.example.default-types-4', container),
-            input = findInput('text', entry);
-
-      // then
-      expect(input).to.exist;
-      expect(input.value).to.eql('');
-    });
-
-
-    it('should display String as default - zeebe:property', async function() {
-
-      // given
-      await expectSelected('RestTask');
-
-      const entry = findEntry('custom-entry-com.example.default-types-5', container),
-            input = findInput('text', entry);
+      // when
+      changeInput(input, '');
+      const group = getGroupById('ElementTemplates__CustomProperties');
 
       // then
-      expect(input).to.exist;
-      expect(input.value).to.eql('');
+      return waitFor(() => {
+        expect(domQuery('.bio-properties-panel-dot', group)).to.exist;
+      });
     });
-
   });
 
 

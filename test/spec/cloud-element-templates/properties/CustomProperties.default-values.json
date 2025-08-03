@@ -2,9 +2,19 @@
   {
     "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
     "name": "Rest Template",
-    "id": "com.example.default-types",
+    "id": "com.example.default-values",
     "appliesTo": [
       "bpmn:ServiceTask"
+    ],
+    "groups": [
+      {
+        "id": "no-default-values",
+        "label": "No Default Values"
+      },
+      {
+        "id": "default-values",
+        "label": "Default Values"
+      }
     ],
     "properties": [
       {
@@ -35,6 +45,13 @@
         }
       },
       {
+        "value": "",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "input-2-target"
+        }
+      },
+      {
         "value": "output-1-target",
         "binding": {
           "type": "zeebe:output",
@@ -47,6 +64,34 @@
         "binding": {
           "type": "zeebe:property",
           "name": "property-1-name"
+        }
+      },
+      {
+        "label": "property-1",
+        "type": "String",
+        "group": "default-values",
+        "value": "property-1",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "property-1-name-default"
+        }
+      },
+      {
+        "label": "property-2",
+        "type": "String",
+        "group": "default-values",
+        "value": "property-2",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "property-2-name-default"
+        }
+      },
+      {
+        "group": "no-default-values",
+        "label": "No default value",
+        "binding": {
+          "type": "property",
+          "name": "name"
         }
       }
     ]
