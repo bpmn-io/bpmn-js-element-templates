@@ -1,0 +1,22 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Generated Values Template",
+    "id": "com.example.generated-values",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "type": "Text",
+        "generatedValue": {
+          "type": "uuid"
+        },
+        "binding": {
+          "type": "zeebe:input",
+          "name": "input"
+        }
+      }
+    ]
+  }
+]

@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.9.1
+
+* `FIX`: use default values for displaying edited marker ([#170](https://github.com/bpmn-io/bpmn-js-element-templates/pull/170))
+
 ## 2.9.0
 
 * `FEAT`: support `zeebe:assignmentDefinition` binding property

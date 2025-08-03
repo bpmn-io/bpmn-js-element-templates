@@ -1,6 +1,6 @@
 import { forEach } from 'min-dash';
 
-
+import { getDefaultValue } from '../../../Helper';
 import { PropertyTooltip } from '../../components/PropertyTooltip';
 
 import {
@@ -24,6 +24,7 @@ import {
 } from '../../../util/bindingTypes';
 
 import { groupByGroupId, findCustomGroup } from './util';
+import { getPropertyValue } from '../../../util/propertyUtil';
 import { TextAreaProperty } from './TextAreaProperty';
 import { StringProperty } from './StringProperty';
 import { FeelProperty } from './FeelProperty';
@@ -132,7 +133,7 @@ function createCustomEntry(id, element, property) {
     return {
       id,
       component: FeelProperty,
-      isEdited: isFeelEntryEdited,
+      isEdited: createIsEdited(isFeelEntryEdited, element, property),
       property
     };
   }
@@ -141,7 +142,7 @@ function createCustomEntry(id, element, property) {
     return {
       id,
       component: NumberProperty,
-      isEdited: isNumberFieldEntryEdited,
+      isEdited: createIsEdited(isNumberFieldEntryEdited, element, property),
       property
     };
   }
@@ -150,7 +151,7 @@ function createCustomEntry(id, element, property) {
     return {
       id,
       component: BooleanProperty,
-      isEdited: isCheckboxEntryEdited,
+      isEdited: createIsEdited(isCheckboxEntryEdited, element, property),
       property
     };
   }
@@ -159,7 +160,7 @@ function createCustomEntry(id, element, property) {
     return {
       id,
       component: DropdownProperty,
-      isEdited: isSelectEntryEdited,
+      isEdited: createIsEdited(isSelectEntryEdited, element, property),
       property
     };
   }
@@ -169,14 +170,14 @@ function createCustomEntry(id, element, property) {
       return {
         id,
         component: FeelProperty,
-        isEdited: isFeelEntryEdited,
+        isEdited: createIsEdited(isFeelEntryEdited, element, property),
         property
       };
     }
     return {
       id,
       component: StringProperty,
-      isEdited: isTextFieldEntryEdited,
+      isEdited: createIsEdited(isTextFieldEntryEdited, element, property),
       property
     };
   }
@@ -186,14 +187,14 @@ function createCustomEntry(id, element, property) {
       return {
         id,
         component: FeelTextAreaProperty,
-        isEdited: isFeelEntryEdited,
+        isEdited: createIsEdited(isFeelEntryEdited, element, property),
         property
       };
     }
     return {
       id,
       component: TextAreaProperty,
-      isEdited: isTextAreaEntryEdited,
+      isEdited: createIsEdited(isTextAreaEntryEdited, element, property),
       property
     };
   }
@@ -217,4 +218,13 @@ function getDefaultType(property) {
   }
 }
 
+function createIsEdited(isEditedEntry, element, property) {
+
+  if (property.generatedValue) return () => true;
+
+  const actualValue = getPropertyValue(element, property);
+  const defaultValue = getDefaultValue(property);
+
+  return defaultValue !== undefined ? () => actualValue !== defaultValue : isEditedEntry;
+}
 
