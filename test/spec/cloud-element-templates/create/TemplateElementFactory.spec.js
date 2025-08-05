@@ -615,6 +615,27 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
         candidateUsers: 'aCandidateUser'
       });
     }));
+
+
+    it('should handle <zeebe:priorityDefinition>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('com.camunda.example.PriorityDefinition');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const priorityDefinition = findExtension(bo, 'zeebe:PriorityDefinition');
+
+      expect(priorityDefinition).to.exist;
+      expect(priorityDefinition).to.jsonEqual({
+        $type: 'zeebe:PriorityDefinition',
+        priority: 10
+      });
+    }));
+
   });
 
 

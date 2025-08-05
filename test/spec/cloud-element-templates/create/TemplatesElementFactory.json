@@ -730,5 +730,34 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "PriorityDefinition",
+    "id": "com.camunda.example.PriorityDefinition",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:UserTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "binding": {
+          "type": "zeebe:userTask"
+        }
+      },
+      {
+        "label": "Priority",
+        "description": "Priority for user task",
+        "type": "Number",
+        "value": 10,
+        "binding": {
+          "type": "zeebe:priorityDefinition",
+          "property": "priority"
+        }
+      }
+    ]
   }
 ]

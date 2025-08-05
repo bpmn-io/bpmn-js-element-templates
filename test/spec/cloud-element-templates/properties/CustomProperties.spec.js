@@ -1416,6 +1416,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
   });
 
+
   describe('zeebe:assignmentDefinition', function() {
 
     it('should display', async function() {
@@ -1504,6 +1505,70 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
   });
 
+
+  describe('zeebe:priorityDefinition', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('UserTask_priority');
+
+      // then
+      const entry = findEntry('custom-entry-com.camunda.example.PriorityDefinition-1', container),
+            input = findInput('number', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('10');
+    });
+
+
+    it('should change, setting priority value', async function() {
+
+      // given
+      const element = await expectSelected('UserTask_priority'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-com.camunda.example.PriorityDefinition-1', container),
+            input = findInput('number', entry);
+
+      changeInput(input, '20');
+
+      // then
+      expect(input.value).to.equal('20');
+
+      const priorityDefinition = findExtension(businessObject, 'zeebe:PriorityDefinition');
+      expect(priorityDefinition).to.exist;
+      expect(priorityDefinition).to.have.property('priority', 20);
+    });
+
+
+    it('should change, creating zeebe:priorityDefinition if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const template = templates.find(t => t.id === 'com.camunda.example.PriorityDefinition');
+      let task = elementRegistry.get('Task_1');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+
+      // then
+      task = elementRegistry.get('Task_1');
+      const priorityDefinition = findExtension(getBusinessObject(task), 'zeebe:PriorityDefinition');
+
+      const entry = findEntry('custom-entry-com.camunda.example.PriorityDefinition-1', container),
+            input = findInput('number', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('10');
+      expect(priorityDefinition).to.have.property('priority', 10);
+    }));
+
+  });
 
   describe('types', function() {
 

@@ -27,7 +27,9 @@ import {
   ZEEBE_USER_TASK,
   ZEEBE_CALLED_DECISION,
   ZEEBE_FORM_DEFINITION,
-  ZEEBE_SCRIPT_TASK, ZEEBE_ASSIGNMENT_DEFINITION
+  ZEEBE_SCRIPT_TASK,
+  ZEEBE_ASSIGNMENT_DEFINITION,
+  ZEEBE_PRIORITY_DEFINITION
 } from './bindingTypes';
 
 import {
@@ -262,6 +264,12 @@ function getRawPropertyValue(element, property) {
     const assignmentDefinition = findExtension(businessObject, 'zeebe:AssignmentDefinition');
 
     return assignmentDefinition ? assignmentDefinition.get(bindingProperty) : defaultValue;
+  }
+
+  if (type === ZEEBE_PRIORITY_DEFINITION) {
+    const priorityDefinition = findExtension(businessObject, 'zeebe:PriorityDefinition');
+
+    return priorityDefinition ? priorityDefinition.get(bindingProperty) : defaultValue;
   }
 
   // should never throw as templates are validated beforehand
@@ -649,6 +657,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     }
   }
 
+  // zeebe:linkedResource
   if (type === ZEEBE_LINKED_RESOURCE_PROPERTY) {
     let linkedResources = findExtension(businessObject, 'zeebe:LinkedResources');
 
@@ -754,7 +763,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     }
   }
 
-
+  // zeebe:formDefinition
   if (type === ZEEBE_FORM_DEFINITION) {
     let formDefinition = findExtension(element, 'zeebe:FormDefinition');
     const propertyName = binding.property;
@@ -818,6 +827,37 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     }
   }
 
+  // zeebe:priorityDefinition
+  if (type === ZEEBE_PRIORITY_DEFINITION) {
+    let priorityDefinition = findExtension(element, 'zeebe:PriorityDefinition');
+    const propertyName = binding.property;
+
+    const properties = {
+      [ propertyName ]: value || ''
+    };
+
+    if (priorityDefinition) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: priorityDefinition
+        }
+      });
+    } else {
+      priorityDefinition = createElement('zeebe:PriorityDefinition', properties, extensionElements, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), priorityDefinition ] }
+        }
+      });
+    }
+  }
 
 
   if (commands.length) {
