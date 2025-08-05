@@ -20,6 +20,8 @@ import {
   shouldUpdate
 } from '../CreateHelper';
 
+import { castToModdleType } from '../util/castToModdleType';
+
 import {
   find,
   without
@@ -56,13 +58,14 @@ import { isExpression, createExpression } from '../util/bpmnExpressionUtil';
  * `zeebe:modelerTemplateVersion`.
  */
 export default class ChangeElementTemplateHandler {
-  constructor(bpmnFactory, bpmnReplace, commandStack, modeling, moddleCopy, injector) {
+  constructor(bpmnFactory, bpmnReplace, commandStack, modeling, moddleCopy, moddle, injector) {
     this._bpmnFactory = bpmnFactory;
     this._bpmnReplace = bpmnReplace;
 
     this._modeling = modeling;
     this._moddleCopy = moddleCopy;
     this._commandStack = commandStack;
+    this._moddle = moddle;
 
     this._injector = injector;
   }
@@ -1251,9 +1254,11 @@ export default class ChangeElementTemplateHandler {
     // If there are new properties:
     newProperties.forEach((newProperty) => {
       const oldProperty = findOldProperty(oldTemplate, newProperty),
-            newPropertyValue = getDefaultValue(newProperty),
             newBinding = newProperty.binding,
             propertyName = getPropertyName(newBinding);
+
+      const originalPropertyValue = getDefaultValue(newProperty);
+      let newPropertyValue = castToModdleType(this._moddle, extensionType, propertyName, originalPropertyValue);
 
       // (2) Update old extension with new property values
       if (extensionElement) {
@@ -1320,6 +1325,7 @@ ChangeElementTemplateHandler.$inject = [
   'commandStack',
   'modeling',
   'moddleCopy',
+  'moddle',
   'injector'
 ];
 
