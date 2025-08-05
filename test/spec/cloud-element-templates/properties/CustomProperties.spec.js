@@ -1536,7 +1536,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       const priorityDefinition = findExtension(businessObject, 'zeebe:PriorityDefinition');
       expect(priorityDefinition).to.exist;
-      expect(priorityDefinition).to.have.property('priority', 20);
+      expect(priorityDefinition).to.have.property('priority', '20');
     });
 
 
@@ -1561,7 +1561,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(entry).to.exist;
       expect(input).to.exist;
       expect(input.value).to.equal('10');
-      expect(priorityDefinition).to.have.property('priority', 10);
+      expect(priorityDefinition).to.have.property('priority', '10');
     }));
   });
 

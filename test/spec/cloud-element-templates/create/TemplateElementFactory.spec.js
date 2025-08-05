@@ -632,7 +632,7 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       expect(priorityDefinition).to.exist;
       expect(priorityDefinition).to.jsonEqual({
         $type: 'zeebe:PriorityDefinition',
-        priority: 10
+        priority: '10'
       });
     }));
   });

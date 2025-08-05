@@ -2778,7 +2778,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
 
       expect(priorityDefinition).to.exist;
-      expect(priorityDefinition).to.have.property('priority', 10);
+      expect(priorityDefinition).to.have.property('priority', '10');
     }));
 
     it('undo', inject(function(commandStack, elementRegistry) {
@@ -2819,7 +2819,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
 
       expect(priorityDefinition).to.exist;
-      expect(priorityDefinition).to.have.property('priority', 10);
+      expect(priorityDefinition).to.have.property('priority', '10');
     }));
 
     it('should not override existing', inject(function(elementRegistry) {
@@ -2836,10 +2836,11 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       expect(priorityDefinition).to.exist;
 
       // Should keep the old values, not override with newTemplate's values
-      // todo understand why this is a string
       expect(priorityDefinition).to.have.property('priority', '5');
 
     }));
+
+    // todo investigate floating point?
 
   });
 
