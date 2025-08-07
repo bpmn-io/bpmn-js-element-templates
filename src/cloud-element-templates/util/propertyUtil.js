@@ -62,8 +62,8 @@ const EXPRESSION_TYPES = [
   'bpmn:FormalExpression'
 ];
 
-export function getPropertyValue(element, property, scope) {
-  const rawValue = getRawPropertyValue(element, property, scope);
+export function getPropertyValue(element, property) {
+  const rawValue = getRawPropertyValue(element, property);
 
   const { type } = property;
 
@@ -74,7 +74,7 @@ export function getPropertyValue(element, property, scope) {
   return rawValue;
 }
 
-function getRawPropertyValue(element, property, scope) {
+function getRawPropertyValue(element, property) {
   let businessObject = getBusinessObject(element);
 
   const defaultValue = '';
