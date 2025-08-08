@@ -9,63 +9,16 @@
     "groups": [
       {
         "id": "no-default-values",
-        "label": "No Default Values"
+        "label": "No Default Values",
+        "openByDefault": true
       },
       {
         "id": "default-values",
-        "label": "Default Values"
+        "label": "Default Values",
+        "openByDefault": true
       }
     ],
     "properties": [
-      {
-        "value": "foo",
-        "binding": {
-          "type": "property",
-          "name": "name"
-        }
-      },
-      {
-        "value": "task-type",
-        "binding": {
-          "type": "zeebe:taskDefinition:type"
-        }
-      },
-      {
-        "value": "header-1-value",
-        "binding": {
-          "type": "zeebe:taskHeader",
-          "key": "header-1-key"
-        }
-      },
-      {
-        "value": "input-1-source",
-        "binding": {
-          "type": "zeebe:input",
-          "name": "input-1-target"
-        }
-      },
-      {
-        "value": "",
-        "binding": {
-          "type": "zeebe:input",
-          "name": "input-2-target"
-        }
-      },
-      {
-        "value": "output-1-target",
-        "binding": {
-          "type": "zeebe:output",
-          "source": "output-1-source"
-        }
-      },
-      {
-        "label": "property-1",
-        "type": "String",
-        "binding": {
-          "type": "zeebe:property",
-          "name": "property-1-name"
-        }
-      },
       {
         "label": "property-1",
         "type": "String",
@@ -84,6 +37,17 @@
         "binding": {
           "type": "zeebe:property",
           "name": "property-2-name-default"
+        }
+      },
+      {
+        "label": "Empty string as default (input)",
+        "type": "String",
+        "group": "default-values",
+        "value": "",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "zeebeInput",
+          "source": "property-3-name-default"
         }
       },
       {

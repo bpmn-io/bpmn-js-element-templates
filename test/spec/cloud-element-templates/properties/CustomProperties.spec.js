@@ -2364,6 +2364,31 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(domQuery('.bio-properties-panel-dot', group)).to.exist;
       });
     });
+
+
+    it('should NOT be marked as edited when property is changed back to empty (default="")', async function() {
+
+      // given
+      const entry = findEntry('custom-entry-com.example.default-values-default-values-2', container),
+            input = findInput('text', entry);
+
+      // when
+      changeInput(input, 'some value');
+
+      // assume
+      const group = getGroupById('group-ElementTemplates__CustomProperties-default-values');
+      await waitFor(() => {
+        expect(domQuery('.bio-properties-panel-dot', group)).to.exist;
+      });
+
+      // and when
+      changeInput(input, '');
+
+      // then
+      await waitFor(() => {
+        expect(domQuery('.bio-properties-panel-dot', group), 'marker should be removed').not.to.exist;
+      });
+    });
   });
 
 
