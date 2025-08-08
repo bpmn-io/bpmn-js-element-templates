@@ -20,6 +20,8 @@ import {
   shouldUpdate
 } from '../CreateHelper';
 
+import { castToModdleType } from '../util/castToModdleType';
+
 import {
   find,
   without
@@ -36,7 +38,8 @@ import {
   ZEEBE_SCRIPT_TASK,
   ZEEBE_USER_TASK,
   ZEEBE_FORM_DEFINITION,
-  ZEEBE_ASSIGNMENT_DEFINITION
+  ZEEBE_ASSIGNMENT_DEFINITION,
+  ZEEBE_PRIORITY_DEFINITION
 } from '../util/bindingTypes';
 
 import {
@@ -55,13 +58,14 @@ import { isExpression, createExpression } from '../util/bpmnExpressionUtil';
  * `zeebe:modelerTemplateVersion`.
  */
 export default class ChangeElementTemplateHandler {
-  constructor(bpmnFactory, bpmnReplace, commandStack, modeling, moddleCopy, injector) {
+  constructor(bpmnFactory, bpmnReplace, commandStack, modeling, moddleCopy, moddle, injector) {
     this._bpmnFactory = bpmnFactory;
     this._bpmnReplace = bpmnReplace;
 
     this._modeling = modeling;
     this._moddleCopy = moddleCopy;
     this._commandStack = commandStack;
+    this._moddle = moddle;
 
     this._injector = injector;
   }
@@ -124,6 +128,8 @@ export default class ChangeElementTemplateHandler {
       this._updateScriptTask(element, oldTemplate, newTemplate);
 
       this._updateZeebeAssignmentDefinition(element, oldTemplate, newTemplate);
+
+      this._updateZeebePriorityDefinition(element, oldTemplate, newTemplate);
     }
   }
 
@@ -934,6 +940,19 @@ export default class ChangeElementTemplateHandler {
     );
   }
 
+  _updateZeebePriorityDefinition(element, oldTemplate, newTemplate) {
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: [ ZEEBE_PRIORITY_DEFINITION ],
+        extensionType: 'zeebe:PriorityDefinition',
+        getPropertyName: (binding) => binding.property
+      }
+    );
+  }
+
   /**
    * Replaces the element with the specified elementType.
    * Takes into account the eventDefinition for events.
@@ -1235,9 +1254,11 @@ export default class ChangeElementTemplateHandler {
     // If there are new properties:
     newProperties.forEach((newProperty) => {
       const oldProperty = findOldProperty(oldTemplate, newProperty),
-            newPropertyValue = getDefaultValue(newProperty),
             newBinding = newProperty.binding,
             propertyName = getPropertyName(newBinding);
+
+      const originalPropertyValue = getDefaultValue(newProperty);
+      let newPropertyValue = castToModdleType(this._moddle, extensionType, propertyName, originalPropertyValue);
 
       // (2) Update old extension with new property values
       if (extensionElement) {
@@ -1304,6 +1325,7 @@ ChangeElementTemplateHandler.$inject = [
   'commandStack',
   'modeling',
   'moddleCopy',
+  'moddle',
   'injector'
 ];
 
@@ -1566,6 +1588,19 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
     });
   }
+
+  if (newBindingType === ZEEBE_PRIORITY_DEFINITION) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_PRIORITY_DEFINITION) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
 }
 
 /**
@@ -1688,6 +1723,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_ASSIGNMENT_DEFINITION) {
+    return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === ZEEBE_PRIORITY_DEFINITION) {
     return businessObject.get(bindingProperty);
   }
 }
