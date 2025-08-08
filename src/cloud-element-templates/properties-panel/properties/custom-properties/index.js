@@ -225,6 +225,12 @@ function createIsEdited(isEditedEntry, element, property) {
   const actualValue = getPropertyValue(element, property);
   const defaultValue = getDefaultValue(property);
 
-  return defaultValue !== undefined ? () => actualValue !== defaultValue : isEditedEntry;
+  return !isEmpty(defaultValue) ? () => actualValue !== defaultValue : isEditedEntry;
 }
 
+/**
+ * Empty string is considered empty for input/output support.
+ */
+function isEmpty(value) {
+  return value === undefined || value === '';
+}
