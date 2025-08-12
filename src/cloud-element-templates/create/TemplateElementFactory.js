@@ -21,6 +21,7 @@ import ZeebeFormDefinitionBindingProvider from './FormDefinitionBindingProvider'
 import ZeebeAssignmentDefinitionBindingProvider from './AssignmentDefinitionBindingProvider';
 import ZeebePriorityDefinitionBindingProvider from './PriorityDefinitionBindingProvider';
 import AdHocBindingProvider from './AdHocBindingProvider';
+import TaskScheduleBindingProvider from './TaskScheduleBindingProvider';
 
 import {
   MESSAGE_PROPERTY_TYPE,
@@ -40,7 +41,8 @@ import {
   ZEEBE_SCRIPT_TASK,
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
-  ZEEBE_AD_HOC
+  ZEEBE_AD_HOC,
+  ZEEBE_TASK_SCHEDULE
 } from '../util/bindingTypes';
 
 import {
@@ -71,7 +73,8 @@ export default class TemplateElementFactory {
       [ZEEBE_SCRIPT_TASK]: ScriptTaskBindingProvider,
       [ZEEBE_ASSIGNMENT_DEFINITION]: ZeebeAssignmentDefinitionBindingProvider,
       [ZEEBE_PRIORITY_DEFINITION]: ZeebePriorityDefinitionBindingProvider,
-      [ZEEBE_AD_HOC]: AdHocBindingProvider
+      [ZEEBE_AD_HOC]: AdHocBindingProvider,
+      [ZEEBE_TASK_SCHEDULE]: TaskScheduleBindingProvider
     };
   }
 

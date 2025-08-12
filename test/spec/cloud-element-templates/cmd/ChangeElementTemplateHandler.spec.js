@@ -42,6 +42,7 @@ import {
   isString,
   isUndefined
 } from 'min-dash';
+import newTemplate from './priority-definition.json';
 
 const modules = [
   CoreModule,
@@ -2925,6 +2926,94 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     }));
   });
+
+
+  describe('zeebe:taskSchedule', function() {
+    beforeEach(bootstrap(require('./task-schedule.bpmn').default));
+
+    const newTemplate = require('./task-schedule.json');
+
+    it('should execute', inject(function(elementRegistry) {
+
+      // given
+      let task = elementRegistry.get('UserTask_1');
+
+      // when
+      changeTemplate(task, newTemplate);
+
+      // then
+      expectElementTemplate(task, 'com.camunda.example.TaskSchedule');
+
+      const taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+      expect(taskSchedule).to.exist;
+      expect(taskSchedule).to.have.property('dueDate', '2023-02-01T12:00:00Z');
+      expect(taskSchedule).to.have.property('followUpDate', '2023-02-05T12:00:00Z');
+    }));
+
+
+    it('undo', inject(function(commandStack, elementRegistry) {
+
+      // given
+      let task = elementRegistry.get('UserTask_1');
+
+      changeTemplate(task, newTemplate);
+
+      // when
+      commandStack.undo();
+
+      // then
+      task = elementRegistry.get('UserTask_1');
+      expectNoElementTemplate(task);
+
+      const taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+      expect(taskSchedule).not.to.exist;
+    }));
+
+
+    it('redo', inject(function(commandStack, elementRegistry) {
+
+      // given
+      let task = elementRegistry.get('UserTask_1');
+
+      changeTemplate(task, newTemplate);
+
+      // when
+      commandStack.undo();
+      commandStack.redo();
+
+      // then
+      task = elementRegistry.get('UserTask_1');
+      expectElementTemplate(task, 'com.camunda.example.TaskSchedule');
+
+      const taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+      expect(taskSchedule).to.exist;
+      expect(taskSchedule).to.have.property('dueDate', '2023-02-01T12:00:00Z');
+      expect(taskSchedule).to.have.property('followUpDate', '2023-02-05T12:00:00Z');
+    }));
+
+
+    it('should not override existing', inject(function(elementRegistry) {
+
+      // given
+      const task = elementRegistry.get('UserTask_taskSchedule');
+
+      // when
+      changeTemplate(task, newTemplate);
+
+      // then
+      const taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+      expect(taskSchedule).to.exist;
+
+      // Should keep the old values, not override with newTemplate's values
+      expect(taskSchedule).to.have.property('dueDate', '2033-02-01T12:00:00Z');
+      expect(taskSchedule).to.have.property('followUpDate', '2033-02-05T12:00:00Z');
+    }));
+  });
+
 
   describe('change template (new and old template specified)', function() {
 

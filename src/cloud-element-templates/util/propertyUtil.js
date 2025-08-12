@@ -30,7 +30,8 @@ import {
   ZEEBE_SCRIPT_TASK,
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
-  ZEEBE_AD_HOC
+  ZEEBE_AD_HOC,
+  ZEEBE_TASK_SCHEDULE
 } from './bindingTypes';
 
 import {
@@ -265,6 +266,12 @@ function getRawPropertyValue(element, property) {
     const assignmentDefinition = findExtension(businessObject, 'zeebe:AssignmentDefinition');
 
     return assignmentDefinition ? assignmentDefinition.get(bindingProperty) : defaultValue;
+  }
+
+  if (type === ZEEBE_TASK_SCHEDULE) {
+    const taskSchedule = findExtension(businessObject, 'zeebe:TaskSchedule');
+
+    return taskSchedule ? taskSchedule.get(bindingProperty) : defaultValue;
   }
 
   if (type === ZEEBE_PRIORITY_DEFINITION) {
@@ -828,6 +835,38 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
           ...context,
           moddleElement: extensionElements,
           properties: { values: [ ...extensionElements.get('values'), assignmentDefinition ] }
+        }
+      });
+    }
+  }
+
+  // zeebe:taskSchedule
+  if (type === ZEEBE_TASK_SCHEDULE) {
+    let taskSchedule = findExtension(element, 'zeebe:TaskSchedule');
+    const propertyName = binding.property;
+
+    const properties = {
+      [ propertyName ]: value || ''
+    };
+
+    if (taskSchedule) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: taskSchedule
+        }
+      });
+    } else {
+      taskSchedule = createElement('zeebe:TaskSchedule', properties, extensionElements, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), taskSchedule ] }
         }
       });
     }
