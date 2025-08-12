@@ -1673,6 +1673,86 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
   });
 
+  describe('zeebe:taskSchedule', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('UserTask_schedule');
+
+      // then
+      const dueEntry = findEntry('custom-entry-com.camunda.example.TaskSchedule-1', container),
+            dueInput = findEditor(dueEntry);
+
+
+      const followUpEntry = findEntry('custom-entry-com.camunda.example.TaskSchedule-2', container),
+            followUpInput = findInput('text', followUpEntry);
+
+      expect(dueEntry).to.exist;
+      expect(dueInput).to.exist;
+      expect(dueInput.textContent).to.equal('someDate');
+
+      expect(followUpEntry).to.exist;
+      expect(followUpInput).to.exist;
+      expect(followUpInput.value).to.equal('2023-02-05T12:00:00Z');
+    });
+
+
+    it('should change, setting followUpDate value', async function() {
+
+      // given
+      const element = await expectSelected('UserTask_schedule'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const followUpEntry = findEntry('custom-entry-com.camunda.example.TaskSchedule-2', container),
+            followUpInput = findInput('text', followUpEntry);
+
+      changeInput(followUpInput, '2023-03-10T15:00:00Z');
+
+      // then
+      expect(followUpInput.value).to.equal('2023-03-10T15:00:00Z');
+
+      const taskSchedule = findExtension(businessObject, 'zeebe:TaskSchedule');
+      expect(taskSchedule).to.exist;
+      expect(taskSchedule).to.have.property('followUpDate', '2023-03-10T15:00:00Z');
+    });
+
+
+    it('should change, creating zeebe:taskSchedule if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const template = templates.find(t => t.id === 'com.camunda.example.TaskSchedule');
+      let task = elementRegistry.get('Task_1');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+
+      // then
+      task = elementRegistry.get('Task_1');
+      const taskSchedule = findExtension(getBusinessObject(task), 'zeebe:TaskSchedule');
+
+      const dueEntry = findEntry('custom-entry-com.camunda.example.TaskSchedule-1', container),
+            dueInput = findEditor(dueEntry);
+
+      const followUpEntry = findEntry('custom-entry-com.camunda.example.TaskSchedule-2', container),
+            followUpInput = findInput('text', followUpEntry);
+
+      expect(dueEntry).to.exist;
+      expect(dueInput).to.exist;
+      expect(dueInput.textContent).to.equal('someDate');
+
+      expect(followUpEntry).to.exist;
+      expect(followUpInput).to.exist;
+      expect(followUpInput.value).to.equal('2023-02-05T12:00:00Z');
+
+      expect(taskSchedule).to.have.property('dueDate', '=someDate');
+      expect(taskSchedule).to.have.property('followUpDate', '2023-02-05T12:00:00Z');
+    }));
+  });
+
   describe('types', function() {
 
     describe('Dropdown', function() {

@@ -653,6 +653,27 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       expect(adHoc.get('outputElement')).to.equal('={ id: toolCall._meta.id }');
     }));
 
+
+    it('should handle <zeebe:taskSchedule>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('com.camunda.example.TaskSchedule');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const taskSchedule = findExtension(bo, 'zeebe:TaskSchedule');
+
+      expect(taskSchedule).to.exist;
+      expect(taskSchedule).to.jsonEqual({
+        $type: 'zeebe:TaskSchedule',
+        dueDate: '2023-02-01T12:00:00Z',
+        followUpDate: '2023-02-05T12:00:00Z'
+      });
+    }));
+
   });
 
 

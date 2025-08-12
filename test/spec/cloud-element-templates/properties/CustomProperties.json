@@ -989,6 +989,44 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Custom Properties",
+    "id": "com.camunda.example.TaskSchedule",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:UserTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "binding": {
+          "type": "zeebe:userTask"
+        }
+      },
+      {
+        "type": "String",
+        "feel": "required",
+        "value": "=someDate",
+        "binding": {
+          "type": "zeebe:taskSchedule",
+          "property": "dueDate"
+        }
+      },
+      {
+        "label": "Follow-up Date",
+        "description": "The follow-up date for the task",
+        "type": "String",
+        "value": "2023-02-05T12:00:00Z",
+        "binding": {
+          "type": "zeebe:taskSchedule",
+          "property": "followUpDate"
+        }
+      }
+    ]
   }
 
 ]

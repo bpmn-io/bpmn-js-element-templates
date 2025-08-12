@@ -18,6 +18,7 @@ export const ZEEBE_SCRIPT_TASK = 'zeebe:script';
 export const ZEEBE_ASSIGNMENT_DEFINITION = 'zeebe:assignmentDefinition';
 export const ZEEBE_PRIORITY_DEFINITION = 'zeebe:priorityDefinition';
 export const ZEEBE_AD_HOC = 'zeebe:adHoc';
+export const ZEEBE_TASK_SCHEDULE = 'zeebe:taskSchedule';
 
 export const EXTENSION_BINDING_TYPES = [
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
@@ -34,7 +35,8 @@ export const EXTENSION_BINDING_TYPES = [
   ZEEBE_SCRIPT_TASK,
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
-  ZEEBE_AD_HOC
+  ZEEBE_AD_HOC,
+  ZEEBE_TASK_SCHEDULE
 ];
 
 export const TASK_DEFINITION_TYPES = [

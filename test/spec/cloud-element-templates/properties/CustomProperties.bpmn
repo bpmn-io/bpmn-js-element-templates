@@ -117,6 +117,12 @@
       </bpmn:extensionElements>
     </bpmn:adHocSubProcess>
     <bpmn:adHocSubProcess id="AdHocSubProcess_empty" name="AdHocSubProcess" />
+    <bpmn:userTask id="UserTask_schedule" name="schedule" zeebe:modelerTemplate="com.camunda.example.TaskSchedule">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:taskSchedule dueDate="=someDate" followUpDate="2023-02-05T12:00:00Z" />
+      </bpmn:extensionElements>
+    </bpmn:userTask>
   </bpmn:process>
   <bpmn:message id="Message" name="name">
     <bpmn:extensionElements>
@@ -235,6 +241,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1q9rek1_di" bpmnElement="AdHocSubProcess_empty">
         <dc:Bounds x="415" y="1490" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13u3ox2_di" bpmnElement="UserTask_schedule">
+        <dc:Bounds x="290" y="1130" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
