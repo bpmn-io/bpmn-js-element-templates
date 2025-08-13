@@ -5,7 +5,7 @@ import {
   changeInput,
   getBpmnJS,
   withPropertiesPanel,
-  inject
+  inject, setEditorValue
 } from 'test/TestHelper';
 
 import {
@@ -438,6 +438,109 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         type: 'foo@bar'
       });
     });
+
+  });
+
+
+  describe('zeebe:AdHoc', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('AdHocSubProcess_1');
+
+      // then
+      const outputCollectionEntry = findEntry('custom-entry-com.camunda.example.AdHoc-1', container),
+            outputCollectionInput = findInput('text', outputCollectionEntry);
+
+      const outputElementEntry = findEntry('custom-entry-com.camunda.example.AdHoc-2', container),
+            outputElementInput = findEditor(outputElementEntry);
+
+      expect(outputCollectionEntry).to.exist;
+      expect(outputCollectionInput).to.exist;
+      expect(outputCollectionInput.value).to.equal('toolCallResults');
+
+      expect(outputElementEntry).to.exist;
+      expect(outputElementInput).to.exist;
+      expect(outputElementInput.textContent).to.equal('element.result');
+    });
+
+
+    it('should change, setting `outputCollection`', async function() {
+
+      // given
+      const element = await expectSelected('AdHocSubProcess_1'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-com.camunda.example.AdHoc-1', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'newOutputCollection');
+
+      // then
+      const adHoc = findExtension(businessObject, 'zeebe:AdHoc');
+      expect(adHoc).to.exist;
+      expect(adHoc).to.have.property('outputCollection', 'newOutputCollection');
+    });
+
+
+    it('should change, setting `outputElement`', async function() {
+
+      // given
+      const element = await expectSelected('AdHocSubProcess_1'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-com.camunda.example.AdHoc-2', container),
+            editor = findEditor(entry);
+
+      await setEditorValue(
+        editor,
+        '{ result: element.result }'
+      );
+
+      // then
+      const adHoc = findExtension(businessObject, 'zeebe:AdHoc');
+      expect(adHoc).to.exist;
+      expect(adHoc).to.have.property('outputElement', '={ result: element.result }');
+    });
+
+
+    it('should change, creating zeebe:AdHoc if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const element = await expectSelected('AdHocSubProcess_empty'),
+            businessObject = getBusinessObject(element);
+      const template = templates.find(t => t.id === 'com.camunda.example.AdHoc');
+      const subProcess = elementRegistry.get('AdHocSubProcess_empty');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(subProcess, template);
+      });
+
+      const outputCollectionEntry = findEntry('custom-entry-com.camunda.example.AdHoc-1', container),
+            outputCollectionInput = findInput('text', outputCollectionEntry);
+
+      const outputElementEntry = findEntry('custom-entry-com.camunda.example.AdHoc-2', container),
+            outputElementInput = findEditor(outputElementEntry);
+
+      // then
+      const adHoc = findExtension(businessObject, 'zeebe:AdHoc');
+
+      expect(outputCollectionEntry).to.exist;
+      expect(outputCollectionInput).to.exist;
+      expect(outputCollectionInput.value).to.equal('toolCallResults');
+
+      expect(outputElementEntry).to.exist;
+      expect(outputElementInput).to.exist;
+      expect(outputElementInput.textContent).to.equal('element.result');
+
+      expect(adHoc).to.exist;
+      expect(adHoc).to.have.property('outputCollection', 'toolCallResults');
+      expect(adHoc).to.have.property('outputElement', '=element.result');
+    }));
 
   });
 

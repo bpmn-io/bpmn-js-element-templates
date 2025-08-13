@@ -1,0 +1,28 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "AdHoc",
+  "id": "com.camunda.example.AdHoc",
+  "appliesTo": [
+    "bpmn:AdHocSubProcess"
+  ],
+  "properties": [
+    {
+      "type": "Text",
+      "value": "toolCallResults",
+      "binding": {
+        "type": "zeebe:adHoc",
+        "property": "outputCollection"
+      }
+    },
+    {
+      "type": "Text",
+      "value": "={ id: toolCall._meta.id }",
+      "feel": "required",
+      "binding": {
+        "type": "zeebe:adHoc",
+        "property": "outputElement"
+      }
+    }
+  ]
+}
+
