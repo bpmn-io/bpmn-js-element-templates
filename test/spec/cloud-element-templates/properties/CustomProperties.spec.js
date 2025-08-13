@@ -1673,6 +1673,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
   });
 
+
   describe('zeebe:taskSchedule', function() {
 
     it('should display', async function() {
@@ -1751,6 +1752,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(taskSchedule).to.have.property('dueDate', '=someDate');
       expect(taskSchedule).to.have.property('followUpDate', '2023-02-05T12:00:00Z');
     }));
+
   });
 
   describe('types', function() {
