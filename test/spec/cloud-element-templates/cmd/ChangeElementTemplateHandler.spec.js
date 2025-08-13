@@ -2141,6 +2141,86 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('zeebe:adHoc', function() {
+
+      beforeEach(bootstrap(require('./ad-hoc.bpmn').default));
+
+      const newTemplate = require('./ad-hoc.json');
+
+      it('should execute', inject(function(elementRegistry) {
+
+        // given
+        let subProcess = elementRegistry.get('AdHocSubProcess_1');
+
+        // when
+        changeTemplate(subProcess, newTemplate);
+
+        // then
+        expectElementTemplate(subProcess, 'com.camunda.example.AdHoc');
+
+        const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+        expect(adHoc).to.exist;
+        expect(adHoc).to.have.property('outputCollection', 'toolCallResults');
+        expect(adHoc).to.have.property('outputElement', '={ id: toolCall._meta.id }');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let subProcess = elementRegistry.get('AdHocSubProcess_1');
+        changeTemplate(subProcess, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        subProcess = elementRegistry.get('AdHocSubProcess_1');
+        expectNoElementTemplate(subProcess);
+        const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+        expect(adHoc).not.to.exist;
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let subProcess = elementRegistry.get('AdHocSubProcess_1');
+        changeTemplate(subProcess, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        subProcess = elementRegistry.get('AdHocSubProcess_1');
+        expectElementTemplate(subProcess, 'com.camunda.example.AdHoc');
+        const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+        expect(adHoc).to.exist;
+        expect(adHoc).to.have.property('outputCollection', 'toolCallResults');
+      }));
+
+
+      it('should not override existing', inject(function(elementRegistry) {
+
+        // given
+        let subProcess = elementRegistry.get('AdHocSubProcess_existing');
+
+        // when
+        changeTemplate(subProcess, newTemplate);
+
+        // then
+        const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+        expect(adHoc).to.exist;
+
+        // existing values should be kept (non Hidden property types)
+        expect(adHoc).to.have.property('outputCollection', 'existingCollection');
+        expect(adHoc).to.have.property('outputElement', '={ existing: true }');
+      }));
+
+    });
+
+
     describe('update zeebe:LinkedElement', function() {
 
       beforeEach(bootstrap(require('./linked-resource.bpmn').default));
@@ -4902,6 +4982,127 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('update zeebe:adHoc', function() {
+
+      beforeEach(bootstrap(require('./ad-hoc.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given
+        const subProcess = elementRegistry.get('AdHocSubProcess_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'oldCollection',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputCollection'
+            }
+          },
+          {
+            value: '={ id: oldValue }',
+            feel: 'required',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputElement'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'newCollection',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputCollection'
+            }
+          },
+          {
+            value: '={ id: newValue }',
+            feel: 'required',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputElement'
+            }
+          }
+        ]);
+
+        changeTemplate('AdHocSubProcess_1', oldTemplate);
+
+        let adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+
+        updateBusinessObject('AdHocSubProcess_1', adHoc, {
+          outputCollection: 'manuallyChanged'
+        });
+
+        // when
+        changeTemplate(subProcess, newTemplate, oldTemplate);
+
+        // then
+        adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+
+        expect(adHoc).to.exist;
+        expect(adHoc.get('outputCollection')).to.equal('manuallyChanged');
+        expect(adHoc.get('outputElement')).to.equal('={ id: newValue }');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given
+        const subProcess = elementRegistry.get('AdHocSubProcess_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'oldCollection',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputCollection'
+            }
+          },
+          {
+            value: '={ id: oldValue }',
+            feel: 'required',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputElement'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'newCollection',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputCollection'
+            }
+          },
+          {
+            value: '={ id: newValue }',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputElement'
+            }
+          }
+        ]);
+
+        changeTemplate('AdHocSubProcess_1', oldTemplate);
+
+        // when
+        changeTemplate(subProcess, newTemplate, oldTemplate);
+
+        // then
+        const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+
+        expect(adHoc).to.exist;
+        expect(adHoc.get('outputCollection')).to.equal('newCollection');
+        expect(adHoc.get('outputElement')).to.equal('={ id: newValue }');
+      }));
+
+    });
+
+
     describe('update zeebe:LinkedResource', function() {
 
       beforeEach(bootstrap(require('./linked-resource.bpmn').default));
@@ -5506,7 +5707,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
       }));
     });
-
 
   });
 
