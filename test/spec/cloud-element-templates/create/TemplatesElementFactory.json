@@ -759,5 +759,32 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "AdHoc Template",
+    "id": "ad-hoc-template",
+    "appliesTo": [
+      "bpmn:AdHocSubProcess"
+    ],
+    "version": 1,
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "toolCallResults",
+        "binding": {
+          "type": "zeebe:adHoc",
+          "property": "outputCollection"
+        }
+      },
+      {
+        "type": "Text",
+        "value": "={ id: toolCall._meta.id }",
+        "binding": {
+          "type": "zeebe:adHoc",
+          "property": "outputElement"
+        }
+      }
+    ]
   }
 ]
