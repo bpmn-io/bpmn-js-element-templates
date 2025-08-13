@@ -615,6 +615,24 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
         candidateUsers: 'aCandidateUser'
       });
     }));
+
+
+    it('should handle <zeebe:adHoc>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('ad-hoc-template');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      const adHoc = findExtension(element, 'zeebe:AdHoc');
+
+      // then
+      expect(adHoc).to.exist;
+      expect(adHoc.get('outputCollection')).to.equal('toolCallResults');
+      expect(adHoc.get('outputElement')).to.equal('={ id: toolCall._meta.id }');
+    }));
+
   });
 
 
