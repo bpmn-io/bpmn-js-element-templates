@@ -2759,6 +2759,80 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
   });
 
+  describe('zeebe:adHoc', function() {
+    beforeEach(bootstrap(require('./ad-hoc.bpmn').default));
+
+    const newTemplate = require('./ad-hoc.json');
+
+    it('should execute', inject(function(elementRegistry) {
+
+      // given
+      let subProcess = elementRegistry.get('AdHocSubProcess_1');
+
+      // when
+      changeTemplate(subProcess, newTemplate);
+
+      // then
+      expectElementTemplate(subProcess, 'com.camunda.example.AdHoc');
+
+      const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+      expect(adHoc).to.exist;
+      expect(adHoc).to.have.property('outputCollection', 'toolCallResults');
+      expect(adHoc).to.have.property('outputElement', '={ id: toolCall._meta.id }');
+    }));
+
+    it('undo', inject(function(commandStack, elementRegistry) {
+
+      // given
+      let subProcess = elementRegistry.get('AdHocSubProcess_1');
+      changeTemplate(subProcess, newTemplate);
+
+      // when
+      commandStack.undo();
+
+      // then
+      subProcess = elementRegistry.get('AdHocSubProcess_1');
+      expectNoElementTemplate(subProcess);
+      const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+      expect(adHoc).not.to.exist;
+    }));
+
+    it('redo', inject(function(commandStack, elementRegistry) {
+
+      // given
+      let subProcess = elementRegistry.get('AdHocSubProcess_1');
+      changeTemplate(subProcess, newTemplate);
+
+      // when
+      commandStack.undo();
+      commandStack.redo();
+
+      // then
+      subProcess = elementRegistry.get('AdHocSubProcess_1');
+      expectElementTemplate(subProcess, 'com.camunda.example.AdHoc');
+      const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+      expect(adHoc).to.exist;
+      expect(adHoc).to.have.property('outputCollection', 'toolCallResults');
+    }));
+
+    it('should not override existing', inject(function(elementRegistry) {
+
+      // given
+      let subProcess = elementRegistry.get('AdHocSubProcess_existing');
+
+      // when
+      changeTemplate(subProcess, newTemplate);
+
+      // then
+      const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+      expect(adHoc).to.exist;
+
+      // existing values should be kept (non Hidden property types)
+      expect(adHoc).to.have.property('outputCollection', 'existingCollection');
+      expect(adHoc).to.have.property('outputElement', '={ existing: true }');
+    }));
+  });
+
 
 
   describe('change template (new and old template specified)', function() {
@@ -5422,7 +5496,122 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       }));
     });
 
+    describe('update zeebe:adHoc', function() {
 
+      beforeEach(bootstrap(require('./ad-hoc.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given a user applies a template and updates a property
+        let subProcess = elementRegistry.get('AdHocSubProcess_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'toolCallResults-old',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputCollection'
+            }
+          },
+          {
+            value: '={ id: toolCall._meta.id }',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputElement'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'toolCallResults-new',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputCollection'
+            }
+          },
+          {
+            value: '={ id: toolCall._meta.newId }',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputElement'
+            }
+          }
+        ]);
+
+        subProcess = changeTemplate(subProcess, oldTemplate);
+
+        let adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+
+        updateBusinessObject('AdHocSubProcess_1', adHoc, {
+          outputCollection: 'toolCallResults-changed'
+        });
+
+        // when
+        changeTemplate(subProcess, newTemplate, oldTemplate);
+
+        // then
+        adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+
+        expect(adHoc).to.exist;
+        expect(adHoc.get('outputCollection')).to.equal('toolCallResults-changed');
+        expect(adHoc.get('outputElement')).to.equal('={ id: toolCall._meta.newId }');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given
+        let subProcess = elementRegistry.get('AdHocSubProcess_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'toolCallResults-old',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputCollection'
+            }
+          },
+          {
+            value: '={ id: toolCall._meta.id }',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputElement'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'toolCallResults-new',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputCollection'
+            }
+          },
+          {
+            value: '={ id: toolCall._meta.newId }',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputElement'
+            }
+          }
+        ]);
+
+        subProcess = changeTemplate(subProcess, oldTemplate);
+
+        // when
+        changeTemplate(subProcess, newTemplate, oldTemplate);
+
+        // then
+        const adHoc = findExtension(subProcess, 'zeebe:AdHoc');
+
+        expect(adHoc).to.exist;
+        expect(adHoc.get('outputCollection')).to.equal('toolCallResults-new');
+        expect(adHoc.get('outputElement')).to.equal('={ id: toolCall._meta.newId }');
+      }));
+
+    });
   });
 
 
@@ -5652,7 +5841,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
   });
-
 
   describe('FEEL Boolean and Numbers', function() {
 

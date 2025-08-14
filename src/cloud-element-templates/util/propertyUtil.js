@@ -27,7 +27,8 @@ import {
   ZEEBE_USER_TASK,
   ZEEBE_CALLED_DECISION,
   ZEEBE_FORM_DEFINITION,
-  ZEEBE_SCRIPT_TASK, ZEEBE_ASSIGNMENT_DEFINITION
+  ZEEBE_SCRIPT_TASK, ZEEBE_ASSIGNMENT_DEFINITION,
+  ZEEBE_AD_HOC
 } from './bindingTypes';
 
 import {
@@ -262,6 +263,11 @@ function getRawPropertyValue(element, property) {
     const assignmentDefinition = findExtension(businessObject, 'zeebe:AssignmentDefinition');
 
     return assignmentDefinition ? assignmentDefinition.get(bindingProperty) : defaultValue;
+  }
+
+  if (type === ZEEBE_AD_HOC) {
+    const adHoc = findExtension(businessObject, 'zeebe:AdHoc');
+    return adHoc ? adHoc.get(bindingProperty) : defaultValue;
   }
 
   // should never throw as templates are validated beforehand
@@ -813,6 +819,38 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
           ...context,
           moddleElement: extensionElements,
           properties: { values: [ ...extensionElements.get('values'), assignmentDefinition ] }
+        }
+      });
+    }
+  }
+
+  // zeebe:adHoc
+  if (type === ZEEBE_AD_HOC) {
+    let adHoc = findExtension(element, 'zeebe:AdHoc');
+    const propertyName = binding.property;
+
+    const properties = {
+      [ propertyName ]: value || ''
+    };
+
+    if (adHoc) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: adHoc
+        }
+      });
+    } else {
+      adHoc = createElement('zeebe:AdHoc', properties, extensionElements, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), adHoc ] }
         }
       });
     }
