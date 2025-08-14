@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.10.0
+
 * `FEAT`: support `zeebe:priorityDefinition` binding property ([#171](https://github.com/bpmn-io/bpmn-js-element-templates/pull/171))
 
 ## 2.9.1
