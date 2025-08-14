@@ -2306,6 +2306,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     });
 
+
     describe('update zeebe:calledDecision', function() {
 
       beforeEach(bootstrap(require('./business-rule-tasks.bpmn').default));
@@ -2670,181 +2671,318 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     });
 
+
+    describe('zeebe:assignmentDefinition', function() {
+
+      beforeEach(bootstrap(require('./assignment-definition.bpmn').default));
+
+      const newTemplate = require('./assignment-definition.json');
+
+      it('should execute', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('UserTask_1');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        expectElementTemplate(task, 'com.camunda.example.AssignmentDefinition');
+
+        const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+        expect(assignmentDefinition).to.exist;
+        expect(assignmentDefinition).to.have.property('assignee', 'anAssignee');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('UserTask_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        task = elementRegistry.get('UserTask_1');
+        expectNoElementTemplate(task);
+
+        const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+        expect(assignmentDefinition).not.to.exist;
+
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('UserTask_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        task = elementRegistry.get('UserTask_1');
+        expectElementTemplate(task, 'com.camunda.example.AssignmentDefinition');
+
+        const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+        expect(assignmentDefinition).to.exist;
+        expect(assignmentDefinition).to.have.property('assignee', 'anAssignee');
+      }));
+
+
+      it('should not override existing', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('UserTask_assignmentDefinition');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+        expect(assignmentDefinition).to.exist;
+
+        // Should keep the old values, not override with newTemplate's values
+        expect(assignmentDefinition).to.have.property('assignee', 'aCustomAssignee');
+        expect(assignmentDefinition).to.have.property('candidateGroups', 'aCandidateGroup, anotherCandidateGroup');
+
+      }));
+
+    });
+
+
+    describe('zeebe:priorityDefinition', function() {
+
+      beforeEach(bootstrap(require('./priority-definition.bpmn').default));
+
+      const newTemplate = require('./priority-definition.json');
+
+      it('should execute', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('UserTask_1');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        expectElementTemplate(task, 'com.camunda.example.PriorityDefinition');
+
+        const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
+
+        expect(priorityDefinition).to.exist;
+        expect(priorityDefinition).to.have.property('priority', 10);
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('UserTask_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        task = elementRegistry.get('UserTask_1');
+        expectNoElementTemplate(task);
+
+        const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
+
+        expect(priorityDefinition).not.to.exist;
+
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('UserTask_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        task = elementRegistry.get('UserTask_1');
+        expectElementTemplate(task, 'com.camunda.example.PriorityDefinition');
+
+        const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
+
+        expect(priorityDefinition).to.exist;
+        expect(priorityDefinition).to.have.property('priority', 10);
+      }));
+
+
+      it('should not override existing', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('UserTask_priorityDefinition');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
+
+        expect(priorityDefinition).to.exist;
+
+        // Should keep the old values, not override with newTemplate's values
+        expect(priorityDefinition).to.have.property('priority', '5');
+
+      }));
+    });
+
+
+    describe('zeebe:taskSchedule', function() {
+
+      beforeEach(bootstrap(require('./task-schedule.bpmn').default));
+
+      const newTemplate = require('./task-schedule.json');
+
+      it('should execute', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('UserTask_1');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        expectElementTemplate(task, 'com.camunda.example.TaskSchedule');
+
+        const taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+        expect(taskSchedule).to.exist;
+        expect(taskSchedule).to.have.property('dueDate', '2023-02-01T12:00:00Z');
+        expect(taskSchedule).to.have.property('followUpDate', '2023-02-05T12:00:00Z');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('UserTask_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        task = elementRegistry.get('UserTask_1');
+        expectNoElementTemplate(task);
+
+        const taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+        expect(taskSchedule).not.to.exist;
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('UserTask_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        task = elementRegistry.get('UserTask_1');
+        expectElementTemplate(task, 'com.camunda.example.TaskSchedule');
+
+        const taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+        expect(taskSchedule).to.exist;
+        expect(taskSchedule).to.have.property('dueDate', '2023-02-01T12:00:00Z');
+        expect(taskSchedule).to.have.property('followUpDate', '2023-02-05T12:00:00Z');
+      }));
+
+
+      it('should not override existing', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('UserTask_taskSchedule');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        const taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+        expect(taskSchedule).to.exist;
+
+        // Should keep the old values, not override with newTemplate's values
+        expect(taskSchedule).to.have.property('dueDate', '2033-02-01T12:00:00Z');
+        expect(taskSchedule).to.have.property('followUpDate', '2033-02-05T12:00:00Z');
+      }));
+
+    });
+
+
+    describe('FEEL Boolean and Numbers', function() {
+
+      beforeEach(bootstrap(require('./casted-values.bpmn').default));
+
+      describe('Boolean', function() {
+
+        const template = require('./casted-values.json')[0];
+
+        it('should apply generated value (uuid)', inject(function(elementRegistry) {
+
+          // given
+          let task = elementRegistry.get('Task_1');
+
+          // when
+          task = changeTemplate(task, template);
+
+          // then
+          expect(getZeebeProperty(task, 'StaticBooleanProperty').value).to.eql('=true');
+          expect(getZeebeProperty(task, 'OptionalBooleanProperty').value).to.eql('=true');
+        }));
+
+      });
+
+      describe('Number', function() {
+
+        const template = require('./casted-values.json')[1];
+
+        it('should apply generated value (uuid)', inject(function(elementRegistry) {
+
+          // given
+          let task = elementRegistry.get('Task_1');
+
+          // when
+          task = changeTemplate(task, template);
+
+          // then
+          expect(getZeebeProperty(task, 'StaticNumberProperty').value).to.eql('=123');
+          expect(getZeebeProperty(task, 'OptionalNumberProperty').value).to.eql('=123');
+        }));
+
+      });
+
+    });
+
   });
 
-  describe('zeebe:assignmentDefinition', function() {
-    beforeEach(bootstrap(require('./assignment-definition.bpmn').default));
-
-    const newTemplate = require('./assignment-definition.json');
-
-    it('should execute', inject(function(elementRegistry) {
-
-      // given
-      let task = elementRegistry.get('UserTask_1');
-
-      // when
-      changeTemplate(task, newTemplate);
-
-      // then
-      expectElementTemplate(task, 'com.camunda.example.AssignmentDefinition');
-
-      const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
-
-      expect(assignmentDefinition).to.exist;
-      expect(assignmentDefinition).to.have.property('assignee', 'anAssignee');
-    }));
-
-
-    it('undo', inject(function(commandStack, elementRegistry) {
-
-      // given
-      let task = elementRegistry.get('UserTask_1');
-
-      changeTemplate(task, newTemplate);
-
-      // when
-      commandStack.undo();
-
-      // then
-      task = elementRegistry.get('UserTask_1');
-      expectNoElementTemplate(task);
-
-      const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
-
-      expect(assignmentDefinition).not.to.exist;
-
-    }));
-
-
-    it('redo', inject(function(commandStack, elementRegistry) {
-
-      // given
-      let task = elementRegistry.get('UserTask_1');
-
-      changeTemplate(task, newTemplate);
-
-      // when
-      commandStack.undo();
-      commandStack.redo();
-
-      // then
-      task = elementRegistry.get('UserTask_1');
-      expectElementTemplate(task, 'com.camunda.example.AssignmentDefinition');
-
-      const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
-
-      expect(assignmentDefinition).to.exist;
-      expect(assignmentDefinition).to.have.property('assignee', 'anAssignee');
-    }));
-
-
-    it('should not override existing', inject(function(elementRegistry) {
-
-      // given
-      const task = elementRegistry.get('UserTask_assignmentDefinition');
-
-      // when
-      changeTemplate(task, newTemplate);
-
-      // then
-      const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
-
-      expect(assignmentDefinition).to.exist;
-
-      // Should keep the old values, not override with newTemplate's values
-      expect(assignmentDefinition).to.have.property('assignee', 'aCustomAssignee');
-      expect(assignmentDefinition).to.have.property('candidateGroups', 'aCandidateGroup, anotherCandidateGroup');
-
-    }));
-
-  });
-
-
-  describe('zeebe:priorityDefinition', function() {
-
-    beforeEach(bootstrap(require('./priority-definition.bpmn').default));
-
-    const newTemplate = require('./priority-definition.json');
-
-    it('should execute', inject(function(elementRegistry) {
-
-      // given
-      let task = elementRegistry.get('UserTask_1');
-
-      // when
-      changeTemplate(task, newTemplate);
-
-      // then
-      expectElementTemplate(task, 'com.camunda.example.PriorityDefinition');
-
-      const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
-
-      expect(priorityDefinition).to.exist;
-      expect(priorityDefinition).to.have.property('priority', 10);
-    }));
-
-
-    it('undo', inject(function(commandStack, elementRegistry) {
-
-      // given
-      let task = elementRegistry.get('UserTask_1');
-
-      changeTemplate(task, newTemplate);
-
-      // when
-      commandStack.undo();
-
-      // then
-      task = elementRegistry.get('UserTask_1');
-      expectNoElementTemplate(task);
-
-      const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
-
-      expect(priorityDefinition).not.to.exist;
-
-    }));
-
-
-    it('redo', inject(function(commandStack, elementRegistry) {
-
-      // given
-      let task = elementRegistry.get('UserTask_1');
-
-      changeTemplate(task, newTemplate);
-
-      // when
-      commandStack.undo();
-      commandStack.redo();
-
-      // then
-      task = elementRegistry.get('UserTask_1');
-      expectElementTemplate(task, 'com.camunda.example.PriorityDefinition');
-
-      const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
-
-      expect(priorityDefinition).to.exist;
-      expect(priorityDefinition).to.have.property('priority', 10);
-    }));
-
-
-    it('should not override existing', inject(function(elementRegistry) {
-
-      // given
-      const task = elementRegistry.get('UserTask_priorityDefinition');
-
-      // when
-      changeTemplate(task, newTemplate);
-
-      // then
-      const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
-
-      expect(priorityDefinition).to.exist;
-
-      // Should keep the old values, not override with newTemplate's values
-      expect(priorityDefinition).to.have.property('priority', '5');
-
-    }));
-  });
 
   describe('change template (new and old template specified)', function() {
 
@@ -5508,6 +5646,305 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('update zeebe:AssignmentDefinition', function() {
+
+      beforeEach(bootstrap(require('./assignment-definition.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given a user applies a template and updates a property
+        let task = elementRegistry.get('UserTask_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'anAssignee-old',
+            binding: {
+              type: 'zeebe:assignmentDefinition',
+              property: 'assignee'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'anAssignee-new',
+            binding: {
+              type: 'zeebe:assignmentDefinition',
+              property: 'assignee'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('UserTask_1');
+        let assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+        updateBusinessObject('UserTask_1', assignmentDefinition, {
+          assignee: 'anAssignee-changed'
+        });
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+        expect(assignmentDefinition).to.exist;
+        expect(assignmentDefinition.get('assignee')).to.equal('anAssignee-changed');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given a user applies a template and does not update a property
+        let task = elementRegistry.get('UserTask_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'anAssignee-old',
+            binding: {
+              type: 'zeebe:assignmentDefinition',
+              property: 'assignee'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'anAssignee-new',
+            binding: {
+              type: 'zeebe:assignmentDefinition',
+              property: 'assignee'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('UserTask_1');
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        const assignmentDefinition = findExtension(task, 'zeebe:AssignmentDefinition');
+
+        expect(assignmentDefinition).to.exist;
+        expect(assignmentDefinition.get('assignee')).to.equal('anAssignee-new');
+      }));
+    });
+
+
+    describe('update zeebe:PriorityDefinition', function() {
+
+      beforeEach(bootstrap(require('./priority-definition.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given a user applies a template and updates a property
+        let task = elementRegistry.get('UserTask_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 5,
+            binding: {
+              type: 'zeebe:priorityDefinition',
+              property: 'priority'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 10,
+            binding: {
+              type: 'zeebe:priorityDefinition',
+              property: 'priority'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('UserTask_1');
+        let priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
+
+        updateBusinessObject('UserTask_1', priorityDefinition, {
+          priority: 7
+        });
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
+
+        expect(priorityDefinition).to.exist;
+        expect(priorityDefinition.get('priority')).to.equal(7);
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given a user applies a template and does not update a property
+        let task = elementRegistry.get('UserTask_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 5,
+            binding: {
+              type: 'zeebe:priorityDefinition',
+              property: 'priority'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 10,
+            binding: {
+              type: 'zeebe:priorityDefinition',
+              property: 'priority'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('UserTask_1');
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        const priorityDefinition = findExtension(task, 'zeebe:PriorityDefinition');
+
+        expect(priorityDefinition).to.exist;
+        expect(priorityDefinition.get('priority')).to.equal(10);
+      }));
+    });
+
+
+    describe('update zeebe:TaskSchedule', function() {
+
+      beforeEach(bootstrap(require('./task-schedule.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given a user applies a template and updates a property
+        let task = elementRegistry.get('UserTask_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: '2023-02-01T12:00:00Z',
+            binding: {
+              type: 'zeebe:taskSchedule',
+              property: 'dueDate'
+            }
+          },
+          {
+            value: '2023-02-05T12:00:00Z',
+            binding: {
+              type: 'zeebe:taskSchedule',
+              property: 'followUpDate'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: '3023-03-01T12:00:00Z',
+            binding: {
+              type: 'zeebe:taskSchedule',
+              property: 'dueDate'
+            }
+          },
+          {
+            value: '3023-03-05T12:00:00Z',
+            binding: {
+              type: 'zeebe:taskSchedule',
+              property: 'followUpDate'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('UserTask_1');
+        let taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+        updateBusinessObject('UserTask_1', taskSchedule, {
+          dueDate: '4023-02-15T12:00:00Z'
+        });
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+        expect(taskSchedule).to.exist;
+        expect(taskSchedule.get('dueDate')).to.equal('4023-02-15T12:00:00Z');
+        expect(taskSchedule.get('followUpDate')).to.equal('3023-03-05T12:00:00Z');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given a user applies a template and does not update a property
+        let task = elementRegistry.get('UserTask_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: '2023-02-01T12:00:00Z',
+            binding: {
+              type: 'zeebe:taskSchedule',
+              property: 'dueDate'
+            }
+          },
+          {
+            value: '2023-02-05T12:00:00Z',
+            binding: {
+              type: 'zeebe:taskSchedule',
+              property: 'followUpDate'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: '3023-03-01T12:00:00Z',
+            binding: {
+              type: 'zeebe:taskSchedule',
+              property: 'dueDate'
+            }
+          },
+          {
+            value: '3023-03-05T12:00:00Z',
+            binding: {
+              type: 'zeebe:taskSchedule',
+              property: 'followUpDate'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('UserTask_1');
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        const taskSchedule = findExtension(task, 'zeebe:TaskSchedule');
+
+        expect(taskSchedule).to.exist;
+        expect(taskSchedule.get('dueDate')).to.equal('3023-03-01T12:00:00Z');
+        expect(taskSchedule.get('followUpDate')).to.equal('3023-03-05T12:00:00Z');
+      }));
+    });
+
   });
 
 
@@ -5738,50 +6175,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
   });
 
-
-  describe('FEEL Boolean and Numbers', function() {
-
-    beforeEach(bootstrap(require('./casted-values.bpmn').default));
-
-    describe('Boolean', function() {
-
-      const template = require('./casted-values.json')[0];
-
-      it('should apply generated value (uuid)', inject(function(elementRegistry) {
-
-        // given
-        let task = elementRegistry.get('Task_1');
-
-        // when
-        task = changeTemplate(task, template);
-
-        // then
-        expect(getZeebeProperty(task, 'StaticBooleanProperty').value).to.eql('=true');
-        expect(getZeebeProperty(task, 'OptionalBooleanProperty').value).to.eql('=true');
-      }));
-
-    });
-
-    describe('Number', function() {
-
-      const template = require('./casted-values.json')[1];
-
-      it('should apply generated value (uuid)', inject(function(elementRegistry) {
-
-        // given
-        let task = elementRegistry.get('Task_1');
-
-        // when
-        task = changeTemplate(task, template);
-
-        // then
-        expect(getZeebeProperty(task, 'StaticNumberProperty').value).to.eql('=123');
-        expect(getZeebeProperty(task, 'OptionalNumberProperty').value).to.eql('=123');
-      }));
-
-    });
-
-  });
 
 });
 
