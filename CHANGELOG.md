@@ -6,7 +6,13 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.11.0
+
 * `FEAT`: support `zeebe:adHoc` binding property ([#175](https://github.com/bpmn-io/bpmn-js-element-templates/pull/175))
+* `FEAT`: support `zeebe:taskSchedule` binding property ([#173](https://github.com/bpmn-io/bpmn-js-element-templates/pull/173))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.12.0`
+* `DEPS`: update to `bpmn-moddle@9.0.3`
+* `DEPS`: update to `zeebe-bpmn-moddle@1.11.0`
 
 ## 2.10.0
 
