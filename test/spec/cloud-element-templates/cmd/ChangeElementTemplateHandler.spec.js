@@ -6376,7 +6376,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
   });
 
-
 });
 
 
