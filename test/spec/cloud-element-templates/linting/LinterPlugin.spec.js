@@ -1,7 +1,9 @@
 import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 
 import validateRule from 'src/cloud-element-templates/linting/rules/element-templates-validate';
+import validateCachedRule from 'src/cloud-element-templates/linting/rules/element-templates-validate-cached';
 import compatibilityRule from 'src/cloud-element-templates/linting/rules/element-templates-compatibility';
+import compatibilityCachedRule from 'src/cloud-element-templates/linting/rules/element-templates-compatibility-cached';
 
 import templates from './LinterPlugin.json';
 
@@ -226,7 +228,17 @@ describe('cloud-element-templates/linting', function() {
     invalid,
   });
 
+  RuleTester.verify('element-templates/validate-cached', validateCachedRule, {
+    valid,
+    invalid,
+  });
+
   RuleTester.verify('element-templates/compatibility', compatibilityRule, {
+    valid: compatible,
+    invalid: incompatible
+  });
+
+  RuleTester.verify('element-templates/compatibility-cached', compatibilityCachedRule, {
     valid: compatible,
     invalid: incompatible
   });
