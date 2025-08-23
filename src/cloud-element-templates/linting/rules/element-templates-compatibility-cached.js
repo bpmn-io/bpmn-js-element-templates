@@ -1,28 +1,17 @@
-/**
- * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
- * under one or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information regarding copyright
- * ownership.
- *
- * Camunda licenses this file to you under the MIT; you may not use this file
- * except in compliance with the MIT License.
- */
-
 import { is } from 'bpmn-js/lib/util/ModelUtil';
 import EventBus from 'diagram-js/lib/core/EventBus';
 
 import ElementTemplates from '../../ElementTemplates';
 import { GlobalCache, getCachedValidator, createTemplateKey } from '../cache/GlobalCache';
 
-const DEBUG = true;
+const DEBUG = false; // Set to false in production for performance
 
-function debugLog(message, ...args) {
-  if (DEBUG) {
-    console.log('[element-templates-compatibility]', message, ...args);
-  }
-}
+// Optimized debug logging - no-op when DEBUG is false
+const debugLog = DEBUG ?
+  console.log.bind(console, '[element-templates-compatibility]') :
+  () => {};
 
-// Global compatibility cache
+// Global compatibility cache with optimized size
 const compatibilityCache = new GlobalCache('element-templates-compatibility', 5000, 500);
 
 export default function({ templates = [] }) {
@@ -35,57 +24,98 @@ export default function({ templates = [] }) {
 
   elementTemplates.set(validTemplates);
 
+  // Cache for update availability to avoid repeated calculations
+  const updateAvailabilityCache = new Map();
+
   function isUpdateAvailable(template) {
+    if (updateAvailabilityCache.has(template.id)) {
+      return updateAvailabilityCache.get(template.id);
+    }
+
     const latestTemplate = elementTemplates.getLatest(template.id, { deprecated: true })[0];
-    return latestTemplate && latestTemplate !== template;
+    const hasUpdate = latestTemplate && latestTemplate !== template;
+
+    updateAvailabilityCache.set(template.id, hasUpdate);
+    return hasUpdate;
   }
 
   function check(node, reporter) {
     if (is(node, 'bpmn:Definitions')) {
       elementTemplates.setEngines(getEnginesConfig(node));
+      return; // Early exit after setting engines
     }
 
     if (!is(node, 'bpmn:FlowElement')) {
       return;
     }
 
+    debugLog('Checking compatibility for node:', node.id, 'type:', node.$type);
+
     let template = elementTemplates.get(node);
 
+    // Early exit if no template
     if (!template) {
       return;
     }
 
-    // Create hash only for the specific template being used
+    // Early exit if template has no engines to check
+    if (!template.engines) {
+      debugLog('No engines to check for template:', template.id);
+      return;
+    }
+
+    debugLog('Checking compatibility for template:', template.id, 'version:', template.version);
+
+    // Create optimized cache key
     const templateHash = createTemplateKey(template);
-    const cacheKey = GlobalCache.getValidationCacheKey(node, template, templateHash);
+    const cacheKey = [ node.id, templateHash ].join('_');
 
     if (compatibilityCache.has(cacheKey)) {
       const cachedErrors = compatibilityCache.get(cacheKey);
       debugLog('Compatibility cache hit for node:', node.id, 'returning', cachedErrors.length, 'cached errors');
-      cachedErrors.forEach(error => {
+
+      // Optimized error reporting
+      for (let i = 0; i < cachedErrors.length; i++) {
+        const error = cachedErrors[i];
         reporter.report(node.id, error.message, error.context);
-      });
+      }
       return;
     }
 
     debugLog('Compatibility cache miss for node:', node.id, 'performing compatibility check');
 
     const errors = [];
+    const incompatibleEngines = elementTemplates.getIncompatibleEngines(template);
+    const engineNames = Object.keys(incompatibleEngines);
 
-    // Check compatibility
-    if (template.engines) {
-      const incomp = elementTemplates.getIncompatibleEngines(template);
-      Object.keys(incomp).forEach((engine) => {
-        const message = getIncompatibilityText(engine, incomp[engine], isUpdateAvailable(template));
-        const errorData = {
-          message,
-          context: { name: node.name }
-        };
-
-        errors.push(errorData);
-        reporter.report(node.id, message, errorData.context);
-      });
+    // Early exit if no incompatible engines
+    if (engineNames.length === 0) {
+      debugLog('No incompatible engines found for template:', template.id);
+      compatibilityCache.set(cacheKey, errors);
+      return;
     }
+
+    // Check if update is available once for this template
+    const hasUpdate = isUpdateAvailable(template);
+
+    // Process incompatible engines efficiently
+    for (let i = 0; i < engineNames.length; i++) {
+      const engine = engineNames[i];
+      const incompatibility = incompatibleEngines[engine];
+
+      debugLog('Found incompatible engine:', engine, 'for template:', template.id);
+
+      const message = getIncompatibilityText(engine, incompatibility, hasUpdate);
+      const errorData = {
+        message,
+        context: { name: node.name }
+      };
+
+      errors.push(errorData);
+      reporter.report(node.id, message, errorData.context);
+    }
+
+    debugLog('Compatibility check completed for node:', node.id, 'found', errors.length, 'errors');
 
     // Cache the results
     compatibilityCache.set(cacheKey, errors);
@@ -101,6 +131,7 @@ function getEnginesConfig(definitions) {
   const executionPlatform = definitions.get('modeler:executionPlatform');
   const executionPlatformVersion = definitions.get('modeler:executionPlatformVersion');
 
+  // Optimized string comparison
   if (executionPlatform === 'Camunda Cloud' && executionPlatformVersion) {
     engines.camunda = executionPlatformVersion;
   }
@@ -109,10 +140,14 @@ function getEnginesConfig(definitions) {
 }
 
 function getIncompatibilityText(engine, { actual, required }, updateAvailable) {
-  const message =
-    `Element template incompatible with current <${engine}> environment. ` +
-    `Requires '${engine} ${required}'; found '${actual}'. ` +
-    `${updateAvailable ? 'Update available.' : ''}`;
+  const parts = [
+    `Element template incompatible with current <${engine}> environment.`,
+    `Requires '${engine} ${required}'; found '${actual}'.`
+  ];
 
-  return message.trim();
+  if (updateAvailable) {
+    parts.push('Update available.');
+  }
+
+  return parts.join(' ');
 }

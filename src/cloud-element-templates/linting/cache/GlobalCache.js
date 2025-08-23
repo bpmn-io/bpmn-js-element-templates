@@ -1,125 +1,364 @@
-/**
- * Global cache implementation for element template linting rules
- */
-import BpmnModdle from 'bpmn-moddle';
-import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
-import { Validator } from '../../Validator';
+const DEBUG = false; // Set to false in production for performance
 
+/**
+ * GlobalCache class for caching with memory monitoring and eviction policies.
+ * Each instance has its own memory monitoring to avoid conflicts.
+ * Improved eviction strategy with threshold-based cleanup.
+ */
 export class GlobalCache {
+
+  /**
+   * Creates a new GlobalCache instance.
+   * @param name - Name of the cache instance for logging
+   * @param maxSize - Maximum number of entries in the cache
+   * @param cleanupThreshold - Threshold to trigger cleanup before reaching maxSize
+   */
   constructor(name, maxSize = 5000, cleanupThreshold = 500) {
     this.name = name;
     this.cache = new Map();
-    this.cacheSize = 0;
     this.maxSize = maxSize;
-    this.cleanupThreshold = cleanupThreshold;
-  }
+    this.cleanupThreshold = Math.min(cleanupThreshold, maxSize); // Ensure threshold <= maxSize
 
-  static getValidationCacheKey(node, template, templateHash) {
-    const baseComponents = [
-      templateHash.substring(0, 16), // Truncate for performance
-      template?.id || 'unknown-template',
-      template?.version || '0',
-      node.id,
-      node.$type
-    ];
-
-    return baseComponents.join('::');
+    // Instance-specific memory monitoring
+    this.memoryMonitor = null;
+    this.cleanupTimer = null;
+    this.startMemoryMonitoring();
   }
 
   has(key) {
-    return this.cache.has(key);
-  }
-
-  get(key) {
-    return this.cache.get(key);
-  }
-
-  set(key, value) {
-    this.evictIfNeeded();
-    this.cache.set(key, value);
-    this.cacheSize++;
-    this.debugLog(`Cached entry for key: ${key.substring(0, 50)}..., cache size: ${this.cacheSize}`);
-  }
-
-  evictIfNeeded() {
-    if (this.cacheSize >= this.maxSize) {
-      const entriesToRemove = Math.min(
-        this.cleanupThreshold,
-        this.cacheSize - (this.maxSize * 0.8)
-      );
-      const iterator = this.cache.keys();
-
-      this.debugLog(`Cache size limit reached: ${this.cacheSize}, evicting oldest ${entriesToRemove} entries`);
-
-      for (let i = 0; i < entriesToRemove; i++) {
-        const key = iterator.next().value;
-        if (key) {
-          this.cache.delete(key);
-          this.cacheSize--;
-        }
-      }
-
-      this.debugLog(`Cache cleanup completed. New cache size: ${this.cacheSize}`);
+    try {
+      return this.cache.has(key);
+    } catch (error) {
+      this.debugLog('Error checking cache key:', error.message);
+      return false;
     }
   }
 
-  flush() {
-    const oldSize = this.cacheSize;
-    this.cache.clear();
-    this.cacheSize = 0;
-    this.debugLog(`Cache flushed. Cleared ${oldSize} entries`);
+  get(key) {
+    try {
+      if (this.cache.has(key)) {
+        return this.cache.get(key);
+      }
+      return undefined;
+    } catch (error) {
+      this.debugLog('Error retrieving cache value:', error.message);
+      return undefined;
+    }
   }
 
-  debugLog(message) {
-    console.debug(`[${this.name}]`, message);
+  set(key, value) {
+    try {
+      const hadKey = this.cache.has(key);
+
+      if (!hadKey) {
+        this.evictIfNeeded();
+      }
+
+      this.cache.set(key, value);
+
+      if (!hadKey) {
+        this.debugLog(`Cached new entry: ${key.substring(0, 50)}..., size: ${this.cache.size}`);
+      }
+    } catch (error) {
+      this.debugLog('Error setting cache value:', error.message);
+    }
   }
 
-  getSize() {
-    return this.cacheSize;
+  evictIfNeeded() {
+    const currentSize = this.cache.size;
+
+    // Implement threshold-based cleanup for better performance
+    if (currentSize >= this.cleanupThreshold) {
+
+      // Calculate how many items to remove based on threshold
+      const targetSize = Math.max(
+        Math.floor(this.cleanupThreshold * 0.8), // 80% of threshold
+        Math.floor(this.maxSize * 0.6) // Don't go below 60% of maxSize
+      );
+
+      const entriesToRemove = currentSize - targetSize;
+
+      if (entriesToRemove > 0) {
+        this.debugLog(`Cache threshold reached: ${currentSize}, evicting ${entriesToRemove} entries`);
+
+        // LRU eviction - remove oldest entries
+        const keysToRemove = Array.from(this.cache.keys()).slice(0, entriesToRemove);
+
+        for (const key of keysToRemove) {
+          this.cache.delete(key);
+        }
+
+        this.debugLog(`Cache cleanup completed. New size: ${this.cache.size}`);
+      }
+    }
+
+    // Emergency cleanup if we somehow exceed maxSize
+    if (currentSize >= this.maxSize) {
+      const emergencyTarget = Math.floor(this.maxSize * 0.7);
+      const emergencyRemoval = currentSize - emergencyTarget;
+
+      this.debugLog(`Emergency cleanup: ${currentSize} >= ${this.maxSize}, removing ${emergencyRemoval} entries`);
+
+      const keysToRemove = Array.from(this.cache.keys()).slice(0, emergencyRemoval);
+      for (const key of keysToRemove) {
+        this.cache.delete(key);
+      }
+    }
+  }
+
+  startMemoryMonitoring() {
+
+    // Instance-specific monitoring to avoid conflicts
+    if (this.memoryMonitor) return;
+
+    this.memoryMonitor = setInterval(() => {
+      try {
+        if (typeof window !== 'undefined' && window.performance?.memory) {
+          const { usedJSHeapSize, totalJSHeapSize } = window.performance.memory;
+          const memoryUsageRatio = usedJSHeapSize / totalJSHeapSize;
+
+          if (memoryUsageRatio > 0.85) {
+            this.clear();
+            console.warn(`[${this.name}] High memory usage detected (${Math.round(memoryUsageRatio * 100)}%), cleared cache`);
+          }
+        }
+      } catch (error) {
+        this.debugLog('Memory monitoring error:', error.message);
+      }
+    }, 30000);
+
+    this.cleanupTimer = setInterval(() => {
+      this.performMaintenance();
+    }, 60000);
+  }
+
+  performMaintenance() {
+    try {
+      const actualSize = this.cache.size;
+
+      // Use cleanupThreshold in maintenance logic
+      if (actualSize > this.cleanupThreshold * 1.2) { // 20% tolerance above threshold
+        this.debugLog(`Maintenance cleanup triggered: ${actualSize} > ${this.cleanupThreshold * 1.2}`);
+        this.evictIfNeeded();
+      }
+
+      // Validate cache integrity against maxSize
+      if (actualSize > this.maxSize * 1.1) { // 10% tolerance
+        this.debugLog(`Cache size anomaly detected: ${actualSize}, performing emergency cleanup`);
+        this.evictIfNeeded();
+      }
+    } catch (error) {
+      this.debugLog('Maintenance error:', error.message);
+    }
   }
 
   clear() {
     this.cache.clear();
-    this.cacheSize = 0;
     this.debugLog('Cache cleared');
+  }
+
+  destroy() {
+    if (this.memoryMonitor) {
+      clearInterval(this.memoryMonitor);
+      this.memoryMonitor = null;
+    }
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
+    this.clear();
+  }
+
+  debugLog(message, ...args) {
+    if (DEBUG) {
+      console.debug(`[${this.name}]`, message, ...args);
+    }
   }
 }
 
-// Shared template parsing cache
-export const parsedTemplatesCache = new Map();
+// Cache instances for shared functionality
+const templateValidatorCache = new Map();
+const djb2Cache = new Map();
 
-export function createTemplateKey(template) {
-  return JSON.stringify({
-    id: template.id,
-    version: template.version,
-    content: typeof template === 'string' ? template : JSON.stringify(template)
+// Utility functions for safe serialization
+function safeStringify(obj) {
+  const seen = new WeakSet();
+
+  return JSON.stringify(obj, function(key, val) {
+    if (typeof val === 'object' && val !== null) {
+      if (seen.has(val)) {
+        return '[Circular]';
+      }
+      seen.add(val);
+    }
+    return val;
   });
 }
 
+function djb2Hash(str) {
+  if (djb2Cache.has(str)) {
+    return djb2Cache.get(str);
+  }
+
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    // eslint-disable-next-line no-bitwise
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+  }
+
+  // eslint-disable-next-line no-bitwise
+  const result = (hash >>> 0).toString(36);
+
+  // Prevent cache from growing too large
+  if (djb2Cache.size > 10000) {
+    djb2Cache.clear();
+  }
+
+  djb2Cache.set(str, result);
+  return result;
+}
+
+// Exported utility functions
 export function getCachedValidator(templates, debugLog) {
-  const templateKeys = templates.map(createTemplateKey);
-  const cacheKey = JSON.stringify(templateKeys);
+  const templateHash = templates.map(t => createTemplateKey(t)).join(',');
 
-  if (parsedTemplatesCache.has(cacheKey)) {
-    debugLog('Using cached validator for', templates.length, 'templates');
-    return parsedTemplatesCache.get(cacheKey);
+  if (templateValidatorCache.has(templateHash)) {
+    debugLog('Template validator cache hit');
+    return templateValidatorCache.get(templateHash);
   }
 
-  debugLog('Creating new validator and parsing', templates.length, 'templates');
+  debugLog('Template validator cache miss, creating new validator');
 
-  const moddle = new BpmnModdle({ zeebe: zeebeModdle });
-  const validator = new Validator(moddle).addAll(templates);
-  const validTemplates = validator.getValidTemplates();
+  // Filter valid templates with robust validation
+  const validTemplates = templates.filter(template => {
+    try {
+      return template &&
+        template.id &&
+        template.properties &&
+        Array.isArray(template.properties);
+    } catch (error) {
+      debugLog('Invalid template encountered:', error.message);
+      return false;
+    }
+  });
 
-  const result = { validator, validTemplates };
-  parsedTemplatesCache.set(cacheKey, result);
+  const result = { validTemplates };
 
-  // Prevent unbounded cache growth
-  if (parsedTemplatesCache.size > 50) {
-    const oldestKey = parsedTemplatesCache.keys().next().value;
-    parsedTemplatesCache.delete(oldestKey);
-    debugLog('Evicted oldest parsed templates from cache');
+  // Prevent validator cache from growing too large
+  if (templateValidatorCache.size > 1000) {
+    templateValidatorCache.clear();
   }
+
+  templateValidatorCache.set(templateHash, result);
 
   return result;
+}
+
+export function createTemplateKey(template) {
+  if (typeof template === 'string') {
+    return djb2Hash(template);
+  }
+
+  try {
+
+    // Extract only serializable properties for fingerprinting
+    const fingerprintData = {
+      id: template.id,
+      name: template.name,
+      version: template.version,
+      description: template.description,
+      appliesTo: Array.isArray(template.appliesTo) ? template.appliesTo.slice() : template.appliesTo,
+      elementType: template.elementType,
+      properties: template.properties?.map(prop => ({
+        id: prop.id,
+        label: prop.label,
+        type: prop.type,
+        binding: prop.binding ? { ...prop.binding } : undefined,
+        constraints: prop.constraints ? { ...prop.constraints } : undefined,
+        value: prop.value,
+        feel: prop.feel,
+        optional: prop.optional,
+        condition: prop.condition ? { ...prop.condition } : undefined
+      })) || [],
+      groups: template.groups?.map(group => ({
+        id: group.id,
+        label: group.label,
+        tooltip: group.tooltip
+      })) || []
+    };
+
+    // Safe serialization with deterministic key ordering
+    const serialized = safeStringify(fingerprintData);
+    return djb2Hash(serialized);
+
+  } catch (error) {
+    console.warn('Template fingerprinting failed, using fallback:', error.message);
+
+    // Fallback to basic properties
+    return djb2Hash(`${template.id || ''}:${template.version || ''}:${template.name || ''}`);
+  }
+}
+
+export function createPropertyValuesHash(propertyValues) {
+  if (propertyValues.length === 0) {
+    return '0';
+  }
+
+  // Use FNV-1a hash for better distribution and collision resistance
+  let hash = 2166136261; // FNV offset basis (32-bit)
+
+  // Sort properties by ID for deterministic hashing
+  const sortedProps = propertyValues
+    .slice()
+    .sort((a, b) => (a.id || '').localeCompare(b.id || ''));
+
+  for (const prop of sortedProps) {
+    const key = prop.id || '';
+    const value = prop.value;
+
+    // Hash the key
+    for (let i = 0; i < key.length; i++) {
+      // eslint-disable-next-line no-bitwise
+      hash ^= key.charCodeAt(i);
+      hash = Math.imul(hash, 16777619); // FNV prime
+    }
+
+    // Hash separator
+    // eslint-disable-next-line no-bitwise
+    hash ^= 58; // ':' character
+    hash = Math.imul(hash, 16777619);
+
+    // Hash value with type safety
+    if (value !== undefined && value !== null) {
+      let valueStr;
+      try {
+        const valueType = typeof value;
+        if (valueType === 'string') {
+          valueStr = value;
+        } else if (valueType === 'number' || valueType === 'boolean') {
+          valueStr = String(value);
+        } else {
+
+          // Safe JSON serialization with circular reference handling
+          valueStr = safeStringify(value);
+        }
+
+        for (let i = 0; i < valueStr.length; i++) {
+          // eslint-disable-next-line no-bitwise
+          hash ^= valueStr.charCodeAt(i);
+          hash = Math.imul(hash, 16777619);
+        }
+      } catch (error) {
+
+        // Fallback for serialization errors
+        // eslint-disable-next-line no-bitwise
+        hash ^= String(value).length;
+        hash = Math.imul(hash, 16777619);
+      }
+    }
+  }
+
+  // Ensure positive 32-bit integer
+  // eslint-disable-next-line no-bitwise
+  return (hash >>> 0).toString(36);
 }

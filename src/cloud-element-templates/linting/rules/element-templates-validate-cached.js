@@ -4,22 +4,19 @@ import EventBus from 'diagram-js/lib/core/EventBus';
 import ElementTemplates from '../../ElementTemplates';
 import { getPropertyValue, validateProperty } from '../../util/propertyUtil';
 import { applyConditions } from '../../Condition';
-import { GlobalCache, getCachedValidator, createTemplateKey } from '../cache/GlobalCache';
+import { GlobalCache, getCachedValidator, createTemplateKey, createPropertyValuesHash } from '../cache/GlobalCache';
 
-const DEBUG = true;
+const DEBUG = false; // Set to false in production for performance
 
-function debugLog(message, ...args) {
-  if (DEBUG) {
-    console.log('[element-templates-validate]', message, ...args);
-  }
-}
+// Optimized debug logging - no-op when DEBUG is false
+const debugLog = DEBUG ?
+  console.log.bind(console, '[element-templates-validate]') :
+  () => {};
 
 // Global validation cache
 const validationCache = new GlobalCache('element-templates-validate', 5000, 500);
 
 export default function({ templates = [] }) {
-
-  // validationCache.flush();
 
   const { validTemplates } = getCachedValidator(templates, debugLog);
 
@@ -37,24 +34,15 @@ export default function({ templates = [] }) {
 
     debugLog('Checking node:', node.id, 'type:', node.$type);
 
-    let template = elementTemplates.get(node);
     const templateId = elementTemplates._getTemplateId(node);
-
-    // Handle missing template
-    if (templateId && !template) {
-      debugLog('Template not found for node:', node.id, 'templateId:', templateId);
-      reporter.report(
-        node.id,
-        'Linked element template not found',
-        {
-          name: node.name
-        }
-      );
+    if (!templateId) {
       return;
     }
 
+    let template = elementTemplates.get(node);
     if (!template) {
-      debugLog('No template associated with node:', node.id);
+      debugLog('Template not found for node:', node.id, 'templateId:', templateId);
+      reporter.report(node.id, 'Linked element template not found', { name: node.name });
       return;
     }
 
@@ -62,22 +50,30 @@ export default function({ templates = [] }) {
 
     template = applyConditions(node, template);
 
-    // Create hash that includes both template and current property values
-    const templateHash = createTemplateKey(template);
-    const propertyValues = template.properties.map(prop => ({
-      id: prop.id,
-      value: getPropertyValue(node, prop)
-    }));
-    const propertyHash = createTemplateKey(propertyValues);
+    if (template.properties?.length === 0) {
+      return;
+    }
 
-    const cacheKey = `${node.id}_${templateHash}_${propertyHash}`;
+    // Cache property values to avoid multiple getPropertyValue calls
+    const propertyValuesWithCache = template.properties.map(prop => {
+      const value = getPropertyValue(node, prop);
+      return { id: prop.id, value, property: prop };
+    });
+
+    // Create optimized cache key using shared utility
+    const templateHash = createTemplateKey(template);
+    const propertyHash = createPropertyValuesHash(propertyValuesWithCache);
+    const cacheKey = [ node.id, templateHash, propertyHash ].join('_');
 
     if (validationCache.has(cacheKey)) {
       const cachedErrors = validationCache.get(cacheKey);
       debugLog('Global validation cache hit for node:', node.id, 'returning', cachedErrors.length, 'cached errors');
-      cachedErrors.forEach(error => {
+
+      for (let i = 0; i < cachedErrors.length; i++) {
+        const error = cachedErrors[i];
         reporter.report(node.id, error.message, error.context);
-      });
+      }
+
       return;
     }
 
@@ -85,9 +81,31 @@ export default function({ templates = [] }) {
 
     const errors = [];
 
-    // Check attributes and collect errors
-    template.properties.forEach((property) => {
-      const value = getPropertyValue(node, property);
+    // Pre-compute entry IDs for better performance
+    const entryIdMap = new Map();
+    let groupPropertyCounts = {};
+
+    // Single pass to build group counts and entry IDs
+    for (let i = 0; i < template.properties.length; i++) {
+      const property = template.properties[i];
+      const group = property.group || '';
+
+      if (!groupPropertyCounts[group]) {
+        groupPropertyCounts[group] = 0;
+      }
+
+      const path = [ 'custom-entry', template.id ];
+      if (property.group) {
+        path.push(property.group);
+      }
+      path.push(groupPropertyCounts[group]);
+
+      entryIdMap.set(property, path.join('-'));
+      groupPropertyCounts[group]++;
+    }
+
+    for (let i = 0; i < propertyValuesWithCache.length; i++) {
+      const { value, property } = propertyValuesWithCache[i];
       const error = validateProperty(value, property);
 
       if (error) {
@@ -96,7 +114,7 @@ export default function({ templates = [] }) {
           message: error,
           context: {
             propertiesPanel: {
-              entryIds: [ getEntryId(property, template) ]
+              entryIds: [ entryIdMap.get(property) ]
             },
             name: node.name
           }
@@ -105,7 +123,7 @@ export default function({ templates = [] }) {
         errors.push(errorData);
         reporter.report(node.id, error, errorData.context);
       }
-    });
+    }
 
     debugLog('Validation completed for node:', node.id, 'found', errors.length, 'errors');
 
@@ -116,21 +134,4 @@ export default function({ templates = [] }) {
   return {
     check
   };
-}
-
-// helpers //////////////////////
-
-function getEntryId(property, template) {
-  const index = template.properties
-    .filter(p => p.group === property.group)
-    .indexOf(property);
-
-  const path = [ 'custom-entry', template.id ];
-
-  if (property.group) {
-    path.push(property.group);
-  }
-
-  path.push(index);
-  return path.join('-');
 }
