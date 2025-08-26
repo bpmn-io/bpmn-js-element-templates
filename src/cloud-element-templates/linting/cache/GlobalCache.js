@@ -1,9 +1,9 @@
 const DEBUG = false; // Set to false in production for performance
 
 /**
- * GlobalCache class for caching with memory monitoring and eviction policies.
- * Each instance has its own memory monitoring to avoid conflicts.
- * Improved eviction strategy with threshold-based cleanup.
+ * GlobalCache class for caching with passive memory monitoring and eviction policies.
+ * Designed to be library-friendly with no background processes.
+ * All maintenance happens during active usage.
  */
 export class GlobalCache {
 
@@ -19,10 +19,8 @@ export class GlobalCache {
     this.maxSize = maxSize;
     this.cleanupThreshold = Math.min(cleanupThreshold, maxSize); // Ensure threshold <= maxSize
 
-    // Instance-specific memory monitoring
-    this.memoryMonitor = null;
-    this.cleanupTimer = null;
-    this.startMemoryMonitoring();
+    // Track last maintenance check for passive monitoring
+    this.lastMaintenanceCheck = Date.now();
   }
 
   has(key) {
@@ -52,6 +50,9 @@ export class GlobalCache {
 
       if (!hadKey) {
         this.evictIfNeeded();
+
+        // Passive maintenance check - only during active usage
+        this.checkMaintenanceIfNeeded();
       }
 
       this.cache.set(key, value);
@@ -61,6 +62,16 @@ export class GlobalCache {
       }
     } catch (error) {
       this.debugLog('Error setting cache value:', error.message);
+    }
+  }
+
+  checkMaintenanceIfNeeded() {
+    const now = Date.now();
+
+    // Only check every 60 seconds during active usage
+    if (now - this.lastMaintenanceCheck > 60000) {
+      this.performMaintenance();
+      this.lastMaintenanceCheck = now;
     }
   }
 
@@ -106,43 +117,27 @@ export class GlobalCache {
     }
   }
 
-  startMemoryMonitoring() {
-
-    // Instance-specific monitoring to avoid conflicts
-    if (this.memoryMonitor) return;
-
-    this.memoryMonitor = setInterval(() => {
-      try {
-        if (typeof window !== 'undefined' && window.performance?.memory) {
-          const { usedJSHeapSize, totalJSHeapSize } = window.performance.memory;
-          const memoryUsageRatio = usedJSHeapSize / totalJSHeapSize;
-
-          if (memoryUsageRatio > 0.85) {
-            this.clear();
-            console.warn(`[${this.name}] High memory usage detected (${Math.round(memoryUsageRatio * 100)}%), cleared cache`);
-          }
-        }
-      } catch (error) {
-        this.debugLog('Memory monitoring error:', error.message);
-      }
-    }, 30000);
-
-    this.cleanupTimer = setInterval(() => {
-      this.performMaintenance();
-    }, 60000);
-  }
-
   performMaintenance() {
     try {
       const actualSize = this.cache.size;
 
-      // Use cleanupThreshold in maintenance logic
+      // Passive memory check
+      if (typeof window !== 'undefined' && window.performance?.memory) {
+        const { usedJSHeapSize, totalJSHeapSize } = window.performance.memory;
+        const memoryUsageRatio = usedJSHeapSize / totalJSHeapSize;
+
+        if (memoryUsageRatio > 0.85) {
+          this.clear();
+          console.warn(`[${this.name}] High memory usage detected (${Math.round(memoryUsageRatio * 100)}%), cleared cache`);
+          return;
+        }
+      }
+
       if (actualSize > this.cleanupThreshold * 1.2) { // 20% tolerance above threshold
         this.debugLog(`Maintenance cleanup triggered: ${actualSize} > ${this.cleanupThreshold * 1.2}`);
         this.evictIfNeeded();
       }
 
-      // Validate cache integrity against maxSize
       if (actualSize > this.maxSize * 1.1) { // 10% tolerance
         this.debugLog(`Cache size anomaly detected: ${actualSize}, performing emergency cleanup`);
         this.evictIfNeeded();
@@ -155,18 +150,6 @@ export class GlobalCache {
   clear() {
     this.cache.clear();
     this.debugLog('Cache cleared');
-  }
-
-  destroy() {
-    if (this.memoryMonitor) {
-      clearInterval(this.memoryMonitor);
-      this.memoryMonitor = null;
-    }
-    if (this.cleanupTimer) {
-      clearInterval(this.cleanupTimer);
-      this.cleanupTimer = null;
-    }
-    this.clear();
   }
 
   debugLog(message, ...args) {
