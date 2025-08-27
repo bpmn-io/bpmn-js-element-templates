@@ -8,13 +8,11 @@ import { GlobalCache, getCachedValidator, createTemplateKey, createPropertyValue
 
 const DEBUG = false; // Set to false in production for performance
 
-// Optimized debug logging - no-op when DEBUG is false
 const debugLog = DEBUG ?
   console.log.bind(console, '[element-templates-validate]') :
   () => {};
 
-// Global validation cache
-const validationCache = new GlobalCache('element-templates-validate', 5000, 500);
+const validationCache = new GlobalCache('element-templates-validate', 2000, 500);
 
 export default function({ templates = [] }) {
 

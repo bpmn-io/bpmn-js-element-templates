@@ -6,13 +6,11 @@ import { GlobalCache, getCachedValidator, createTemplateKey } from '../cache/Glo
 
 const DEBUG = false; // Set to false in production for performance
 
-// Optimized debug logging - no-op when DEBUG is false
 const debugLog = DEBUG ?
   console.log.bind(console, '[element-templates-compatibility]') :
   () => {};
 
-// Global compatibility cache with optimized size
-const compatibilityCache = new GlobalCache('element-templates-compatibility', 5000, 500);
+const compatibilityCache = new GlobalCache('element-templates-compatibility', 2000, 500);
 
 export default function({ templates = [] }) {
   const { validTemplates } = getCachedValidator(templates, debugLog);

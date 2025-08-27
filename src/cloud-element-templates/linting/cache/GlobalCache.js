@@ -35,7 +35,14 @@ export class GlobalCache {
   get(key) {
     try {
       if (this.cache.has(key)) {
-        return this.cache.get(key);
+        const value = this.cache.get(key);
+
+        // Update LRU order by re-inserting the item
+        // This moves it to the end of the Map's iteration order
+        this.cache.delete(key);
+        this.cache.set(key, value);
+
+        return value;
       }
       return undefined;
     } catch (error) {
@@ -68,6 +75,8 @@ export class GlobalCache {
   checkMaintenanceIfNeeded() {
     const now = Date.now();
 
+    this.debugLog('Checking cache:', now, 'last check:', this.lastMaintenanceCheck, 'interval:', now - this.lastMaintenanceCheck);
+
     // Only check every 60 seconds during active usage
     if (now - this.lastMaintenanceCheck > 60000) {
       this.performMaintenance();
@@ -78,6 +87,8 @@ export class GlobalCache {
   evictIfNeeded() {
     const currentSize = this.cache.size;
 
+    this.debugLog(`Eviction check: current size ${currentSize}`, `max size ${this.maxSize}`, `cleanup threshold ${this.cleanupThreshold}`);
+
     // Implement threshold-based cleanup for better performance
     if (currentSize >= this.cleanupThreshold) {
 
@@ -87,7 +98,9 @@ export class GlobalCache {
         Math.floor(this.maxSize * 0.6) // Don't go below 60% of maxSize
       );
 
-      const entriesToRemove = currentSize - targetSize;
+      const entriesToRemove = (currentSize - targetSize) + 1;
+
+      this.debugLog('Entries to remove:', entriesToRemove);
 
       if (entriesToRemove > 0) {
         this.debugLog(`Cache threshold reached: ${currentSize}, evicting ${entriesToRemove} entries`);
@@ -103,8 +116,11 @@ export class GlobalCache {
       }
     }
 
+    this.debugLog('Current size', currentSize, 'max size', this.maxSize);
+
     // Emergency cleanup if we somehow exceed maxSize
     if (currentSize >= this.maxSize) {
+      this.debugLog('emergency cleanup triggered');
       const emergencyTarget = Math.floor(this.maxSize * 0.7);
       const emergencyRemoval = currentSize - emergencyTarget;
 
@@ -126,12 +142,16 @@ export class GlobalCache {
         const { usedJSHeapSize, totalJSHeapSize } = window.performance.memory;
         const memoryUsageRatio = usedJSHeapSize / totalJSHeapSize;
 
-        if (memoryUsageRatio > 0.85) {
+        this.debugLog('Memory usage:', Math.round(memoryUsageRatio * 100) + '%', `[${memoryUsageRatio}]`, `(used: ${Math.round(usedJSHeapSize / 1024 / 1024)} MB, total: ${Math.round(totalJSHeapSize / 1024 / 1024)} MB)`);
+
+        if (memoryUsageRatio >= 0.85) {
           this.clear();
           console.warn(`[${this.name}] High memory usage detected (${Math.round(memoryUsageRatio * 100)}%), cleared cache`);
           return;
         }
       }
+
+      this.debugLog('Performing maintenance check, actual size:', actualSize);
 
       if (actualSize > this.cleanupThreshold * 1.2) { // 20% tolerance above threshold
         this.debugLog(`Maintenance cleanup triggered: ${actualSize} > ${this.cleanupThreshold * 1.2}`);
