@@ -1,5 +1,7 @@
+import { Linter } from 'bpmnlint';
 import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 
+import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/linting';
 import validateRule from 'src/cloud-element-templates/linting/rules/element-templates-validate';
 import compatibilityRule from 'src/cloud-element-templates/linting/rules/element-templates-compatibility';
 
@@ -231,6 +233,82 @@ describe('cloud-element-templates/linting', function() {
     invalid: incompatible
   });
 
+
+  it('should create the plugin within performance constraints', function() {
+
+    // given
+    this.timeout(100);
+
+    let i = 0;
+    while (i < 1000) {
+
+      // when
+      ElementTemplateLinterPlugin(templates);
+      i++;
+    }
+
+    // then
+    // no error (timeout)
+  });
+
+
+  it('should create `validate` rule within performance constraints', function() {
+
+    // given
+    this.timeout(100);
+
+    let i = 0;
+    while (i < 1000) {
+
+      // when
+      validateRule({ templates });
+      i++;
+    }
+
+    // then
+    // no error (timeout)
+  });
+
+
+  it('should create `compatibility` rule within performance constraints', function() {
+
+    // given
+    this.timeout(100);
+
+    let i = 0;
+    while (i < 1000) {
+
+      // when
+      compatibilityRule({ templates });
+      i++;
+    }
+
+    // then
+    // no error (timeout)
+  });
+
+
+  it('should lint correctly when templates configuration changes', async function() {
+
+    // given
+    let linter = new Linter(ElementTemplateLinterPlugin(templates));
+    const moddleElement = (await createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.empty" />')).root;
+
+    // when
+    const result = await linter.lint(moddleElement);
+
+    // assume
+    expect(Object.keys(result)).to.be.empty;
+
+    // and when
+    linter = new Linter(ElementTemplateLinterPlugin([]));
+    const secondResult = await linter.lint(moddleElement);
+
+    // then
+    const report = secondResult['element-templates/validate'][0];
+    expect(report).to.have.property('id', 'Task_1');
+    expect(report).to.have.property('message', 'Linked element template not found');
+  });
 });
 
 

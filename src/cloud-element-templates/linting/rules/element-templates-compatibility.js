@@ -11,18 +11,9 @@
 import ElementTemplates from '../../ElementTemplates';
 import EventBus from 'diagram-js/lib/core/EventBus';
 
-import BpmnModdle from 'bpmn-moddle';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
 
-import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
-
-import { Validator } from '../../Validator';
-
 export default function({ templates = [] }) {
-  const moddle = new BpmnModdle({ zeebe: zeebeModdle });
-
-  const validator = new Validator(moddle).addAll(templates);
-  const validTemplates = validator.getValidTemplates();
 
   // We use the ElementTemplates Module without the required bpmn-js modules
   // As we only use it to facilitate template ID and version lookup,
@@ -30,7 +21,7 @@ export default function({ templates = [] }) {
   const eventBus = new EventBus();
   const elementTemplates = new ElementTemplates(null, null, eventBus, null, null);
 
-  elementTemplates.set(validTemplates);
+  elementTemplates.set(templates);
 
   function isUpdateAvailable(template) {
 
