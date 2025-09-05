@@ -13,12 +13,32 @@ import StaticResolver from 'bpmnlint/lib/resolver/static-resolver';
 import validate from './rules/element-templates-validate';
 import compatibility from './rules/element-templates-compatibility';
 
+
+import BpmnModdle from 'bpmn-moddle';
+
+import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
+
+import { Validator } from '../Validator';
+
+let lastTemplates = [],
+    lastValidTemplates = [];
+
 export const ElementTemplateLinterPlugin = function(templates) {
+
+  if (!templatesEqual(lastTemplates, templates)) {
+    const moddle = new BpmnModdle({ zeebe: zeebeModdle });
+
+    const validator = new Validator(moddle).addAll(templates);
+    const validTemplates = validator.getValidTemplates();
+    lastTemplates = templates;
+    lastValidTemplates = validTemplates;
+  }
+
   return {
     config: {
       rules: {
-        'element-templates/validate': [ 'error', { templates } ],
-        'element-templates/compatibility': [ 'warn', { templates } ]
+        'element-templates/validate': [ 'error', { templates: lastValidTemplates } ],
+        'element-templates/compatibility': [ 'warn', { templates: lastValidTemplates } ]
       }
     },
     resolver: new StaticResolver({
@@ -27,3 +47,11 @@ export const ElementTemplateLinterPlugin = function(templates) {
     })
   };
 };
+
+function templatesEqual(a, b) {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  return JSON.stringify(a) === JSON.stringify(b);
+}
