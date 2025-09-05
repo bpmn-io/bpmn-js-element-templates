@@ -1,3 +1,7 @@
+import BpmnModdle from 'bpmn-moddle';
+import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
+import { Validator } from '../../Validator';
+
 const DEBUG = false; // Set to false in production for performance
 
 /**
@@ -232,18 +236,9 @@ export function getCachedValidator(templates, debugLog) {
 
   debugLog('Template validator cache miss, creating new validator');
 
-  // Filter valid templates with robust validation
-  const validTemplates = templates.filter(template => {
-    try {
-      return template &&
-        template.id &&
-        template.properties &&
-        Array.isArray(template.properties);
-    } catch (error) {
-      debugLog('Invalid template encountered:', error.message);
-      return false;
-    }
-  });
+  const moddle = new BpmnModdle({ zeebe: zeebeModdle });
+  const validator = new Validator(moddle).addAll(templates);
+  const validTemplates = validator.getValidTemplates();
 
   const result = { validTemplates };
 
