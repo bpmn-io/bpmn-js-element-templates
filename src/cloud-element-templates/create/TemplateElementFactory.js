@@ -42,12 +42,11 @@ import {
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
-  ZEEBE_TASK_SCHEDULE
+  ZEEBE_TASK_SCHEDULE,
 } from '../util/bindingTypes';
 
-import {
-  isConditionMet
-} from '../Condition';
+import { isConditionMet } from '../Condition';
+import { isSubprocess } from '../../utils/ElementUtil';
 
 export default class TemplateElementFactory {
 
@@ -115,8 +114,12 @@ export default class TemplateElementFactory {
     const elementFactory = this._elementFactory;
 
     const attrs = {
-      type: elementType.value || appliesTo[0]
+      type: elementType.value || appliesTo[0],
     };
+
+    if (isSubprocess(attrs.type)) {
+      attrs.isExpanded = true;
+    }
 
     // apply eventDefinition
     if (elementType.eventDefinition) {
