@@ -60,3 +60,13 @@ export function findRootElementById(businessObject, type, id) {
 
   return elements.find(element => element.id === id);
 }
+
+/**
+ * Check if element type is a subprocess (either regular or AdHoc).
+ *
+ * @param {string} elementType
+ * @returns {boolean}
+ */
+export function isSubprocess(elementType) {
+  return elementType === 'bpmn:SubProcess' || elementType === 'bpmn:AdHocSubProcess' || elementType === 'bpmn:Transaction';
+}

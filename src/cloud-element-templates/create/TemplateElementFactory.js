@@ -45,9 +45,8 @@ import {
   ZEEBE_TASK_SCHEDULE
 } from '../util/bindingTypes';
 
-import {
-  isConditionMet
-} from '../Condition';
+import { isConditionMet } from '../Condition';
+import { isSubprocess } from '../../utils/ElementUtil';
 
 export default class TemplateElementFactory {
 
@@ -117,6 +116,10 @@ export default class TemplateElementFactory {
     const attrs = {
       type: elementType.value || appliesTo[0]
     };
+
+    if (isSubprocess(attrs.type)) {
+      attrs.isExpanded = true;
+    }
 
     // apply eventDefinition
     if (elementType.eventDefinition) {

@@ -36,6 +36,8 @@ import conditionTemplates from './TemplateElementFactory.conditions.json';
 
 import completionConditionTemplates from '../fixtures/completion-condition.json';
 
+import subprocessTemplates from '../fixtures/subprocess.json';
+
 
 describe('provider/cloud-element-templates - TemplateElementFactory', function() {
 
@@ -133,6 +135,41 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
     // then
     expect(icon).to.exist;
     expect(icon).to.equal("data:image/svg+xml,%3Csvg width='24' height='24'%3C/svg%3E");
+  }));
+
+
+  it('should create expanded subprocess elements', inject(function(templateElementFactory) {
+
+    // given
+    const subprocessTemplate = subprocessTemplates[0]; // 'subprocess' template
+
+    // when
+    const element = templateElementFactory.create(subprocessTemplate);
+
+    // then
+    expect(element.type).to.equal('bpmn:SubProcess');
+    expect(element.collapsed).to.be.false; // subprocess should be expanded
+  }));
+
+
+  it('should create expanded AdHoc subprocess elements', inject(function(templateElementFactory) {
+
+    // given
+    const adHocSubprocessTemplate = {
+      '$schema': 'https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json',
+      'id': 'adhocsubprocess',
+      'name': 'AdHocSubProcess',
+      'version': 1,
+      'appliesTo': [ 'bpmn:AdHocSubProcess' ],
+      'properties': []
+    };
+
+    // when
+    const element = templateElementFactory.create(adHocSubprocessTemplate);
+
+    // then
+    expect(element.type).to.equal('bpmn:AdHocSubProcess');
+    expect(element.collapsed).to.be.false; // AdHoc subprocess should also be expanded
   }));
 
 
