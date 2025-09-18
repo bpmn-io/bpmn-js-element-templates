@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.13.0
+
+* `FEAT`: create sub-processes as expanded elements ([#185](https://github.com/bpmn-io/bpmn-js-element-templates/pull/185))
+
 ## 2.12.0
 
 * `FEAT`: cache templates between linter plugin usages ([#179](https://github.com/bpmn-io/bpmn-js-element-templates/pull/179))
