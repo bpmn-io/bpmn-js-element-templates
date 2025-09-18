@@ -114,7 +114,7 @@ export default class TemplateElementFactory {
     const elementFactory = this._elementFactory;
 
     const attrs = {
-      type: elementType.value || appliesTo[0],
+      type: elementType.value || appliesTo[0]
     };
 
     if (isSubprocess(attrs.type)) {
