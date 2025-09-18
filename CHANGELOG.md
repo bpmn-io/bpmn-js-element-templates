@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.14.0
+
+* `FEAT`: support `activeElementsCollection` property on `zeebe:adHoc` ([camunda/element-templates-json-schema#198](https://github.com/camunda/element-templates-json-schema/pull/198))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.13.0`
+
 ## 2.13.0
 
 * `FEAT`: create sub-processes as expanded elements ([#185](https://github.com/bpmn-io/bpmn-js-element-templates/pull/185))
