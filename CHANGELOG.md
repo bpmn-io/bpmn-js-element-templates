@@ -8,7 +8,7 @@ ___Note:__ Yet to be released changes appear here._
 
 ## 2.14.0
 
-* `FEAT`: support `activeElementsCollection` property on `zeebe:adHoc` ([camunda/element-templates-json-schema#198](https://github.com/camunda/element-templates-json-schema/pull/198))
+* `FEAT`: support `activeElementsCollection` property on `zeebe:adHoc` ([camunda/element-templates-json-schema#198](https://github.com/camunda/element-templates-json-schema/pull/198), [#186](https://github.com/bpmn-io/bpmn-js-element-templates/pull/186))
 * `DEPS`: update to `@bpmn-io/element-templates-validator@2.13.0`
 
 ## 2.13.0
@@ -276,3 +276,4 @@ _No user visible changes._
 ## 1.0.0
 
 * initial release
+
