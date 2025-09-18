@@ -68,5 +68,5 @@ export function findRootElementById(businessObject, type, id) {
  * @returns {boolean}
  */
 export function isSubprocess(elementType) {
-  return elementType === 'bpmn:SubProcess' || elementType === 'bpmn:AdHocSubProcess';
+  return elementType === 'bpmn:SubProcess' || elementType === 'bpmn:AdHocSubProcess' || elementType === 'bpmn:Transaction';
 }

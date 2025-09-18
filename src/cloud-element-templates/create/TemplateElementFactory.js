@@ -42,7 +42,7 @@ import {
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
-  ZEEBE_TASK_SCHEDULE,
+  ZEEBE_TASK_SCHEDULE
 } from '../util/bindingTypes';
 
 import { isConditionMet } from '../Condition';
