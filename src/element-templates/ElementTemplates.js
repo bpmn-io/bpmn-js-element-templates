@@ -2,6 +2,7 @@ import {
   find,
   isString,
   isUndefined,
+  isArray
 } from 'min-dash';
 
 import {
@@ -10,8 +11,11 @@ import {
   coerceEngines,
   getIncompatibleEngines,
   isCompatible,
-  findTemplates
+  findTemplates,
+  buildTemplatesById
 } from './Helper';
+
+import { gt as semver_gt } from 'semver';
 
 // eslint-disable-next-line no-undef
 const packageVersion = process.env.PKG_VERSION;
@@ -110,6 +114,72 @@ export default class ElementTemplates {
       ...options,
       latest: true
     });
+  }
+
+  /**
+   * Get templates that would become available after an engine upgrade.
+   *
+   * @param {Object|Array<Object>} engineUpgrades Sequence of or single engine upgrade(s) to be applied. Lists should be provided in ascending order for predictable results. Return structure matches this parameter.
+   * @param {Object} [options]
+   * @param {boolean} [options.includeVersionUpgrades=false]
+   *
+   * @returns {Array<ElementTemplate>|Array<Array<ElementTemplate>>}
+   */
+  getUpgrades(engineUpgrades, options = {}) {
+    const singleUpgrade = !isArray(engineUpgrades);
+    const engineUpgradeSteps = singleUpgrade ? [ engineUpgrades ] : engineUpgrades;
+
+    const results = [];
+    let currentEngines = this._engines;
+    let cumulativeTemplatesById = buildTemplatesById(this._templates, currentEngines);
+
+    for (const upgrade of engineUpgradeSteps) {
+      const futureEngines = { ...currentEngines, ...upgrade };
+
+      const isActualUpgrade = Object.keys(upgrade).some(engine => {
+        const currentVersion = currentEngines[engine];
+        const futureVersion = futureEngines[engine];
+        return currentVersion && futureVersion && semver_gt(futureVersion, currentVersion);
+      });
+
+      if (!isActualUpgrade) {
+        results.push([]);
+        continue;
+      }
+
+      const futureTemplatesById = buildTemplatesById(this._templates, futureEngines);
+
+      const newTemplates = [];
+
+      for (const id in futureTemplatesById) {
+        const futureLatest = futureTemplatesById[id].latest;
+        const cumulativeLatest = cumulativeTemplatesById[id] && cumulativeTemplatesById[id].latest;
+
+        if (!futureLatest) {
+          continue;
+        }
+
+        // new template ID
+        if (!cumulativeLatest) {
+          newTemplates.push(futureLatest);
+          cumulativeTemplatesById[id]['latest'] = futureLatest;
+          continue;
+        }
+
+        // new version of existing template
+        if (options.includeVersionUpgrades && futureLatest.version && cumulativeLatest.version) {
+          if (futureLatest.version > cumulativeLatest.version) {
+            newTemplates.push(futureLatest);
+            cumulativeTemplatesById[id]['latest'] = futureLatest;
+          }
+        }
+      }
+
+      results.push(newTemplates);
+      currentEngines = futureEngines;
+    }
+
+    return singleUpgrade ? results[0] : results;
   }
 
   /**

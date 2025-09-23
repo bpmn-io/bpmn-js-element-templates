@@ -558,6 +558,232 @@ describe('provider/element-templates - ElementTemplates', function() {
   });
 
 
+  describe('getUpgrade', function() {
+
+    const testTemplates = [
+      {
+        id: 'downgrade-template',
+        name: 'Downgrade Template',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [],
+        version: 1,
+        engines: {
+          'camunda-platform': '7.18.0'
+        }
+      },
+      {
+        id: 'versioned-template',
+        name: 'Versioned Template v1',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [],
+        version: 1,
+        engines: {
+          'camunda-platform': '^8.0.0'
+        }
+      },
+      {
+        id: 'versioned-template',
+        name: 'Versioned Template v2',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [],
+        version: 2,
+        engines: {
+          'camunda-platform': '^8.1.0'
+        }
+      },
+      {
+        id: 'exact-version-template',
+        name: 'Exact Version Template',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [],
+        version: 1,
+        engines: {
+          'camunda-platform': '8.1.0'
+        }
+      },
+      {
+        id: 'future-template',
+        name: 'Future Template',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [],
+        version: 1,
+        engines: {
+          'camunda-platform': '^8.2.0'
+        }
+      },
+      {
+        id: 'exact-version-template',
+        name: 'Exact Version Template',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [],
+        version: 2,
+        engines: {
+          'camunda-platform': '8.3.0'
+        }
+      },
+    ];
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(testTemplates);
+      elementTemplates.setEngines({
+        'camunda-platform': '8.0.0'
+      });
+    }));
+
+
+    it('should return newly available templates after single upgrade', inject(function(elementTemplates) {
+
+      // when
+      const newTemplates = elementTemplates.getUpgrades({ 'camunda-platform': '8.1.0' });
+
+      // then
+      expect(newTemplates).to.have.length(1);
+      expect(newTemplates[0].id).to.equal('exact-version-template');
+    }));
+
+
+    it('should include version upgrades after single upgrade', inject(function(elementTemplates) {
+
+      // when
+      const newTemplates = elementTemplates.getUpgrades({ 'camunda-platform': '8.1.0' }, { includeVersionUpgrades: true });
+
+      // then
+      expect(newTemplates).to.have.length(2);
+      expect(newTemplates.map(t => t.id)).to.eql([ 'versioned-template', 'exact-version-template' ]);
+      expect(newTemplates.find(t => t.id === 'versioned-template').version).to.equal(2);
+    }));
+
+
+    it('should return empty array if no new templates are available', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({ 'camunda-platform': '8.3.0' });
+
+      // when
+      const newTemplates = elementTemplates.getUpgrades({ 'camunda-platform': '8.4.0' });
+
+      // then
+      expect(newTemplates).to.be.empty;
+    }));
+
+
+    it('should return empty array for engine downgrade', inject(function(elementTemplates) {
+
+      // when
+      const newTemplates = elementTemplates.getUpgrades({ 'camunda-platform': '7.18.0' });
+
+      // then
+      expect(newTemplates).to.be.empty;
+    }));
+
+
+    it('should return newly available templates after multiple sequential upgrades', inject(function(elementTemplates) {
+
+      // when
+      const newTemplates = elementTemplates.getUpgrades([
+        { 'camunda-platform': '8.1.0' },
+        { 'camunda-platform': '8.2.0' }
+      ]);
+
+      // then
+      expect(newTemplates).to.have.length(2);
+
+      // first step: 8.0.0 -> 8.1.0
+      expect(newTemplates[0]).to.have.length(1);
+      expect(newTemplates[0][0].id).to.equal('exact-version-template');
+
+      // second step: 8.1.0 -> 8.2.0
+      expect(newTemplates[1]).to.have.length(1);
+      expect(newTemplates[1][0].id).to.equal('future-template');
+    }));
+
+
+    it('should include version upgrades after multiple sequential upgrades', inject(function(elementTemplates) {
+
+      // when
+      const newTemplates = elementTemplates.getUpgrades([
+        { 'camunda-platform': '8.1.0' },
+        { 'camunda-platform': '8.2.0' }
+      ], { includeVersionUpgrades: true });
+
+      // then
+      expect(newTemplates).to.have.length(2);
+
+      // first step: 8.0.0 -> 8.1.0
+      expect(newTemplates[0]).to.have.length(2);
+      expect(newTemplates[0].map(t => t.id)).to.eql([ 'versioned-template', 'exact-version-template' ]);
+
+      // second step: 8.1.0 -> 8.2.0
+      expect(newTemplates[1]).to.have.length(1);
+      expect(newTemplates[1][0].id).to.equal('future-template');
+    }));
+
+
+    it('should handle no-op steps in multiple upgrades', inject(function(elementTemplates) {
+
+      // when
+      const newTemplates = elementTemplates.getUpgrades([
+        { 'camunda-platform': '7.18.0' }, // no-op (downgrade)
+        { 'camunda-platform': '8.0.0' }, // no-op (same version)
+      ]);
+
+      // then
+      expect(newTemplates).to.have.length(2);
+      expect(newTemplates[0]).to.be.empty;
+      expect(newTemplates[1]).to.be.empty;
+    }));
+
+    it ('should ignore repeats of the same version', inject(function(elementTemplates) {
+
+      // when
+      const newTemplates = elementTemplates.getUpgrades([
+        { 'camunda-platform': '8.2.0' },
+        { 'camunda-platform': '8.1.0' },
+        { 'camunda-platform': '8.2.0' }
+      ], { includeVersionUpgrades: true });
+
+      // then
+      expect(newTemplates).to.have.length(3);
+      expect(newTemplates[0]).to.have.length(2);
+      expect(newTemplates[0].map(t => t.id)).to.eql([ 'versioned-template', 'future-template' ]);
+      expect(newTemplates[1]).to.be.empty;
+      expect(newTemplates[2]).to.be.empty;
+    }));
+
+    it('should not accumulate templates for skipped over versions', inject(function(elementTemplates) {
+
+      // when
+      const newTemplates = elementTemplates.getUpgrades({ 'camunda-platform': '8.2.0' }, { includeVersionUpgrades: true });
+
+      // then
+      expect(newTemplates).to.have.length(2);
+      expect(newTemplates.find(t => t.id === 'exact-version-template')).not.to.exist;
+    }));
+
+    it('should remember upgrades it has already suggested', inject(function(elementTemplates) {
+
+      // when
+      const upgradeList = [ { 'camunda-platform': '8.1.0' }, { 'camunda-platform': '8.2.0' }, { 'camunda-platform': '8.3.0' } ];
+      const newTemplates = elementTemplates.getUpgrades(upgradeList);
+
+      // then
+      expect(newTemplates).to.have.length(3);
+      expect(newTemplates[0].find(t => t.id === 'exact-version-template')).to.exist;
+      expect(newTemplates[2].find(t => t.id === 'exact-version-template')).to.not.exist;
+
+      // but when
+      const newTemplatesAgain = elementTemplates.getUpgrades(upgradeList, { includeVersionUpgrades: true });
+
+      // then
+      expect(newTemplatesAgain).to.have.length(3);
+      expect(newTemplatesAgain[0].find(t => t.id === 'exact-version-template')).to.exist;
+      expect(newTemplatesAgain[2].find(t => t.id === 'exact-version-template')).to.exist;
+    }));
+
+
+  });
+
+
   describe('set', function() {
 
     it('should set templates', inject(function(elementTemplates) {

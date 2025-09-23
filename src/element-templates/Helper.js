@@ -36,10 +36,6 @@ export const TEMPLATE_ID_ATTR = 'camunda:modelerTemplate';
  */
 export const TEMPLATE_VERSION_ATTR = 'camunda:modelerTemplateVersion';
 
-// eslint-disable-next-line no-undef
-const packageVersion = process.env.PKG_VERSION;
-
-
 /**
  * Coerces and validates engine profile.
  *
