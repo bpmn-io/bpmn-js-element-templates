@@ -1,28 +1,17 @@
 import {
-  filter,
   find,
-  flatten,
-  has,
-  isNil,
-  isObject,
   isString,
   isUndefined,
-  reduce,
-  values
 } from 'min-dash';
 
 import {
   getTemplateId,
-  getTemplateVersion
+  getTemplateVersion,
+  coerceEngines,
+  getIncompatibleEngines,
+  isCompatible,
+  findTemplates
 } from './Helper';
-
-import { isAny } from 'bpmn-js/lib/util/ModelUtil';
-
-import {
-  valid as isSemverValid,
-  satisfies as isSemverCompatible,
-  coerce
-} from 'semver';
 
 // eslint-disable-next-line no-undef
 const packageVersion = process.env.PKG_VERSION;
@@ -129,27 +118,8 @@ export default class ElementTemplates {
    * @param {Array<ElementTemplate>} templates
    */
   set(templates) {
-    this._templatesById = {};
     this._templates = templates;
-
-    templates.forEach((template) => {
-      const id = template.id;
-      const version = isUndefined(template.version) ? '_' : template.version;
-
-      if (!this._templatesById[ id ]) {
-        this._templatesById[ id ] = { };
-      }
-
-      this._templatesById[ id ][ version ] = template;
-
-      const latest = this._templatesById[ id ].latest;
-
-      if (this.isCompatible(template)) {
-        if (!latest || isUndefined(latest.version) || latest.version < version) {
-          this._templatesById[ id ].latest = template;
-        }
-      }
-    });
+    this._templatesById = buildTemplatesById(this._templates, this._engines);
 
     this._fire('changed');
   }
@@ -159,9 +129,7 @@ export default class ElementTemplates {
   }
 
   setEngines(engines) {
-
     this._engines = this._coerceEngines(engines);
-
     this._fire('engines.changed');
   }
 
@@ -173,32 +141,7 @@ export default class ElementTemplates {
    * @return { Record<string, string> } filtered, valid engines
    */
   _coerceEngines(engines) {
-
-    // we provide <elementTemplates> engine with the current
-    // package version; templates may use that engine to declare
-    // compatibility with this library
-    engines = {
-      elementTemplates: packageVersion,
-      ...engines
-    };
-
-    return reduce(engines, (validEngines, version, engine) => {
-
-      const coercedVersion = coerce(version);
-
-      if (!isSemverValid(coercedVersion)) {
-        console.error(
-          new Error(`Engine <${ engine }> specifies unparseable version <${version}>`)
-        );
-
-        return validEngines;
-      }
-
-      return {
-        ...validEngines,
-        [ engine ]: coercedVersion.raw
-      };
-    }, {});
+    return coerceEngines(engines, packageVersion);
   }
 
   /**
@@ -209,7 +152,7 @@ export default class ElementTemplates {
    * @return {boolean} - true if compatible or no engine is set for elementTemplates or template.
    */
   isCompatible(template) {
-    return !Object.keys(this.getIncompatibleEngines(template)).length;
+    return isCompatible(template, this._engines);
   }
 
   /**
@@ -220,24 +163,7 @@ export default class ElementTemplates {
    * @return { Record<string, { required: string, found: string } } - incompatible engines along with their template and local versions
    */
   getIncompatibleEngines(template) {
-    const localEngines = this._engines;
-    const templateEngines = template.engines;
-
-    return reduce(templateEngines, (result, _, engine) => {
-
-      if (!has(localEngines, engine)) {
-        return result;
-      }
-
-      if (!isSemverCompatible(localEngines[engine], templateEngines[engine])) {
-        result[engine] = {
-          actual: localEngines[engine],
-          required: templateEngines[engine]
-        };
-      }
-
-      return result;
-    }, {});
+    return getIncompatibleEngines(template, this._engines);
   }
 
   /**
@@ -247,37 +173,7 @@ export default class ElementTemplates {
    * @return {Array<ElementTemplate>}
    */
   _getTemplateVerions(id, options = {}) {
-
-    const {
-      latest: includeLatestOnly,
-      deprecated: includeDeprecated
-    } = options;
-
-    const templatesById = this._templatesById;
-    const getVersions = (template) => {
-      const { latest, ...versions } = template;
-      return includeLatestOnly ? (
-        !includeDeprecated && (latest && latest.deprecated) ? [] : (latest ? [ latest ] : [])
-      ) : values(versions) ;
-    };
-
-    if (isNil(id)) {
-      return flatten(values(templatesById).map(getVersions));
-    }
-
-    if (isObject(id)) {
-      const element = id;
-
-      return filter(this._getTemplateVerions(null, options), function(template) {
-        return isAny(element, template.appliesTo);
-      }) || [];
-    }
-
-    if (isString(id)) {
-      return templatesById[ id ] && getVersions(templatesById[ id ]);
-    }
-
-    throw new Error('argument must be of type {string|djs.model.Base|undefined}');
+    return findTemplates(id, this._templatesById, options);
   }
 
   _getTemplateId(element) {
