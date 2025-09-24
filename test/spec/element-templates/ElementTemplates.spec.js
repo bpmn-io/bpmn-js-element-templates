@@ -784,7 +784,7 @@ describe('provider/element-templates - ElementTemplates', function() {
   });
 
 
-  describe.only('getUpgrades - filtering', function() {
+  describe('getUpgrades - filtering', function() {
 
     const testTemplates = [
       {
