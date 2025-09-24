@@ -46,31 +46,31 @@ export default class ElementTemplates {
   /**
    * Get template with given ID and optional version or for element.
    *
-   * @param {String|djs.model.Base} id
+   * @param {String|djs.model.Base} elementOrTemplateId
    * @param {number} [version]
    *
    * @return {ElementTemplate}
    */
-  get(id, version) {
+  get(elementOrTemplateId, version) {
     const templates = this._templatesById;
 
     let element;
 
-    if (isUndefined(id)) {
+    if (isUndefined(elementOrTemplateId)) {
       return null;
-    } else if (isString(id)) {
+    } else if (isString(elementOrTemplateId)) {
 
       if (isUndefined(version)) {
         version = '_';
       }
 
-      if (templates[ id ] && templates[ id ][ version ]) {
-        return templates[ id ][ version ];
+      if (templates[ elementOrTemplateId ] && templates[ elementOrTemplateId ][ version ]) {
+        return templates[ elementOrTemplateId ][ version ];
       } else {
         return null;
       }
     } else {
-      element = id;
+      element = elementOrTemplateId;
 
       return this.get(this._getTemplateId(element), this._getTemplateVersion(element));
     }
@@ -92,11 +92,11 @@ export default class ElementTemplates {
   /**
    * Get all templates (with given ID or applicable to element).
    *
-   * @param {string|djs.model.Base} [id]
+   * @param {string|djs.model.Base} [elementOrTemplateId]
    * @return {Array<ElementTemplate>}
    */
-  getAll(id) {
-    return this._getTemplateVerions(id, { includeDeprecated: true });
+  getAll(elementOrTemplateId) {
+    return this._getTemplateVerions(elementOrTemplateId, { includeDeprecated: true });
   }
 
 
@@ -104,13 +104,13 @@ export default class ElementTemplates {
    * Get all templates (with given ID or applicable to element) with the latest
    * version.
    *
-   * @param {String|djs.model.Base} [id]
+   * @param {String|djs.model.Base} [elementOrTemplateId]
    * @param {{ deprecated?: boolean }} [options]
    *
    * @return {Array<ElementTemplate>}
    */
-  getLatest(id, options = {}) {
-    return this._getTemplateVerions(id, {
+  getLatest(elementOrTemplateId, options = {}) {
+    return this._getTemplateVerions(elementOrTemplateId, {
       ...options,
       latest: true
     });
@@ -119,14 +119,14 @@ export default class ElementTemplates {
   /**
    * Get templates that would become available after an engine upgrade.
    *
-   * @param {string|djs.model.Base} [id]
+   * @param {string|djs.model.Base} [elementOrTemplateId]
    * @param {Object|Array<Object>} engineUpgrades Sequence of or single engine upgrade(s) to be applied. Lists should be provided in ascending order for predictable results. Return structure matches this parameter.
    * @param {Object} [options]
    * @param {boolean} [options.includeVersionUpgrades=false]
    *
    * @returns {Array<ElementTemplate>|Array<Array<ElementTemplate>>}
    */
-  getUpgrades(id, engineUpgrades, options = {}) {
+  getUpgrades(elementOrTemplateId, engineUpgrades, options = {}) {
     const singleUpgrade = !isArray(engineUpgrades);
     const engineUpgradeSteps = singleUpgrade ? [ engineUpgrades ] : engineUpgrades;
 
@@ -134,7 +134,7 @@ export default class ElementTemplates {
     let currentEngines = this._engines;
 
     // initialize accumulator with latest templates from the current engine state
-    let latestVersionsAcc = Object.fromEntries(this.getLatest(id).map(template => [ template.id, template.version ]));
+    let latestVersionsAcc = Object.fromEntries(this.getLatest(elementOrTemplateId).map(template => [ template.id, template.version ]));
 
     for (const upgrade of engineUpgradeSteps) {
       const futureEngines = { ...currentEngines, ...upgrade };
@@ -151,7 +151,7 @@ export default class ElementTemplates {
       }
 
       const futureEngineTemplatesIndex = buildTemplatesById(this._templates, futureEngines);
-      const futureTemplates = findTemplates(id, futureEngineTemplatesIndex, { latest: true });
+      const futureTemplates = findTemplates(elementOrTemplateId, futureEngineTemplatesIndex, { latest: true });
 
       const newTemplates = [];
 
@@ -231,13 +231,13 @@ export default class ElementTemplates {
   }
 
   /**
-   * @param {object|string|null} id
+   * @param {object|string|null} elementOrTemplateId
    * @param { { latest?: boolean, deprecated?: boolean } [options]
    *
    * @return {Array<ElementTemplate>}
    */
-  _getTemplateVerions(id, options = {}) {
-    return findTemplates(id, this._templatesById, options);
+  _getTemplateVerions(elementOrTemplateId, options = {}) {
+    return findTemplates(elementOrTemplateId, this._templatesById, options);
   }
 
   _getTemplateId(element) {
