@@ -2,6 +2,22 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import { is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 
+import {
+  filter,
+  flatten,
+  has,
+  isNil,
+  isObject,
+  isString,
+  isUndefined,
+  reduce,
+  values
+} from 'min-dash';
+
+import {
+  satisfies as isSemverCompatible
+} from 'semver';
+
 /**
  * The BPMN 2.0 extension attribute name under
  * which the element template ID is stored.
@@ -17,6 +33,123 @@ export const TEMPLATE_ID_ATTR = 'camunda:modelerTemplate';
  * @type {String}
  */
 export const TEMPLATE_VERSION_ATTR = 'camunda:modelerTemplateVersion';
+
+/**
+ * Returns incompatible engines for a given template.
+ *
+ * @param {Object} template
+ * @param {Object} checkEngines
+ *
+ * @return {Object}
+ */
+export function getIncompatibleEngines(template, checkEngines) {
+  const templateEngines = template.engines;
+
+  return reduce(templateEngines, (result, _, engine) => {
+
+    if (!has(checkEngines, engine)) {
+      return result;
+    }
+
+    if (!isSemverCompatible(checkEngines[engine], templateEngines[engine])) {
+      result[engine] = {
+        actual: checkEngines[engine],
+        required: templateEngines[engine]
+      };
+    }
+
+    return result;
+  }, {});
+}
+
+/**
+ * Returns whether a template is compatible with the given engines.
+ *
+ * @param {Object} template
+ * @param {Object} checkEngines
+ *
+ * @return {boolean}
+ */
+export function isCompatible(template, checkEngines) {
+  return !Object.keys(getIncompatibleEngines(template, checkEngines)).length;
+}
+
+/**
+ * Build a map of templates grouped by id.
+ *
+ * @param {Array<Object>} templates
+ * @param {Object} engines
+ *
+ * @return {Object}
+ */
+export function buildTemplatesById(templates, engines) {
+  const templatesById = {};
+
+  templates.forEach((template) => {
+    const id = template.id;
+    const version = isUndefined(template.version) ? '_' : template.version;
+
+    if (!templatesById[id]) {
+      templatesById[id] = {};
+    }
+
+    templatesById[id][version] = template;
+
+    const latest = templatesById[id].latest;
+
+    if (isCompatible(template, engines)) {
+      if (!latest || isUndefined(latest.version) || latest.version < version)
+      {
+        templatesById[id].latest = template;
+      }
+    }
+  });
+
+  return templatesById;
+}
+
+/**
+ * Finds the list of templates that match the given criteria within a template index.
+ *
+ * @param {string|djs.model.Base} [elementOrTemplateId]
+ * @param {Object} templatesIndex
+ * @param {Object} [options]
+ * @param {boolean} [options.latest]
+ * @param {boolean} [options.deprecated]
+ *
+ * @return {Array<Object>}
+ */
+export function findTemplates(elementOrTemplateId, templatesIndex, options = {}) {
+  const {
+    latest: includeLatestOnly,
+    deprecated: includeDeprecated
+  } = options;
+
+  const getVersions = (template) => {
+    const { latest, ...versions } = template;
+    return includeLatestOnly ? (
+      !includeDeprecated && (latest && latest.deprecated) ? [] : (latest ? [ latest ] : [])
+    ) : values(versions) ;
+  };
+
+  if (isNil(elementOrTemplateId)) {
+    return flatten(values(templatesIndex).map(getVersions));
+  }
+
+  if (isObject(elementOrTemplateId)) {
+    const element = elementOrTemplateId;
+
+    return filter(findTemplates(null, templatesIndex, options), function(template) {
+      return isAny(element, template.appliesTo);
+    }) || [];
+  }
+
+  if (isString(elementOrTemplateId)) {
+    return templatesIndex[ elementOrTemplateId ] && getVersions(templatesIndex[ elementOrTemplateId ]);
+  }
+
+  throw new Error('argument must be of type {string|djs.model.Base|undefined}');
+}
 
 
 /**

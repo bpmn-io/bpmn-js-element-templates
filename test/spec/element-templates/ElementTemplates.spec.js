@@ -558,6 +558,103 @@ describe('provider/element-templates - ElementTemplates', function() {
   });
 
 
+  describe('getCompatible', function() {
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(enginesTemplates);
+    }));
+
+
+    it('should return templates compatible with engine override (upgrade)', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '7.13.0'
+      });
+
+      // assume
+      const initialTemplates = elementTemplates.getLatest('example.engines.test.basic');
+      expect(initialTemplates[0].version).to.eql(2);
+
+      // when
+      const newTemplates = elementTemplates.getCompatible('example.engines.test.basic', {
+        camunda: '7.14.3'
+      });
+
+      // then
+      expect(newTemplates).to.have.length(1);
+      expect(newTemplates[0].version).to.eql(3);
+    }));
+
+
+    it('should return templates compatible with engine override (downgrade)', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '7.15.0'
+      });
+
+      // assume
+      const initialTemplates = elementTemplates.getLatest('example.engines.test.basic');
+      expect(initialTemplates[0].version).to.eql(3);
+
+      // when
+      const oldTemplates = elementTemplates.getCompatible('example.engines.test.basic', {
+        camunda: '7.13.0'
+      });
+
+      // then
+      expect(oldTemplates).to.have.length(1);
+      expect(oldTemplates[0].version).to.eql(2);
+    }));
+
+
+    it('should filter by element', inject(function(elementTemplates, elementRegistry) {
+
+      // given
+      const task = elementRegistry.get('Task_1');
+
+      elementTemplates.setEngines({
+        camunda: '7.13.0'
+      });
+
+      // when
+      const templates = elementTemplates.getCompatible(task, {
+        camunda: '7.15.0'
+      });
+
+      // then
+      expect(templates).to.have.length(2);
+      expect(templates.map(t => t.id)).to.eql([
+        'example.engines.test.multiple',
+        'example.engines.test.basic'
+      ]);
+    }));
+
+
+    it('should return elements if irrelevant engine override is provided', inject(function(elementTemplates) {
+
+      // given
+      elementTemplates.setEngines({
+        camunda: '7.15.0'
+      });
+
+      // when
+      const templates = elementTemplates.getCompatible(null, {
+        irrelevantEngine: '12.0.0'
+      });
+
+      // then
+      expect(templates).to.have.length(2);
+      expect(templates.map(t => t.id)).to.eql([
+        'example.engines.test.multiple',
+        'example.engines.test.basic'
+      ]);
+    }));
+
+  });
+
+
   describe('set', function() {
 
     it('should set templates', inject(function(elementTemplates) {
