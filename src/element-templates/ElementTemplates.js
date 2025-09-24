@@ -1,28 +1,20 @@
 import {
-  filter,
   find,
-  flatten,
-  has,
-  isNil,
-  isObject,
   isString,
   isUndefined,
-  reduce,
-  values
+  reduce
 } from 'min-dash';
 
 import {
   getTemplateId,
-  getTemplateVersion
+  getTemplateVersion,
+  findTemplates,
+  buildTemplatesById,
+  getIncompatibleEngines as _getIncompatibleEngines,
+  isCompatible as _isCompatible
 } from './Helper';
 
-import { isAny } from 'bpmn-js/lib/util/ModelUtil';
-
-import {
-  valid as isSemverValid,
-  satisfies as isSemverCompatible,
-  coerce
-} from 'semver';
+import { coerce, valid as isSemverValid } from 'semver';
 
 // eslint-disable-next-line no-undef
 const packageVersion = process.env.PKG_VERSION;
@@ -53,31 +45,31 @@ export default class ElementTemplates {
   /**
    * Get template with given ID and optional version or for element.
    *
-   * @param {String|djs.model.Base} id
+   * @param {String|djs.model.Base} elementOrTemplateId
    * @param {number} [version]
    *
    * @return {ElementTemplate}
    */
-  get(id, version) {
+  get(elementOrTemplateId, version) {
     const templates = this._templatesById;
 
     let element;
 
-    if (isUndefined(id)) {
+    if (isUndefined(elementOrTemplateId)) {
       return null;
-    } else if (isString(id)) {
+    } else if (isString(elementOrTemplateId)) {
 
       if (isUndefined(version)) {
         version = '_';
       }
 
-      if (templates[ id ] && templates[ id ][ version ]) {
-        return templates[ id ][ version ];
+      if (templates[ elementOrTemplateId ] && templates[ elementOrTemplateId ][ version ]) {
+        return templates[ elementOrTemplateId ][ version ];
       } else {
         return null;
       }
     } else {
-      element = id;
+      element = elementOrTemplateId;
 
       return this.get(this._getTemplateId(element), this._getTemplateVersion(element));
     }
@@ -99,11 +91,11 @@ export default class ElementTemplates {
   /**
    * Get all templates (with given ID or applicable to element).
    *
-   * @param {string|djs.model.Base} [id]
+   * @param {string|djs.model.Base} [elementOrTemplateId]
    * @return {Array<ElementTemplate>}
    */
-  getAll(id) {
-    return this._getTemplateVerions(id, { includeDeprecated: true });
+  getAll(elementOrTemplateId) {
+    return findTemplates(elementOrTemplateId, this._templatesById, { includeDeprecated: true });
   }
 
 
@@ -111,15 +103,36 @@ export default class ElementTemplates {
    * Get all templates (with given ID or applicable to element) with the latest
    * version.
    *
-   * @param {String|djs.model.Base} [id]
+   * @param {String|djs.model.Base} [elementOrTemplateId]
    * @param {{ deprecated?: boolean }} [options]
    *
    * @return {Array<ElementTemplate>}
    */
-  getLatest(id, options = {}) {
-    return this._getTemplateVerions(id, {
+  getLatest(elementOrTemplateId, options = {}) {
+    return findTemplates(elementOrTemplateId, this._templatesById, {
       ...options,
       latest: true
+    });
+  }
+
+  /**
+   * Get templates compatible with a given engine configuration override.
+   *
+   * @param {string|djs.model.Base} [elementOrTemplateId]
+   * @param {Object} enginesOverrides
+   * @param {Object} [options]
+   * @param {boolean} [options.deprecated=false]
+   * @param {boolean} [options.latest=true]
+   *
+   * @returns {Array<ElementTemplate>}
+   */
+  getCompatible(elementOrTemplateId, enginesOverrides = {}, options = {}) {
+    const overridenEngines = this._coerceEngines({ ...this._engines, ...enginesOverrides });
+    const templatesById = buildTemplatesById(this._templates, overridenEngines);
+
+    return findTemplates(elementOrTemplateId, templatesById, {
+      latest: true,
+      ...options
     });
   }
 
@@ -129,27 +142,8 @@ export default class ElementTemplates {
    * @param {Array<ElementTemplate>} templates
    */
   set(templates) {
-    this._templatesById = {};
     this._templates = templates;
-
-    templates.forEach((template) => {
-      const id = template.id;
-      const version = isUndefined(template.version) ? '_' : template.version;
-
-      if (!this._templatesById[ id ]) {
-        this._templatesById[ id ] = { };
-      }
-
-      this._templatesById[ id ][ version ] = template;
-
-      const latest = this._templatesById[ id ].latest;
-
-      if (this.isCompatible(template)) {
-        if (!latest || isUndefined(latest.version) || latest.version < version) {
-          this._templatesById[ id ].latest = template;
-        }
-      }
-    });
+    this._templatesById = buildTemplatesById(this._templates, this._engines);
 
     this._fire('changed');
   }
@@ -159,9 +153,7 @@ export default class ElementTemplates {
   }
 
   setEngines(engines) {
-
     this._engines = this._coerceEngines(engines);
-
     this._fire('engines.changed');
   }
 
@@ -209,7 +201,7 @@ export default class ElementTemplates {
    * @return {boolean} - true if compatible or no engine is set for elementTemplates or template.
    */
   isCompatible(template) {
-    return !Object.keys(this.getIncompatibleEngines(template)).length;
+    return _isCompatible(template, this._engines);
   }
 
   /**
@@ -220,64 +212,19 @@ export default class ElementTemplates {
    * @return { Record<string, { required: string, found: string } } - incompatible engines along with their template and local versions
    */
   getIncompatibleEngines(template) {
-    const localEngines = this._engines;
-    const templateEngines = template.engines;
-
-    return reduce(templateEngines, (result, _, engine) => {
-
-      if (!has(localEngines, engine)) {
-        return result;
-      }
-
-      if (!isSemverCompatible(localEngines[engine], templateEngines[engine])) {
-        result[engine] = {
-          actual: localEngines[engine],
-          required: templateEngines[engine]
-        };
-      }
-
-      return result;
-    }, {});
+    return _getIncompatibleEngines(template, this._engines);
   }
 
   /**
+   * Get template versions for a given element or template ID.
+   *
    * @param {object|string|null} id
    * @param { { latest?: boolean, deprecated?: boolean } [options]
    *
    * @return {Array<ElementTemplate>}
    */
   _getTemplateVerions(id, options = {}) {
-
-    const {
-      latest: includeLatestOnly,
-      deprecated: includeDeprecated
-    } = options;
-
-    const templatesById = this._templatesById;
-    const getVersions = (template) => {
-      const { latest, ...versions } = template;
-      return includeLatestOnly ? (
-        !includeDeprecated && (latest && latest.deprecated) ? [] : (latest ? [ latest ] : [])
-      ) : values(versions) ;
-    };
-
-    if (isNil(id)) {
-      return flatten(values(templatesById).map(getVersions));
-    }
-
-    if (isObject(id)) {
-      const element = id;
-
-      return filter(this._getTemplateVerions(null, options), function(template) {
-        return isAny(element, template.appliesTo);
-      }) || [];
-    }
-
-    if (isString(id)) {
-      return templatesById[ id ] && getVersions(templatesById[ id ]);
-    }
-
-    throw new Error('argument must be of type {string|djs.model.Base|undefined}');
+    return findTemplates(id, this._templatesById, options);
   }
 
   _getTemplateId(element) {
