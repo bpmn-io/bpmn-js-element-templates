@@ -147,14 +147,14 @@ export function buildTemplatesById(templates, engines) {
  * Find templates in a list of templates.
  *
  * @param {string|djs.model.Base} [id]
- * @param {Array<Object>} templates
+ * @param {Object} templatesIndex
  * @param {Object} [options]
  * @param {boolean} [options.latest]
  * @param {boolean} [options.deprecated]
  *
  * @return {Array<Object>}
  */
-export function findTemplates(id, templates, options = {}) {
+export function findTemplates(id, templatesIndex, options = {}) {
   const {
     latest: includeLatestOnly,
     deprecated: includeDeprecated
@@ -168,19 +168,19 @@ export function findTemplates(id, templates, options = {}) {
   };
 
   if (isNil(id)) {
-    return flatten(values(templates).map(getVersions));
+    return flatten(values(templatesIndex).map(getVersions));
   }
 
   if (isObject(id)) {
     const element = id;
 
-    return filter(findTemplates(null, templates, options), function(template) {
+    return filter(findTemplates(null, templatesIndex, options), function(template) {
       return isAny(element, template.appliesTo);
     }) || [];
   }
 
   if (isString(id)) {
-    return templates[ id ] && getVersions(templates[ id ]);
+    return templatesIndex[ id ] && getVersions(templatesIndex[ id ]);
   }
 
   throw new Error('argument must be of type {string|djs.model.Base|undefined}');

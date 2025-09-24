@@ -119,19 +119,22 @@ export default class ElementTemplates {
   /**
    * Get templates that would become available after an engine upgrade.
    *
+   * @param {string|djs.model.Base} [id]
    * @param {Object|Array<Object>} engineUpgrades Sequence of or single engine upgrade(s) to be applied. Lists should be provided in ascending order for predictable results. Return structure matches this parameter.
    * @param {Object} [options]
    * @param {boolean} [options.includeVersionUpgrades=false]
    *
    * @returns {Array<ElementTemplate>|Array<Array<ElementTemplate>>}
    */
-  getUpgrades(engineUpgrades, options = {}) {
+  getUpgrades(id, engineUpgrades, options = {}) {
     const singleUpgrade = !isArray(engineUpgrades);
     const engineUpgradeSteps = singleUpgrade ? [ engineUpgrades ] : engineUpgrades;
 
     const results = [];
     let currentEngines = this._engines;
-    let cumulativeTemplatesById = buildTemplatesById(this._templates, currentEngines);
+
+    // initialize accumulator with latest templates from the current engine state
+    let latestVersionsAcc = Object.fromEntries(this.getLatest(id).map(template => [ template.id, template.version ]));
 
     for (const upgrade of engineUpgradeSteps) {
       const futureEngines = { ...currentEngines, ...upgrade };
@@ -147,31 +150,22 @@ export default class ElementTemplates {
         continue;
       }
 
-      const futureTemplatesById = buildTemplatesById(this._templates, futureEngines);
+      const futureEngineTemplatesIndex = buildTemplatesById(this._templates, futureEngines);
+      const futureTemplates = findTemplates(id, futureEngineTemplatesIndex, { latest: true });
 
       const newTemplates = [];
 
-      for (const id in futureTemplatesById) {
-        const futureLatest = futureTemplatesById[id].latest;
-        const cumulativeLatest = cumulativeTemplatesById[id] && cumulativeTemplatesById[id].latest;
-
-        if (!futureLatest) {
-          continue;
-        }
+      for (const futureTemplate of futureTemplates) {
+        const latestVersion = latestVersionsAcc[futureTemplate.id];
+        const isValidUpgrade = options.includeVersionUpgrades
+          ? (futureTemplate.version > (latestVersion ?? 0))
+          : (!latestVersion);
 
         // new template ID
-        if (!cumulativeLatest) {
-          newTemplates.push(futureLatest);
-          cumulativeTemplatesById[id]['latest'] = futureLatest;
+        if (isValidUpgrade) {
+          newTemplates.push(futureTemplate);
+          latestVersionsAcc[futureTemplate.id] = futureTemplate.version;
           continue;
-        }
-
-        // new version of existing template
-        if (options.includeVersionUpgrades && futureLatest.version && cumulativeLatest.version) {
-          if (futureLatest.version > cumulativeLatest.version) {
-            newTemplates.push(futureLatest);
-            cumulativeTemplatesById[id]['latest'] = futureLatest;
-          }
         }
       }
 
