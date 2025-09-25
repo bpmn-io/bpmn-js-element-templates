@@ -114,4 +114,5 @@
 .bio-properties-panel-deprecated-template-text,
 .bio-properties-panel-template-incompatible-text {
   width: 216px;
+  overflow-wrap: break-word;
 }

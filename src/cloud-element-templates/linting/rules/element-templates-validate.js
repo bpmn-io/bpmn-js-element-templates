@@ -40,7 +40,7 @@ export default function({ templates = [] }) {
     if (templateId && !template) {
       reporter.report(
         node.id,
-        'Linked element template not found',
+        `Linked element template '${templateId}' not found`,
         {
           name: node.name
         }

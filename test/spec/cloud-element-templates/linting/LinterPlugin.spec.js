@@ -72,7 +72,7 @@ const invalid = [
     },
     report: {
       id: 'Task_1',
-      message: 'Linked element template not found'
+      message: 'Linked element template \'missing-template\' not found'
     }
   },
   {
@@ -307,7 +307,7 @@ describe('cloud-element-templates/linting', function() {
     // then
     const report = secondResult['element-templates/validate'][0];
     expect(report).to.have.property('id', 'Task_1');
-    expect(report).to.have.property('message', 'Linked element template not found');
+    expect(report).to.have.property('message', 'Linked element template \'constraints.empty\' not found');
   });
 });
 
