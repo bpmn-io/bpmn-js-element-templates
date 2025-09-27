@@ -97,7 +97,7 @@ export default class ElementTemplates {
    * @return {Array<ElementTemplate>}
    */
   getAll(elementOrTemplateId) {
-    return findTemplates(elementOrTemplateId, this._templatesById, { includeDeprecated: true });
+    return findTemplates(elementOrTemplateId, this._templatesById, { deprecated: true });
   }
 
 
