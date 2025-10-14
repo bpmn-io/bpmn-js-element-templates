@@ -146,7 +146,7 @@ function TemplateGroupButtons({ element, getTemplateId }) {
   } else if (templateState.type === 'KNOWN_TEMPLATE') {
     return <AppliedTemplate element={ element } />;
   } else if (templateState.type === 'UNKNOWN_TEMPLATE') {
-    return <UnknownTemplate element={ element } />;
+    return <UnknownTemplate element={ element } templateState={ templateState } />;
   } else if (templateState.type === 'DEPRECATED_TEMPLATE') {
     return <DeprecatedTemplate element={ element } templateState={ templateState } />;
   } else if (templateState.type === 'INCOMPATIBLE_TEMPLATE') {
@@ -203,12 +203,12 @@ function RemoveTemplate() {
   return <span class="bio-properties-panel-remove-template">{ translate('Remove') }</span>;
 }
 
-function UnknownTemplate({ element }) {
+function UnknownTemplate({ element, templateState }) {
   const translate = useService('translate'),
         elementTemplates = useService('elementTemplates');
 
   const menuItems = [
-    { entry: <NotFoundText /> },
+    { entry: <NotFoundText templateState={ templateState } /> },
     { separator: true },
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
@@ -224,14 +224,15 @@ function UnknownTemplate({ element }) {
   );
 }
 
-function NotFoundText() {
+function NotFoundText({ templateState }) {
   const translate = useService('translate');
+  const { templateId } = templateState;
 
   return (
     <div class="bio-properties-panel-template-not-found-text">
-      { translate(
-        'The template applied was not found. Therefore, its properties cannot be shown. Unlink to access the data.'
-      ) }
+      { (translate(
+        'The applied template with id \'{templateId}\' was not found. Its properties cannot be shown. Unlink to access the data.'
+      )).replace('{templateId}', `${templateId}`) }
     </div>
   );
 }
