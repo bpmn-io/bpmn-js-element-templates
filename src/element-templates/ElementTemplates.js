@@ -16,6 +16,8 @@ import {
 
 import { coerce, valid as isSemverValid } from 'semver';
 
+{ /* Required to break up imports, see https://github.com/babel/babel/issues/15156 */ }
+
 // eslint-disable-next-line no-undef
 const packageVersion = process.env.PKG_VERSION;
 

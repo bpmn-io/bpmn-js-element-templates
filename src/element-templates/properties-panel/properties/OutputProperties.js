@@ -19,6 +19,8 @@ import { createElement } from '../../../utils/ElementUtil';
 
 import { createOutputParameter } from '../../CreateHelper';
 
+{ /* Required to break up imports, see https://github.com/babel/babel/issues/15156 */ }
+
 
 export function OutputProperties(props) {
   const {
