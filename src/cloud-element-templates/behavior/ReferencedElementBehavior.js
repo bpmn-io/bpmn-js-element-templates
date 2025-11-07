@@ -2,7 +2,7 @@ import { getBusinessObject, is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 import { isString } from 'min-dash';
 
-import { findMessage, getTemplateId, TEMPLATE_ID_ATTR } from '../Helper';
+import { findMessage, findSignal, getTemplateId, TEMPLATE_ID_ATTR } from '../Helper';
 import {
   getReferringElement,
   removeRootElement
@@ -66,9 +66,16 @@ export class ReferencedElementBehavior extends CommandInterceptor {
 
     const bo = getBusinessObject(element);
     const message = findMessage(bo);
+    const signal = findSignal(bo);
 
     if (message && getTemplateId(message)) {
       this._modeling.updateModdleProperties(element, message, {
+        [TEMPLATE_ID_ATTR]: null
+      });
+    }
+    
+    if (signal && getTemplateId(signal)) {
+      this._modeling.updateModdleProperties(element, signal, {
         [TEMPLATE_ID_ATTR]: null
       });
     }
@@ -89,17 +96,23 @@ export class ReferencedElementBehavior extends CommandInterceptor {
 
     const bo = getBusinessObject(oldShape);
     const message = findMessage(bo);
+    const signal = findSignal(bo);
 
-    if (!message || !getTemplateId(message)) {
-      return;
+    if (message && getTemplateId(message)) {
+      if (!canHaveReferencedElement(newShape) || !newTemplate) {
+        removeRootElement(message, this._injector);
+      } else {
+        this._addMessage(newShape, message);
+      }
     }
 
-    if (!canHaveReferencedElement(newShape) || !newTemplate) {
-      removeRootElement(message, this._injector);
-      return;
+    if (signal && getTemplateId(signal)) {
+      if (!canHaveReferencedElement(newShape) || !newTemplate) {
+        removeRootElement(signal, this._injector);
+      } else {
+        this._addSignal(newShape, signal);
+      }
     }
-
-    this._addMessage(newShape, message);
   }
 
   _handleRemoval(context) {
@@ -119,9 +132,14 @@ export class ReferencedElementBehavior extends CommandInterceptor {
 
     const bo = getBusinessObject(shape);
     const message = findMessage(bo);
+    const signal = findSignal(bo);
 
     if (message && getTemplateId(message)) {
       removeRootElement(message, this._injector);
+    }
+    
+    if (signal && getTemplateId(signal)) {
+      removeRootElement(signal, this._injector);
     }
   }
 
@@ -130,6 +148,14 @@ export class ReferencedElementBehavior extends CommandInterceptor {
 
     this._modeling.updateModdleProperties(element, bo, {
       'messageRef': message
+    });
+  }
+
+  _addSignal(element, signal) {
+    const bo = getReferringElement(element);
+
+    this._modeling.updateModdleProperties(element, bo, {
+      'signalRef': signal
     });
   }
 }

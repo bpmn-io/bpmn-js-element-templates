@@ -1,0 +1,49 @@
+[
+  {
+    "name": "ValidSignalWithFeelOptional",
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "com.camunda.example.ValidSignalWithFeelOptional",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:IntermediateThrowEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateThrowEvent",
+      "eventDefinition": "bpmn:SignalEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Signal Name",
+        "type": "String",
+        "feel": "optional",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        }
+      }
+    ]
+  },
+  {
+    "name": "ValidSignalStartEvent",
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "com.camunda.example.ValidSignalStartEvent",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:IntermediateThrowEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:SignalEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Signal Name",
+        "type": "String",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        }
+      }
+    ]
+  }
+]

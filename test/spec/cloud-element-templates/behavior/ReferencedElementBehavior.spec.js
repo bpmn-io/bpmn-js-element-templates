@@ -13,7 +13,7 @@ import {
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
 import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
 import ElementTemplatesModule from 'src/cloud-element-templates';
-import { findMessage, getTemplateId, TEMPLATE_ID_ATTR } from 'src/cloud-element-templates/Helper';
+import { findMessage, findSignal, getTemplateId, TEMPLATE_ID_ATTR } from 'src/cloud-element-templates/Helper';
 
 
 import diagramXML from './ReferencedElementBehavior.bpmn';
@@ -209,6 +209,35 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
   });
 
 
+  describe('signal events', function() {
+
+    it('should unlink templated signal when template is unlinked', inject(
+      function(elementRegistry, elementTemplates, templateElementFactory) {
+
+        // given
+        const signalTemplate = findTemplate('signalEventTemplate');
+        const event = templateElementFactory.create(signalTemplate);
+        
+        const eventBo = getBusinessObject(event);
+        const eventDefinitions = eventBo.get('eventDefinitions');
+        const signal = eventDefinitions[0].get('signalRef');
+
+        // assume
+        expect(signal).to.exist;
+        expect(signal.get(TEMPLATE_ID_ATTR)).to.equal('signalEventTemplate');
+
+        // when
+        elementTemplates.unlinkTemplate(event);
+
+        // then
+        expect(signal).to.exist;
+        expect(signal.get(TEMPLATE_ID_ATTR)).not.to.exist;
+      })
+    );
+
+  });
+
+
   describe('copy element', function() {
 
     it('should create new message when element copied', inject(
@@ -267,4 +296,13 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
 function getMessages() {
   return getBpmnJS().getDefinitions().rootElements.filter(
     e => is(e, 'bpmn:Message'));
+}
+
+function getSignals() {
+  return getBpmnJS().getDefinitions().rootElements.filter(
+    e => is(e, 'bpmn:Signal'));
+}
+
+function findTemplate(id) {
+  return templates.find(t => t.id === id);
 }

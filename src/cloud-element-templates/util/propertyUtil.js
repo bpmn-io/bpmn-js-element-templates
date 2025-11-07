@@ -15,6 +15,8 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   PROPERTY_BINDING_TYPES,
+  SIGNAL_BINDING_TYPES,
+  SIGNAL_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
   ZEEBE_TASK_DEFINITION_TYPE_TYPE,
   ZEEBE_TASK_DEFINITION,
@@ -44,6 +46,7 @@ import {
   findInputParameter,
   findMessage,
   findOutputParameter,
+  findSignal,
   findZeebeProperty,
   findZeebeSubscription,
   getTemplateId
@@ -215,6 +218,19 @@ function getRawPropertyValue(element, property) {
     return defaultValue;
   }
 
+  // bpmn:Signal#property
+  if (type === SIGNAL_PROPERTY_TYPE) {
+    const signal = findSignal(businessObject);
+
+    const value = signal ? signal.get(name) : undefined;
+
+    if (!isUndefined(value)) {
+      return value;
+    }
+
+    return defaultValue;
+  }
+
   // zeebe:calledElement
   if (type === ZEEBE_CALLED_ELEMENT) {
     const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
@@ -357,6 +373,30 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     }
 
     businessObject = message;
+  }
+
+  // ensure signal exists
+  if (SIGNAL_BINDING_TYPES.includes(type)) {
+    if (is(businessObject, 'bpmn:Event')) {
+      businessObject = businessObject.get('eventDefinitions')[0];
+    }
+
+    let signal = findSignal(businessObject);
+
+    if (!signal) {
+      signal = bpmnFactory.create('bpmn:Signal', { 'zeebe:modelerTemplate': getTemplateId(element) });
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: businessObject,
+          properties: { signalRef: signal }
+        }
+      });
+    }
+
+    businessObject = signal;
   }
 
   // ensure extension elements
@@ -984,6 +1024,14 @@ export function unsetProperty(commandStack, element, property) {
     }
   }
 
+  if (SIGNAL_BINDING_TYPES.includes(type)) {
+    businessObject = findSignal(businessObject);
+
+    if (!businessObject) {
+      return;
+    }
+  }
+
   // property
   if (PROPERTY_BINDING_TYPES.includes(type)) {
     const { name } = binding;
@@ -1186,6 +1234,20 @@ export function unsetProperty(commandStack, element, property) {
 
   // bpmn:Message#property
   if (type === MESSAGE_PROPERTY_TYPE) {
+    commands.push({
+      cmd: 'element.updateModdleProperties',
+      context: {
+        ...context,
+        moddleElement: businessObject,
+        properties: {
+          [ binding.name ]: undefined
+        }
+      }
+    });
+  }
+
+  // bpmn:Signal#property
+  if (type === SIGNAL_PROPERTY_TYPE) {
     commands.push({
       cmd: 'element.updateModdleProperties',
       context: {

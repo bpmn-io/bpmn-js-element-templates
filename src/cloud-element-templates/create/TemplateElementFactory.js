@@ -12,6 +12,7 @@ import TaskHeaderBindingProvider from './TaskHeaderBindingProvider';
 import ZeebePropertiesProvider from './ZeebePropertiesProvider';
 import { MessagePropertyBindingProvider } from './MessagePropertyBindingProvider';
 import { MessageZeebeSubscriptionBindingProvider } from './MessageZeebeSubscriptionBindingProvider';
+import { SignalPropertyBindingProvider } from './SignalPropertyBindingProvider';
 import { CalledElementBindingProvider } from './CalledElementBindingProvider';
 import LinkedResourcePropertyBindingProvider from './LinkedResourceProvider';
 import ZeebeUserTaskBindingProvider from './ZeebeUserTaskBindingProvider';
@@ -27,6 +28,7 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   PROPERTY_TYPE,
+  SIGNAL_PROPERTY_TYPE,
   ZEEBE_TASK_DEFINITION_TYPE_TYPE,
   ZEEBE_TASK_DEFINITION,
   ZEBBE_INPUT_TYPE,
@@ -64,6 +66,7 @@ export default class TemplateElementFactory {
       [ZEEBE_TASK_HEADER_TYPE]: TaskHeaderBindingProvider,
       [MESSAGE_PROPERTY_TYPE]: MessagePropertyBindingProvider,
       [MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE]: MessageZeebeSubscriptionBindingProvider,
+      [SIGNAL_PROPERTY_TYPE]: SignalPropertyBindingProvider,
       [ZEEBE_CALLED_ELEMENT]: CalledElementBindingProvider,
       [ZEEBE_LINKED_RESOURCE_PROPERTY]: LinkedResourcePropertyBindingProvider,
       [ZEEBE_USER_TASK]: ZeebeUserTaskBindingProvider,
@@ -265,7 +268,7 @@ function findDependentProperties(property, properties) {
     return [];
   }
 
-  const dependentProperty = findProperyById(properties, condition.property);
+  const dependentProperty = findPropertyById(properties, condition.property);
 
   if (dependentProperty) {
     return [ dependentProperty ];
@@ -274,7 +277,7 @@ function findDependentProperties(property, properties) {
   return [];
 }
 
-function findProperyById(properties, id) {
+function findPropertyById(properties, id) {
   return find(properties, function(property) {
     return property.id === id;
   });
