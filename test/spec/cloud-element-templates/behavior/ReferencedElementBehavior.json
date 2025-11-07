@@ -39,5 +39,28 @@
       "value" : "bpmn:IntermediateCatchEvent"
     },
     "properties" : [  ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Signal Event Template",
+    "id": "signalEventTemplate",
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent",
+      "bpmn:IntermediateThrowEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:SignalEventDefinition"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "signalName",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        }
+      }
+    ]
   }
 ]

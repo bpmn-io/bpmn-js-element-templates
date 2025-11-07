@@ -23,6 +23,7 @@ import {
   findInputParameter,
   findMessage,
   findOutputParameter,
+  findSignal,
   findTaskHeader,
   findZeebeProperty,
   findZeebeSubscription
@@ -205,6 +206,23 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
 
       // then
       expect(message.get('zeebe:modelerTemplate')).to.equal('example.camunda.SubscriptionMessageTemplate');
+    })
+  );
+
+
+  it('should apply <modelerTemplate> on templated signal (bpmn:Signal#property)',
+    inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.SignalTemplate');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+      const businessObject = getBusinessObject(element);
+      const signal = findSignal(businessObject);
+
+      // then
+      expect(signal.get('zeebe:modelerTemplate')).to.equal('example.camunda.SignalTemplate');
     })
   );
 
@@ -503,6 +521,24 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
         $type: 'zeebe:Subscription',
         correlationKey: '=variable'
       });
+    }));
+
+
+    it('should handle <bpmn:Signal#property>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.SignalTemplate');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+      const bo = getBusinessObject(element);
+
+      const eventDefinition = bo.get('eventDefinitions')[0];
+      const signal = eventDefinition.get('signalRef');
+
+      // then
+      expect(signal).to.exist;
+      expect(signal).to.have.property('name', 'hard-coded-signal');
     }));
 
 

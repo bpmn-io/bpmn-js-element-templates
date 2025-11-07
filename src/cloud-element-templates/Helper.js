@@ -172,6 +172,24 @@ export function findMessage(businessObject) {
   return businessObject.get('messageRef');
 }
 
+export function findSignal(businessObject) {
+  if (is(businessObject, 'bpmn:Event')) {
+    const eventDefinitions = businessObject.get('eventDefinitions');
+
+    if (!eventDefinitions || !eventDefinitions.length) {
+      return;
+    }
+
+    businessObject = eventDefinitions[0];
+  }
+
+  if (!businessObject) {
+    return;
+  }
+
+  return businessObject.get('signalRef');
+}
+
 export function findZeebeSubscription(message) {
   return findExtension(message, 'zeebe:Subscription');
 }
