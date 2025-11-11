@@ -99,7 +99,7 @@ export class ReferencedElementBehavior extends CommandInterceptor {
     const signal = findSignal(bo);
 
     if (message && getTemplateId(message)) {
-      if (!canHaveReferencedElement(newShape) || !newTemplate) {
+      if (!newTemplate || !canHaveMessage(newShape)) {
         removeRootElement(message, this._injector);
       } else {
         this._addMessage(newShape, message);
@@ -107,7 +107,7 @@ export class ReferencedElementBehavior extends CommandInterceptor {
     }
 
     if (signal && getTemplateId(signal)) {
-      if (!canHaveReferencedElement(newShape) || !newTemplate) {
+      if (!newTemplate || !canHaveSignal(newShape)) {
         removeRootElement(signal, this._injector);
       } else {
         this._addSignal(newShape, signal);
@@ -181,6 +181,40 @@ function canHaveReferencedElement(element) {
     'bpmn:ReceiveTask',
     'bpmn:SendTask'
   ]);
+}
+
+function canHaveMessage(element) {
+  if (is(element, 'bpmn:ReceiveTask') || is(element, 'bpmn:SendTask')) {
+    return true;
+  }
+
+  if (is(element, 'bpmn:Event')) {
+    const bo = getBusinessObject(element);
+    const eventDefinitions = bo.get('eventDefinitions');
+    
+    if (!eventDefinitions || !eventDefinitions.length) {
+      return false;
+    }
+
+    return is(eventDefinitions[0], 'bpmn:MessageEventDefinition');
+  }
+
+  return false;
+}
+
+function canHaveSignal(element) {
+  if (is(element, 'bpmn:Event')) {
+    const bo = getBusinessObject(element);
+    const eventDefinitions = bo.get('eventDefinitions');
+    
+    if (!eventDefinitions || !eventDefinitions.length) {
+      return false;
+    }
+
+    return is(eventDefinitions[0], 'bpmn:SignalEventDefinition');
+  }
+
+  return false;
 }
 
 function isLabel(element) {

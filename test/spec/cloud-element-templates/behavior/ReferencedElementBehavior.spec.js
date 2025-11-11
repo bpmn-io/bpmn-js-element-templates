@@ -13,7 +13,7 @@ import {
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
 import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
 import ElementTemplatesModule from 'src/cloud-element-templates';
-import { findMessage, findSignal, getTemplateId, TEMPLATE_ID_ATTR } from 'src/cloud-element-templates/Helper';
+import { findMessage, getTemplateId, TEMPLATE_ID_ATTR } from 'src/cloud-element-templates/Helper';
 
 
 import diagramXML from './ReferencedElementBehavior.bpmn';
@@ -206,6 +206,51 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
         expect(getMessages()).to.have.lengthOf(initialMessages.length - 1);
       })
     );
+
+
+    it('should remove old message when replacing message event with signal event', inject(
+      function(elementRegistry, bpmnReplace) {
+
+        // given
+        let event = elementRegistry.get('MessageEvent');
+        const initialMessages = getMessages();
+        const initialSignals = getSignals();
+
+        const messageBo = getBusinessObject(event);
+        const messageEventDef = messageBo.get('eventDefinitions')[0];
+        const oldMessage = messageEventDef.get('messageRef');
+
+        // assume
+        expect(oldMessage).to.exist;
+        expect(oldMessage.get(TEMPLATE_ID_ATTR)).to.equal('messageEventTemplate');
+
+        // when - replace message event with signal event
+        event = bpmnReplace.replaceElement(event, {
+          type: 'bpmn:IntermediateCatchEvent',
+          eventDefinitionType: 'bpmn:SignalEventDefinition'
+        });
+
+        // then
+        const eventBo = getBusinessObject(event);
+        const eventDefinitions = eventBo.get('eventDefinitions');
+        expect(eventDefinitions).to.have.length(1);
+
+        const signalEventDef = eventDefinitions[0];
+        expect(signalEventDef.$type).to.equal('bpmn:SignalEventDefinition');
+
+        // old message should be removed
+        const messageRef = signalEventDef.get('messageRef');
+        expect(messageRef).not.to.exist;
+
+        // signal reference should not exist (no template applied)
+        const signalRef = signalEventDef.get('signalRef');
+        expect(signalRef).not.to.exist;
+
+        // old templated message should be removed from definitions
+        expect(getMessages()).to.have.lengthOf(initialMessages.length - 1);
+        expect(getSignals()).to.have.lengthOf(initialSignals.length);
+      })
+    );
   });
 
 
@@ -217,7 +262,7 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
         // given
         const signalTemplate = findTemplate('signalEventTemplate');
         const event = templateElementFactory.create(signalTemplate);
-        
+
         const eventBo = getBusinessObject(event);
         const eventDefinitions = eventBo.get('eventDefinitions');
         const signal = eventDefinitions[0].get('signalRef');
