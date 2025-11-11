@@ -6,6 +6,7 @@ import {
 import {
   findExtension,
   findMessage,
+  findSignal,
   getDefaultFixedValue,
   getDefaultValue,
   getTemplateVersion,
@@ -30,6 +31,8 @@ import {
   MESSAGE_BINDING_TYPES,
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
+  SIGNAL_BINDING_TYPES,
+  SIGNAL_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
   ZEEBE_CALLED_DECISION,
   ZEEBE_CALLED_ELEMENT,
@@ -51,7 +54,7 @@ import {
   createElement,
   getRoot
 } from '../../utils/ElementUtil';
-import { removeMessage } from '../util/rootElementUtil';
+import { removeMessage, removeSignal } from '../util/rootElementUtil';
 import { isExpression, createExpression } from '../util/bpmnExpressionUtil';
 
 /**
@@ -114,6 +117,8 @@ export default class ChangeElementTemplateHandler {
       this._updateZeebePropertyProperties(element, oldTemplate, newTemplate);
 
       this._updateMessage(element, oldTemplate, newTemplate);
+
+      this._updateSignal(element, oldTemplate, newTemplate);
 
       this._updateCalledElement(element, oldTemplate, newTemplate);
 
@@ -657,6 +662,18 @@ export default class ChangeElementTemplateHandler {
     }
   }
 
+  _updateSignal(element, oldTemplate, newTemplate) {
+
+    // update bpmn:Signal properties
+    this._updateSignalProperties(element, oldTemplate, newTemplate);
+
+    this._updateZeebeModelerTemplateOnReferencedElement(element, oldTemplate, newTemplate);
+
+    if (!hasSignalProperties(newTemplate)) {
+      removeSignal(element, this._injector);
+    }
+  }
+
   /**
    * Update bpmn:Message properties.
    *
@@ -699,6 +716,61 @@ export default class ChangeElementTemplateHandler {
             newBindingName = newBinding.name,
             newPropertyValue = getDefaultValue(newProperty),
             changedElement = message;
+
+      let properties = {};
+
+      if (shouldKeepValue(changedElement, oldProperty, newProperty)) {
+        return;
+      }
+
+      properties[ newBindingName ] = newPropertyValue;
+
+      this._modeling.updateModdleProperties(element, changedElement, properties);
+    });
+  }
+
+  /**
+   * Update bpmn:Signal properties.
+   *
+   * @param {djs.model.Base} element
+   * @param {Object} oldTemplate
+   * @param {Object} newTemplate
+   */
+  _updateSignalProperties(element, oldTemplate, newTemplate) {
+    const newProperties = newTemplate.properties.filter((newProperty) => {
+      const newBinding = newProperty.binding,
+            newBindingType = newBinding.type;
+
+      return newBindingType === SIGNAL_PROPERTY_TYPE;
+    });
+
+    const removedProperties = oldTemplate && oldTemplate.properties.filter((oldProperty) => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      return oldBindingType === SIGNAL_PROPERTY_TYPE && !newProperties.find((newProperty) => newProperty.binding.name === oldProperty.binding.name);
+    }) || [];
+
+    let signal = this._getSignal(element);
+    signal && removedProperties.forEach((removedProperty) => {
+
+      this._modeling.updateModdleProperties(element, signal, {
+        [removedProperty.binding.name]: undefined
+      });
+    });
+
+    if (!newProperties.length) {
+      return;
+    }
+
+    signal = this._ensureSignal(element, newTemplate);
+
+    newProperties.forEach((newProperty) => {
+      const oldProperty = findOldProperty(oldTemplate, newProperty),
+            newBinding = newProperty.binding,
+            newBindingName = newBinding.name,
+            newPropertyValue = getDefaultValue(newProperty),
+            changedElement = signal;
 
       let properties = {};
 
@@ -798,18 +870,25 @@ export default class ChangeElementTemplateHandler {
     const businessObject = getBusinessObject(element);
 
     const message = findMessage(businessObject);
+    const signal = findSignal(businessObject);
 
-    if (!message) {
+    if (!message && !signal) {
       return;
     }
 
-    if (getTemplateId(message) === newTemplate.id) {
-      return;
+    // Handle message
+    if (message && getTemplateId(message) !== newTemplate.id) {
+      this._modeling.updateModdleProperties(element, message, {
+        'zeebe:modelerTemplate': newTemplate.id
+      });
     }
 
-    this._modeling.updateModdleProperties(element, message, {
-      'zeebe:modelerTemplate': newTemplate.id
-    });
+    // Handle signal
+    if (signal && getTemplateId(signal) !== newTemplate.id) {
+      this._modeling.updateModdleProperties(element, signal, {
+        'zeebe:modelerTemplate': newTemplate.id
+      });
+    }
   }
 
   _getSubscription(element, bo) {
@@ -838,6 +917,22 @@ export default class ChangeElementTemplateHandler {
     return message;
   }
 
+  _createSignal(element, template) {
+    let bo = getBusinessObject(element);
+
+    if (is(bo, 'bpmn:Event')) {
+      bo = bo.get('eventDefinitions')[0];
+    }
+
+    const signal = this._bpmnFactory.create('bpmn:Signal', { 'zeebe:modelerTemplate': template.id });
+
+    signal.$parent = getRoot(bo);
+
+    this._modeling.updateModdleProperties(element, bo, { signalRef: signal });
+
+    return signal;
+  }
+
   _getMessage(element) {
     let bo = getBusinessObject(element);
 
@@ -846,6 +941,16 @@ export default class ChangeElementTemplateHandler {
     }
 
     return bo && bo.get('messageRef');
+  }
+
+  _getSignal(element) {
+    let bo = getBusinessObject(element);
+
+    if (is(bo, 'bpmn:Event')) {
+      bo = bo.get('eventDefinitions')[0];
+    }
+
+    return bo && bo.get('signalRef');
   }
 
   _ensureMessage(element, template) {
@@ -865,6 +970,25 @@ export default class ChangeElementTemplateHandler {
     }
 
     return this._moddleCopy.copyElement(message, newMessage, [ 'name', 'extensionElements' ]);
+  }
+
+  _ensureSignal(element, template) {
+
+    const signal = this._getSignal(element);
+
+    // signal is already templated, so we use it
+    if (signal && signal.get('zeebe:modelerTemplate')) {
+      return signal;
+    }
+
+    const newSignal = this._createSignal(element, template);
+
+    // no signal is set on the element, so no properties to copy
+    if (!signal) {
+      return newSignal;
+    }
+
+    return this._moddleCopy.copyElement(signal, newSignal, [ 'name' ]);
   }
 
 
@@ -1808,6 +1932,10 @@ function remove(array, item) {
 
 function hasMessageProperties(template) {
   return template.properties.some(p => MESSAGE_BINDING_TYPES.includes(p.binding.type));
+}
+
+function hasSignalProperties(template) {
+  return template.properties.some(p => SIGNAL_BINDING_TYPES.includes(p.binding.type));
 }
 
 function shouldUpdateElementType(element, oldTemplate, newType) {

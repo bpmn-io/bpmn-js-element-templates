@@ -33,7 +33,7 @@ import complexTemplates from './fixtures/complex';
 import integrationTemplates from './fixtures/integration';
 import { findExtensions, findExtension } from 'src/cloud-element-templates/Helper';
 import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
-import { findMessage } from 'src/cloud-element-templates/Helper';
+import { findMessage, findSignal } from 'src/cloud-element-templates/Helper';
 
 // eslint-disable-next-line no-undef
 const packageVersion = process.env.PKG_VERSION;
@@ -683,6 +683,42 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should create element with bpmn:SignalEventDefinition', inject(function(elementTemplates) {
+
+      // given
+      const templates = require('./fixtures/signal.json');
+
+      // when
+      const element = elementTemplates.createElement(templates[0]);
+
+      const businessObject = getBusinessObject(element);
+      const eventDefinitions = businessObject.get('eventDefinitions');
+
+      // then
+      expect(eventDefinitions).to.have.lengthOf(1);
+      expect(is(eventDefinitions[0], 'bpmn:SignalEventDefinition')).to.be.true;
+    }));
+
+
+    it('should create signal', inject(function(elementTemplates) {
+
+      // given
+      const templates = require('./fixtures/signal.json');
+
+      // when
+      const element = elementTemplates.createElement(templates[0]);
+
+      const businessObject = getBusinessObject(element);
+      const eventDefinitions = businessObject.get('eventDefinitions');
+
+      // then
+      const signal = eventDefinitions[0].get('signalRef');
+
+      expect(signal).to.exist;
+      expect(signal.get('name')).to.eql('hiddenSignalName');
+    }));
+
+
     it('should create element with zeebe:UserTask', inject(function(elementTemplates) {
 
       // given
@@ -1092,6 +1128,35 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       expect(message).to.exist;
       expect(message.get('name')).to.eql('hiddenName');
+    }));
+
+
+    it('should apply signal binding', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const templates = require('./fixtures/signal.json');
+      elementTemplates.set(templates);
+
+      const template = templates[0];
+      const event = elementRegistry.get('IntermediateCatchMessage');
+
+      debugger;
+
+      // assume
+      expect(template).to.exist;
+
+      // when
+      const updatedEvent = elementTemplates.applyTemplate(event, template);
+
+      // then
+      const businessObject = getBusinessObject(updatedEvent);
+      const eventDefinitions = businessObject.get('eventDefinitions');
+
+      // then
+      const signal = eventDefinitions[0].get('signalRef');
+
+      expect(signal).to.exist;
+      expect(signal.get('name')).to.eql('hiddenSignalName');
     }));
 
 
