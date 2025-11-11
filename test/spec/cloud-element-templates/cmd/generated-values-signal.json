@@ -1,0 +1,28 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Signal Property",
+    "id": "example.com.generated.signal",
+    "description": "A template.",
+    "appliesTo": [
+      "bpmn:Event"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:SignalEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "signal name",
+        "type": "Hidden",
+        "generatedValue": {
+          "type": "uuid"
+        },
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        }
+      }
+    ]
+  }
+]
