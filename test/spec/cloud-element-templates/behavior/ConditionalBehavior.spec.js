@@ -18,6 +18,7 @@ import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 import diagramXML from '../fixtures/condition.bpmn';
 import messageDiagramXML from '../fixtures/condition-message.bpmn';
 import messageCorrelationDiagramXML from '../fixtures/message-correlation-key.bpmn';
+import signalDiagramXML from '../fixtures/condition-signal.bpmn';
 
 import template from '../fixtures/condition.json';
 import updateTemplates from '../fixtures/condition-update.json';
@@ -30,11 +31,12 @@ import numberTemplate from '../fixtures/condition-number.json';
 
 import messageTemplates from '../fixtures/condition-message.json';
 import messageCorrelationTemplate from '../fixtures/message-correlation-key.json';
+import signalTemplates from '../fixtures/condition-signal.json';
 
 import calledElementTemplate from '../fixtures/condition-called-element.json';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
-import { findExtension, findMessage, findZeebeSubscription } from 'src/cloud-element-templates/Helper';
+import { findExtension, findMessage, findSignal, findZeebeSubscription } from 'src/cloud-element-templates/Helper';
 import ConditionalBehavior from 'src/cloud-element-templates/behavior/ConditionalBehavior';
 import { getBpmnJS } from 'bpmn-js/test/helper';
 import { isString } from 'min-dash';
@@ -1265,6 +1267,207 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         // then
         const message = findMessage(getBusinessObject(element));
         expect(message).to.exist;
+
+        const rootElements = bpmnjs.getDefinitions().get('rootElements');
+        expect(rootElements).to.have.lengthOf(initialRootElements.length);
+      })
+    );
+  });
+
+
+  describe('update bpmn:Signal#property', function() {
+
+    const template = signalTemplates[0];
+
+    beforeEach(bootstrapModeler(signalDiagramXML, {
+      container: container,
+      modules: [
+        coreModule,
+        elementTemplatesModule,
+        modelingModule,
+        ConditionalBehavior,
+        BpmnPropertiesPanelModule,
+        {
+          propertiesPanel: [ 'value', { registerProvider() {} } ]
+        }
+      ],
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      }
+    }));
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set([ template ]);
+    }));
+
+
+    it('should add conditional entries', inject(async function() {
+
+      // when
+      const element = changeTemplate('SignalEvent_3', template);
+
+      // then
+      const signal = findSignal(getBusinessObject(element));
+
+      expect(signal).to.have.property('name', 'one');
+    }));
+
+
+    it('should remove conditional entries', inject(
+      async function(elementRegistry, modeling) {
+
+        // given
+        const element = elementRegistry.get('SignalEvent_1');
+        const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+
+        // when
+        modeling.updateModdleProperties(element, property, {
+          value: 'three'
+        });
+
+        // then
+        const signal = findSignal(getBusinessObject(element));
+
+        expect(signal).not.to.have.property('name');
+      })
+    );
+
+
+    it('should switch between conditional properties', inject(
+      async function(elementRegistry, modeling) {
+
+        // given
+        const element = elementRegistry.get('SignalEvent_1');
+        const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+
+        // when
+        modeling.updateModdleProperties(element, property, {
+          value: 'two'
+        });
+
+        // then
+        const signal = findSignal(getBusinessObject(element));
+
+        expect(signal).to.have.property('name', 'two');
+      })
+    );
+
+
+    it('undo', inject(function(commandStack, elementRegistry, modeling) {
+
+      // given
+      let element = elementRegistry.get('SignalEvent_1');
+      const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+
+      // when
+      modeling.updateModdleProperties(element, property, {
+        value: 'three'
+      });
+
+      // assume
+      const signal = findSignal(getBusinessObject(element));
+      expect(signal).not.to.have.property('name');
+
+      // when
+      commandStack.undo();
+
+      expect(signal).to.have.property('name', 'one');
+    }));
+
+
+    it('redo', inject(function(commandStack, elementRegistry, modeling) {
+
+      // given
+      let element = elementRegistry.get('SignalEvent_1');
+      const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+
+      // when
+      modeling.updateModdleProperties(element, property, {
+        value: 'three'
+      });
+
+      // assume
+      const signal = findSignal(getBusinessObject(element));
+
+      // when
+      commandStack.undo();
+
+      // assume
+      expect(signal).to.have.property('name', 'one');
+
+      // when
+      commandStack.redo();
+
+      // then
+      expect(signal).not.to.have.property('name');
+    }));
+
+
+    it('should set zeebe:modelerTemplate on created signal', inject(function() {
+
+      // when
+      const element = changeTemplate('SignalEvent_3', template);
+
+      // then
+      const signal = findSignal(getBusinessObject(element));
+
+      expect(signal.get('zeebe:modelerTemplate')).to.eql(template.id);
+    }));
+
+
+    it('should remove bpmn:Signal if none bpmn:Signal bindings are left', inject(
+      async function(elementRegistry, modeling, bpmnjs) {
+
+        // given
+        const template = signalTemplates[1];
+        const element = changeTemplate('SignalEvent_3', template);
+        const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+        const initialSignal = findSignal(getBusinessObject(element));
+        const initialRootElements = bpmnjs.getDefinitions().get('rootElements');
+
+        // assume
+        expect(initialSignal).to.exist;
+
+        // when
+        modeling.updateModdleProperties(element, property, {
+          value: 'three'
+        });
+
+        // then
+        const signal = findSignal(getBusinessObject(element));
+
+        expect(signal).not.to.exist;
+
+        const rootElements = bpmnjs.getDefinitions().get('rootElements');
+        expect(rootElements).to.have.lengthOf(initialRootElements.length - 1);
+      })
+    );
+
+
+    it('should recreate bpmn:Signal if signal bindings are active again', inject(
+      async function(elementRegistry, modeling, bpmnjs) {
+
+        // given
+        const template = signalTemplates[1];
+        const element = changeTemplate('SignalEvent_3', template);
+        const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
+        const initialSignal = findSignal(getBusinessObject(element));
+        const initialRootElements = bpmnjs.getDefinitions().get('rootElements');
+
+        // assume
+        expect(initialSignal).to.exist;
+
+        // when
+        modeling.updateModdleProperties(element, property, {
+          value: 'three'
+        });
+        modeling.updateModdleProperties(element, property, {
+          value: 'two'
+        });
+
+        // then
+        const signal = findSignal(getBusinessObject(element));
+        expect(signal).to.exist;
 
         const rootElements = bpmnjs.getDefinitions().get('rootElements');
         expect(rootElements).to.have.lengthOf(initialRootElements.length);
