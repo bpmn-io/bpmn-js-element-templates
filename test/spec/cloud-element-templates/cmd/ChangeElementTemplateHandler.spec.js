@@ -2225,20 +2225,17 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         function(elementRegistry, bpmnjs) {
 
           // given - both events share the same signal
-          const newTemplate = require('./signal-event-template-1.json');
+          const newTemplate = require('./signal-event-template-2.json');
           const event1 = elementRegistry.get('SharedSignalEvent_1');
-          const event2 = elementRegistry.get('SharedSignalEvent_2');
+          let event2 = elementRegistry.get('SharedSignalEvent_2');
 
           const sharedSignal = findSignal(getBusinessObject(event1));
-          const initialRootElements = bpmnjs.getDefinitions().get('rootElements');
+          const initialRootElementsCount = bpmnjs.getDefinitions().get('rootElements').length;
 
-          expect(sharedSignal).to.exist;
-          expect(sharedSignal.get('name')).to.equal('sharedSignalName');
-          expect(findSignal(getBusinessObject(event1))).to.equal(sharedSignal);
-          expect(findSignal(getBusinessObject(event2))).to.equal(sharedSignal);
+          expect(findSignal(getBusinessObject(event1))).to.equal(findSignal(getBusinessObject(event2)));
 
           // when - apply template with string input to event2
-          changeTemplate(event2, newTemplate);
+          event2 = changeTemplate(event2, newTemplate);
 
           // then - new signal should be created with copied name
           const event2Signal = findSignal(getBusinessObject(event2));
@@ -2254,7 +2251,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           // both signals should exist in definitions
           const definitions = bpmnjs.getDefinitions();
           const rootElements = definitions.get('rootElements');
-          expect(rootElements).to.have.lengthOf(initialRootElements.length + 1);
+          expect(rootElements).to.have.lengthOf(initialRootElementsCount + 1);
           expect(rootElements.find(e => e === sharedSignal)).to.exist;
           expect(rootElements.find(e => e === event2Signal)).to.exist;
         }));
