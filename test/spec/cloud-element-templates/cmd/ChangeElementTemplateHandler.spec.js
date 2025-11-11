@@ -2216,6 +2216,51 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('referenced elements', function() {
+
+      beforeEach(bootstrap(require('./shared-signal.bpmn').default));
+
+
+      it('should create new signal when applying template with string input to element sharing signal', inject(
+        function(elementRegistry, bpmnjs) {
+
+          // given - both events share the same signal
+          const newTemplate = require('./signal-event-template-1.json');
+          const event1 = elementRegistry.get('SharedSignalEvent_1');
+          const event2 = elementRegistry.get('SharedSignalEvent_2');
+
+          const sharedSignal = findSignal(getBusinessObject(event1));
+          const initialRootElements = bpmnjs.getDefinitions().get('rootElements');
+
+          expect(sharedSignal).to.exist;
+          expect(sharedSignal.get('name')).to.equal('sharedSignalName');
+          expect(findSignal(getBusinessObject(event1))).to.equal(sharedSignal);
+          expect(findSignal(getBusinessObject(event2))).to.equal(sharedSignal);
+
+          // when - apply template with string input to event2
+          changeTemplate(event2, newTemplate);
+
+          // then - new signal should be created with copied name
+          const event2Signal = findSignal(getBusinessObject(event2));
+          expect(event2Signal).to.exist;
+          expect(event2Signal).not.to.equal(sharedSignal);
+          expect(event2Signal.get('name')).to.equal('sharedSignalName'); // name should be copied
+          expect(event2Signal.get('zeebe:modelerTemplate')).to.equal(newTemplate.id);
+
+          // event1 should still reference the original shared signal
+          expect(findSignal(getBusinessObject(event1))).to.equal(sharedSignal);
+          expect(sharedSignal.get('zeebe:modelerTemplate')).not.to.exist;
+
+          // both signals should exist in definitions
+          const definitions = bpmnjs.getDefinitions();
+          const rootElements = definitions.get('rootElements');
+          expect(rootElements).to.have.lengthOf(initialRootElements.length + 1);
+          expect(rootElements.find(e => e === sharedSignal)).to.exist;
+          expect(rootElements.find(e => e === event2Signal)).to.exist;
+        }));
+    });
+
+
     describe('generated value', function() {
 
       beforeEach(bootstrap(require('./generated-values.bpmn').default));
