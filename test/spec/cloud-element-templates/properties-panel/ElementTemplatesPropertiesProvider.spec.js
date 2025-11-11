@@ -907,6 +907,43 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
   });
 
 
+  describe('templated signal', function() {
+
+    it('should hide templated signal', inject(async function(elementRegistry, selection) {
+
+      // given
+      const event = elementRegistry.get('SignalEvent_1');
+
+      // when
+      await act(() => selection.select(event));
+      const signalRefSelect = domQuery('select[name=signalRef]', container);
+
+      // then
+      expect(asOptionNamesList(signalRefSelect)).to.eql([
+        '<none>',
+        'Create new ...',
+        'Signal_1'
+      ]);
+    }));
+
+
+    it('should still display signal select as first entry in group', inject(async function(elementRegistry, selection) {
+
+      // given
+      const event = elementRegistry.get('SignalEvent_1');
+
+      // when
+      await act(() => selection.select(event));
+      const signalGroupEntries = domQueryAll('[data-group-id="group-signal"] .bio-properties-panel-entry', container);
+      const signalRefSelect = domQuery('[data-entry-id="signalRef"]', container);
+
+      // then
+      expect(signalGroupEntries[0]).to.eql(signalRefSelect);
+    }));
+
+  });
+
+
   describe('multiinstance characteristics', function() {
 
     it('should display multi-instance configuration', inject(
