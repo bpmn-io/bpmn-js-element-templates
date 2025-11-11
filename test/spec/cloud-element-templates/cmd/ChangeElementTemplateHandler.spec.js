@@ -25,6 +25,7 @@ import {
   findInputParameter,
   findMessage,
   findOutputParameter,
+  findSignal,
   findTaskHeader,
   findZeebeProperty,
   findZeebeSubscription
@@ -1906,6 +1907,114 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('update bpmn:Signal#property', function() {
+
+      beforeEach(bootstrap(require('./signal-event.bpmn').default));
+
+      const newTemplate = require('./signal-event-template-1.json');
+
+      it('execute', inject(function(bpmnjs, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('SignalEvent_1');
+
+        // when
+        changeTemplate(event, newTemplate);
+
+        // then
+        event = elementRegistry.get('SignalEvent_1');
+        expectElementTemplate(event, 'signal-event-template', 1);
+
+        const signal = findSignal(getBusinessObject(event));
+
+        expect(signal).to.exist;
+        expect(signal.get('name')).to.equal('signal_name');
+
+        expect(signal.$parent).to.equal(bpmnjs.getDefinitions());
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('SignalEvent_1');
+
+        // when
+        changeTemplate(event, newTemplate);
+        commandStack.undo();
+
+        // then
+        event = elementRegistry.get('SignalEvent_1');
+        expectNoElementTemplate(event);
+
+        const signal = findSignal(getBusinessObject(event));
+
+        expect(signal).not.to.exist;
+      }));
+
+
+      it('redo', inject(function(bpmnjs, commandStack, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('SignalEvent_1');
+
+        // when
+        changeTemplate(event, newTemplate);
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        event = elementRegistry.get('SignalEvent_1');
+        expectElementTemplate(event, 'signal-event-template', 1);
+
+        const signal = findSignal(getBusinessObject(event));
+
+        expect(signal).to.exist;
+        expect(signal.get('name')).to.equal('signal_name');
+
+        expect(signal.$parent).to.equal(bpmnjs.getDefinitions());
+      }));
+
+
+      it('should remove bpmn:Signal if bpmn:Signal#property not specified', inject(function(bpmnjs, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('SignalEvent_1');
+        event = changeTemplate(event, newTemplate);
+
+        // when
+        const emptyTemplate = createTemplate([]);
+        changeTemplate(event, emptyTemplate, newTemplate);
+
+        // then
+        event = elementRegistry.get('SignalEvent_1');
+        const signal = findSignal(getBusinessObject(event));
+
+        expect(signal).not.to.exist;
+      }));
+
+
+      withBpmnJs('>=18.0.0')('should reuse bpmn:Signal name property', inject(function(elementRegistry) {
+
+        // given
+        const template = require('./signal-event-template-2.json');
+
+        let event = elementRegistry.get('SignalEvent_4');
+
+        // when
+        changeTemplate(event, template);
+
+        // then
+        event = elementRegistry.get('SignalEvent_4');
+
+        const signal = findSignal(getBusinessObject(event));
+
+        expect(signal.get('name')).to.equal('signal_1');
+      }));
+
+    });
+
+
     describe('update zeebe:calledElement', function() {
 
       beforeEach(bootstrap(require('./task.bpmn').default));
@@ -2054,6 +2163,59 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('create signal with zeebe:modelerTemplate', function() {
+
+      beforeEach(bootstrap(require('./signal-event.bpmn').default));
+
+
+      it('should apply zeebe:modelerTemplate if bpmn:Signal#property specified', inject(
+        function(elementRegistry) {
+
+          // given
+          const newTemplate = require('./signal-event-template-1.json');
+          let event = elementRegistry.get('SignalEvent_1');
+
+          // when
+          changeTemplate(event, newTemplate);
+
+          // then
+          event = elementRegistry.get('SignalEvent_1');
+          expectElementTemplate(event, newTemplate.id, 1);
+
+          const signal = findSignal(getBusinessObject(event));
+
+          expect(signal).to.exist;
+          expect(signal.get('zeebe:modelerTemplate')).to.equal(newTemplate.id);
+        })
+      );
+
+
+      it('should create a new signal but keep existing one in definitions', inject(
+        function(elementRegistry, bpmnjs) {
+
+          // given
+          const newTemplate = require('./signal-event-template-1.json');
+          let event = elementRegistry.get('SignalEvent_2');
+          const originalSignal = findSignal(getBusinessObject(event));
+
+          // when
+          changeTemplate(event, newTemplate);
+
+          // then
+          event = elementRegistry.get('SignalEvent_2');
+          expectElementTemplate(event, newTemplate.id, 1);
+
+          const signal = findSignal(getBusinessObject(event));
+          expect(signal).to.exist;
+
+          const definitions = bpmnjs.getDefinitions(event);
+          const rootElements = definitions.get('rootElements');
+          expect(rootElements.find(e => e === signal)).to.exist;
+          expect(rootElements.find(e => e === originalSignal)).to.exist;
+        }));
+    });
+
+
     describe('generated value', function() {
 
       beforeEach(bootstrap(require('./generated-values.bpmn').default));
@@ -2110,6 +2272,23 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         const subscription = findZeebeSubscription(message);
         expect(subscription.get('correlationKey')).to.match(uuidRegex, 'correlation key is not a uuid');
       }));
+
+
+      it('should apply generated value on signal (uuid)', inject(function(elementRegistry) {
+
+        // given
+        const uuidRegex = /^[\w\d]{8}(-[\w\d]{4}){3}-[\w\d]{12}$/;
+        let event = elementRegistry.get('Event_1');
+
+        // when
+        event = changeTemplate(event, require('./generated-values-signal.json')[0]);
+
+        // then
+        const bo = getBusinessObject(event);
+
+        const signal = findSignal(bo);
+        expect(signal.get('name')).to.match(uuidRegex, 'signal name is not a uuid');
+      }));
     });
 
 
@@ -2137,6 +2316,29 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         const bo = getBusinessObject(task);
 
         expect(bo.$attrs).not.to.have.property('messageRef');
+      }));
+
+
+      it('should NOT create unnecessary signal', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        // when
+        changeTemplate(task, {
+          '$schema': 'https://unpkg.com/browse/@camunda/zeebe-element-templates-json-schema/resources/schema.json',
+          'id': 'com.camunda.example.test.signal',
+          'name': 'TEST SIGNAL',
+          'appliesTo': [
+            'bpmn:FlowNode'
+          ],
+          'properties': []
+        });
+
+        // then
+        const bo = getBusinessObject(task);
+
+        expect(bo.$attrs).not.to.have.property('signalRef');
       }));
     });
 
