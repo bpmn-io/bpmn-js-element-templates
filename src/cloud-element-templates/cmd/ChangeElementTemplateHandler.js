@@ -120,6 +120,8 @@ export default class ChangeElementTemplateHandler {
 
       this._updateSignal(element, oldTemplate, newTemplate);
 
+      this._updateZeebeModelerTemplateOnReferencedElement(element, oldTemplate, newTemplate);
+
       this._updateCalledElement(element, oldTemplate, newTemplate);
 
       this._updateLinkedResources(element, oldTemplate, newTemplate);
@@ -655,8 +657,6 @@ export default class ChangeElementTemplateHandler {
     // update bpmn:Message zeebe:subscription properties
     this._updateMessageZeebeSubscriptionProperties(element, oldTemplate, newTemplate);
 
-    this._updateZeebeModelerTemplateOnReferencedElement(element, oldTemplate, newTemplate);
-
     if (!hasMessageProperties(newTemplate)) {
       removeMessage(element, this._injector);
     }
@@ -666,8 +666,6 @@ export default class ChangeElementTemplateHandler {
 
     // update bpmn:Signal properties
     this._updateSignalProperties(element, oldTemplate, newTemplate);
-
-    this._updateZeebeModelerTemplateOnReferencedElement(element, oldTemplate, newTemplate);
 
     if (!hasSignalProperties(newTemplate)) {
       removeSignal(element, this._injector);
