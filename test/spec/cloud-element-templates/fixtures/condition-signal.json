@@ -1,0 +1,139 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Signal Property",
+    "id": "example.com.condition.signal",
+    "description": "A conditional signal template.",
+    "appliesTo": [
+      "bpmn:Event"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:SignalEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "select",
+        "type": "Dropdown",
+        "value": "one",
+        "choices": [
+          {
+            "name": "one",
+            "value": "one"
+          },
+          {
+            "name": "two",
+            "value": "two"
+          },
+          {
+            "name": "three",
+            "value": "three"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:property",
+          "name": "select"
+        }
+      },
+      {
+        "label": "name",
+        "type": "Hidden",
+        "value": "one",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        },
+        "condition": {
+          "property": "select",
+          "equals": "one"
+        }
+      },
+      {
+        "label": "name",
+        "type": "Hidden",
+        "value": "two",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        },
+        "condition": {
+          "property": "select",
+          "equals": "two"
+        }
+      },
+      {
+        "label": "unconditional - to prevent signal removal",
+        "type": "Hidden",
+        "value": "two",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "foo"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Signal Property (limited props)",
+    "id": "example.com.condition.signal-short",
+    "description": "A conditional signal template.",
+    "appliesTo": [
+      "bpmn:Event"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:SignalEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "select",
+        "type": "Dropdown",
+        "value": "one",
+        "choices": [
+          {
+            "name": "one",
+            "value": "one"
+          },
+          {
+            "name": "two",
+            "value": "two"
+          },
+          {
+            "name": "three",
+            "value": "three"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:property",
+          "name": "select"
+        }
+      },
+      {
+        "label": "name",
+        "type": "Hidden",
+        "value": "one",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        },
+        "condition": {
+          "property": "select",
+          "equals": "one"
+        }
+      },
+      {
+        "label": "name",
+        "type": "Hidden",
+        "value": "two",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        },
+        "condition": {
+          "property": "select",
+          "equals": "two"
+        }
+      }
+    ]
+  }
+]
