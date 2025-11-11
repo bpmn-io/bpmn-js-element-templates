@@ -1675,6 +1675,19 @@ export function findOldProperty(oldTemplate, newProperty) {
     });
   }
 
+  if (newBindingType === SIGNAL_PROPERTY_TYPE) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== SIGNAL_PROPERTY_TYPE) {
+        return;
+      }
+
+      return oldBinding.name === newBinding.name;
+    });
+  }
+
   if (newBindingType === ZEEBE_LINKED_RESOURCE_PROPERTY) {
     return oldProperties.find(oldProperty => {
       const oldBinding = oldProperty.binding,
@@ -1876,6 +1889,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE) {
+    return businessObject.get(bindingName);
+  }
+
+  if (bindingType === SIGNAL_PROPERTY_TYPE) {
     return businessObject.get(bindingName);
   }
 
