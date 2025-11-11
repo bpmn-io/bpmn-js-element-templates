@@ -137,5 +137,53 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Signal Event Template",
+    "id": "updateSignalTemplate",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent",
+      "bpmn:IntermediateThrowEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:SignalEventDefinition"
+    },
+    "properties": [
+      {
+        "type": "String",
+        "value": "signal_version_1",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Signal Event Template - new",
+    "id": "updateSignalTemplate",
+    "version": 2,
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent",
+      "bpmn:IntermediateThrowEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:SignalEventDefinition"
+    },
+    "properties": [
+      {
+        "type": "String",
+        "value": "signal_version_2",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        }
+      }
+    ]
   }
 ]

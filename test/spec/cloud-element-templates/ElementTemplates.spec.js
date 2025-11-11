@@ -1634,6 +1634,57 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     );
 
 
+    it('should update signal event template', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const signalTemplates = require('./fixtures/signal.json');
+      const updateTemplates = signalTemplates.filter(t => t.id === 'updateSignalTemplate');
+      const newTemplate = updateTemplates.find(t => t.version === 2);
+      elementTemplates.set(updateTemplates);
+      let event = elementRegistry.get('SignalEvent');
+
+
+      // when
+      event = elementTemplates.applyTemplate(event, newTemplate);
+
+      // then
+      const eventBo = getBusinessObject(event);
+
+      expect(eventBo.modelerTemplate).to.eql('updateSignalTemplate');
+      expect(eventBo.modelerTemplateVersion).to.eql(2);
+
+      const signal = findSignal(eventBo);
+      expect(signal.name).to.eql('signal_version_2');
+    }));
+
+
+    it('should update signal event template but keep user-edited name',
+      inject(function(elementRegistry, modeling, elementTemplates) {
+
+        // given
+        const signalTemplates = require('./fixtures/signal.json');
+        const updateTemplates = signalTemplates.filter(t => t.id === 'updateSignalTemplate');
+        const newTemplate = updateTemplates.find(t => t.version === 2);
+        elementTemplates.set(updateTemplates);
+        let event = elementRegistry.get('SignalEvent'),
+            eventBo = getBusinessObject(event);
+        modeling.updateModdleProperties(event, findSignal(eventBo), { name: 'user_edited' });
+
+        // when
+        event = elementTemplates.applyTemplate(event, newTemplate);
+
+        // then
+        eventBo = getBusinessObject(event);
+
+        expect(eventBo.modelerTemplate).to.eql('updateSignalTemplate');
+        expect(eventBo.modelerTemplateVersion).to.eql(2);
+
+        const signal = findSignal(eventBo);
+        expect(signal.name).to.eql('user_edited');
+      })
+    );
+
+
     it('should fire elementTemplates.update event', inject(function(elementRegistry, elementTemplates, eventBus) {
 
       // given
