@@ -1441,6 +1441,26 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it.only('should remove ad-hoc subprocess template and keep collapsed state', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      let subprocess = elementRegistry.get('Agent');
+
+      console.log(subprocess, subprocess.di);
+
+      expect(subprocess.di.isExpanded).to.be.true;
+
+      // when
+      subprocess = elementTemplates.removeTemplate(subprocess);
+
+      // then
+      console.log(subprocess, subprocess.di);
+
+      // TODO: should be true but is undefined after removing element template
+      expect(subprocess.di.isExpanded).to.be.true;
+    }));
+
+
     it('should fire elementTemplates.remove event', inject(function(elementRegistry, elementTemplates, eventBus) {
 
       // given
