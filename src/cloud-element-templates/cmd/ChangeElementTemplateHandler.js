@@ -761,6 +761,7 @@ export default class ChangeElementTemplateHandler {
       return;
     }
 
+    // could this be a bug if no signal property is defined?
     signal = this._ensureSignal(element, newTemplate);
 
     newProperties.forEach((newProperty) => {
@@ -867,23 +868,10 @@ export default class ChangeElementTemplateHandler {
   _updateZeebeModelerTemplateOnReferencedElement(element, oldTemplate, newTemplate) {
     const businessObject = getBusinessObject(element);
 
-    const message = findMessage(businessObject);
-    const signal = findSignal(businessObject);
+    const referencedElement = findMessage(businessObject) || findSignal(businessObject);
 
-    if (!message && !signal) {
-      return;
-    }
-
-    // Handle message
-    if (message && getTemplateId(message) !== newTemplate.id) {
-      this._modeling.updateModdleProperties(element, message, {
-        'zeebe:modelerTemplate': newTemplate.id
-      });
-    }
-
-    // Handle signal
-    if (signal && getTemplateId(signal) !== newTemplate.id) {
-      this._modeling.updateModdleProperties(element, signal, {
+    if (referencedElement && getTemplateId(referencedElement) !== newTemplate.id) {
+      this._modeling.updateModdleProperties(element, referencedElement, {
         'zeebe:modelerTemplate': newTemplate.id
       });
     }
