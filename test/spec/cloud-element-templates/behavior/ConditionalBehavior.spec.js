@@ -139,6 +139,33 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     );
 
 
+    it('should update conditional feel property (missing equal sign)', inject(
+      async function(modeling) {
+
+        // given
+        const element = changeTemplate('Task_1', dependentDropdownsTemplate);
+        const businessObject = getBusinessObject(element);
+
+        modeling.updateModdleProperties(element, businessObject, {
+          root: 'Root A',
+        });
+
+        // assume
+        expect(businessObject.get('root')).to.eql('Root A');
+        expect(businessObject.get('feel-value')).to.eql('=broken');
+
+        // when
+        modeling.updateModdleProperties(element, businessObject, {
+          root: 'Root B',
+        });
+
+        // then
+        expect(businessObject.get('root')).to.eql('Root B');
+        expect(businessObject.get('feel-value')).to.eql('=correct');
+      })
+    );
+
+
     it('undo', inject(function(commandStack, modeling) {
 
       // given

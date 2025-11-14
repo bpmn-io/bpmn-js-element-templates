@@ -82,6 +82,38 @@
       "constraints": {
         "notEmpty": true
       }
+    },
+    {
+      "id": "feel-value",
+      "label": "Broken FEEL",
+      "feel": "required",
+      "binding": {
+        "name": "feel-value",
+        "type": "property"
+      },
+      "condition": {
+        "property": "root",
+        "equals": "Root A",
+        "type": "simple"
+      },
+      "type": "Text",
+      "value": "broken"
+    },
+    {
+      "id": "feel-value",
+      "label": "Correct FEEL",
+      "feel": "required",
+      "binding": {
+        "name": "feel-value",
+        "type": "property"
+      },
+      "condition": {
+        "property": "root",
+        "equals": "Root B",
+        "type": "simple"
+      },
+      "type": "Text",
+      "value": "=correct"
     }
   ]
 }
