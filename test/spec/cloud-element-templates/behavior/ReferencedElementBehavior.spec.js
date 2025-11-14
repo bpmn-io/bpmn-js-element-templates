@@ -206,6 +206,80 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
         expect(getMessages()).to.have.lengthOf(initialMessages.length - 1);
       })
     );
+
+
+    it('should remove old message when replacing message event with signal event', inject(
+      function(elementRegistry, bpmnReplace) {
+
+        // given
+        let event = elementRegistry.get('MessageEvent');
+        const initialMessages = getMessages();
+        const initialSignals = getSignals();
+
+        const messageBo = getBusinessObject(event);
+        const messageEventDef = messageBo.get('eventDefinitions')[0];
+        const oldMessage = messageEventDef.get('messageRef');
+
+        // assume
+        expect(oldMessage).to.exist;
+        expect(oldMessage.get(TEMPLATE_ID_ATTR)).to.equal('messageEventTemplate');
+
+        // when - replace message event with signal event
+        event = bpmnReplace.replaceElement(event, {
+          type: 'bpmn:IntermediateCatchEvent',
+          eventDefinitionType: 'bpmn:SignalEventDefinition'
+        });
+
+        // then
+        const eventBo = getBusinessObject(event);
+        const eventDefinitions = eventBo.get('eventDefinitions');
+        expect(eventDefinitions).to.have.length(1);
+
+        const signalEventDef = eventDefinitions[0];
+        expect(signalEventDef.$type).to.equal('bpmn:SignalEventDefinition');
+
+        // old message should be removed
+        const messageRef = signalEventDef.get('messageRef');
+        expect(messageRef).not.to.exist;
+
+        // signal reference should not exist (no template applied)
+        const signalRef = signalEventDef.get('signalRef');
+        expect(signalRef).not.to.exist;
+
+        // old templated message should be removed from definitions
+        expect(getMessages()).to.have.lengthOf(initialMessages.length - 1);
+        expect(getSignals()).to.have.lengthOf(initialSignals.length);
+      })
+    );
+  });
+
+
+  describe('signal events', function() {
+
+    it('should unlink templated signal when template is unlinked', inject(
+      function(elementRegistry, elementTemplates, templateElementFactory) {
+
+        // given
+        const signalTemplate = findTemplate('signalEventTemplate');
+        const event = templateElementFactory.create(signalTemplate);
+
+        const eventBo = getBusinessObject(event);
+        const eventDefinitions = eventBo.get('eventDefinitions');
+        const signal = eventDefinitions[0].get('signalRef');
+
+        // assume
+        expect(signal).to.exist;
+        expect(signal.get(TEMPLATE_ID_ATTR)).to.equal('signalEventTemplate');
+
+        // when
+        elementTemplates.unlinkTemplate(event);
+
+        // then
+        expect(signal).to.exist;
+        expect(signal.get(TEMPLATE_ID_ATTR)).not.to.exist;
+      })
+    );
+
   });
 
 
@@ -267,4 +341,13 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
 function getMessages() {
   return getBpmnJS().getDefinitions().rootElements.filter(
     e => is(e, 'bpmn:Message'));
+}
+
+function getSignals() {
+  return getBpmnJS().getDefinitions().rootElements.filter(
+    e => is(e, 'bpmn:Signal'));
+}
+
+function findTemplate(id) {
+  return templates.find(t => t.id === id);
 }

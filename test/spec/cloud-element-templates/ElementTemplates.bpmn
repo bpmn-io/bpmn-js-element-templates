@@ -40,6 +40,9 @@
     <bpmn:intermediateCatchEvent id="MessageEvent" zeebe:modelerTemplate="updateTemplate" zeebe:modelerTemplateVersion="1">
       <bpmn:messageEventDefinition id="MessageEventDefinition_0ki3umf" messageRef="Message_0zwscdd" />
     </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="SignalEvent" zeebe:modelerTemplate="updateSignalTemplate" zeebe:modelerTemplateVersion="1">
+      <bpmn:signalEventDefinition id="SignalEventDefinition_0ki3umf" signalRef="Signal_0zwscdd" />
+    </bpmn:intermediateCatchEvent>
     <bpmn:subProcess id="SubProcess_1" zeebe:modelerTemplate="processFefaults-c8" zeebe:modelerTemplateVersion="1">
       <bpmn:extensionElements />
       <bpmn:startEvent id="Event_0zbvlz6" />
@@ -68,6 +71,7 @@
       <zeebe:subscription correlationKey="=correlationKey" />
     </bpmn:extensionElements>
   </bpmn:message>
+  <bpmn:signal id="Signal_0zwscdd" name="signal_version_1" zeebe:modelerTemplate="updateSignalTemplate" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
       <bpmndi:BPMNShape id="Activity_1srimyz_di" bpmnElement="Task_1">
@@ -105,6 +109,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0rxdmt7_di" bpmnElement="MessageEvent">
         <dc:Bounds x="262" y="422" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0signal1_di" bpmnElement="SignalEvent">
+        <dc:Bounds x="472" y="422" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1iahht4_di" bpmnElement="UserTask_1">
         <dc:Bounds x="160" y="620" width="100" height="80" />
