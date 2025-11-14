@@ -1705,7 +1705,7 @@ function shouldKeepValue(element, oldProperty, newProperty) {
  * @returns {boolean}
  */
 function propertyChanged(element, oldProperty) {
-  const oldPropertyValue = oldProperty.value;
+  const oldPropertyValue = getDefaultValue(oldProperty);
 
   return getPropertyValue(element, oldProperty) !== oldPropertyValue;
 }
