@@ -176,7 +176,10 @@ export function findZeebeSubscription(message) {
   return findExtension(message, 'zeebe:Subscription');
 }
 
-export function getValue(property) {
+/**
+ * Get the default value disregarding generated values.
+ */
+export function getDefaultFixedValue(property) {
   if (
     shouldCastToFeel(property) || property.feel === 'required'
   ) {
@@ -188,7 +191,7 @@ export function getValue(property) {
 
 export function getDefaultValue(property) {
 
-  const value = getValue(property);
+  const value = getDefaultFixedValue(property);
 
   if (value !== undefined) {
     return value;
