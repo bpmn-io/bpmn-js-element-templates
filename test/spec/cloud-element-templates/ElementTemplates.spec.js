@@ -1140,8 +1140,6 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       const template = templates[0];
       const event = elementRegistry.get('IntermediateCatchMessage');
 
-      debugger;
-
       // assume
       expect(template).to.exist;
 

@@ -351,7 +351,3 @@ function getSignals() {
   return getBpmnJS().getDefinitions().rootElements.filter(
     e => is(e, 'bpmn:Signal'));
 }
-
-function findTemplate(id) {
-  return templates.find(t => t.id === id);
-}
