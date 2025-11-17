@@ -31,7 +31,6 @@ import {
   MESSAGE_BINDING_TYPES,
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
-  SIGNAL_BINDING_TYPES,
   SIGNAL_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
   ZEEBE_CALLED_DECISION,
@@ -761,7 +760,7 @@ export default class ChangeElementTemplateHandler {
       return;
     }
 
-    // could this be a bug if no signal property is defined?
+    // The template schema guarantees that if signal#property is active
     signal = this._ensureSignal(element, newTemplate);
 
     newProperties.forEach((newProperty) => {
@@ -1938,7 +1937,7 @@ function hasMessageProperties(template) {
 }
 
 function hasSignalProperties(template) {
-  return template.properties.some(p => SIGNAL_BINDING_TYPES.includes(p.binding.type));
+  return template.properties.some(p => p.binding.type === SIGNAL_PROPERTY_TYPE);
 }
 
 function shouldUpdateElementType(element, oldTemplate, newType) {

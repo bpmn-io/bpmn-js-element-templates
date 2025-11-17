@@ -15,7 +15,6 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   PROPERTY_BINDING_TYPES,
-  SIGNAL_BINDING_TYPES,
   SIGNAL_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
   ZEEBE_TASK_DEFINITION_TYPE_TYPE,
@@ -376,7 +375,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
   }
 
   // ensure signal exists
-  if (SIGNAL_BINDING_TYPES.includes(type)) {
+  if (type === SIGNAL_PROPERTY_TYPE) {
     if (is(businessObject, 'bpmn:Event')) {
       businessObject = businessObject.get('eventDefinitions')[0];
     }
@@ -1024,7 +1023,7 @@ export function unsetProperty(commandStack, element, property) {
     }
   }
 
-  if (SIGNAL_BINDING_TYPES.includes(type)) {
+  if (type === SIGNAL_PROPERTY_TYPE) {
     businessObject = findSignal(businessObject);
 
     if (!businessObject) {
