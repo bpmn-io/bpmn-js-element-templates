@@ -6,6 +6,7 @@ import {
 import {
   findExtension,
   findMessage,
+  getValue,
   getDefaultValue,
   getTemplateVersion,
   getTemplateId,
@@ -1705,7 +1706,7 @@ function shouldKeepValue(element, oldProperty, newProperty) {
  * @returns {boolean}
  */
 function propertyChanged(element, oldProperty) {
-  const oldPropertyValue = getDefaultValue(oldProperty);
+  const oldPropertyValue = getValue(oldProperty);
 
   return getPropertyValue(element, oldProperty) !== oldPropertyValue;
 }
