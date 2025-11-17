@@ -176,16 +176,25 @@ export function findZeebeSubscription(message) {
   return findExtension(message, 'zeebe:Subscription');
 }
 
-export function getDefaultValue(property) {
-
+/**
+ * Get the default value disregarding generated values.
+ */
+export function getDefaultFixedValue(property) {
   if (
     shouldCastToFeel(property) || property.feel === 'required'
   ) {
     return toFeelExpression(property.value, property.type);
   }
 
-  if (property.value !== undefined) {
-    return property.value;
+  return property.value;
+}
+
+export function getDefaultValue(property) {
+
+  const value = getDefaultFixedValue(property);
+
+  if (value !== undefined) {
+    return value;
   }
 
   if (property.generatedValue) {
