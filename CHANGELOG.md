@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.15.1
+
+* `FIX`: ensure FEEL expression is enforced for `feel: required` properties ([#202](https://github.com/bpmn-io/bpmn-js-element-templates/pull/202))
+* `FIX`: prevent JSDoc comments from being removed ([#200](https://github.com/bpmn-io/bpmn-js-element-templates/pull/200))
+
 ## 2.15.0
 
 * `FEAT`: add `elementTemplates#getCompatible` ([#189](https://github.com/bpmn-io/bpmn-js-element-templates/pull/189))
