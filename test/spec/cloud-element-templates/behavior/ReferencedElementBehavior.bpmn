@@ -10,6 +10,9 @@
     <bpmn:intermediateCatchEvent id="SignalEvent" name="Event" zeebe:modelerTemplate="signalEventTemplate">
       <bpmn:signalEventDefinition id="SignalEventDefinition_1" signalRef="Signal_1" />
     </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="SignalEvent_2" name="No Template Signal Event">
+      <bpmn:signalEventDefinition id="SignalEventDefinition_2" signalRef="Signal_2" />
+    </bpmn:intermediateCatchEvent>
   </bpmn:process>
   <bpmn:message id="Message_1" name="messageName" zeebe:modelerTemplate="messageEventTemplate">
     <bpmn:extensionElements>
@@ -18,6 +21,7 @@
   </bpmn:message>
   <bpmn:message id="Message_2"></bpmn:message>
   <bpmn:signal id="Signal_1" name="signalName" zeebe:modelerTemplate="signalEventTemplate" />
+  <bpmn:signal id="Signal_2" name="Signal_2" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
       <bpmndi:BPMNShape id="Event_0cwpnu8_di" bpmnElement="MessageEvent">
@@ -28,6 +32,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_3_di" bpmnElement="SignalEvent">
         <dc:Bounds x="182" y="502" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_4_di" bpmnElement="SignalEvent_2">
+        <dc:Bounds x="182" y="552" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
