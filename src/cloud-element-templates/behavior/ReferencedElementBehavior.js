@@ -65,17 +65,10 @@ export class ReferencedElementBehavior extends CommandInterceptor {
     }
 
     const bo = getBusinessObject(element);
-    const message = findMessage(bo);
-    const signal = findSignal(bo);
+    const referencedElement = findMessage(bo) || findSignal(bo);
 
-    if (message && getTemplateId(message)) {
-      this._modeling.updateModdleProperties(element, message, {
-        [TEMPLATE_ID_ATTR]: null
-      });
-    }
-    
-    if (signal && getTemplateId(signal)) {
-      this._modeling.updateModdleProperties(element, signal, {
+    if (referencedElement && getTemplateId(referencedElement)) {
+      this._modeling.updateModdleProperties(element, referencedElement, {
         [TEMPLATE_ID_ATTR]: null
       });
     }
@@ -131,15 +124,10 @@ export class ReferencedElementBehavior extends CommandInterceptor {
     }
 
     const bo = getBusinessObject(shape);
-    const message = findMessage(bo);
-    const signal = findSignal(bo);
+    const referencedElement = findMessage(bo) || findSignal(bo);
 
-    if (message && getTemplateId(message)) {
-      removeRootElement(message, this._injector);
-    }
-    
-    if (signal && getTemplateId(signal)) {
-      removeRootElement(signal, this._injector);
+    if (referencedElement && getTemplateId(referencedElement)) {
+      removeRootElement(referencedElement, this._injector);
     }
   }
 
@@ -191,7 +179,7 @@ function canHaveMessage(element) {
   if (is(element, 'bpmn:Event')) {
     const bo = getBusinessObject(element);
     const eventDefinitions = bo.get('eventDefinitions');
-    
+
     if (!eventDefinitions || !eventDefinitions.length) {
       return false;
     }
@@ -206,7 +194,7 @@ function canHaveSignal(element) {
   if (is(element, 'bpmn:Event')) {
     const bo = getBusinessObject(element);
     const eventDefinitions = bo.get('eventDefinitions');
-    
+
     if (!eventDefinitions || !eventDefinitions.length) {
       return false;
     }
