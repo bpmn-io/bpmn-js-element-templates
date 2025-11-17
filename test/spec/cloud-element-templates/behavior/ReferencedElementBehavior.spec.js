@@ -213,8 +213,8 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
 
         // given
         let event = elementRegistry.get('MessageEvent');
-        const initialMessages = getMessages();
-        const initialSignals = getSignals();
+        const initialMessagesCount = getMessages().length;
+        const initialSignalsCount = getSignals().length;
 
         const messageBo = getBusinessObject(event);
         const messageEventDef = messageBo.get('eventDefinitions')[0];
@@ -247,8 +247,8 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
         expect(signalRef).not.to.exist;
 
         // old templated message should be removed from definitions
-        expect(getMessages()).to.have.lengthOf(initialMessages.length - 1);
-        expect(getSignals()).to.have.lengthOf(initialSignals.length);
+        expect(getMessages()).to.have.lengthOf(initialMessagesCount - 1);
+        expect(getSignals()).to.have.lengthOf(initialSignalsCount);
       })
     );
   });
@@ -257,26 +257,30 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
   describe('signal events', function() {
 
     it('should unlink templated signal when template is unlinked', inject(
-      function(elementRegistry, elementTemplates, templateElementFactory) {
+      function(elementRegistry, elementTemplates) {
 
         // given
-        const signalTemplate = findTemplate('signalEventTemplate');
-        const event = templateElementFactory.create(signalTemplate);
-
-        const eventBo = getBusinessObject(event);
-        const eventDefinitions = eventBo.get('eventDefinitions');
-        const signal = eventDefinitions[0].get('signalRef');
-
-        // assume
-        expect(signal).to.exist;
-        expect(signal.get(TEMPLATE_ID_ATTR)).to.equal('signalEventTemplate');
+        const event = elementRegistry.get('SignalEvent');
+        const initialSignals = getSignals();
 
         // when
         elementTemplates.unlinkTemplate(event);
 
         // then
+        const eventBo = getBusinessObject(event);
+
+        expect(eventBo.modelerTemplate).not.to.exist;
+        expect(eventBo.modelerTemplateVersion).not.to.exist;
+        expect(eventBo.name).to.equal('Event');
+
+        const eventDefinitions = eventBo.get('eventDefinitions');
+        expect(eventDefinitions).to.have.length(1);
+
+        const signal = eventDefinitions[0].get('signalRef');
         expect(signal).to.exist;
         expect(signal.get(TEMPLATE_ID_ATTR)).not.to.exist;
+
+        expect(getSignals()).to.have.lengthOf(initialSignals.length);
       })
     );
 
