@@ -8,7 +8,7 @@ import {
   MessageProps
 } from './properties';
 
-import { getTemplateId } from '../Helper';
+import { getTemplateId, getTemplateVersion } from '../Helper';
 
 import { applyConditions } from '../Condition';
 import { getPropertyValue } from '../util/propertyUtil';
@@ -52,7 +52,8 @@ export default class ElementTemplatesPropertiesProvider {
         id: 'ElementTemplates__Template',
         label: translate('Template'),
         component: createElementTemplatesGroup({
-          getTemplateId
+          getTemplateId,
+          getTemplateVersion
         }),
         entries: TemplateProps({ element, elementTemplates: this._elementTemplates })
       };

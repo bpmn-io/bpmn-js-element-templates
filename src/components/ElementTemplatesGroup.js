@@ -12,7 +12,7 @@ import {
   useService
 } from 'bpmn-js-properties-panel';
 
-import { getTemplateId as defaultGetTemplateId } from '../element-templates/Helper';
+import { getTemplateId as defaultGetTemplateId, getTemplateVersion as defaultGetTemplateVersion } from '../element-templates/Helper';
 
 import {
   getVersionOrDateFromTemplate
@@ -34,6 +34,7 @@ import {
  * @typedef UnknownTemplate
  * @property {'UNKNOWN_TEMPLATE'} type
  * @property {string} templateId
+ * @property {string} templateVersion
  *
  * @typedef OutdatedTemplate
  * @property {'OUTDATED_TEMPLATE'} type
@@ -46,13 +47,15 @@ import {
  *
  * @param {object} [props]
  * @param {function} [props.getTemplateId]
+ * @param {function} [props.getTemplateVersion]
  * @param {function} [props.unlinkTemplate]
  * @param {function} [props.updateTemplate]
  */
 export function createElementTemplatesGroup(props = {}) {
 
   const {
-    getTemplateId = defaultGetTemplateId
+    getTemplateId = defaultGetTemplateId,
+    getTemplateVersion = defaultGetTemplateVersion
   } = props;
 
   return function ElementTemplatesGroup(props) {
@@ -88,7 +91,8 @@ export function createElementTemplatesGroup(props = {}) {
         <div class="bio-properties-panel-group-header-buttons">
           <TemplateGroupButtons
             element={ element }
-            getTemplateId={ getTemplateId } />
+            getTemplateId={ getTemplateId }
+            getTemplateVersion={ getTemplateVersion } />
           { !empty && <SectionToggle open={ open } /> }
         </div>
       </div>
@@ -133,13 +137,14 @@ function SectionToggle({ open }) {
  * @param {object} props
  * @param {object} props.element
  * @param {function} props.getTemplateId
+ * @param {function} props.getTemplateVersion
  * @param {function} props.unlinkTemplate
  * @param {function} props.updateTemplate
  */
-function TemplateGroupButtons({ element, getTemplateId }) {
+function TemplateGroupButtons({ element, getTemplateId, getTemplateVersion }) {
   const elementTemplates = useService('elementTemplates');
 
-  const templateState = getTemplateState(elementTemplates, element, getTemplateId);
+  const templateState = getTemplateState(elementTemplates, element, getTemplateId, getTemplateVersion);
 
   if (templateState.type === 'NO_TEMPLATE') {
     return <SelectEntryTemplate element={ element } />;
@@ -226,13 +231,20 @@ function UnknownTemplate({ element, templateState }) {
 
 function NotFoundText({ templateState }) {
   const translate = useService('translate');
-  const { templateId } = templateState;
+  const { templateId, templateVersion } = templateState;
 
   return (
     <div class="bio-properties-panel-template-not-found-text">
-      { (translate(
-        'The applied template with id \'{templateId}\' was not found. Its properties cannot be shown. Unlink to access the data.'
-      )).replace('{templateId}', `${templateId}`) }
+      <div class="bio-properties-panel-template-id">
+        <span>{ translate('Id') }</span>
+        <code>{ templateId }</code>
+      </div>
+      { templateVersion && (
+        <div class="bio-properties-panel-template-version">
+          <span>{ translate('Version') }</span>
+          <code>{ templateVersion }</code>
+        </div>
+      ) }
     </div>
   );
 }
@@ -378,9 +390,10 @@ function IncompatibleText() {
  * @param {object} elementTemplates
  * @param {object} element
  * @param {function} getTemplateId
+ * @param {function} getTemplateVersion
  * @returns {TemplateState}
  */
-function getTemplateState(elementTemplates, element, getTemplateId) {
+function getTemplateState(elementTemplates, element, getTemplateId, getTemplateVersion) {
   const templateId = getTemplateId(element),
         template = elementTemplates.get(element);
 
@@ -389,7 +402,8 @@ function getTemplateState(elementTemplates, element, getTemplateId) {
   }
 
   if (!template) {
-    return { type: 'UNKNOWN_TEMPLATE', templateId };
+    const templateVersion = getTemplateVersion(element);
+    return { type: 'UNKNOWN_TEMPLATE', templateId, templateVersion };
   }
 
   if (template.deprecated) {
