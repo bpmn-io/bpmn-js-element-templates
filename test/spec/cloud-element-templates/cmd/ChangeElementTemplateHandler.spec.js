@@ -2218,10 +2218,10 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     describe('referenced elements', function() {
 
-      beforeEach(bootstrap(require('./shared-signal.bpmn').default));
+      beforeEach(bootstrap(require('./shared-referenced-elements.bpmn').default));
 
 
-      it('should create new signal when applying template with string input to element sharing signal', inject(
+      withBpmnJs('>=18.0.0')('should create new signal when applying template with string input to element sharing signal', inject(
         function(elementRegistry, bpmnjs) {
 
           // given - both events share the same signal
@@ -2254,6 +2254,42 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(rootElements).to.have.lengthOf(initialRootElementsCount + 1);
           expect(rootElements.find(e => e === sharedSignal)).to.exist;
           expect(rootElements.find(e => e === event2Signal)).to.exist;
+        }));
+
+
+      withBpmnJs('>=18.0.0')('should create new message when applying template with string input to element sharing message', inject(
+        function(elementRegistry, bpmnjs) {
+
+          // given - both events share the same message
+          const newTemplate = require('./message-event-template-1.json');
+          const event1 = elementRegistry.get('SharedMessageEvent_1');
+          let event2 = elementRegistry.get('SharedMessageEvent_2');
+
+          const sharedMessage = findMessage(getBusinessObject(event1));
+          const initialRootElementsCount = bpmnjs.getDefinitions().get('rootElements').length;
+
+          expect(findMessage(getBusinessObject(event1))).to.equal(findMessage(getBusinessObject(event2)));
+
+          // when - apply template with string input to event2
+          event2 = changeTemplate(event2, newTemplate);
+
+          // then - new message should be created with copied name
+          const event2Message = findMessage(getBusinessObject(event2));
+          expect(event2Message).to.exist;
+          expect(event2Message).not.to.equal(sharedMessage);
+          expect(event2Message.get('name')).to.equal('sharedMessageName'); // name should be copied
+          expect(event2Message.get('zeebe:modelerTemplate')).to.equal(newTemplate.id);
+
+          // event1 should still reference the original shared message
+          expect(findMessage(getBusinessObject(event1))).to.equal(sharedMessage);
+          expect(sharedMessage.get('zeebe:modelerTemplate')).not.to.exist;
+
+          // both messages should exist in definitions
+          const definitions = bpmnjs.getDefinitions();
+          const rootElements = definitions.get('rootElements');
+          expect(rootElements).to.have.lengthOf(initialRootElementsCount + 1);
+          expect(rootElements.find(e => e === sharedMessage)).to.exist;
+          expect(rootElements.find(e => e === event2Message)).to.exist;
         }));
     });
 
