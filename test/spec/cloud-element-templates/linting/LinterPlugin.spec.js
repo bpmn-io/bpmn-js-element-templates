@@ -76,6 +76,17 @@ const invalid = [
     }
   },
   {
+    name: 'Template Not Found with Version',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="missing-template" zeebe:modelerTemplateVersion="1.0.0" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Linked element template \'missing-template\' (version: 1.0.0) not found'
+    }
+  },
+  {
     name: 'Min Length',
     moddleElement: createProcess('<bpmn:task id="Task_1" name="a" zeebe:modelerTemplate="constraints.minLength" />'),
     config: {
