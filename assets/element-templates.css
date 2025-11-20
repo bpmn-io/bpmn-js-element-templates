@@ -116,3 +116,31 @@
   width: 216px;
   overflow-wrap: break-word;
 }
+
+.bio-properties-panel-template-not-found-text .bio-properties-panel-template-id,
+.bio-properties-panel-template-not-found-text .bio-properties-panel-template-version {
+  margin-bottom: 8px;
+}
+
+.bio-properties-panel-template-not-found-text .bio-properties-panel-template-id:last-child,
+.bio-properties-panel-template-not-found-text .bio-properties-panel-template-version:last-child {
+  margin-bottom: 0;
+}
+
+.bio-properties-panel-template-not-found-text span {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--color-grey-225-10-75);
+}
+
+.bio-properties-panel-template-not-found-text code {
+  display: block;
+  font-family: monospace;
+  font-size: 12px;
+  background-color: var(--color-grey-225-10-15);
+  padding: 4px 6px;
+  border-radius: 3px;
+  overflow-wrap: break-word;
+}
