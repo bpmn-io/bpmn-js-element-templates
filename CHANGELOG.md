@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.16.0
+
+* `FEAT`: support signal events ([#201](https://github.com/bpmn-io/bpmn-js-element-templates/pull/201))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.14.0`
+
 ## 2.15.1
 
 * `FIX`: ensure FEEL expression is enforced for `feel: required` properties ([#202](https://github.com/bpmn-io/bpmn-js-element-templates/pull/202))
