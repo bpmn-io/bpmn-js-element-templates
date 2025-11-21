@@ -83,7 +83,7 @@ export function createElementTemplatesGroup(props = {}) {
         }
       ) } onClick={ toggleOpen }
       >
-        <div title={ label } class="bio-properties-panel-group-header-title">
+        <div class="bio-properties-panel-group-header-title">
           { label }
         </div>
 
