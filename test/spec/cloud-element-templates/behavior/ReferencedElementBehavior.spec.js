@@ -48,7 +48,7 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
         const initialMessages = getMessages();
 
         // when
-        elementTemplates.applyTemplate(event, templates[0]);
+        elementTemplates.applyTemplate(event, templates.find(t => t.id === 'messageEventTemplate'));
 
         // then
         expect(getMessages()).to.have.lengthOf(initialMessages.length + 1);
@@ -56,22 +56,52 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
     );
 
 
-    it('should create new signal when template is applied', inject(
-      function(elementRegistry, elementTemplates, bpmnReplace) {
+    it('should create new message and remove old one when template is changed', inject(
+      function(elementRegistry, elementTemplates) {
 
         // given
-        let event = elementRegistry.get('MessageEvent_2');
-        event = bpmnReplace.replaceElement(event, {
-          type: 'bpmn:IntermediateCatchEvent',
-          eventDefinitionType: 'bpmn:SignalEventDefinition'
-        });
+        let event = elementRegistry.get('MessageEvent');
+        const initialMessages = getMessages();
+
+        // when
+        elementTemplates.applyTemplate(event, templates.find(t => t.id === 'anotherMessageEventTemplate'));
+
+        // then
+        expect(getMessages()).to.have.lengthOf(initialMessages.length);
+        expect(findMessage(getBusinessObject(event)).get(TEMPLATE_ID_ATTR)).to.equal('anotherMessageEventTemplate');
+      })
+    );
+
+
+    it('should create new signal when template is applied', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        let event = elementRegistry.get('SignalEvent_2');
         const initialSignals = getSignals();
 
         // when
-        elementTemplates.applyTemplate(event, templates[2]);
+        elementTemplates.applyTemplate(event, templates.find(t => t.id === 'signalEventTemplate'));
 
         // then
         expect(getSignals()).to.have.lengthOf(initialSignals.length + 1);
+      })
+    );
+
+
+    it('should create new signal and remove old one when template is changed', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        let event = elementRegistry.get('SignalEvent');
+        const initialSignals = getSignals();
+
+        // when
+        elementTemplates.applyTemplate(event, templates.find(t => t.id === 'anotherSignalEventTemplate'));
+
+        // then
+        expect(getSignals()).to.have.lengthOf(initialSignals.length);
+        expect(findSignal(getBusinessObject(event)).get(TEMPLATE_ID_ATTR)).to.equal('anotherSignalEventTemplate');
       })
     );
 
@@ -81,11 +111,11 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
 
         // given
         let event = elementRegistry.get('MessageEvent_2');
-        event = elementTemplates.applyTemplate(event, templates[0]);
+        event = elementTemplates.applyTemplate(event, templates.find(t => t.id === 'messageEventTemplate'));
         const initialMessages = getMessages();
 
         // when
-        elementTemplates.applyTemplate(event, templates[1]);
+        elementTemplates.applyTemplate(event, templates.find(t => t.id === 'blankIntermediateEvent'));
 
         // then
         expect(getMessages()).to.have.lengthOf(initialMessages.length - 1);
@@ -98,11 +128,11 @@ describe('provider/cloud-element-templates - ReferencedElementBehavior', functio
 
         // given
         let event = elementRegistry.get('SignalEvent_2');
-        event = elementTemplates.applyTemplate(event, templates[2]);
+        event = elementTemplates.applyTemplate(event, templates.find(t => t.id === 'signalEventTemplate'));
         const initialSignals = getSignals();
 
         // when
-        elementTemplates.applyTemplate(event, templates[1]);
+        elementTemplates.applyTemplate(event, templates.find(t => t.id === 'blankIntermediateEvent'));
 
         // then
         expect(getSignals()).to.have.lengthOf(initialSignals.length - 1);
