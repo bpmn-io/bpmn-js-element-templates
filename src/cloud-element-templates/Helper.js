@@ -154,6 +154,10 @@ export function findTaskHeader(taskHeaders, binding) {
   });
 }
 
+/**
+ * Find message referred to in an event, an event definition, or a task.
+ * @param {ModdleElement} businessObject
+ */
 export function findMessage(businessObject) {
   if (is(businessObject, 'bpmn:Event')) {
     const eventDefinitions = businessObject.get('eventDefinitions');
@@ -172,6 +176,10 @@ export function findMessage(businessObject) {
   return businessObject.get('messageRef');
 }
 
+/**
+ * Find signal referred to in an event or an event definition.
+ * @param {ModdleElement} businessObject
+ */
 export function findSignal(businessObject) {
   if (is(businessObject, 'bpmn:Event')) {
     const eventDefinitions = businessObject.get('eventDefinitions');
