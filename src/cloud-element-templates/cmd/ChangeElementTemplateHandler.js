@@ -931,11 +931,13 @@ export default class ChangeElementTemplateHandler {
   _getSignal(element) {
     let bo = getBusinessObject(element);
 
-    if (is(bo, 'bpmn:Event')) {
-      bo = bo.get('eventDefinitions')[0];
+    if (!is(bo, 'bpmn:Event')) {
+      return;
     }
 
-    return bo && bo.get('signalRef');
+    const eventDefinition = bo.get('eventDefinitions')[0];
+
+    return eventDefinition && eventDefinition.get('signalRef');
   }
 
   _ensureMessage(element, template) {
