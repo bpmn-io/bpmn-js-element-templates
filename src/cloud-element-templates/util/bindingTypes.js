@@ -9,6 +9,7 @@ export const ZEEBE_TASK_DEFINITION = 'zeebe:taskDefinition';
 export const ZEEBE_TASK_HEADER_TYPE = 'zeebe:taskHeader';
 export const MESSAGE_PROPERTY_TYPE = 'bpmn:Message#property';
 export const MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE = 'bpmn:Message#zeebe:subscription#property';
+export const SIGNAL_PROPERTY_TYPE = 'bpmn:Signal#property';
 export const ZEEBE_CALLED_ELEMENT = 'zeebe:calledElement';
 export const ZEEBE_LINKED_RESOURCE_PROPERTY = 'zeebe:linkedResource';
 export const ZEEBE_USER_TASK = 'zeebe:userTask';
@@ -56,5 +57,6 @@ export const MESSAGE_BINDING_TYPES = [
 
 export const PROPERTY_BINDING_TYPES = [
   PROPERTY_TYPE,
-  MESSAGE_PROPERTY_TYPE
+  MESSAGE_PROPERTY_TYPE,
+  SIGNAL_PROPERTY_TYPE
 ];

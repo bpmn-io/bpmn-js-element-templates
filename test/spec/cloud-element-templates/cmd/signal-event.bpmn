@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_signal" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:intermediateCatchEvent id="SignalEvent_1" />
+    <bpmn:intermediateCatchEvent id="SignalEvent_2">
+      <bpmn:signalEventDefinition signalRef="Signal_1" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="SignalEvent_3" zeebe:modelerTemplate="signal-event-template" zeebe:modelerTemplateVersion="1">
+      <bpmn:signalEventDefinition signalRef="Signal_2" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="SignalEvent_4">
+      <bpmn:signalEventDefinition id="SignalEventDefinition_1" signalRef="Signal_1" />
+    </bpmn:intermediateCatchEvent>
+  </bpmn:process>
+  <bpmn:signal id="Signal_1" name="signal_1" />
+  <bpmn:signal id="Signal_2" name="signal_name" zeebe:modelerTemplate="signal-event-template" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="SignalEvent_1_di" bpmnElement="SignalEvent_1">
+        <dc:Bounds x="160" y="50" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SignalEvent_2_di" bpmnElement="SignalEvent_2">
+        <dc:Bounds x="210" y="50" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SignalEvent_3_di" bpmnElement="SignalEvent_3">
+        <dc:Bounds x="260" y="50" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SignalEvent_4_di" bpmnElement="SignalEvent_4">
+        <dc:Bounds x="312" y="50" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

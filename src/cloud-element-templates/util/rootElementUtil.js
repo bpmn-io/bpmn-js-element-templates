@@ -2,7 +2,7 @@ import {
   getBusinessObject,
   is
 } from 'bpmn-js/lib/util/ModelUtil';
-import { findMessage } from '../Helper';
+import { findMessage, findSignal } from '../Helper';
 
 export function removeRootElement(rootElement, injector) {
   const modeling = injector.get('modeling'),
@@ -51,6 +51,34 @@ export function removeMessage(element, injector) {
     messageRef: undefined
   });
   removeRootElement(message, injector);
+}
+
+/**
+ * Remove signal from element and the diagram.
+ *
+ * @param {import('bpmn-js/lib/model/Types').Element} element
+ * @param {import('didi').Injector} injector
+ */
+export function removeSignal(element, injector) {
+  const modeling = injector.get('modeling');
+
+  const bo = getReferringElement(element);
+
+  // Event does not have an event definition
+  if (!bo) {
+    return;
+  }
+
+  const signal = findSignal(bo);
+
+  if (!signal) {
+    return;
+  }
+
+  modeling.updateModdleProperties(element, bo, {
+    signalRef: undefined
+  });
+  removeRootElement(signal, injector);
 }
 
 

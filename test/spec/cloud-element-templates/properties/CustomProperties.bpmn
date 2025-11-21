@@ -57,6 +57,15 @@
     <bpmn:intermediateCatchEvent id="MessageEvent_noData" name="No data" zeebe:modelerTemplate="messageEventTemplate">
       <bpmn:messageEventDefinition id="MessageEventDefinition_1hzq0o7" />
     </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="SignalEvent" name="Displayed" zeebe:modelerTemplate="signalEventTemplate">
+      <bpmn:signalEventDefinition id="SignalEventDefinition_1" signalRef="Signal_1" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="SignalEvent_hidden" name="Hidden" zeebe:modelerTemplate="signalEventTemplate_hidden">
+      <bpmn:signalEventDefinition id="SignalEventDefinition_2" signalRef="Signal_2" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="SignalEvent_noData" name="No data" zeebe:modelerTemplate="signalEventTemplate">
+      <bpmn:signalEventDefinition id="SignalEventDefinition_3" />
+    </bpmn:intermediateCatchEvent>
     <bpmn:serviceTask id="ValidatedConditionalTask" name="Validated Conditional Task" />
     <bpmn:serviceTask id="TaskDefinition" name="Task Definition" zeebe:modelerTemplate="taskDefinitionTemplate">
       <bpmn:extensionElements>
@@ -134,6 +143,8 @@
       <zeebe:subscription correlationKey="correlationKey" />
     </bpmn:extensionElements>
   </bpmn:message>
+  <bpmn:signal id="Signal_1" name="name" zeebe:modelerTemplate="signalEventTemplate"/>
+  <bpmn:signal id="Signal_2" name="hiddenName" zeebe:modelerTemplate="signalEventTemplate_hidden" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
       <bpmndi:BPMNShape id="Activity_1d5ac68_di" bpmnElement="RestTask">
@@ -182,6 +193,24 @@
         <dc:Bounds x="262" y="722" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="261" y="765" width="39" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_Signal_1_di" bpmnElement="SignalEvent">
+        <dc:Bounds x="382" y="652" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="376" y="695" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_Signal_2_di" bpmnElement="SignalEvent_hidden">
+        <dc:Bounds x="442" y="652" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="443" y="695" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_Signal_3_di" bpmnElement="SignalEvent_noData">
+        <dc:Bounds x="382" y="722" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="381" y="765" width="39" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0c7o61daaa_di" bpmnElement="ValidatedConditionalTask">

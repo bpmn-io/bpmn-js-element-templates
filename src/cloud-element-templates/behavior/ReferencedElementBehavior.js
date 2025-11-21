@@ -2,7 +2,7 @@ import { getBusinessObject, is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 import { isString } from 'min-dash';
 
-import { findMessage, getTemplateId, TEMPLATE_ID_ATTR } from '../Helper';
+import { findMessage, findSignal, getTemplateId, TEMPLATE_ID_ATTR } from '../Helper';
 import {
   getReferringElement,
   removeRootElement
@@ -65,10 +65,10 @@ export class ReferencedElementBehavior extends CommandInterceptor {
     }
 
     const bo = getBusinessObject(element);
-    const message = findMessage(bo);
+    const referencedElement = findMessage(bo) || findSignal(bo);
 
-    if (message && getTemplateId(message)) {
-      this._modeling.updateModdleProperties(element, message, {
+    if (referencedElement && getTemplateId(referencedElement)) {
+      this._modeling.updateModdleProperties(element, referencedElement, {
         [TEMPLATE_ID_ATTR]: null
       });
     }
@@ -89,17 +89,23 @@ export class ReferencedElementBehavior extends CommandInterceptor {
 
     const bo = getBusinessObject(oldShape);
     const message = findMessage(bo);
+    const signal = findSignal(bo);
 
-    if (!message || !getTemplateId(message)) {
-      return;
+    if (message && getTemplateId(message)) {
+      if (!newTemplate || !canHaveMessage(newShape)) {
+        removeRootElement(message, this._injector);
+      } else {
+        this._addMessage(newShape, message);
+      }
     }
 
-    if (!canHaveReferencedElement(newShape) || !newTemplate) {
-      removeRootElement(message, this._injector);
-      return;
+    if (signal && getTemplateId(signal)) {
+      if (!newTemplate || !canHaveSignal(newShape)) {
+        removeRootElement(signal, this._injector);
+      } else {
+        this._addSignal(newShape, signal);
+      }
     }
-
-    this._addMessage(newShape, message);
   }
 
   _handleRemoval(context) {
@@ -118,10 +124,10 @@ export class ReferencedElementBehavior extends CommandInterceptor {
     }
 
     const bo = getBusinessObject(shape);
-    const message = findMessage(bo);
+    const referencedElement = findMessage(bo) || findSignal(bo);
 
-    if (message && getTemplateId(message)) {
-      removeRootElement(message, this._injector);
+    if (referencedElement && getTemplateId(referencedElement)) {
+      removeRootElement(referencedElement, this._injector);
     }
   }
 
@@ -130,6 +136,14 @@ export class ReferencedElementBehavior extends CommandInterceptor {
 
     this._modeling.updateModdleProperties(element, bo, {
       'messageRef': message
+    });
+  }
+
+  _addSignal(element, signal) {
+    const bo = getReferringElement(element);
+
+    this._modeling.updateModdleProperties(element, bo, {
+      'signalRef': signal
     });
   }
 }
@@ -155,6 +169,40 @@ function canHaveReferencedElement(element) {
     'bpmn:ReceiveTask',
     'bpmn:SendTask'
   ]);
+}
+
+function canHaveMessage(element) {
+  if (is(element, 'bpmn:ReceiveTask') || is(element, 'bpmn:SendTask')) {
+    return true;
+  }
+
+  if (is(element, 'bpmn:Event')) {
+    const bo = getBusinessObject(element);
+    const eventDefinitions = bo.get('eventDefinitions');
+
+    if (!eventDefinitions || !eventDefinitions.length) {
+      return false;
+    }
+
+    return is(eventDefinitions[0], 'bpmn:MessageEventDefinition');
+  }
+
+  return false;
+}
+
+function canHaveSignal(element) {
+  if (is(element, 'bpmn:Event')) {
+    const bo = getBusinessObject(element);
+    const eventDefinitions = bo.get('eventDefinitions');
+
+    if (!eventDefinitions || !eventDefinitions.length) {
+      return false;
+    }
+
+    return is(eventDefinitions[0], 'bpmn:SignalEventDefinition');
+  }
+
+  return false;
 }
 
 function isLabel(element) {

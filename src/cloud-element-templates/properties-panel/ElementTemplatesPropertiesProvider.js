@@ -5,7 +5,8 @@ import {
 
 import {
   CustomProperties,
-  MessageProps
+  MessageProps,
+  SignalProps
 } from './properties';
 
 import { getTemplateId } from '../Helper';
@@ -37,6 +38,7 @@ export default class ElementTemplatesPropertiesProvider {
       const injector = this._injector;
 
       updateMessageGroup(groups, element);
+      updateSignalGroup(groups, element);
 
       if (!this._shouldShowTemplateProperties(element)) {
         return groups;
@@ -106,6 +108,19 @@ function updateMessageGroup(groups, element) {
   messageGroup.entries = overrideGenericEntries(
     messageGroup.entries,
     MessageProps({ element })
+  );
+}
+
+function updateSignalGroup(groups, element) {
+  const signalGroup = findGroup(groups, 'signal');
+
+  if (!signalGroup) {
+    return;
+  }
+
+  signalGroup.entries = overrideGenericEntries(
+    signalGroup.entries,
+    SignalProps({ element })
   );
 }
 

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Signal Event Template",
+  "id": "signal-event-template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:IntermediateCatchEvent",
+    "bpmn:IntermediateThrowEvent"
+  ],
+  "elementType": {
+    "value": "bpmn:IntermediateCatchEvent",
+    "eventDefinition": "bpmn:SignalEventDefinition"
+  },
+  "properties": [
+    {
+      "type": "Hidden",
+      "value": "signal_name",
+      "binding": {
+        "type": "bpmn:Signal#property",
+        "name": "name"
+      }
+    }
+  ]
+}

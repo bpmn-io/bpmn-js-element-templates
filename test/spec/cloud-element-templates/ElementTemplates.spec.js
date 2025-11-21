@@ -33,7 +33,7 @@ import complexTemplates from './fixtures/complex';
 import integrationTemplates from './fixtures/integration';
 import { findExtensions, findExtension } from 'src/cloud-element-templates/Helper';
 import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
-import { findMessage } from 'src/cloud-element-templates/Helper';
+import { findMessage, findSignal } from 'src/cloud-element-templates/Helper';
 
 // eslint-disable-next-line no-undef
 const packageVersion = process.env.PKG_VERSION;
@@ -683,6 +683,42 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should create element with bpmn:SignalEventDefinition', inject(function(elementTemplates) {
+
+      // given
+      const templates = require('./fixtures/signal.json');
+
+      // when
+      const element = elementTemplates.createElement(templates[0]);
+
+      const businessObject = getBusinessObject(element);
+      const eventDefinitions = businessObject.get('eventDefinitions');
+
+      // then
+      expect(eventDefinitions).to.have.lengthOf(1);
+      expect(is(eventDefinitions[0], 'bpmn:SignalEventDefinition')).to.be.true;
+    }));
+
+
+    it('should create signal', inject(function(elementTemplates) {
+
+      // given
+      const templates = require('./fixtures/signal.json');
+
+      // when
+      const element = elementTemplates.createElement(templates[0]);
+
+      const businessObject = getBusinessObject(element);
+      const eventDefinitions = businessObject.get('eventDefinitions');
+
+      // then
+      const signal = eventDefinitions[0].get('signalRef');
+
+      expect(signal).to.exist;
+      expect(signal.get('name')).to.eql('hiddenSignalName');
+    }));
+
+
     it('should create element with zeebe:UserTask', inject(function(elementTemplates) {
 
       // given
@@ -1092,6 +1128,33 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       expect(message).to.exist;
       expect(message.get('name')).to.eql('hiddenName');
+    }));
+
+
+    it('should apply signal binding', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const templates = require('./fixtures/signal.json');
+      elementTemplates.set(templates);
+
+      const template = templates[0];
+      const event = elementRegistry.get('IntermediateCatchMessage');
+
+      // assume
+      expect(template).to.exist;
+
+      // when
+      const updatedEvent = elementTemplates.applyTemplate(event, template);
+
+      // then
+      const businessObject = getBusinessObject(updatedEvent);
+      const eventDefinitions = businessObject.get('eventDefinitions');
+
+      // then
+      const signal = eventDefinitions[0].get('signalRef');
+
+      expect(signal).to.exist;
+      expect(signal.get('name')).to.eql('hiddenSignalName');
     }));
 
 
@@ -1565,6 +1628,57 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
         const message = findMessage(eventBo);
         expect(message.name).to.eql('user_edited');
+      })
+    );
+
+
+    it('should update signal event template', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const signalTemplates = require('./fixtures/signal.json');
+      const updateTemplates = signalTemplates.filter(t => t.id === 'updateSignalTemplate');
+      const newTemplate = updateTemplates.find(t => t.version === 2);
+      elementTemplates.set(updateTemplates);
+      let event = elementRegistry.get('SignalEvent');
+
+
+      // when
+      event = elementTemplates.applyTemplate(event, newTemplate);
+
+      // then
+      const eventBo = getBusinessObject(event);
+
+      expect(eventBo.modelerTemplate).to.eql('updateSignalTemplate');
+      expect(eventBo.modelerTemplateVersion).to.eql(2);
+
+      const signal = findSignal(eventBo);
+      expect(signal.name).to.eql('signal_version_2');
+    }));
+
+
+    it('should update signal event template but keep user-edited name',
+      inject(function(elementRegistry, modeling, elementTemplates) {
+
+        // given
+        const signalTemplates = require('./fixtures/signal.json');
+        const updateTemplates = signalTemplates.filter(t => t.id === 'updateSignalTemplate');
+        const newTemplate = updateTemplates.find(t => t.version === 2);
+        elementTemplates.set(updateTemplates);
+        let event = elementRegistry.get('SignalEvent'),
+            eventBo = getBusinessObject(event);
+        modeling.updateModdleProperties(event, findSignal(eventBo), { name: 'user_edited' });
+
+        // when
+        event = elementTemplates.applyTemplate(event, newTemplate);
+
+        // then
+        eventBo = getBusinessObject(event);
+
+        expect(eventBo.modelerTemplate).to.eql('updateSignalTemplate');
+        expect(eventBo.modelerTemplateVersion).to.eql(2);
+
+        const signal = findSignal(eventBo);
+        expect(signal.name).to.eql('user_edited');
       })
     );
 

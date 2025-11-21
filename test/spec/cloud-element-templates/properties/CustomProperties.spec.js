@@ -32,6 +32,7 @@ import {
   findInputParameter,
   findMessage,
   findOutputParameter,
+  findSignal,
   findTaskHeader,
   findZeebeProperty,
   findZeebeSubscription
@@ -1244,6 +1245,99 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('bpmn:Signal#property', function() {
+
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('SignalEvent');
+
+      // then
+      const entry = findEntry('custom-entry-signalEventTemplate-0', container),
+            input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('name');
+    });
+
+
+    it('should NOT display (type=hidden)', async function() {
+
+      // when
+      await expectSelected('SignalEvent_hidden');
+
+      // then
+      const entry = findEntry('custom-entry-signalEventTemplate_hidden-0', container);
+
+      expect(entry).to.not.exist;
+    });
+
+
+    it('should change, setting bpmn:Signal#property (plain)', async function() {
+
+      // given
+      const event = await expectSelected('SignalEvent'),
+            businessObject = getBusinessObject(event);
+
+      // when
+      const entry = findEntry('custom-entry-signalEventTemplate-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'meaningfulSignalName');
+
+      // then
+      const signal = findSignal(businessObject);
+
+      expect(signal).to.exist;
+      expect(signal).to.have.property('name', 'meaningfulSignalName');
+    });
+
+
+    it('should change, creating bpmn:Signal if non-existing', async function() {
+
+      // given
+      const event = await expectSelected('SignalEvent_noData'),
+            businessObject = getBusinessObject(event);
+
+      // when
+      const entry = findEntry('custom-entry-signalEventTemplate-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, 'meaningfulSignalName');
+
+      // then
+      const signal = findSignal(businessObject);
+
+      // then
+      expect(signal).to.exist;
+      expect(signal).to.have.property('name', 'meaningfulSignalName');
+    });
+
+
+    it('should NOT remove bpmn:Signal when changed to empty value', inject(async function() {
+
+      // given
+      const event = await expectSelected('SignalEvent'),
+            businessObject = getBusinessObject(event);
+
+      // when
+      const entry = findEntry('custom-entry-signalEventTemplate-0', container),
+            input = findInput('text', entry);
+
+      changeInput(input, '');
+
+      // then
+      const signal = findSignal(businessObject);
+
+      expect(signal).to.exist;
+      expect(signal).to.have.property('name', '');
+    }));
+
+  });
+
+
   describe('zeebe:calledElement', function() {
 
 
@@ -1321,6 +1415,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(calledElement).to.have.property('processId', '');
     }));
   });
+
 
   describe('zeebe:CalledDecision', function() {
     it('should display', async function() {
@@ -1754,6 +1849,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
 
   });
+
 
   describe('types', function() {
 
