@@ -53,7 +53,9 @@ export default class ElementTemplatesPropertiesProvider {
         element,
         id: 'ElementTemplates__Template',
         label: translate('Template'),
-        component: createElementTemplatesGroup(),
+        component: createElementTemplatesGroup({
+          getTemplateId
+        }),
         entries: TemplateProps({ element, elementTemplates: this._elementTemplates })
       };
 

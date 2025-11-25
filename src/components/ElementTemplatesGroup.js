@@ -12,8 +12,6 @@ import {
   useService
 } from 'bpmn-js-properties-panel';
 
-import { getTemplateId as defaultGetTemplateId } from '../element-templates/Helper';
-
 import {
   getVersionOrDateFromTemplate
 } from '../utils/templateUtil';
@@ -47,14 +45,14 @@ import {
  * Factory to create an element templates group.
  *
  * @param {object} [props]
- * @param {function} [props.getTemplateId]
+ * @param {function} props.getTemplateId
  * @param {function} [props.unlinkTemplate]
  * @param {function} [props.updateTemplate]
  */
 export function createElementTemplatesGroup(props = {}) {
 
   const {
-    getTemplateId = defaultGetTemplateId
+    getTemplateId
   } = props;
 
   return function ElementTemplatesGroup(props) {
