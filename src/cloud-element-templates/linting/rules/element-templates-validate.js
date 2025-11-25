@@ -35,12 +35,14 @@ export default function({ templates = [] }) {
     let template = elementTemplates.get(node);
 
     const templateId = elementTemplates._getTemplateId(node);
+    const templateVersion = elementTemplates._getTemplateVersion(node);
 
     // Handle missing template
     if (templateId && !template) {
+      const versionText = templateVersion ? ` (version: ${templateVersion})` : '';
       reporter.report(
         node.id,
-        'Linked element template not found',
+        `Linked element template '${templateId}'${versionText} not found`,
         {
           name: node.name
         }
