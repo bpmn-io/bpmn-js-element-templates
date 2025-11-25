@@ -12,7 +12,7 @@ import {
   OutputProperties
 } from './properties';
 
-import { getTemplateId } from '../Helper';
+import { getTemplateId, getTemplateVersion } from '../Helper';
 
 const CAMUNDA_ERROR_EVENT_DEFINITION_TYPE = 'camunda:errorEventDefinition',
       CAMUNDA_INPUT_PARAMETER_TYPE = 'camunda:inputParameter',
@@ -56,7 +56,12 @@ export default class ElementTemplatesPropertiesProvider {
         component: createElementTemplatesGroup({
           getTemplateId
         }),
-        entries: TemplateProps({ element, elementTemplates: this._elementTemplates })
+        entries: TemplateProps({
+          element,
+          elementTemplates: this._elementTemplates,
+          getTemplateId,
+          getTemplateVersion
+        })
       };
 
       // (1) Add templates group
