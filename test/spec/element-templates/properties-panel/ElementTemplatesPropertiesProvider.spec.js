@@ -117,7 +117,7 @@ describe('provider/element-templates - ElementTemplates', function() {
     );
 
 
-    it('should NOT display update template button when no update is available', inject(
+    it('should display error when template is not available', inject(
       async function(elementRegistry, selection) {
 
         // given
@@ -129,9 +129,19 @@ describe('provider/element-templates - ElementTemplates', function() {
         });
 
         // then
-        const updateAvailable = domQuery('.bio-properties-panel-template-update-available', container);
+        const errorButton = domQuery('.bio-properties-panel-template-not-found', container);
+        const header = domQuery('.bio-properties-panel-templates-group .bio-properties-panel-group-header', container);
 
-        expect(updateAvailable).not.to.exist;
+        expect(errorButton).to.exist;
+
+        // when
+        header.click();
+
+        // then
+        const entries = domQuery('.bio-properties-panel-templates-group .bio-properties-panel-group-entries', container);
+
+        expect(entries).to.exist;
+        expect(entries.textContent).to.include('IDdefault');
       })
     );
 

@@ -4,14 +4,31 @@ import { getVersionOrDateFromTemplate } from '../utils/templateUtil';
 
 { /* Required to break up imports, see https://github.com/babel/babel/issues/15156 */ }
 
-export function TemplateProps({ element, elementTemplates }) {
-  const template = elementTemplates.get(element);
+export function TemplateProps({
+  element,
+  elementTemplates,
+  getTemplateId,
+  getTemplateVersion
+}) {
 
-  if (!template) {
+  const localTemplate = elementTemplates.get(element);
+
+  const template = localTemplate || {
+    id: getTemplateId(element),
+    version: getTemplateVersion(element)
+  };
+
+  // no template configured
+  if (!template.id) {
     return [];
   }
 
   return [
+    !localTemplate && {
+      id: 'template-id',
+      component: TemplateId,
+      template
+    },
     {
       id: 'template-name',
       component: TemplateName,
@@ -27,13 +44,23 @@ export function TemplateProps({ element, elementTemplates }) {
       component: TemplateDescription,
       template
     }
-  ].filter(entry => !!entry.component);
+  ];
 }
 
 function TemplateName({ id, template }) {
   const translate = useService('translate');
 
-  return <TextEntry id={ id } label={ translate('Name') } content={ template.name } />;
+  const { name } = template;
+
+  return name
+    ? <TextEntry id={ id } label={ translate('Name') } content={ name } />
+    : null;
+}
+
+function TemplateId({ id, template }) {
+  const translate = useService('translate');
+
+  return <TextEntry id={ id } label={ translate('ID') } content={ template.id } />;
 }
 
 function TemplateVersion({ id, template }) {
@@ -41,7 +68,9 @@ function TemplateVersion({ id, template }) {
 
   const version = getVersionOrDateFromTemplate(template);
 
-  return version ? <TextEntry id={ id } label={ translate('Version') } content={ version } /> : null;
+  return version
+    ? <TextEntry id={ id } label={ translate('Version') } content={ version } />
+    : null;
 }
 
 function TemplateDescription({ id, template }) {

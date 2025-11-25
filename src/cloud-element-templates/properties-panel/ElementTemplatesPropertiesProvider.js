@@ -9,7 +9,7 @@ import {
   SignalProps
 } from './properties';
 
-import { getTemplateId } from '../Helper';
+import { getTemplateId, getTemplateVersion } from '../Helper';
 
 import { applyConditions } from '../Condition';
 import { getPropertyValue } from '../util/propertyUtil';
@@ -56,7 +56,12 @@ export default class ElementTemplatesPropertiesProvider {
         component: createElementTemplatesGroup({
           getTemplateId
         }),
-        entries: TemplateProps({ element, elementTemplates: this._elementTemplates })
+        entries: TemplateProps({
+          element,
+          elementTemplates: this._elementTemplates,
+          getTemplateId,
+          getTemplateVersion
+        })
       };
 
       // (1) Add templates group
