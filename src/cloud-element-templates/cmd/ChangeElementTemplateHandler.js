@@ -7,6 +7,7 @@ import {
   findExtension,
   findMessage,
   findSignal,
+  findTimerEventDefinition,
   getDefaultFixedValue,
   getDefaultValue,
   getTemplateVersion,
@@ -32,6 +33,7 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   SIGNAL_PROPERTY_TYPE,
+  TIMER_EVENT_DEFINITION_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
   ZEEBE_CALLED_DECISION,
   ZEEBE_CALLED_ELEMENT,
@@ -127,6 +129,8 @@ export default class ChangeElementTemplateHandler {
     this._updateMessage(element, oldTemplate, newTemplate);
 
     this._updateSignal(element, oldTemplate, newTemplate);
+
+    this._updateTimerEventDefinition(element, oldTemplate, newTemplate);
 
     this._updateZeebeModelerTemplateOnReferencedElement(element, oldTemplate, newTemplate);
 
@@ -876,6 +880,154 @@ export default class ChangeElementTemplateHandler {
 
       this._modeling.updateModdleProperties(element, changedElement, properties);
     });
+  }
+
+  /**
+   * Update bpmn:TimerEventDefinition properties.
+   *
+   * @param {djs.model.Base} element
+   * @param {Object} oldTemplate
+   * @param {Object} newTemplate
+   */
+  _updateTimerEventDefinition(element, oldTemplate, newTemplate) {
+    const commandStack = this._commandStack;
+
+    let oldProperties = [],
+        newProperties = [];
+
+    if (oldTemplate) {
+      oldProperties = oldTemplate.properties.filter((oldProperty) => {
+        const oldBinding = oldProperty.binding,
+              oldBindingType = oldBinding.type;
+
+        return oldBindingType === TIMER_EVENT_DEFINITION_PROPERTY_TYPE;
+      });
+    }
+
+    if (newTemplate) {
+      newProperties = newTemplate.properties.filter((newProperty) => {
+        const newBinding = newProperty.binding,
+              newBindingType = newBinding.type;
+
+        return newBindingType === TIMER_EVENT_DEFINITION_PROPERTY_TYPE;
+      });
+    }
+
+    const removedProperties = oldProperties.filter((oldProperty) => {
+      return !newProperties.find((newProperty) => newProperty.binding.name === oldProperty.binding.name);
+    });
+
+    const timerEventDefinition = findTimerEventDefinition(element);
+
+    if (!timerEventDefinition) {
+      return;
+    }
+
+    // Remove old timer properties that are no longer in the template
+    removedProperties.forEach((removedProperty) => {
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: timerEventDefinition,
+        properties: {
+          [removedProperty.binding.name]: undefined
+        }
+      });
+    });
+
+    if (!newProperties.length) {
+      return;
+    }
+
+    // First, check if we need to auto-convert to non-interrupting for timeCycle
+    // This must happen BEFORE setting the timer property, otherwise the
+    // CleanUpTimerExpressionBehavior will remove it
+    const hasTimeCycle = newProperties.some(p => p.binding.name === 'timeCycle');
+    if (hasTimeCycle) {
+      this._ensureNonInterruptingForTimeCycle(element);
+    }
+
+    // Set new timer properties
+    newProperties.forEach((newProperty) => {
+      const oldProperty = findOldProperty(oldTemplate, newProperty),
+            newBinding = newProperty.binding,
+            newBindingName = newBinding.name,
+            newPropertyValue = getDefaultValue(newProperty);
+
+      // Check if we should keep the existing value
+      if (shouldKeepValue(timerEventDefinition, oldProperty, newProperty)) {
+        return;
+      }
+
+      // Create or update the FormalExpression
+      let expression = timerEventDefinition.get(newBindingName);
+
+      if (!expression) {
+        expression = createExpression(newPropertyValue, timerEventDefinition, this._bpmnFactory);
+
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: timerEventDefinition,
+          properties: {
+
+            // remove any existing timer values, satisfying that there is only one
+            timeDate: undefined,
+            timeDuration: undefined,
+            timeCycle: undefined,
+            [newBindingName]: expression
+          }
+        });
+      } else {
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: expression,
+          properties: {
+            body: newPropertyValue
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Ensure element is non-interrupting when using timeCycle.
+   * - Boundary events: set cancelActivity to false
+   * - Event subprocess start events: set isInterrupting to false
+   *
+   * @param {djs.model.Base} element
+   */
+  _ensureNonInterruptingForTimeCycle(element) {
+    const commandStack = this._commandStack;
+    const businessObject = getBusinessObject(element);
+
+    // Boundary events with timeCycle must be non-interrupting
+    if (is(element, 'bpmn:BoundaryEvent')) {
+      if (businessObject.get('cancelActivity') !== false) {
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: businessObject,
+          properties: {
+            cancelActivity: false
+          }
+        });
+      }
+      return;
+    }
+
+    // Start events in event subprocess with timeCycle must be non-interrupting
+    if (is(element, 'bpmn:StartEvent')) {
+      const parent = businessObject.$parent;
+      if (is(parent, 'bpmn:SubProcess') && parent.get('triggeredByEvent')) {
+        if (businessObject.get('isInterrupting') !== false) {
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: businessObject,
+            properties: {
+              isInterrupting: false
+            }
+          });
+        }
+      }
+    }
   }
 
   /**
@@ -1911,6 +2063,19 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
     });
   }
+
+  if (newBindingType === TIMER_EVENT_DEFINITION_PROPERTY_TYPE) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== TIMER_EVENT_DEFINITION_PROPERTY_TYPE) {
+        return;
+      }
+
+      return oldBinding.name === newBinding.name;
+    });
+  }
 }
 
 /**
@@ -2050,6 +2215,12 @@ function getPropertyValue(element, property) {
 
   if (bindingType === ZEEBE_TASK_SCHEDULE) {
     return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === TIMER_EVENT_DEFINITION_PROPERTY_TYPE) {
+
+    // the actual value is nested in an Expression
+    return businessObject.get(bindingName)?.get('body');
   }
 }
 

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Timer Cycle Boundary Event Template",
+  "id": "timer-cycle-boundary-event-template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:BoundaryEvent"
+  ],
+  "elementType": {
+    "value": "bpmn:BoundaryEvent",
+    "eventDefinition": "bpmn:TimerEventDefinition"
+  },
+  "properties": [
+    {
+      "label": "Cycle Interval",
+      "type": "String",
+      "value": "R/PT5M",
+      "binding": {
+        "type": "bpmn:TimerEventDefinition#property",
+        "name": "timeCycle"
+      }
+    }
+  ]
+}

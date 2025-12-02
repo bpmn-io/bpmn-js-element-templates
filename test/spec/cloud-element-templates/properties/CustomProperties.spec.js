@@ -85,6 +85,9 @@ import bpmnExpressionTemplates from '../fixtures/completion-condition.json';
 
 import complexPropertyTemplates from './CustomProperties.complex-property.json';
 
+import timerDiagramXML from './CustomProperties.timer.bpmn';
+import timerElementTemplates from './CustomProperties.timer.json';
+
 
 describe('provider/cloud-element-templates - CustomProperties', function() {
 
@@ -1851,6 +1854,239 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('bpmn:timerEventDefinition#property', function() {
+
+    beforeEach(bootstrapPropertiesPanel(timerDiagramXML, {
+      container,
+      debounceInput: false,
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        elementTemplatesModule,
+        modelingModule
+      ],
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      },
+      elementTemplates: timerElementTemplates
+    }));
+
+
+    it('should apply timer template and change timer date value', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const event = await expectSelected('TimerStartEvent');
+      const template = timerElementTemplates.find(t => t.id === 'timer-start-date');
+      expect(template).to.exist;
+
+      await act(() => {
+        elementTemplates.applyTemplate(event, template);
+      });
+
+      const updatedEvent = elementRegistry.get('TimerStartEvent');
+      const bo = getBusinessObject(updatedEvent);
+      expect(bo.get('zeebe:modelerTemplate')).to.equal('timer-start-date');
+
+      const entry = findEntry('custom-entry-timer-start-date-0', container);
+      expect(entry).to.exist;
+
+      const editor = findEditor(entry);
+      expect(editor).to.exist;
+      expect(editor.textContent).to.equal('now() + duration("PT1H")');
+
+      // when
+      await setEditorValue(editor, 'now() + duration("PT2H")');
+
+      // then
+      const timerEventDefinition = bo.get('eventDefinitions')[0];
+      const timeDate = timerEventDefinition.get('timeDate');
+      expect(timeDate).to.exist;
+      expect(timeDate.get('body')).to.equal('=now() + duration("PT2H")');
+    }));
+
+
+    it('should apply timer template to boundary event and change value', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const event = await expectSelected('TimerBoundaryEvent');
+      const template = timerElementTemplates.find(t => t.id === 'timer-boundary-cycle');
+
+      await act(() => {
+        elementTemplates.applyTemplate(event, template);
+      });
+
+      const updatedEvent = elementRegistry.get('TimerBoundaryEvent');
+      const bo = getBusinessObject(updatedEvent);
+      expect(bo.get('zeebe:modelerTemplate')).to.equal('timer-boundary-cycle');
+      expect(bo.get('cancelActivity')).to.equal(false);
+
+      const entry = findEntry('custom-entry-timer-boundary-cycle-0', container);
+      const input = findInput('text', entry);
+      expect(input.value).to.equal('R3/PT1H');
+
+      // when
+      changeInput(input, 'R5/PT30M');
+
+      // then - moddle element should be updated
+      const timerEventDefinition = bo.get('eventDefinitions')[0];
+      const timeCycle = timerEventDefinition.get('timeCycle');
+      expect(timeCycle.get('body')).to.equal('R5/PT30M');
+    }));
+
+
+    it('should apply timer duration template to event subprocess start', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const event = await expectSelected('EventSubProcessTimerStart');
+      const template = timerElementTemplates.find(t => t.id === 'timer-subprocess-duration');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(event, template);
+      });
+
+      // then
+      const updatedEvent = elementRegistry.get('EventSubProcessTimerStart');
+      const bo = getBusinessObject(updatedEvent);
+      expect(bo.get('zeebe:modelerTemplate')).to.equal('timer-subprocess-duration');
+
+      // find and change the timer input
+      const entry = findEntry('custom-entry-timer-subprocess-duration-0', container);
+      const input = findInput('text', entry);
+      expect(input.value).to.equal('PT10M');
+
+      changeInput(input, 'PT1H');
+
+      // then - moddle element should be updated
+      const timerEventDefinition = bo.get('eventDefinitions')[0];
+      const timeDuration = timerEventDefinition.get('timeDuration');
+      expect(timeDuration.get('body')).to.equal('PT1H');
+    }));
+
+
+    it('should change, creating timeDate if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const event = await expectSelected('IntermediateCatchEvent_Blank');
+      const template = timerElementTemplates.find(t => t.id === 'timer-catch-date');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(event, template);
+      });
+
+      // then
+      const updatedEvent = elementRegistry.get('IntermediateCatchEvent_Blank');
+      const bo = getBusinessObject(updatedEvent);
+      const timerEventDefinition = bo.get('eventDefinitions')[0];
+
+      const entry = findEntry('custom-entry-timer-catch-date-0', container);
+      const input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('2025-12-25T10:00:00Z');
+
+      const timeDate = timerEventDefinition.get('timeDate');
+      expect(timeDate).to.exist;
+      expect(timeDate.get('body')).to.equal('2025-12-25T10:00:00Z');
+    }));
+
+
+    it('should change, creating timeCycle if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const event = await expectSelected('StartEvent_Blank');
+      const template = timerElementTemplates.find(t => t.id === 'timer-start-cycle');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(event, template);
+      });
+
+      // then
+      const updatedEvent = elementRegistry.get('StartEvent_Blank');
+      const bo = getBusinessObject(updatedEvent);
+      const timerEventDefinition = bo.get('eventDefinitions')[0];
+
+      const entry = findEntry('custom-entry-timer-start-cycle-0', container);
+      const input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('R/PT5M');
+
+      const timeCycle = timerEventDefinition.get('timeCycle');
+      expect(timeCycle).to.exist;
+      expect(timeCycle.get('body')).to.equal('R/PT5M');
+    }));
+
+
+    it('should change, creating timeDuration if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const event = await expectSelected('IntermediateCatchEvent_Blank');
+      const template = timerElementTemplates.find(t => t.id === 'timer-catch-duration');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(event, template);
+      });
+
+      // then
+      const updatedEvent = elementRegistry.get('IntermediateCatchEvent_Blank');
+      const bo = getBusinessObject(updatedEvent);
+      const timerEventDefinition = bo.get('eventDefinitions')[0];
+
+      const entry = findEntry('custom-entry-timer-catch-duration-0', container);
+      const input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('PT30M');
+
+      const timeDuration = timerEventDefinition.get('timeDuration');
+      expect(timeDuration).to.exist;
+      expect(timeDuration.get('body')).to.equal('PT30M');
+    }));
+
+
+    it('should change, creating timeDate if non-existing and other template is applied', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const event = await expectSelected('Templated_Signal_Event');
+      const template = timerElementTemplates.find(t => t.id === 'timer-catch-date');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(event, template);
+      });
+
+      // then
+      const updatedEvent = elementRegistry.get('Templated_Signal_Event');
+      const updatedBo = getBusinessObject(updatedEvent);
+
+      // verify timer template is now applied
+      expect(updatedBo.get('zeebe:modelerTemplate')).to.equal('timer-catch-date');
+
+      // verify event definition changed from signal to timer
+      const timerEventDefinition = updatedBo.get('eventDefinitions')[0];
+      expect(timerEventDefinition.$type).to.equal('bpmn:TimerEventDefinition');
+
+      const entry = findEntry('custom-entry-timer-catch-date-0', container);
+      const input = findInput('text', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('2025-12-25T10:00:00Z');
+
+      const timeDate = timerEventDefinition.get('timeDate');
+      expect(timeDate).to.exist;
+      expect(timeDate.get('body')).to.equal('2025-12-25T10:00:00Z');
+    }));
+  });
+
+
   describe('types', function() {
 
     describe('Dropdown', function() {
@@ -3208,6 +3444,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(input.textContent).to.eql('Placeholder');
     });
   });
+
 
 });
 

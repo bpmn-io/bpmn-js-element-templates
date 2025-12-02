@@ -1,0 +1,141 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Cycle Start Template",
+    "id": "timer-cycle-start-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Cycle",
+        "type": "String",
+        "value": "R/PT5M",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeCycle"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Duration Start Template",
+    "id": "timer-duration-start-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Duration",
+        "type": "String",
+        "value": "PT1H",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDuration"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Date Start Template",
+    "id": "timer-date-start-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Date",
+        "type": "String",
+        "value": "2024-01-01T00:00:00Z",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDate"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Cycle Boundary Template",
+    "id": "timer-cycle-boundary-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:BoundaryEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:BoundaryEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Cycle",
+        "type": "String",
+        "value": "R/PT5M",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeCycle"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Duration Boundary Template",
+    "id": "timer-duration-boundary-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:BoundaryEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:BoundaryEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Duration",
+        "type": "String",
+        "value": "PT30M",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDuration"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Non-Timer Start Template",
+    "id": "non-timer-start-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "properties": [
+      {
+        "label": "Name",
+        "type": "String",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        }
+      }
+    ]
+  }
+]

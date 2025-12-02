@@ -198,6 +198,23 @@ export function findSignal(businessObject) {
   return businessObject.get('signalRef');
 }
 
+/**
+ * Find timer event definition in an event.
+ * @param {ModdleElement|element} element
+ */
+export function findTimerEventDefinition(element) {
+  const businessObject = getBusinessObject(element);
+  if (is(businessObject, 'bpmn:Event')) {
+    const eventDefinitions = businessObject.get('eventDefinitions');
+
+    if (!eventDefinitions.length) {
+      return;
+    }
+
+    return eventDefinitions.find(def => is(def, 'bpmn:TimerEventDefinition'));
+  }
+}
+
 export function findZeebeSubscription(message) {
   return findExtension(message, 'zeebe:Subscription');
 }

@@ -10,6 +10,7 @@ export const ZEEBE_TASK_HEADER_TYPE = 'zeebe:taskHeader';
 export const MESSAGE_PROPERTY_TYPE = 'bpmn:Message#property';
 export const MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE = 'bpmn:Message#zeebe:subscription#property';
 export const SIGNAL_PROPERTY_TYPE = 'bpmn:Signal#property';
+export const TIMER_EVENT_DEFINITION_PROPERTY_TYPE = 'bpmn:TimerEventDefinition#property';
 export const ZEEBE_CALLED_ELEMENT = 'zeebe:calledElement';
 export const ZEEBE_LINKED_RESOURCE_PROPERTY = 'zeebe:linkedResource';
 export const ZEEBE_USER_TASK = 'zeebe:userTask';

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Timer Cycle Event Template",
+  "id": "timer-cycle-event-template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:StartEvent",
+    "bpmn:BoundaryEvent"
+  ],
+  "elementType": {
+    "value": "bpmn:StartEvent",
+    "eventDefinition": "bpmn:TimerEventDefinition"
+  },
+  "properties": [
+    {
+      "label": "Cron Expression",
+      "type": "String",
+      "value": "0 0 9-17 * * MON-FRI",
+      "binding": {
+        "type": "bpmn:TimerEventDefinition#property",
+        "name": "timeCycle"
+      }
+    }
+  ]
+}
