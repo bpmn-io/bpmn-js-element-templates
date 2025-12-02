@@ -25,6 +25,7 @@ import {
   findOutputParameter,
   findSignal,
   findTaskHeader,
+  findTimerEventDefinition,
   findZeebeProperty,
   findZeebeSubscription
 } from 'src/cloud-element-templates/Helper';
@@ -539,6 +540,92 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       // then
       expect(signal).to.exist;
       expect(signal).to.have.property('name', 'hard-coded-signal');
+    }));
+
+
+    it('should handle <bpmn:TimerEventDefinition#property> - timeCycle', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.TimerStartEventTemplate');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+      const bo = getBusinessObject(element);
+
+      const timerEventDefinition = findTimerEventDefinition(bo);
+
+      // then
+      expect(timerEventDefinition).to.exist;
+      expect(is(timerEventDefinition, 'bpmn:TimerEventDefinition')).to.be.true;
+
+      const timeCycle = timerEventDefinition.get('timeCycle');
+      expect(timeCycle).to.exist;
+      expect(timeCycle.get('body')).to.equal('0 0 9-17 * * MON-FRI');
+    }));
+
+
+    it('should handle <bpmn:TimerEventDefinition#property> - timeDuration', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.TimerCatchEventTemplate');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+      const bo = getBusinessObject(element);
+
+      const timerEventDefinition = findTimerEventDefinition(bo);
+
+      // then
+      expect(timerEventDefinition).to.exist;
+      expect(is(timerEventDefinition, 'bpmn:TimerEventDefinition')).to.be.true;
+
+      const timeDuration = timerEventDefinition.get('timeDuration');
+      expect(timeDuration).to.exist;
+      expect(timeDuration.get('body')).to.equal('PT1H');
+    }));
+
+
+    it('should handle <bpmn:TimerEventDefinition#property> - timeDate with FEEL expression', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.TimerDateEventTemplate');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+      const bo = getBusinessObject(element);
+
+      const timerEventDefinition = findTimerEventDefinition(bo);
+
+      // then
+      expect(timerEventDefinition).to.exist;
+      expect(is(timerEventDefinition, 'bpmn:TimerEventDefinition')).to.be.true;
+
+      const timeDate = timerEventDefinition.get('timeDate');
+      expect(timeDate).to.exist;
+      expect(timeDate.get('body')).to.equal('=now() + duration("PT1H")');
+    }));
+
+    it('should handle <bpmn:TimerEventDefinition#property> - timeCycle on boundary event making it non-interrupting', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.TimerBoundaryEventTemplate');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+      const bo = getBusinessObject(element);
+
+      const timerEventDefinition = findTimerEventDefinition(bo);
+
+      // then
+      expect(element.type).to.equal('bpmn:BoundaryEvent');
+      expect(bo.get('cancelActivity')).to.be.false;
+
+      expect(timerEventDefinition).to.exist;
+      expect(is(timerEventDefinition, 'bpmn:TimerEventDefinition')).to.be.true;
+
+      const timeCycle = timerEventDefinition.get('timeCycle');
+      expect(timeCycle).to.exist;
+      expect(timeCycle.get('body')).to.equal('R/PT5M');
     }));
 
 

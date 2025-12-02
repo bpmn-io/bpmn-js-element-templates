@@ -1,0 +1,178 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Start Date",
+    "id": "timer-start-date",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "timerDate",
+        "label": "Timer Date",
+        "type": "String",
+        "feel": "required",
+        "value": "=now() + duration(\"PT1H\")",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDate"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Start Cycle",
+    "id": "timer-start-cycle",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "timerCycle",
+        "label": "Timer Cycle",
+        "type": "String",
+        "value": "R/PT5M",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeCycle"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Boundary Cycle",
+    "id": "timer-boundary-cycle",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:BoundaryEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:BoundaryEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "timerCycle",
+        "label": "Timer Cycle",
+        "type": "String",
+        "value": "R3/PT1H",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeCycle"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Event Subprocess Duration",
+    "id": "timer-subprocess-duration",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "timerDuration",
+        "label": "Timer Duration",
+        "type": "String",
+        "value": "PT10M",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDuration"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Catch Date",
+    "id": "timer-catch-date",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "timerDate",
+        "label": "Timer Date",
+        "type": "String",
+        "value": "2025-12-25T10:00:00Z",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDate"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Catch Duration",
+    "id": "timer-catch-duration",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "timerDuration",
+        "label": "Timer Duration",
+        "type": "String",
+        "value": "PT30M",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDuration"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Signal Catch Event",
+    "id": "signalEventTemplate",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:SignalEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "signalName",
+        "label": "Signal Name",
+        "type": "String",
+        "value": "MySignal",
+        "binding": {
+          "type": "bpmn:Signal#property",
+          "name": "name"
+        }
+      }
+    ]
+  }
+]

@@ -27,6 +27,7 @@ import {
   findOutputParameter,
   findSignal,
   findTaskHeader,
+  findTimerEventDefinition,
   findZeebeProperty,
   findZeebeSubscription
 } from 'src/cloud-element-templates/Helper';
@@ -2010,6 +2011,247 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         const signal = findSignal(getBusinessObject(event));
 
         expect(signal.get('name')).to.equal('signal_1');
+      }));
+
+    });
+
+
+    describe('update bpmn:TimerEventDefinition#property', function() {
+
+      beforeEach(bootstrap(require('./timer-event.bpmn').default));
+
+      const timeCycleTemplate = require('./timer-event-template-cycle.json');
+      const timeCycleBoundaryTemplate = require('./timer-event-template-cycle-boundary.json');
+      const timeDateTemplate = require('./timer-event-template-date.json');
+      const timeDurationTemplate = require('./timer-event-template-duration.json');
+
+      it('execute and set timeCycle ', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('TimerStartEvent_1');
+
+        // when
+        changeTemplate(event, timeCycleTemplate);
+
+        // then
+        event = elementRegistry.get('TimerStartEvent_1');
+        expectElementTemplate(event, 'timer-cycle-event-template', 1);
+
+        const timerEventDefinition = findTimerEventDefinition(event);
+
+        expect(timerEventDefinition).to.exist;
+
+        const timeCycle = timerEventDefinition.get('timeCycle');
+        expect(timeCycle).to.exist;
+        expect(timeCycle.get('body')).to.equal('0 0 9-17 * * MON-FRI');
+      }));
+
+
+      it('execute and set timeDate', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('TimerStartEvent_1');
+
+        // when
+        changeTemplate(event, timeDateTemplate);
+
+        // then
+        event = elementRegistry.get('TimerStartEvent_1');
+        expectElementTemplate(event, 'timer-date-event-template', 1);
+
+        const timerEventDefinition = findTimerEventDefinition(event);
+
+        expect(timerEventDefinition).to.exist;
+
+        const timeDate = timerEventDefinition.get('timeDate');
+        expect(timeDate).to.exist;
+        expect(timeDate.get('body')).to.equal('2024-12-24T18:00:00Z');
+      }));
+
+
+      it('execute and set timeDuration', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('TimerCatchEvent_1');
+
+        // when
+        changeTemplate(event, timeDurationTemplate);
+
+        // then
+        event = elementRegistry.get('TimerCatchEvent_1');
+        expectElementTemplate(event, 'timer-duration-event-template', 1);
+
+        const timerEventDefinition = findTimerEventDefinition(event);
+
+        expect(timerEventDefinition).to.exist;
+
+        const timeDuration = timerEventDefinition.get('timeDuration');
+        expect(timeDuration).to.exist;
+        expect(timeDuration.get('body')).to.equal('PT1H');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('TimerStartEvent_1');
+
+        // when
+        changeTemplate(event, timeCycleTemplate);
+        commandStack.undo();
+
+        // then
+        event = elementRegistry.get('TimerStartEvent_1');
+        expectNoElementTemplate(event);
+
+        const timerEventDefinition = findTimerEventDefinition(event);
+
+        // timer event definition exists but has no timeCycle
+        expect(timerEventDefinition).to.exist;
+        expect(timerEventDefinition.get('timeCycle')).not.to.exist;
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('TimerStartEvent_1');
+
+        // when
+        changeTemplate(event, timeCycleTemplate);
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        event = elementRegistry.get('TimerStartEvent_1');
+        expectElementTemplate(event, 'timer-cycle-event-template', 1);
+
+        const timerEventDefinition = findTimerEventDefinition(event);
+
+        expect(timerEventDefinition).to.exist;
+
+        const timeCycle = timerEventDefinition.get('timeCycle');
+        expect(timeCycle).to.exist;
+        expect(timeCycle.get('body')).to.equal('0 0 9-17 * * MON-FRI');
+      }));
+
+
+      it('should set timeCycle on interrupting boundary event and convert to non-interrupting', inject(function(elementRegistry, elementTemplates) {
+
+        // given - interrupting boundary event with timer definition
+        let event = elementRegistry.get('TimerBoundaryEvent_1');
+        expect(getBusinessObject(event).get('cancelActivity')).to.equal(true);
+
+        elementTemplates.set([ timeCycleBoundaryTemplate ]);
+
+        // when - apply timeCycle boundary template
+        event = elementTemplates.applyTemplate(event, timeCycleBoundaryTemplate);
+
+        // then - should be non-interrupting now
+        expect(event).to.exist;
+
+        expect(getBusinessObject(event).get('cancelActivity')).to.equal(false);
+
+        const timerEventDefinition = findTimerEventDefinition(event);
+        expect(timerEventDefinition).to.exist;
+        const timeCycle = timerEventDefinition.get('timeCycle');
+        expect(timeCycle).to.exist;
+        expect(timeCycle.get('body')).to.equal('R/PT5M');
+      }));
+
+
+      it('should set timeCycle on interrupting event subprocess start and convert to non-interrupting', inject(function(elementRegistry) {
+
+        // given - interrupting start event in event subprocess
+        let event = elementRegistry.get('EventSubProcessStart_1');
+        expect(getBusinessObject(event).get('isInterrupting')).to.equal(true);
+
+        // when
+        event = changeTemplate(event, timeCycleTemplate);
+
+        // then - should be non-interrupting now
+        expect(event).to.exist;
+
+        expect(getBusinessObject(event).get('isInterrupting')).to.equal(false);
+
+        const timerEventDefinition = findTimerEventDefinition(event);
+        expect(timerEventDefinition).to.exist;
+        const timeCycle = timerEventDefinition.get('timeCycle');
+        expect(timeCycle).to.exist;
+        expect(timeCycle.get('body')).to.equal('0 0 9-17 * * MON-FRI');
+      }));
+
+      it('should remove existing timeCycle timer when applying template with different value', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('TimerStartEvent_2');
+        const timerEventDefinition = findTimerEventDefinition(event);
+        expect(timerEventDefinition.get('timeCycle')).to.exist;
+
+        // when
+        event = changeTemplate(event, timeDateTemplate);
+
+        // then
+        expectElementTemplate(event, 'timer-date-event-template', 1);
+
+        const updatedTimerEventDefinition = findTimerEventDefinition(event);
+
+        expect(updatedTimerEventDefinition.get('timeCycle')).not.to.exist;
+
+        const timeDate = updatedTimerEventDefinition.get('timeDate');
+
+        expect(timeDate).to.exist;
+        expect(timeDate.get('body')).to.equal('2024-12-24T18:00:00Z');
+      }));
+
+
+      it('should remove existing timeDuration when applying template with different value', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('TimerCatchEvent_2');
+        const timerEventDefinition = findTimerEventDefinition(event);
+        expect(timerEventDefinition.get('timeDuration')).to.exist;
+
+        // when
+        event = changeTemplate(event, timeDateTemplate);
+
+        // then
+        expectElementTemplate(event, 'timer-date-event-template', 1);
+
+        const updatedTimerEventDefinition = findTimerEventDefinition(event);
+
+        expect(updatedTimerEventDefinition.get('timeDuration')).not.to.exist;
+
+        const timeDate = updatedTimerEventDefinition.get('timeDate');
+
+        expect(timeDate).to.exist;
+        expect(timeDate.get('body')).to.equal('2024-12-24T18:00:00Z');
+      }));
+
+
+      it('should remove existing timeDate when applying template with different value', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('EventSubProcessStart_2');
+        event = changeTemplate(event, timeDateTemplate);
+
+        let timerEventDefinition = findTimerEventDefinition(event);
+        expect(timerEventDefinition.get('timeDate')).to.exist;
+
+        // when
+        event = changeTemplate(event, timeDurationTemplate, timeDateTemplate);
+
+        // then
+        expectElementTemplate(event, 'timer-duration-event-template', 1);
+
+        timerEventDefinition = findTimerEventDefinition(event);
+
+        expect(timerEventDefinition.get('timeDate')).not.to.exist;
+
+        const timeDuration = timerEventDefinition.get('timeDuration');
+
+        expect(timeDuration).to.exist;
+        expect(timeDuration.get('body')).to.equal('PT1H');
       }));
 
     });
@@ -6424,6 +6666,142 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(taskSchedule.get('dueDate')).to.equal('3023-03-01T12:00:00Z');
         expect(taskSchedule.get('followUpDate')).to.equal('3023-03-05T12:00:00Z');
       }));
+    });
+
+
+    describe('update bpmn:TimerEventDefinition#property', function() {
+
+      beforeEach(bootstrap(require('./timer-event.bpmn').default));
+
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given
+        const event = elementRegistry.get('TimerCatchEvent_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'PT30M',
+            binding: {
+              type: 'bpmn:TimerEventDefinition#property',
+              name: 'timeDuration'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'PT2H',
+            binding: {
+              type: 'bpmn:TimerEventDefinition#property',
+              name: 'timeDuration'
+            }
+          }
+        ]);
+
+        changeTemplate('TimerCatchEvent_1', oldTemplate);
+
+        const timerEventDefinition = findTimerEventDefinition(event);
+        const timeDuration = timerEventDefinition.get('timeDuration');
+
+        updateBusinessObject('TimerCatchEvent_1', timeDuration, {
+          body: 'PT45M'
+        });
+
+        // when
+        changeTemplate(event, newTemplate, oldTemplate);
+
+        // then
+        const updatedTimerEventDefinition = findTimerEventDefinition(event);
+        const updatedTimeDuration = updatedTimerEventDefinition.get('timeDuration');
+
+        expect(updatedTimeDuration).to.exist;
+        expect(updatedTimeDuration.get('body')).to.equal('PT45M');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given
+        const event = elementRegistry.get('TimerCatchEvent_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'PT30M',
+            binding: {
+              type: 'bpmn:TimerEventDefinition#property',
+              name: 'timeDuration'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'PT2H',
+            binding: {
+              type: 'bpmn:TimerEventDefinition#property',
+              name: 'timeDuration'
+            }
+          }
+        ]);
+
+        changeTemplate('TimerCatchEvent_1', oldTemplate);
+
+        // when
+        changeTemplate(event, newTemplate, oldTemplate);
+
+        // then
+        const timerEventDefinition = findTimerEventDefinition(event);
+        const timeDuration = timerEventDefinition.get('timeDuration');
+
+        expect(timeDuration).to.exist;
+        expect(timeDuration.get('body')).to.equal('PT2H');
+      }));
+
+
+      it('change timer definition type', inject(function(elementRegistry) {
+
+        // given
+        const event = elementRegistry.get('TimerCatchEvent_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: '2024-12-24T18:00:00Z',
+            binding: {
+              type: 'bpmn:TimerEventDefinition#property',
+              name: 'timeDate'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'PT1H',
+            binding: {
+              type: 'bpmn:TimerEventDefinition#property',
+              name: 'timeDuration'
+            }
+          }
+        ]);
+
+        changeTemplate('TimerCatchEvent_1', oldTemplate);
+
+        const timerEventDefinition = findTimerEventDefinition(event);
+
+        expect(timerEventDefinition.get('timeDate')).to.exist;
+        expect(timerEventDefinition.get('timeDate').get('body')).to.equal('2024-12-24T18:00:00Z');
+
+        // when
+        changeTemplate(event, newTemplate, oldTemplate);
+
+        // then
+        const updatedTimerEventDefinition = findTimerEventDefinition(event);
+
+        expect(updatedTimerEventDefinition.get('timeDate')).not.to.exist;
+        expect(updatedTimerEventDefinition.get('timeDuration')).to.exist;
+        expect(updatedTimerEventDefinition.get('timeDuration').get('body')).to.equal('PT1H');
+      }));
+
     });
 
   });

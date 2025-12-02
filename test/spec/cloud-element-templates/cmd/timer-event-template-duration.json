@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Timer Duration Event Template",
+  "id": "timer-duration-event-template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:IntermediateCatchEvent",
+    "bpmn:BoundaryEvent"
+  ],
+  "elementType": {
+    "value": "bpmn:IntermediateCatchEvent",
+    "eventDefinition": "bpmn:TimerEventDefinition"
+  },
+  "properties": [
+    {
+      "label": "Duration",
+      "type": "String",
+      "value": "PT1H",
+      "binding": {
+        "type": "bpmn:TimerEventDefinition#property",
+        "name": "timeDuration"
+      }
+    }
+  ]
+}

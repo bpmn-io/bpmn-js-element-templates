@@ -1,13 +1,27 @@
 import {
+  isObject
+} from 'min-dash';
+
+import {
   getTemplateId,
   getTemplateVersion
 } from './Helper';
 
 import { default as DefaultElementTemplates } from '../element-templates/ElementTemplates';
 
+import { isTimerTemplateApplicable } from './util/timerUtil';
+
 /**
  * @typedef {import('bpmn-js/lib/model/Types').Element} Element
  */
+
+/**
+ * Filters to determine whether a template is applicable to a given element.
+ * @type {Array<(template: ElementTemplate, element: Element) => boolean>}
+ */
+const TEMPLATE_FILTERS = [
+  isTimerTemplateApplicable
+];
 
 /**
  * Registry for element templates.
@@ -25,6 +39,67 @@ export default class ElementTemplates extends DefaultElementTemplates {
 
   _getTemplateVersion(element) {
     return getTemplateVersion(element);
+  }
+
+  /**
+   * Get all templates (with given ID or applicable to element).
+   *
+   * @param {string|djs.model.Base} [elementOrTemplateId]
+   * @return {Array<ElementTemplate>}
+   */
+  getAll(elementOrTemplateId) {
+    const templates = super.getAll(elementOrTemplateId);
+
+    if (isObject(elementOrTemplateId)) {
+      return this._filterApplicableTemplates(templates, elementOrTemplateId);
+    }
+
+    return templates;
+  }
+
+  /**
+   * Get all templates (with given ID or applicable to element) with the latest version.
+   *
+   * @param {String|djs.model.Base} [elementOrTemplateId]
+   * @param {{ deprecated?: boolean }} [options]
+   *
+   * @return {Array<ElementTemplate>}
+   */
+  getLatest(elementOrTemplateId, options = {}) {
+    const templates = super.getLatest(elementOrTemplateId, options);
+
+    if (isObject(elementOrTemplateId)) {
+      return this._filterApplicableTemplates(templates, elementOrTemplateId);
+    }
+
+    return templates;
+  }
+
+  /**
+   * Get compatible templates for element with optional engine overrides.
+   *
+   * @param {String|djs.model.Base} [elementOrTemplateId]
+   * @param {Object} [enginesOverrides]
+   * @param {Object} [options]
+   *
+   * @return {Array<ElementTemplate>}
+   */
+  getCompatible(elementOrTemplateId, enginesOverrides = {}, options = {}) {
+    const templates = super.getCompatible(elementOrTemplateId, enginesOverrides, options);
+
+    if (isObject(elementOrTemplateId)) {
+      return this._filterApplicableTemplates(templates, elementOrTemplateId);
+    }
+
+    return templates;
+  }
+
+  _filterApplicableTemplates(templates, element) {
+    return TEMPLATE_FILTERS.reduce(
+      (filteredTemplates, filterFn) =>
+        filteredTemplates.filter(template => filterFn(template, element)),
+      templates
+    );
   }
 
   /**

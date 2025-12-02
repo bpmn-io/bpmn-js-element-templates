@@ -1,5 +1,6 @@
 import ConditionalBehavior from './ConditionalBehavior';
 import ReplaceBehavior from './ReplaceBehavior';
+import TimerTemplateBehavior from './TimerTemplateBehavior';
 import UpdatePropertiesOrderBehavior from './UpdatePropertiesOrderBehavior';
 import { ReferencedElementBehavior } from './ReferencedElementBehavior';
 import { GeneratedValueBehavior } from './GeneratedValueBehavior';
@@ -14,7 +15,8 @@ export default {
     'elementTemplatesReferencedElementBehavior',
     'elementTemplatesUpdatePropertiesOrderBehavior',
     'elementTemplatesCalledElementBehavior',
-    'elementTemplatesUserTaskBehavior'
+    'elementTemplatesUserTaskBehavior',
+    'elementTemplatesTimerTemplateBehavior'
   ],
   elementTemplatesReplaceBehavior: [ 'type', ReplaceBehavior ],
   elementTemplatesConditionalBehavior: [ 'type', ConditionalBehavior ],
@@ -22,5 +24,6 @@ export default {
   elementTemplatesReferencedElementBehavior: [ 'type', ReferencedElementBehavior ],
   elementTemplatesUpdatePropertiesOrderBehavior: [ 'type', UpdatePropertiesOrderBehavior ],
   elementTemplatesCalledElementBehavior: [ 'type', CalledElementBehavior ],
-  elementTemplatesUserTaskBehavior: [ 'type', UserTaskBehavior ]
+  elementTemplatesUserTaskBehavior: [ 'type', UserTaskBehavior ],
+  elementTemplatesTimerTemplateBehavior: [ 'type', TimerTemplateBehavior ]
 };

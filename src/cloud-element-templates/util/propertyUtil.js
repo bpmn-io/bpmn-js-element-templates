@@ -5,7 +5,7 @@ import {
 
 import {
   isString,
-  isUndefined, without
+  isUndefined
 } from 'min-dash';
 
 import {
@@ -16,6 +16,7 @@ import {
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   PROPERTY_BINDING_TYPES,
   SIGNAL_PROPERTY_TYPE,
+  TIMER_EVENT_DEFINITION_PROPERTY_TYPE,
   TASK_DEFINITION_TYPES,
   ZEEBE_TASK_DEFINITION_TYPE_TYPE,
   ZEEBE_TASK_DEFINITION,
@@ -46,8 +47,8 @@ import {
   findMessage,
   findOutputParameter,
   findSignal,
+  findTimerEventDefinition,
   findZeebeProperty,
-  findZeebeSubscription,
   getTemplateId
 } from '../Helper';
 
@@ -230,6 +231,23 @@ function getRawPropertyValue(element, property) {
     return defaultValue;
   }
 
+  // bpmn:TimerEventDefinition#property
+  if (type === TIMER_EVENT_DEFINITION_PROPERTY_TYPE) {
+    const timerEventDefinition = findTimerEventDefinition(businessObject);
+
+    if (!timerEventDefinition) {
+      return defaultValue;
+    }
+
+    const expression = timerEventDefinition.get(name);
+
+    if (expression) {
+      return expression.get('body');
+    }
+
+    return defaultValue;
+  }
+
   // zeebe:calledElement
   if (type === ZEEBE_CALLED_ELEMENT) {
     const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
@@ -396,6 +414,40 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     }
 
     businessObject = signal;
+  }
+
+  // handle timer event definition property
+  if (type === TIMER_EVENT_DEFINITION_PROPERTY_TYPE) {
+    const timerEventDefinition = findTimerEventDefinition(businessObject);
+
+    if (!timerEventDefinition) {
+      throw new Error('cannot set timer property on element without TimerEventDefinition');
+    }
+
+    let expression = timerEventDefinition.get(name);
+
+    if (!expression) {
+      expression = bpmnFactory.create('bpmn:FormalExpression', { body: value || '' });
+      expression.$parent = timerEventDefinition;
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: timerEventDefinition,
+          properties: { [name]: expression }
+        }
+      });
+    } else {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: expression,
+          properties: { body: value || '' }
+        }
+      });
+    }
   }
 
   // ensure extension elements
@@ -995,301 +1047,6 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
 }
 
 
-export function unsetProperty(commandStack, element, property) {
-  let businessObject = getBusinessObject(element);
-
-  const {
-    binding
-  } = property;
-
-  const {
-    type
-  } = binding;
-
-  let extensionElements;
-
-  const commands = [];
-
-  const context = {
-    element,
-    property
-  };
-
-  if (MESSAGE_BINDING_TYPES.includes(type)) {
-    businessObject = findMessage(businessObject);
-
-    if (!businessObject) {
-      return;
-    }
-  }
-
-  if (type === SIGNAL_PROPERTY_TYPE) {
-    businessObject = findSignal(businessObject);
-
-    if (!businessObject) {
-      return;
-    }
-  }
-
-  // property
-  if (PROPERTY_BINDING_TYPES.includes(type)) {
-    const { name } = binding;
-
-    commands.push({
-      cmd: 'element.updateModdleProperties',
-      context: {
-        ...context,
-        moddleElement: businessObject,
-        properties: { [ name ]: undefined }
-      }
-    });
-  }
-
-
-  if (EXTENSION_BINDING_TYPES.includes(type)) {
-    extensionElements = businessObject.get('extensionElements');
-    if (!extensionElements)
-      return;
-  }
-
-  // zeebe:taskDefinition
-  if (TASK_DEFINITION_TYPES.includes(type)) {
-    const oldTaskDefinition = findExtension(extensionElements, 'zeebe:TaskDefinition');
-
-    const propertyName = getTaskDefinitionPropertyName(binding);
-
-    if (oldTaskDefinition) {
-
-      if (isOnlyProperty(oldTaskDefinition, propertyName)) {
-
-        // remove task definition
-        commands.push({
-          cmd: 'element.updateModdleProperties',
-          context: {
-            ...context,
-            moddleElement: extensionElements,
-            properties: {
-              values: without(extensionElements.get('values'), oldTaskDefinition)
-            }
-          }
-        });
-      } else {
-
-        // remove property
-        commands.push({
-          cmd: 'element.updateModdleProperties',
-          context: {
-            ...context,
-            moddleElement: oldTaskDefinition,
-            properties: {
-              [ propertyName ]: undefined
-            }
-          }
-        });
-      }
-    }
-  }
-
-
-  // zeebe:IoMapping
-  if (IO_BINDING_TYPES.includes(type)) {
-    let ioMapping = findExtension(extensionElements, 'zeebe:IoMapping');
-
-    if (!ioMapping)
-      return;
-
-    // zeebe:Input
-    if (type === ZEBBE_INPUT_TYPE) {
-      const oldZeebeInputParameter = findInputParameter(ioMapping, binding);
-      const values = ioMapping.get('inputParameters').filter((value) => value !== oldZeebeInputParameter);
-
-      if (ioMapping.get('outputParameters').length == 0 && values.length == 0) {
-
-        commands.push({
-          cmd: 'element.updateModdleProperties',
-          context: {
-            ...context,
-            moddleElement: extensionElements,
-            properties: {
-              values:  without(extensionElements.get('values'), ioMapping)
-            }
-          }
-        });
-      }
-
-      else {
-        commands.push({
-          cmd: 'element.updateModdleProperties',
-          context: {
-            ...context,
-            moddleElement: ioMapping,
-            properties: { inputParameters: [ ...values ] }
-          }
-        });
-      }
-    }
-
-    // zeebe:Output
-    if (type === ZEEBE_OUTPUT_TYPE) {
-      const oldZeebeOutputParameter = findOutputParameter(ioMapping, binding);
-      const values = ioMapping.get('outputParameters').filter((value) => value !== oldZeebeOutputParameter);
-
-      if (ioMapping.get('inputParameters').length == 0 && values.length == 0) {
-
-        commands.push({
-          cmd: 'element.updateModdleProperties',
-          context: {
-            ...context,
-            moddleElement: extensionElements,
-            properties: {
-              values: without(extensionElements.get('values'), ioMapping)
-            }
-          }
-        });
-      }
-
-      commands.push({
-        cmd: 'element.updateModdleProperties',
-        context: {
-          ...context,
-          moddleElement: ioMapping,
-          properties: { 'outputParameters': [ ...values ] }
-        }
-      });
-    }
-  }
-
-  // zeebe:taskHeaders
-  if (type === ZEEBE_TASK_HEADER_TYPE) {
-    let taskHeaders = findExtension(extensionElements, 'zeebe:TaskHeaders');
-
-    if (!taskHeaders)
-      return;
-
-    const oldTaskHeader = findTaskHeader(taskHeaders, binding);
-
-    const values = taskHeaders.get('values').filter((value) => value !== oldTaskHeader);
-
-    if (values.length === 0) {
-
-      commands.push({
-        cmd: 'element.updateModdleProperties',
-        context: {
-          ...context,
-          moddleElement: extensionElements,
-          properties: {
-            values: without(extensionElements.get('values'), taskHeaders)
-          }
-        }
-      });
-    }
-    else {
-      commands.push({
-        cmd: 'element.updateModdleProperties',
-        context: {
-          ...context,
-          moddleElement: taskHeaders,
-          properties: { values: [ ...values ] }
-        }
-      });
-    }
-  }
-
-  // zeebe:Property
-  if (type === ZEEBE_PROPERTY_TYPE) {
-    let zeebeProperties = findExtension(extensionElements, 'zeebe:Properties');
-
-    if (!zeebeProperties)
-      return;
-
-    const oldZeebeProperty = findZeebeProperty(zeebeProperties, binding);
-
-    const properties = zeebeProperties.get('properties').filter((property) => property !== oldZeebeProperty);
-
-    if (!properties.length) {
-      commands.push({
-        cmd: 'element.updateModdleProperties',
-        context: {
-          ...context,
-          moddleElement: extensionElements,
-          properties: {
-            values: without(extensionElements.get('values'), zeebeProperties)
-          }
-        }
-      });
-    } else {
-      commands.push({
-        cmd: 'element.updateModdleProperties',
-        context: {
-          ...context,
-          moddleElement: zeebeProperties,
-          properties: {
-            properties: [ ...properties ]
-          }
-        }
-      });
-    }
-  }
-
-  // bpmn:Message#property
-  if (type === MESSAGE_PROPERTY_TYPE) {
-    commands.push({
-      cmd: 'element.updateModdleProperties',
-      context: {
-        ...context,
-        moddleElement: businessObject,
-        properties: {
-          [ binding.name ]: undefined
-        }
-      }
-    });
-  }
-
-  // bpmn:Signal#property
-  if (type === SIGNAL_PROPERTY_TYPE) {
-    commands.push({
-      cmd: 'element.updateModdleProperties',
-      context: {
-        ...context,
-        moddleElement: businessObject,
-        properties: {
-          [ binding.name ]: undefined
-        }
-      }
-    });
-  }
-
-  // bpmn:Message#zeebe:subscription#property
-  if (type === MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE) {
-    const subscription = findZeebeSubscription(businessObject);
-
-    if (!subscription) {
-      return;
-    }
-
-    commands.push({
-      cmd: 'element.updateModdleProperties',
-      context: {
-        ...context,
-        moddleElement: subscription,
-        properties: {
-          [ binding.name ]: undefined
-        }
-      }
-    });
-  }
-
-
-  if (commands.length) {
-    commandStack.execute(
-      'element-templates.multi-command-executor',
-      commands
-    );
-
-    return;
-  }
-}
-
 // TODO(@barmac): fix translate usage (https://github.com/bpmn-io/bpmn-js-element-templates/pull/53#issuecomment-1906203270)
 export function validateProperty(value, property, translate = defaultTranslate) {
   const {
@@ -1364,13 +1121,6 @@ function matchesPattern(string, pattern) {
   return new RegExp(pattern).test(string);
 }
 
-function isOnlyProperty(moddleElement, propertyName) {
-  const descriptor = moddleElement.$descriptor;
-
-  return descriptor.properties.every(({ name }) => {
-    return propertyName === name || moddleElement.get(name) === undefined;
-  });
-}
 
 function defaultTranslate(template, replacements) {
 

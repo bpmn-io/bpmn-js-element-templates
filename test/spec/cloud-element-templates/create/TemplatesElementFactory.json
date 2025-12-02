@@ -844,5 +844,94 @@
         }
       }
     ]
+  },
+  {
+    "name": "Timer Start Event Template",
+    "id": "example.camunda.TimerStartEventTemplate",
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Cron Expression",
+        "type": "String",
+        "value": "0 0 9-17 * * MON-FRI",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeCycle"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Timer Catch Event Template",
+    "id": "example.camunda.TimerCatchEventTemplate",
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Duration",
+        "type": "String",
+        "value": "PT1H",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDuration"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Timer Date Event Template",
+    "id": "example.camunda.TimerDateEventTemplate",
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Date",
+        "type": "String",
+        "feel": "required",
+        "value": "=now() + duration(\"PT1H\")",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDate"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Timer Boundary Event Template",
+    "id": "example.camunda.TimerBoundaryEventTemplate",
+    "appliesTo": [
+      "bpmn:BoundaryEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:BoundaryEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Cycle Interval",
+        "type": "String",
+        "value": "R/PT5M",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeCycle"
+        }
+      }
+    ]
   }
 ]

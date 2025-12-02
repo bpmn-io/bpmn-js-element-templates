@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Timer Date Event Template",
+  "id": "timer-date-event-template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:StartEvent",
+    "bpmn:IntermediateCatchEvent",
+    "bpmn:BoundaryEvent"
+  ],
+  "elementType": {
+    "value": "bpmn:StartEvent",
+    "eventDefinition": "bpmn:TimerEventDefinition"
+  },
+  "properties": [
+    {
+      "type": "Hidden",
+      "value": "2024-12-24T18:00:00Z",
+      "binding": {
+        "type": "bpmn:TimerEventDefinition#property",
+        "name": "timeDate"
+      }
+    }
+  ]
+}

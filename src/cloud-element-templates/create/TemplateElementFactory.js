@@ -13,6 +13,7 @@ import ZeebePropertiesProvider from './ZeebePropertiesProvider';
 import { MessagePropertyBindingProvider } from './MessagePropertyBindingProvider';
 import { MessageZeebeSubscriptionBindingProvider } from './MessageZeebeSubscriptionBindingProvider';
 import { SignalPropertyBindingProvider } from './SignalPropertyBindingProvider';
+import { TimerPropertyBindingProvider } from './TimerPropertyBindingProvider';
 import { CalledElementBindingProvider } from './CalledElementBindingProvider';
 import LinkedResourcePropertyBindingProvider from './LinkedResourceProvider';
 import ZeebeUserTaskBindingProvider from './ZeebeUserTaskBindingProvider';
@@ -29,6 +30,7 @@ import {
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   PROPERTY_TYPE,
   SIGNAL_PROPERTY_TYPE,
+  TIMER_EVENT_DEFINITION_PROPERTY_TYPE,
   ZEEBE_TASK_DEFINITION_TYPE_TYPE,
   ZEEBE_TASK_DEFINITION,
   ZEBBE_INPUT_TYPE,
@@ -67,6 +69,7 @@ export default class TemplateElementFactory {
       [MESSAGE_PROPERTY_TYPE]: MessagePropertyBindingProvider,
       [MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE]: MessageZeebeSubscriptionBindingProvider,
       [SIGNAL_PROPERTY_TYPE]: SignalPropertyBindingProvider,
+      [TIMER_EVENT_DEFINITION_PROPERTY_TYPE]: TimerPropertyBindingProvider,
       [ZEEBE_CALLED_ELEMENT]: CalledElementBindingProvider,
       [ZEEBE_LINKED_RESOURCE_PROPERTY]: LinkedResourcePropertyBindingProvider,
       [ZEEBE_USER_TASK]: ZeebeUserTaskBindingProvider,

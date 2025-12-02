@@ -562,6 +562,208 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
   });
 
 
+  describe('timer template filtering', function() {
+
+    const timerTemplates = require('./ElementTemplates.timer-templates.json');
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(timerTemplates);
+    }));
+
+
+    describe('getAll', function() {
+
+      it('should NOT return timeDuration template for process-level start event', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const startEvent = elementRegistry.get('TimerStartEvent');
+
+          // when
+          const templates = elementTemplates.getAll(startEvent);
+
+          // then - timeDuration should be filtered out, but timeCycle and timeDate should be included
+          const templateIds = templates.map(t => t.id);
+          expect(templateIds).to.include('timer-cycle-start-template');
+          expect(templateIds).to.include('timer-date-start-template');
+          expect(templateIds).to.include('non-timer-start-template');
+          expect(templateIds).to.not.include('timer-duration-start-template');
+        }
+      ));
+
+
+      it('should return timeDuration template for event subprocess start event', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const startEvent = elementRegistry.get('EventSubProcessStart');
+
+          // when
+          const templates = elementTemplates.getAll(startEvent);
+
+          // then - all timer types should be valid for event subprocess starts
+          const templateIds = templates.map(t => t.id);
+          expect(templateIds).to.include('timer-cycle-start-template');
+          expect(templateIds).to.include('timer-date-start-template');
+          expect(templateIds).to.include('timer-duration-start-template');
+          expect(templateIds).to.include('non-timer-start-template');
+        }
+      ));
+
+
+      it('should return timeCycle template for interrupting boundary event', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const boundaryEvent = elementRegistry.get('InterruptingBoundaryEvent');
+
+          // when
+          const templates = elementTemplates.getAll(boundaryEvent);
+
+          // then - all timer types should be valid for boundary events
+          const templateIds = templates.map(t => t.id);
+          expect(templateIds).to.include('timer-duration-boundary-template');
+          expect(templateIds).to.include('timer-cycle-boundary-template');
+        }
+      ));
+
+
+      it('should return timeCycle template for non-interrupting boundary event', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const boundaryEvent = elementRegistry.get('NonInterruptingBoundaryEvent');
+
+          // when
+          const templates = elementTemplates.getAll(boundaryEvent);
+
+          // then - all timer types should be valid for non-interrupting boundary events
+          const templateIds = templates.map(t => t.id);
+          expect(templateIds).to.include('timer-duration-boundary-template');
+          expect(templateIds).to.include('timer-cycle-boundary-template');
+        }
+      ));
+
+
+      it('should return all templates when querying by template ID (not element)', inject(
+        function(elementTemplates) {
+
+          // when - query by template ID, not by element
+          const templates = elementTemplates.getAll('timer-duration-start-template');
+
+          // then - should return the template without filtering
+          expect(templates).to.have.length(1);
+          expect(templates[0].id).to.equal('timer-duration-start-template');
+        }
+      ));
+
+    });
+
+
+    describe('getLatest', function() {
+
+      it('should NOT return timeDuration template for process-level start event', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const startEvent = elementRegistry.get('TimerStartEvent');
+
+          // when
+          const templates = elementTemplates.getLatest(startEvent);
+
+          // then
+          const templateIds = templates.map(t => t.id);
+          expect(templateIds).to.include('timer-cycle-start-template');
+          expect(templateIds).to.include('timer-date-start-template');
+          expect(templateIds).to.include('non-timer-start-template');
+          expect(templateIds).to.not.include('timer-duration-start-template');
+        }
+      ));
+
+
+      it('should return timeDuration template for event subprocess start event', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const startEvent = elementRegistry.get('EventSubProcessStart');
+
+          // when
+          const templates = elementTemplates.getLatest(startEvent);
+
+          // then
+          const templateIds = templates.map(t => t.id);
+          expect(templateIds).to.include('timer-duration-start-template');
+        }
+      ));
+
+
+      it('should return all templates when querying by template ID (not element)', inject(
+        function(elementTemplates) {
+
+          // when
+          const templates = elementTemplates.getLatest('timer-duration-start-template');
+
+          // then
+          expect(templates).to.have.length(1);
+          expect(templates[0].id).to.equal('timer-duration-start-template');
+        }
+      ));
+
+    });
+
+
+    describe('getCompatible', function() {
+
+      it('should NOT return timeDuration template for process-level start event', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const startEvent = elementRegistry.get('TimerStartEvent');
+
+          // when
+          const templates = elementTemplates.getCompatible(startEvent);
+
+          // then
+          const templateIds = templates.map(t => t.id);
+          expect(templateIds).to.include('timer-cycle-start-template');
+          expect(templateIds).to.include('timer-date-start-template');
+          expect(templateIds).to.include('non-timer-start-template');
+          expect(templateIds).to.not.include('timer-duration-start-template');
+        }
+      ));
+
+
+      it('should return timeDuration template for event subprocess start event', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const startEvent = elementRegistry.get('EventSubProcessStart');
+
+          // when
+          const templates = elementTemplates.getCompatible(startEvent);
+
+          // then
+          const templateIds = templates.map(t => t.id);
+          expect(templateIds).to.include('timer-duration-start-template');
+        }
+      ));
+
+      it('should return all templates when querying by template ID (not element)', inject(
+        function(elementTemplates) {
+
+          // when
+          const templates = elementTemplates.getCompatible('timer-duration-start-template');
+
+          // then
+          expect(templates).to.have.length(1);
+          expect(templates[0].id).to.equal('timer-duration-start-template');
+        }
+      ));
+    });
+
+  });
+
+
   describe('createElement', function() {
 
     beforeEach(inject(function(elementTemplates) {

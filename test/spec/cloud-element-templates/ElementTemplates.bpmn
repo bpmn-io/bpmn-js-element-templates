@@ -51,6 +51,21 @@
     <bpmn:startEvent id="MessageStartEvent">
       <bpmn:messageEventDefinition id="MessageEventDefinition_1jjph4o" messageRef="Message" />
     </bpmn:startEvent>
+    <bpmn:startEvent id="TimerStartEvent">
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1" />
+    </bpmn:startEvent>
+    <bpmn:task id="TaskWithBoundary" />
+    <bpmn:boundaryEvent id="InterruptingBoundaryEvent" attachedToRef="TaskWithBoundary">
+      <bpmn:timerEventDefinition id="TimerEventDefinition_2" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="NonInterruptingBoundaryEvent" cancelActivity="false" attachedToRef="TaskWithBoundary">
+      <bpmn:timerEventDefinition id="TimerEventDefinition_3" />
+    </bpmn:boundaryEvent>
+    <bpmn:subProcess id="EventSubProcess_1" triggeredByEvent="true">
+      <bpmn:startEvent id="EventSubProcessStart" isInterrupting="false">
+        <bpmn:timerEventDefinition id="TimerEventDefinition_4" />
+      </bpmn:startEvent>
+    </bpmn:subProcess>
     <bpmn:userTask id="UserTask_1">
       <bpmn:extensionElements>
         <zeebe:userTask />
@@ -129,10 +144,28 @@
       <bpmndi:BPMNShape id="Activity_1q778dg_di" bpmnElement="SubProcess_2" isExpanded="true">
         <dc:Bounds x="560" y="520" width="350" height="200" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TimerStartEvent_di" bpmnElement="TimerStartEvent">
+        <dc:Bounds x="332" y="362" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TaskWithBoundary_di" bpmnElement="TaskWithBoundary">
+        <dc:Bounds x="160" y="720" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="InterruptingBoundaryEvent_di" bpmnElement="InterruptingBoundaryEvent">
+        <dc:Bounds x="192" y="782" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="NonInterruptingBoundaryEvent_di" bpmnElement="NonInterruptingBoundaryEvent">
+        <dc:Bounds x="232" y="782" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EventSubProcess_1_di" bpmnElement="EventSubProcess_1" isExpanded="true">
+        <dc:Bounds x="300" y="700" width="200" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EventSubProcessStart_di" bpmnElement="EventSubProcessStart">
+        <dc:Bounds x="340" y="742" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Group_1_di" bpmnElement="Group_1">
-        <dc:Bounds x="560" y="160" width="300" height="300" />
+        <dc:Bounds x="520" y="160" width="300" height="300" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="679" y="167" width="63" height="14" />
+          <dc:Bounds x="639" y="167" width="63" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="TextAnnotation_1_di" bpmnElement="TextAnnotation_1">
