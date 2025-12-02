@@ -34,6 +34,7 @@ import integrationTemplates from './fixtures/integration';
 import { findExtensions, findExtension } from 'src/cloud-element-templates/Helper';
 import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
 import { findMessage, findSignal } from 'src/cloud-element-templates/Helper';
+import { isExpanded } from 'bpmn-js/lib/util/DiUtil';
 
 // eslint-disable-next-line no-undef
 const packageVersion = process.env.PKG_VERSION;
@@ -1268,6 +1269,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       // given
       const task = elementRegistry.get('Task_1');
+      const oldTemplate = elementTemplates.get(task);
       const newTemplate = templates[6];
       const spy = sinon.spy();
 
@@ -1280,6 +1282,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       expect(spy).to.have.been.calledOnce;
       expect(spy.getCalls()[0].args[1]).to.eql({
         element: task,
+        oldTemplate,
         newTemplate
       });
     }));
@@ -1358,6 +1361,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       // given
       const task = elementRegistry.get('Task_1');
+      const oldTemplate = elementTemplates.get(task);
       const spy = sinon.spy();
 
       eventBus.on('elementTemplates.unlink', spy);
@@ -1368,7 +1372,8 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       // then
       expect(spy).to.have.been.calledOnce;
       expect(spy.getCalls()[0].args[1]).to.eql({
-        element: task
+        element: task,
+        oldTemplate
       });
     }));
   });
@@ -1508,6 +1513,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       // given
       const task = elementRegistry.get('Task_1');
+      const oldTemplate = elementTemplates.get(task);
       const spy = sinon.spy();
 
       eventBus.on('elementTemplates.remove', spy);
@@ -1518,7 +1524,8 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       // then
       expect(spy).to.have.been.calledOnce;
       expect(spy.getCalls()[0].args[1]).to.eql({
-        element: task
+        element: task,
+        oldTemplate
       });
     }));
 
@@ -1552,6 +1559,21 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       // then
       const bo = getBusinessObject(task);
       expect(bo.extensionElements.values[0].$type).to.equal('zeebe:ExecutionListeners');
+    }));
+
+
+    it('should keep expanded state of subprocess', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      let subprocess = elementRegistry.get('SubProcess_2');
+
+      expect(isExpanded(subprocess)).to.be.true;
+
+      // when
+      subprocess = elementTemplates.removeTemplate(subprocess);
+
+      // then
+      expect(isExpanded(subprocess)).to.be.true;
     }));
 
   });
@@ -1690,6 +1712,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         template => template.id === 'foo' && template.version === 2);
 
       const task = elementRegistry.get('Task_1');
+      const oldTemplate = elementTemplates.get(task);
       const spy = sinon.spy();
 
       eventBus.on('elementTemplates.update', spy);
@@ -1701,6 +1724,7 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       expect(spy).to.have.been.calledOnce;
       expect(spy.getCalls()[0].args[1]).to.eql({
         element: task,
+        oldTemplate,
         newTemplate
       });
     }));
@@ -2162,7 +2186,6 @@ describe('provider/cloud-element-templates - ElementTemplates - integration', fu
         // when
         task = elementTemplates.applyTemplate(task, null);
         task = elementTemplates.applyTemplate(task, template);
-
 
         // then
         expectInputs(task, [

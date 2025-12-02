@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_08adx7k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.11.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_08adx7k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.41.0">
   <bpmn:process id="Process_1" isExecutable="true" zeebe:modelerTemplate="process-template" zeebe:modelerTemplateVersion="1">
     <bpmn:task id="Task_1" name="foo" zeebe:modelerTemplate="foo">
       <bpmn:documentation>bar</bpmn:documentation>
@@ -56,6 +56,7 @@
         <zeebe:userTask />
       </bpmn:extensionElements>
     </bpmn:userTask>
+    <bpmn:subProcess id="SubProcess_2" zeebe:modelerTemplate="unknown" zeebe:modelerTemplateVersion="1" />
     <bpmn:group id="Group_1" categoryValueRef="CategoryValue_025ggwq" />
     <bpmn:textAnnotation id="TextAnnotation_1">
       <bpmn:text>Text Annotation</bpmn:text>
@@ -124,6 +125,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0nu49eb_di" bpmnElement="MessageStartEvent">
         <dc:Bounds x="262" y="362" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1q778dg_di" bpmnElement="SubProcess_2" isExpanded="true">
+        <dc:Bounds x="560" y="520" width="350" height="200" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Group_1_di" bpmnElement="Group_1">
         <dc:Bounds x="560" y="160" width="300" height="300" />
