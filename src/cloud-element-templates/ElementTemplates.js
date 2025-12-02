@@ -6,6 +6,10 @@ import {
 import { default as DefaultElementTemplates } from '../element-templates/ElementTemplates';
 
 /**
+ * @typedef {import('bpmn-js/lib/model/Types').Element} Element
+ */
+
+/**
  * Registry for element templates.
  */
 export default class ElementTemplates extends DefaultElementTemplates {
@@ -43,26 +47,13 @@ export default class ElementTemplates extends DefaultElementTemplates {
   /**
    * Apply element template to a given element.
    *
-   * @param {djs.model.Base} element
+   * @param {Element} element
    * @param {ElementTemplate} newTemplate
    *
-   * @return {djs.model.Base} the updated element
+   * @return {Element} the updated element
    */
   applyTemplate(element, newTemplate) {
-
-    let action = 'apply';
-    let payload = { element, newTemplate };
-
     const oldTemplate = this.get(element);
-
-    if (oldTemplate && !newTemplate) {
-      action = 'unlink';
-      payload = { element };
-    }
-
-    if (newTemplate && oldTemplate && (newTemplate.id === oldTemplate.id)) {
-      action = 'update';
-    }
 
     const context = {
       element,
@@ -70,13 +61,43 @@ export default class ElementTemplates extends DefaultElementTemplates {
       oldTemplate
     };
 
+    const event = oldTemplate?.id === newTemplate?.id ? 'update' : 'apply';
+
     this._commandStack.execute('propertiesPanel.zeebe.changeTemplate', context);
 
-    this._eventBus.fire(`elementTemplates.${action}`, payload);
+    this._fire(event, {
+      element,
+      newTemplate,
+      oldTemplate
+    });
 
     return context.element;
   }
 
+  /**
+   * Remove template from a given element.
+   *
+   * @param {Element} element
+   *
+   * @return {Element} the updated element
+   */
+  removeTemplate(element) {
+    const oldTemplate = this.get(element);
+
+    const context = {
+      element,
+      oldTemplate
+    };
+
+    this._commandStack.execute('propertiesPanel.removeTemplate', context);
+
+    this._fire('remove', {
+      element,
+      oldTemplate
+    });
+
+    return context.element;
+  }
 }
 
 ElementTemplates.$inject = [

@@ -21,6 +21,9 @@ import { coerce, valid as isSemverValid } from 'semver';
 // eslint-disable-next-line no-undef
 const packageVersion = process.env.PKG_VERSION;
 
+/**
+ * @typedef {import('bpmn-js/lib/model/Types').Element} Element
+ */
 
 /**
  * Registry for element templates.
@@ -47,7 +50,7 @@ export default class ElementTemplates {
   /**
    * Get template with given ID and optional version or for element.
    *
-   * @param {String|djs.model.Base} elementOrTemplateId
+   * @param {String|Element} elementOrTemplateId
    * @param {number} [version]
    *
    * @return {ElementTemplate}
@@ -80,7 +83,7 @@ export default class ElementTemplates {
   /**
    * Get default template for given element.
    *
-   * @param {djs.model.Base} element
+   * @param {Element} element
    *
    * @return {ElementTemplate}
    */
@@ -93,7 +96,7 @@ export default class ElementTemplates {
   /**
    * Get all templates (with given ID or applicable to element).
    *
-   * @param {string|djs.model.Base} [elementOrTemplateId]
+   * @param {string|Element} [elementOrTemplateId]
    * @return {Array<ElementTemplate>}
    */
   getAll(elementOrTemplateId) {
@@ -105,7 +108,7 @@ export default class ElementTemplates {
    * Get all templates (with given ID or applicable to element) with the latest
    * version.
    *
-   * @param {String|djs.model.Base} [elementOrTemplateId]
+   * @param {String|Element} [elementOrTemplateId]
    * @param {{ deprecated?: boolean }} [options]
    *
    * @return {Array<ElementTemplate>}
@@ -120,7 +123,7 @@ export default class ElementTemplates {
   /**
    * Get templates compatible with a given engine configuration override.
    *
-   * @param {string|djs.model.Base} [elementOrTemplateId]
+   * @param {string|Element} [elementOrTemplateId]
    * @param {Object} enginesOverrides
    * @param {Object} [options]
    * @param {boolean} [options.deprecated=false]
@@ -240,25 +243,13 @@ export default class ElementTemplates {
   /**
    * Apply element template to a given element.
    *
-   * @param {djs.model.Base} element
+   * @param {Element} element
    * @param {ElementTemplate} newTemplate
    *
-   * @return {djs.model.Base} the updated element
+   * @return {Element} the updated element
    */
   applyTemplate(element, newTemplate) {
-
-    let action = 'apply';
-    let payload = { element, newTemplate };
     const oldTemplate = this.get(element);
-
-    if (oldTemplate && !newTemplate) {
-      action = 'unlink';
-      payload = { element };
-    }
-
-    if (newTemplate && oldTemplate && (newTemplate.id === oldTemplate.id)) {
-      action = 'update';
-    }
 
     const context = {
       element,
@@ -266,9 +257,15 @@ export default class ElementTemplates {
       oldTemplate
     };
 
+    const event = oldTemplate?.id === newTemplate?.id ? 'update' : 'apply';
+
     this._commandStack.execute('propertiesPanel.camunda.changeTemplate', context);
 
-    this._fire(action, payload);
+    this._fire(event, {
+      element,
+      newTemplate,
+      oldTemplate
+    });
 
     return context.element;
   }
@@ -280,34 +277,52 @@ export default class ElementTemplates {
   /**
    * Remove template from a given element.
    *
-   * @param {djs.model.Base} element
+   * @param {Element} element
    *
-   * @return {djs.model.Base} the updated element
+   * @return {Element} the updated element
    */
   removeTemplate(element) {
-    this._fire('remove', { element });
+    const oldTemplate = this.get(element);
 
     const context = {
-      element
+      element,
+      oldTemplate
     };
 
     this._commandStack.execute('propertiesPanel.removeTemplate', context);
 
-    return context.newElement;
+    this._fire('remove', {
+      element,
+      oldTemplate
+    });
 
+    return context.newElement;
   }
 
   /**
    * Unlink template from a given element.
    *
-   * @param {djs.model.Base} element
+   * @param {Element} element
    *
-   * @return {djs.model.Base} the updated element
+   * @return {Element} the updated element
    */
   unlinkTemplate(element) {
-    return this.applyTemplate(element, null);
-  }
+    const oldTemplate = this.get(element);
 
+    const context = {
+      element,
+      oldTemplate
+    };
+
+    this._commandStack.execute('propertiesPanel.unlinkTemplate', context);
+
+    this._fire('unlink', {
+      element,
+      oldTemplate
+    });
+
+    return context.element;
+  }
 }
 
 ElementTemplates.$inject = [

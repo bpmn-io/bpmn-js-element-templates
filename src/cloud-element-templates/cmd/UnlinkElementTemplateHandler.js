@@ -1,4 +1,4 @@
-export default class RemoveElementTemplateHandler {
+export default class UnlinkElementTemplateHandler {
   constructor(commandStack) {
     this._commandStack = commandStack;
   }
@@ -13,10 +13,10 @@ export default class RemoveElementTemplateHandler {
       element,
       oldTemplate,
       newTemplate: null,
-      removeProperties: true
+      removeProperties: false
     });
   }
 }
 
 
-RemoveElementTemplateHandler.$inject = [ 'commandStack' ];
+UnlinkElementTemplateHandler.$inject = [ 'commandStack' ];

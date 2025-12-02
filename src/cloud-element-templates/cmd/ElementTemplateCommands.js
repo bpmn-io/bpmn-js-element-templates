@@ -1,5 +1,6 @@
 import ChangeElementTemplateHandler from './ChangeElementTemplateHandler';
 import RemoveElementTemplateHandler from './RemoveElementTemplateHandler';
+import UnlinkElementTemplateHandler from './UnlinkElementTemplateHandler';
 import MultiCommandHandler from '../../element-templates/cmd/MultiCommandHandler';
 
 export default class ElementTemplatesCommands {
@@ -17,6 +18,11 @@ export default class ElementTemplatesCommands {
     commandStack.registerHandler(
       'propertiesPanel.removeTemplate',
       RemoveElementTemplateHandler
+    );
+
+    commandStack.registerHandler(
+      'propertiesPanel.unlinkTemplate',
+      UnlinkElementTemplateHandler
     );
 
     // apply default element templates on shape creation
