@@ -1906,7 +1906,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
     }));
 
 
-    describe('feel', function() {
+    describe('number', function() {
 
       it('should keep number property value when condition property is feel-static', inject(function() {
 
@@ -1945,55 +1945,115 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         // then
         expectZeebePropertyValueByKey(businessObject, 'text-required');
       }));
+
+
+      it('should match when property type is Number but value is a numeric string and condition expects a Number', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', numberTemplate);
+
+        // when
+        const businessObject = getBusinessObject(element);
+
+        // then
+        // Even though number-string = "100", its type is Number;
+        // therefore, a compare-with-number property should be considered valid (number-string = 100).
+        expectZeebePropertyValueByKey(businessObject, 'compare-with-number');
+      }));
+
+
+      it('should match number property with number value when condition has numeric value', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', numberTemplate);
+
+        // when
+        const businessObject = getBusinessObject(element);
+
+        // then
+        expectZeebePropertyValueByKey(businessObject, 'compare-number-with-number');
+      }));
+
+
+      it('should not match when property type is Number but condition expect string', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', numberTemplate);
+
+        // when
+        const businessObject = getBusinessObject(element);
+        const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+        const properties = zeebeProperties.get('zeebe:properties');
+
+        // then
+        // Although number-string has the value "100", its type is Number,
+        // so it should not match a compare-with-string property, which expects the value "100" as a string type.
+        expect(properties.find(p => p.name === 'compare-with-string')).to.not.exist;
+      }));
     });
 
 
-    it('should match when property type is Number but value is a numeric string and condition expects a Number', inject(function() {
+    describe('boolean', function() {
 
-      // given
-      const element = changeTemplate('Task_1', numberTemplate);
+      // TODO(@jarekdanielak): To be implemented as part of
+      // https://github.com/bpmn-io/bpmn-js-element-templates/issues/195
+      it.skip('should match `true`', inject(function() {
 
-      // when
-      const businessObject = getBusinessObject(element);
+        // given
+        const element = changeTemplate('Task_1', booleanTemplate);
 
-      // then
-      // Even though number-string = "100", its type is Number;
-      // therefore, a compare-with-number property should be considered valid (number-string = 100).
-      expectZeebePropertyValueByKey(businessObject, 'compare-with-number');
-    }));
+        // when
+        const businessObject = getBusinessObject(element);
 
+        // then
+        expectZeebePropertyValueByKey(businessObject, 'booleanStaticProp', '=true');
+        expectZeebePropertyValueByKey(businessObject, 'inputForActiveStaticCheckbox');
 
-    it('should match number property with number value when condition has numeric value', inject(function() {
+        const zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
+        console.log(zeebeProperties);
 
-      // given
-      const element = changeTemplate('Task_1', numberTemplate);
-
-      // when
-      const businessObject = getBusinessObject(element);
-
-      // then
-      expectZeebePropertyValueByKey(businessObject, 'compare-number-with-number');
-    }));
+        expect(zeebeProperties.find(p => p.name === 'inputForInactiveStaticCheckbox')).to.not.exist;
+      }));
 
 
-    it('should not match when property type is Number but condition expect string', inject(function() {
+      it('should match `false`');
 
-      // given
-      const element = changeTemplate('Task_1', numberTemplate);
 
-      // when
-      const businessObject = getBusinessObject(element);
-      const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
-      const properties = zeebeProperties.get('zeebe:properties');
+      it('should match "=true"', inject(function() {
 
-      // then
-      // Although number-string has the value "100", its type is Number,
-      // so it should not match a compare-with-string property, which expects the value "100" as a string type.
-      expect(properties.find(p => p.name === 'compare-with-string')).to.not.exist;
-    }));
+        // given
+        const element = changeTemplate('Task_1', booleanTemplate);
 
+        // when
+        const businessObject = getBusinessObject(element);
+
+        // then
+        expectZeebePropertyValueByKey(businessObject, 'booleanStaticFeelProp', '=true');
+        expectZeebePropertyValueByKey(businessObject, 'inputForActiveStaticFeelCheckbox');
+
+        const zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
+        expect(zeebeProperties.find(p => p.name === 'inputForInactiveStaticFeelCheckbox')).to.not.exist;
+      }));
+
+
+      it('should match "=false"', inject(function(modeling) {
+
+        // given
+        const element = changeTemplate('Task_1', booleanTemplate);
+
+        // when
+        const property = findExtension(element, 'zeebe:Properties').get('properties').find(p => p.name === 'booleanStaticFeelProp');
+        modeling.updateModdleProperties(element, property, {
+          value: '=false'
+        });
+
+        // then
+        const businessObject = getBusinessObject(element);
+        expectZeebePropertyValueByKey(businessObject, 'booleanStaticFeelProp', '=false');
+        expectZeebePropertyValueByKey(businessObject, 'inputForInactiveStaticFeelCheckbox');
+      }));
+    });
   });
-
 });
 
 

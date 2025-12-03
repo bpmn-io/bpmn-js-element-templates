@@ -16,9 +16,31 @@
       "value": false
     },
     {
+      "id": "booleanStaticProp",
+      "type": "Boolean",
+      "label": "Checkbox Static (true)",
+      "feel": "static",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "booleanStaticProp"
+      },
+      "value": true
+    },
+    {
+      "id": "booleanStaticFeelProp",
+      "type": "Boolean",
+      "label": "Checkbox Static FEEL (\"=true\")",
+      "feel": "static",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "booleanStaticFeelProp"
+      },
+      "value": "=true"
+    },
+    {
       "id": "inputForActiveCheckbox",
       "type": "String",
-      "label": "Input that appears when checkbox is ACTIVE",
+      "label": "Show if Checkbox is ACTIVE",
       "binding": {
         "type": "zeebe:taskHeader",
         "key": "inputActive"
@@ -32,7 +54,7 @@
     {
       "id": "inputForInactiveCheckbox",
       "type": "String",
-      "label": "Input that appears when checkbox is INACTIVE",
+      "label": "Show if Checkbox is INACTIVE",
       "binding": {
         "type": "zeebe:taskHeader",
         "key": "inputInactive"
@@ -41,6 +63,62 @@
       "condition": {
         "property": "booleanProp",
         "equals": false
+      }
+    },
+    {
+      "id": "inputForActiveStaticCheckbox",
+      "type": "String",
+      "label": "Show if Checkbox Static is ACTIVE",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "inputForActiveStaticCheckbox"
+      },
+      "value": "active",
+      "condition": {
+        "property": "booleanStaticProp",
+        "equals": true
+      }
+    },
+    {
+      "id": "inputForInactiveStaticCheckbox",
+      "type": "String",
+      "label": "Show if Checkbox Static is INACTIVE",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "inputForInactiveStaticCheckbox"
+      },
+      "value": "inactive",
+      "condition": {
+        "property": "booleanStaticProp",
+        "equals": false
+      }
+    },
+    {
+      "id": "inputForActiveStaticFeelCheckbox",
+      "type": "String",
+      "label": "Show if Checkbox Static FEEL is ACTIVE",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "inputForActiveStaticFeelCheckbox"
+      },
+      "value": "active",
+      "condition": {
+        "property": "booleanStaticFeelProp",
+        "equals": "=true"
+      }
+    },
+    {
+      "id": "inputForInactiveStaticFeelCheckbox",
+      "type": "String",
+      "label": "Show if Checkbox Static FEEL is INACTIVE",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "inputForInactiveStaticFeelCheckbox"
+      },
+      "value": "inactive",
+      "condition": {
+        "property": "booleanStaticFeelProp",
+        "equals": "=false"
       }
     }
   ]
