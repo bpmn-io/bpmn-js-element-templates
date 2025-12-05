@@ -1,5 +1,6 @@
 /**
  * Check if the property is cast to FEEL expression:
+ * - Any property with feel set to 'required'
  * - Boolean and Number properties with feel set to 'optional' or 'static'
  * - Boolean and Number input/output parameters have default feel=static
  *
@@ -7,6 +8,10 @@
  */
 export const shouldCastToFeel = (property) => {
   const feel = getFeelValue(property);
+
+  if (feel === 'required') {
+    return true;
+  }
 
   return [ 'optional', 'static' ].includes(feel) && [ 'Boolean', 'Number' ].includes(property.type);
 };
