@@ -1972,22 +1972,6 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         expectZeebePropertyValueByKey(businessObject, 'compare-number-with-number');
       }));
 
-
-      it('should not match when property type is Number but condition expect string', inject(function() {
-
-        // given
-        const element = changeTemplate('Task_1', numberTemplate);
-
-        // when
-        const businessObject = getBusinessObject(element);
-        const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
-        const properties = zeebeProperties.get('zeebe:properties');
-
-        // then
-        // Although number-string has the value "100", its type is Number,
-        // so it should not match a compare-with-string property, which expects the value "100" as a string type.
-        expect(properties.find(p => p.name === 'compare-with-string')).to.not.exist;
-      }));
     });
 
 

@@ -1,7 +1,11 @@
 import { isEventSubProcess } from 'bpmn-js/lib/util/DiUtil';
 import { getPropertyValue } from './util/propertyUtil';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
-import { shouldCastToFeel } from './util/FeelUtil';
+import {
+  shouldCastToFeel,
+  fromFeelExpression,
+  isFeel
+} from './util/FeelUtil';
 
 /**
  * Based on conditions, remove properties from the template.
@@ -41,10 +45,10 @@ export function isConditionMet(element, properties, property) {
 }
 
 function isSimpleConditionMet(element, properties, condition) {
-  const { property, equals, oneOf, isActive } = condition;
+  const { property: propertyId, equals, oneOf, isActive } = condition;
 
   if (typeof isActive !== 'undefined') {
-    const relatedCondition = properties.find(p => p.id === property);
+    const relatedCondition = properties.find(p => p.id === propertyId);
 
     if (!relatedCondition) {
       return !isActive;
@@ -53,37 +57,21 @@ function isSimpleConditionMet(element, properties, condition) {
     return isActive ? isConditionMet(element, properties, relatedCondition) : !isConditionMet(element, properties, relatedCondition);
   }
 
-  const propertyObject = getProperty(properties, property);
-
-  if (propertyObject) {
-
-    // if the property is a FEEL [optional, static, required] property,
-    // we need to get the value removing the '='
-
-    const propertyValue = shouldCastToFeel(propertyObject) || propertyObject.feel === 'required' ?
-      getPropertyValue(element, propertyObject).slice(1) :
-      getPropertyValue(element, propertyObject);
-
-    if (hasProperty(condition, 'equals')) {
-      return compareProperty(propertyObject, propertyValue, equals);
-    }
-
-    if (oneOf) {
-      return oneOf.includes(propertyValue);
-    }
-  }
-
-  return false;
-}
-
-export function getProperty(properties, propertyId) {
   const property = properties.find(p => p.id === propertyId);
 
   if (!property) {
-    return;
+    return false;
   }
 
-  return property;
+  if (hasProperty(condition, 'equals')) {
+    return compare(element, property, equals);
+  }
+
+  if (oneOf) {
+    return oneOf.some(equals => compare(element, property, equals));
+  }
+
+  return false;
 }
 
 function isPropertyAllowed(element, property) {
@@ -102,19 +90,25 @@ function isPropertyAllowed(element, property) {
   return true;
 }
 
-function compareProperty(propertyObj, propertyValue, value) {
+function compare(element, property, equals) {
 
-  // Number
-  if (propertyObj.type === 'Number') {
-    return Number(propertyValue) === value;
+  const value = shouldCastToFeel(property) ?
+    fromFeelExpression(getPropertyValue(element, property), property.type) :
+    getPropertyValue(element, property);
+
+  if (typeof value === 'undefined' || value === null) {
+    return false;
   }
 
-  // Boolean
-  else if (propertyObj.type === 'Boolean') {
-    return Boolean(propertyValue) === value;
+  if (isFeel(equals)) {
+    equals = fromFeelExpression(equals, property.type);
   }
 
-  return propertyValue === value;
+  if (property.type === 'Number') {
+    return Number(value) === Number(equals);
+  }
+
+  return value === equals;
 }
 
 // helpers //////////////////////
