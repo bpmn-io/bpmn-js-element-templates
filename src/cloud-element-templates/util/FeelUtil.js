@@ -40,3 +40,23 @@ export const toFeelExpression = (value, type) => {
 
   return '=' + value.toString();
 };
+
+export const fromFeelExpression = (value, type) => {
+  if (typeof value === 'undefined') {
+    return value;
+  }
+
+  if (typeof value === 'string' && value.startsWith('=')) {
+    value = value.slice(1);
+  }
+
+  if (type === 'Number') {
+    return Number(value);
+  }
+
+  if (type === 'Boolean') {
+    return value !== 'false';
+  }
+
+  return value;
+};
