@@ -1892,7 +1892,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       // assume
       expectTaskHeaderValue(getBusinessObject(element), 'inactive');
 
-      // whem
+      // when
       const property = findExtension(element, 'zeebe:Properties').get('properties')[0];
 
       // when
@@ -2102,7 +2102,7 @@ function expectZeebePropertyValue(businessObject, value) {
   expect(properties[0].value).to.eql(value);
 }
 
-function expectZeebePropertyValueByKey(businessObject ,key, value) {
+function expectZeebePropertyValueByKey(businessObject, key, value) {
   const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
   const properties = zeebeProperties.get('zeebe:properties');
 
