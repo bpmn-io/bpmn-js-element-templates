@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.17.0
+
+* `FEAT`: display `id` and `version` for unknown element templates ([#203](https://github.com/bpmn-io/bpmn-js-element-templates/pull/203))
+
 ## 2.16.1
 
 * `FIX`: remove unnecessary title attribute ([#205](https://github.com/bpmn-io/bpmn-js-element-templates/pull/205))
