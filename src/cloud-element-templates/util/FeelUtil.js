@@ -65,3 +65,7 @@ export const fromFeelExpression = (value, type) => {
 
   return value;
 };
+
+export function isFeel(value) {
+  return typeof value === 'string' && value.trim().startsWith('=');
+}

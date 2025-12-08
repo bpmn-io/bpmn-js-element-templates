@@ -63,6 +63,8 @@ import {
 import { createElement } from '../../utils/ElementUtil';
 import { getExpressionValue, isExpression, createExpression } from './bpmnExpressionUtil';
 
+import { isFeel } from './FeelUtil';
+
 { /* Required to break up imports, see https://github.com/babel/babel/issues/15156 */ }
 
 const EXPRESSION_TYPES = [
@@ -1379,8 +1381,4 @@ function defaultTranslate(template, replacements) {
   return template.replace(/{([^}]+)}/g, function(_, key) {
     return replacements[key] || '{' + key + '}';
   });
-}
-
-function isFeel(value) {
-  return isString(value) && value.trim().startsWith('=');
 }
