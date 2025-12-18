@@ -6,6 +6,12 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.18.0
+
+* `FEAT`: support timer event templates ([#208](https://github.com/bpmn-io/bpmn-js-element-templates/pull/208))
+* `FIX`: remove properties instead of replacing element on template removal ([#206](https://github.com/bpmn-io/bpmn-js-element-templates/pull/206))
+* `DEPS`: update `@bpmn-io/element-templates-validator` to `v2.16.0`
+
 ## 2.17.0
 
 * `FEAT`: display `id` and `version` for unknown element templates ([#203](https://github.com/bpmn-io/bpmn-js-element-templates/pull/203))
