@@ -3,6 +3,8 @@ import {
   inject
 } from 'test/TestHelper';
 
+import { expect } from 'chai';
+
 import { getRoot } from 'src/utils/ElementUtil';
 
 import diagramXML from './CreateHelper.bpmn';

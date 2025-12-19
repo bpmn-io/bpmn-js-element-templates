@@ -1,6 +1,8 @@
 import { sanitizeHTML } from 'src/utils/sanitize';
 
 
+
+import { expect } from 'chai';
 describe('provider/element-template - sanitize', function() {
 
   it('should keep safe links', function() {

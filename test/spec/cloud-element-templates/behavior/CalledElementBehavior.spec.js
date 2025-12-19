@@ -1,4 +1,6 @@
 import TestContainer from 'mocha-test-container-support';
+import { expect } from 'chai';
+
 import coreModule from 'bpmn-js/lib/core';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';

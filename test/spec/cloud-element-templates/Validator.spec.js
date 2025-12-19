@@ -3,6 +3,8 @@ import { Validator } from 'src/cloud-element-templates/Validator';
 import { getZeebeSchemaVersion as getTemplateSchemaVersion } from '@bpmn-io/element-templates-validator';
 import BPMNModdle from 'bpmn-moddle';
 
+
+import { expect } from 'chai';
 const ElementTemplateSchemaVersion = getTemplateSchemaVersion();
 
 

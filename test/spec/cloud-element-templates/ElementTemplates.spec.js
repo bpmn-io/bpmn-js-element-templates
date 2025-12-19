@@ -1,5 +1,8 @@
 import TestContainer from 'mocha-test-container-support';
 
+import { expect } from 'chai';
+import { spy } from 'sinon';
+
 import {
   is,
   isAny
@@ -1026,15 +1029,15 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     it('should emit <elementTemplates.changed> event', inject(function(elementTemplates, eventBus) {
 
       // given
-      const spy = sinon.spy();
+      const changeSpy = spy();
 
-      eventBus.on('elementTemplates.changed', spy);
+      eventBus.on('elementTemplates.changed', changeSpy);
 
       // when
       elementTemplates.set(templates);
 
       // then
-      expect(spy).to.have.been.calledOnce;
+      expect(changeSpy).to.have.been.calledOnce;
     }));
 
   });
@@ -1076,15 +1079,15 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     it('should emit event', inject(function(elementTemplates, eventBus) {
 
       // given
-      const spy = sinon.spy();
+      const changeSpy = spy();
 
-      eventBus.on('elementTemplates.engines.changed', spy);
+      eventBus.on('elementTemplates.engines.changed', changeSpy);
 
       // when
       elementTemplates.setEngines({});
 
       // then
-      expect(spy).to.have.been.calledOnce;
+      expect(changeSpy).to.have.been.calledOnce;
     }));
 
 
@@ -1473,16 +1476,16 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       const task = elementRegistry.get('Task_1');
       const oldTemplate = elementTemplates.get(task);
       const newTemplate = templates[6];
-      const spy = sinon.spy();
+      const changeSpy = spy();
 
-      eventBus.on('elementTemplates.apply', spy);
+      eventBus.on('elementTemplates.apply', changeSpy);
 
       // when
       elementTemplates.applyTemplate(task, newTemplate);
 
       // then
-      expect(spy).to.have.been.calledOnce;
-      expect(spy.getCalls()[0].args[1]).to.eql({
+      expect(changeSpy).to.have.been.calledOnce;
+      expect(changeSpy.getCalls()[0].args[1]).to.eql({
         element: task,
         oldTemplate,
         newTemplate
@@ -1564,16 +1567,16 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       // given
       const task = elementRegistry.get('Task_1');
       const oldTemplate = elementTemplates.get(task);
-      const spy = sinon.spy();
+      const changeSpy = spy();
 
-      eventBus.on('elementTemplates.unlink', spy);
+      eventBus.on('elementTemplates.unlink', changeSpy);
 
       // when
       elementTemplates.unlinkTemplate(task);
 
       // then
-      expect(spy).to.have.been.calledOnce;
-      expect(spy.getCalls()[0].args[1]).to.eql({
+      expect(changeSpy).to.have.been.calledOnce;
+      expect(changeSpy.getCalls()[0].args[1]).to.eql({
         element: task,
         oldTemplate
       });
@@ -1716,16 +1719,16 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       // given
       const task = elementRegistry.get('Task_1');
       const oldTemplate = elementTemplates.get(task);
-      const spy = sinon.spy();
+      const changeSpy = spy();
 
-      eventBus.on('elementTemplates.remove', spy);
+      eventBus.on('elementTemplates.remove', changeSpy);
 
       // when
       elementTemplates.removeTemplate(task);
 
       // then
-      expect(spy).to.have.been.calledOnce;
-      expect(spy.getCalls()[0].args[1]).to.eql({
+      expect(changeSpy).to.have.been.calledOnce;
+      expect(changeSpy.getCalls()[0].args[1]).to.eql({
         element: task,
         oldTemplate
       });
@@ -1915,16 +1918,16 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       const task = elementRegistry.get('Task_1');
       const oldTemplate = elementTemplates.get(task);
-      const spy = sinon.spy();
+      const changeSpy = spy();
 
-      eventBus.on('elementTemplates.update', spy);
+      eventBus.on('elementTemplates.update', changeSpy);
 
       // when
       elementTemplates.applyTemplate(task, newTemplate);
 
       // then
-      expect(spy).to.have.been.calledOnce;
-      expect(spy.getCalls()[0].args[1]).to.eql({
+      expect(changeSpy).to.have.been.calledOnce;
+      expect(changeSpy.getCalls()[0].args[1]).to.eql({
         element: task,
         oldTemplate,
         newTemplate
