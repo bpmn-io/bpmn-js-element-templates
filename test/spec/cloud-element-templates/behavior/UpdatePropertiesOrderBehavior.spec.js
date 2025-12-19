@@ -1,5 +1,7 @@
 import TestContainer from 'mocha-test-container-support';
 
+import { expect } from 'chai';
+
 import {
   findExtension
 } from 'src/cloud-element-templates/Helper';

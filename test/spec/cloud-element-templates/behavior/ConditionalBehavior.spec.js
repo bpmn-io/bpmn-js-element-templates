@@ -1,4 +1,6 @@
 import TestContainer from 'mocha-test-container-support';
+import { expect } from 'chai';
+
 import { act } from '@testing-library/preact';
 
 import {

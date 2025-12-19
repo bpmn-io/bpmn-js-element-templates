@@ -2,6 +2,8 @@ import BPMNModdle from 'bpmn-moddle';
 import validate from 'src/element-templates/util/validate';
 
 
+
+import { expect } from 'chai';
 describe('provider/element-template - validate', function() {
 
   it('should return validation errors only', function() {

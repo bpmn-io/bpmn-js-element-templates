@@ -1,5 +1,8 @@
 import TestContainer from 'mocha-test-container-support';
 
+import { expect } from 'chai';
+import { spy } from 'sinon';
+
 import {
   act
 } from '@testing-library/preact';
@@ -321,10 +324,10 @@ describe('provider/element-templates - ElementTemplates', function() {
       async function(elementRegistry, selection, eventBus) {
 
         // given
-        const spy = sinon.spy();
+        const changeSpy = spy();
         const element = elementRegistry.get('Task_3');
 
-        eventBus.on('elementTemplates.select', spy);
+        eventBus.on('elementTemplates.select', changeSpy);
 
         await act(() => {
           selection.select(element);
@@ -338,8 +341,8 @@ describe('provider/element-templates - ElementTemplates', function() {
         });
 
         // then
-        expect(spy).to.have.been.calledOnce;
-        expect(spy).to.have.been.calledWithMatch({ element });
+        expect(changeSpy).to.have.been.calledOnce;
+        expect(changeSpy).to.have.been.calledWithMatch({ element });
       })
     );
   });

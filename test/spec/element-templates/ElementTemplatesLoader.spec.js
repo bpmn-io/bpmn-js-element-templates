@@ -1,5 +1,8 @@
 import TestContainer from 'mocha-test-container-support';
 
+import { expect } from 'chai';
+import { spy } from 'sinon';
+
 import { bootstrapModeler, inject } from 'test/TestHelper';
 
 import coreModule from 'bpmn-js/lib/core';
@@ -108,7 +111,7 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
     it('should emit <elementTemplates.changed> event', inject(function(elementTemplatesLoader, eventBus) {
 
       // given
-      const changedListener = sinon.spy(function() {});
+      const changedListener = spy(function() {});
 
       eventBus.on('elementTemplates.changed', changedListener);
 
@@ -155,7 +158,7 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
       inject(function(elementTemplatesLoader, eventBus) {
 
         // given
-        const changedListener = sinon.spy(function() {});
+        const changedListener = spy(function() {});
 
         eventBus.on('elementTemplates.changed', changedListener);
 
@@ -172,7 +175,7 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
       inject(function(elementTemplatesLoader, eventBus) {
 
         // given
-        const errorListener = sinon.spy(function() {
+        const errorListener = spy(function() {
           console.log(arguments);
         });
 
@@ -195,7 +198,7 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
           done(new Error('foo'));
         };
 
-        const errorListener = sinon.spy(function(e) {
+        const errorListener = spy(function(e) {
 
           const errors = e.errors;
 
@@ -204,7 +207,7 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
           expect(errors[0].message).to.eql('foo');
         });
 
-        const changedListener = sinon.spy(function() {});
+        const changedListener = spy(function() {});
 
         eventBus.on('elementTemplates.errors', errorListener);
         eventBus.on('elementTemplates.changed', changedListener);
@@ -231,7 +234,7 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
           ]);
         };
 
-        const errorListener = sinon.spy(function(e) {
+        const errorListener = spy(function(e) {
 
           const errors = e.errors;
 
@@ -241,7 +244,7 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
           ]);
         });
 
-        const changedListener = sinon.spy(function() {});
+        const changedListener = spy(function() {});
 
         eventBus.on('elementTemplates.errors', errorListener);
         eventBus.on('elementTemplates.changed', changedListener);
