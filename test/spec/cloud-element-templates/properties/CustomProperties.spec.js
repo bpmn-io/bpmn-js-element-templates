@@ -1,5 +1,8 @@
 import TestContainer from 'mocha-test-container-support';
 
+import { expect } from 'chai';
+import { spy, useFakeTimers } from 'sinon';
+
 import {
   bootstrapPropertiesPanel,
   changeInput,
@@ -299,14 +302,14 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
             input = findInput('text', entry);
 
       // input event causes an uncaught error which cannot be caught in try/catch
-      const spy = sinon.spy();
-      window.onerror = spy;
+      const changeSpy = spy();
+      window.onerror = changeSpy;
 
       // when
       changeInput(input, 'foo');
 
       // then
-      expect(spy).to.have.been.calledOnce;
+      expect(changeSpy).to.have.been.calledOnce;
       expect(task.businessObject.get('extensionElements')).to.equal(initialValue);
     }));
   });
@@ -2355,7 +2358,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }
 
     beforeEach(function() {
-      clock = sinon.useFakeTimers();
+      clock = useFakeTimers();
     });
 
     afterEach(function() {

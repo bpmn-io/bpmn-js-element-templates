@@ -3,6 +3,8 @@ import {
   inject
 } from '../../../TestHelper';
 
+import { expect } from 'chai';
+
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import { BpmnPropertiesProviderModule as BpmnPropertiesProvider } from 'bpmn-js-properties-panel';
 import ElementTemplatesModule from 'src/cloud-element-templates';
 import CoreModule from 'bpmn-js/lib/core';

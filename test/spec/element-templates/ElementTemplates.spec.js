@@ -1,5 +1,8 @@
 import TestContainer from 'mocha-test-container-support';
 
+import { expect } from 'chai';
+import { spy } from 'sinon';
+
 import {
   isAny
 } from 'bpmn-js/lib/util/ModelUtil';
@@ -680,15 +683,15 @@ describe('provider/element-templates - ElementTemplates', function() {
     it('should emit <elementTemplates.changed> event', inject(function(elementTemplates, eventBus) {
 
       // given
-      const spy = sinon.spy();
+      const changeSpy = spy();
 
-      eventBus.on('elementTemplates.changed', spy);
+      eventBus.on('elementTemplates.changed', changeSpy);
 
       // when
       elementTemplates.set(templates);
 
       // then
-      expect(spy).to.have.been.calledOnce;
+      expect(changeSpy).to.have.been.calledOnce;
     }));
 
   });
@@ -699,15 +702,15 @@ describe('provider/element-templates - ElementTemplates', function() {
     it('should emit event', inject(function(elementTemplates, eventBus) {
 
       // given
-      const spy = sinon.spy();
+      const changeSpy = spy();
 
-      eventBus.on('elementTemplates.engines.changed', spy);
+      eventBus.on('elementTemplates.engines.changed', changeSpy);
 
       // when
       elementTemplates.setEngines({});
 
       // then
-      expect(spy).to.have.been.calledOnce;
+      expect(changeSpy).to.have.been.calledOnce;
     }));
 
   });

@@ -4,6 +4,8 @@ import { getSchemaVersion as getTemplateSchemaVersion } from '@bpmn-io/element-t
 
 import BPMNModdle from 'bpmn-moddle';
 
+
+import { expect } from 'chai';
 const ElementTemplateSchemaVersion = getTemplateSchemaVersion();
 
 

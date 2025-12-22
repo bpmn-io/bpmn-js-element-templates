@@ -10,6 +10,8 @@ import templates from './LinterPlugin.json';
 import BPMNModdle from 'bpmn-moddle';
 import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
+
+import { expect } from 'chai';
 const valid = [
   {
     name: 'Valid Template',

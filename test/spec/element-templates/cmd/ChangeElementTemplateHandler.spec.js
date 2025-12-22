@@ -4,6 +4,8 @@ import {
   inject
 } from 'test/TestHelper';
 
+import { expect } from 'chai';
+
 import TestContainer from 'mocha-test-container-support';
 
 import CoreModule from 'bpmn-js/lib/core';

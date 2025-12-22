@@ -2,6 +2,8 @@ import {
   getVersionOrDateFromTemplate
 } from 'src/utils/templateUtil';
 
+import { expect } from 'chai';
+
 import TestContainer from 'mocha-test-container-support';
 
 import { bootstrapModeler } from 'test/TestHelper';
