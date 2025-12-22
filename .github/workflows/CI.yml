@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        node-version: [ 20 ]
+        node-version: [ 24 ]
         integration-deps:
         - diagram-js@14 bpmn-js@17 bpmn-js-create-append-anything@0.6 @bpmn-io/element-template-chooser@1
         - "" # as defined in package.json
