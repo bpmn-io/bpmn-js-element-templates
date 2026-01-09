@@ -1977,9 +1977,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
     describe('boolean', function() {
 
-      // TODO(@jarekdanielak): To be implemented as part of
-      // https://github.com/bpmn-io/bpmn-js-element-templates/issues/195
-      it.skip('should match `true`', inject(function() {
+      it('should match `true`', inject(function() {
 
         // given
         const element = changeTemplate('Task_1', booleanTemplate);
@@ -1992,13 +1990,27 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         expectZeebePropertyValueByKey(businessObject, 'inputForActiveStaticCheckbox');
 
         const zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
-        console.log(zeebeProperties);
 
         expect(zeebeProperties.find(p => p.name === 'inputForInactiveStaticCheckbox')).to.not.exist;
       }));
 
 
-      it('should match `false`');
+      it('should match `false`', inject(function(modeling) {
+
+        // given
+        const element = changeTemplate('Task_1', booleanTemplate);
+
+        // when
+        const property = findExtension(element, 'zeebe:Properties').get('properties').find(p => p.name === 'booleanStaticProp');
+        modeling.updateModdleProperties(element, property, {
+          value: '=false'
+        });
+
+        // then
+        const businessObject = getBusinessObject(element);
+        expectZeebePropertyValueByKey(businessObject, 'booleanStaticProp', '=false');
+        expectZeebePropertyValueByKey(businessObject, 'inputForInactiveStaticCheckbox');
+      }));
 
 
       it('should match "=true"', inject(function() {
