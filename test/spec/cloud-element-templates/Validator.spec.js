@@ -1,7 +1,7 @@
 import { Validator } from 'src/cloud-element-templates/Validator';
 
 import { getZeebeSchemaVersion as getTemplateSchemaVersion } from '@bpmn-io/element-templates-validator';
-import BPMNModdle from 'bpmn-moddle';
+import { BpmnModdle } from 'bpmn-moddle';
 
 
 import { expect } from 'chai';
@@ -23,7 +23,7 @@ describe('provider/cloud-element-templates - Validator', function() {
   let moddle;
 
   beforeEach(function() {
-    moddle = new BPMNModdle();
+    moddle = new BpmnModdle();
   });
 
 

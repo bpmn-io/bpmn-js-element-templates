@@ -7,7 +7,7 @@ import compatibilityRule from 'src/cloud-element-templates/linting/rules/element
 
 import templates from './LinterPlugin.json';
 
-import BPMNModdle from 'bpmn-moddle';
+import { BpmnModdle } from 'bpmn-moddle';
 import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
 
@@ -328,7 +328,7 @@ describe('cloud-element-templates/linting', function() {
 // helpers ///////////
 
 async function createModdle(xml) {
-  const moddle = new BPMNModdle({
+  const moddle = new BpmnModdle({
     zeebe: zeebeModdle
   });
 
