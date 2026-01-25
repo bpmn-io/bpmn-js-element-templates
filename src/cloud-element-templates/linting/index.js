@@ -14,7 +14,7 @@ import validate from './rules/element-templates-validate';
 import compatibility from './rules/element-templates-compatibility';
 
 
-import BpmnModdle from 'bpmn-moddle';
+import { BpmnModdle } from 'bpmn-moddle';
 
 import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 

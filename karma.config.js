@@ -1,5 +1,3 @@
-/* eslint-env node */
-
 const path = require('path');
 
 const pkg = require('./package.json');
