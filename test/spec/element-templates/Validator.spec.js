@@ -2,7 +2,7 @@ import { Validator } from 'src/element-templates/Validator';
 
 import { getSchemaVersion as getTemplateSchemaVersion } from '@bpmn-io/element-templates-validator';
 
-import BPMNModdle from 'bpmn-moddle';
+import { BpmnModdle } from 'bpmn-moddle';
 
 
 import { expect } from 'chai';
@@ -21,7 +21,7 @@ describe('provider/element-templates - Validator', function() {
     return validator.getValidTemplates();
   }
 
-  const moddle = new BPMNModdle();
+  const moddle = new BpmnModdle();
 
 
   describe('schema version', function() {
