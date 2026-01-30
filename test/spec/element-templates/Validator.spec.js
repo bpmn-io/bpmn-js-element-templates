@@ -290,6 +290,34 @@ describe('provider/element-templates - Validator', function() {
     });
 
 
+    it('should accept template with no version and version 0 as different versions', function() {
+
+      // given
+      const templates = new Validator(moddle);
+
+      // when
+      templates.addAll([
+        {
+          id: 'foo',
+          name: 'Foo (no version)',
+          appliesTo: [ 'bpmn:Task' ],
+          properties: []
+        },
+        {
+          id: 'foo',
+          name: 'Foo (version 0)',
+          version: 0,
+          appliesTo: [ 'bpmn:Task' ],
+          properties: []
+        }
+      ]);
+
+      // then
+      expect(errors(templates)).to.be.empty;
+      expect(valid(templates)).to.have.length(2);
+    });
+
+
     it('should reject missing appliesTo', function() {
 
       // given

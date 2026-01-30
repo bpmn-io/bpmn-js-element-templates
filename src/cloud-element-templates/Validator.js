@@ -15,7 +15,7 @@ import {
   getZeebeSchemaPackage as getTemplateSchemaPackage,
   getZeebeSchemaVersion as getTemplateSchemaVersion
 } from '@bpmn-io/element-templates-validator';
-import { forEach } from 'min-dash';
+import { forEach, isNil } from 'min-dash';
 
 const SUPPORTED_SCHEMA_VERSION = getTemplateSchemaVersion();
 const SUPPORTED_SCHEMA_PACKAGE = getTemplateSchemaPackage();
@@ -37,7 +37,7 @@ export class Validator extends BaseValidator {
    */
   _validateTemplate(template) {
     const id = template.id,
-          version = template.version || '_',
+          version = isNil(template.version) ? '_' : template.version,
           schema = template.$schema,
           schemaVersion = schema && getSchemaVersion(schema);
 
