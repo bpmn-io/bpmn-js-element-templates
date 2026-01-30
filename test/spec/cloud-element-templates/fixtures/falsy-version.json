@@ -1,8 +1,15 @@
 [
   {
     "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
-    "id": "foo",
-    "name":"Foo 1",
+    "id": "falsy-template",
+    "name":"Falsy version (no version)",
+    "appliesTo": [ "bpmn:Task" ],
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "falsy-template",
+    "name":"Falsy version (version 0)",
     "version": 0,
     "appliesTo": [ "bpmn:Task" ],
     "properties": []

@@ -2,6 +2,7 @@ import {
   filter,
   forEach,
   isArray,
+  isNil,
   isString
 } from 'min-dash';
 
@@ -63,7 +64,7 @@ export class Validator {
 
     if (!err) {
       id = template.id;
-      version = template.version || '_';
+      version = isNil(template.version) ? '_' : template.version;
 
       if (!this._templatesById[ id ]) {
         this._templatesById[ id ] = {};
@@ -86,7 +87,7 @@ export class Validator {
    */
   _validateTemplate(template) {
     const id = template.id,
-          version = template.version || '_',
+          version = isNil(template.version) ? '_' : template.version,
           schemaVersion = template.$schema && getSchemaVersion(template.$schema);
 
     // (1) compatibility

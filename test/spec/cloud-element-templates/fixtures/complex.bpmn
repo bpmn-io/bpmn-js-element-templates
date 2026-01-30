@@ -98,6 +98,7 @@
     <bpmn:serviceTask id="Activity_1dnqc94" name="incompatible" zeebe:modelerTemplate="example.engines.test.incompatible" />
     <bpmn:serviceTask id="Activity_1ofw5tu" name="incompatible (update available)" zeebe:modelerTemplate="example.engines.test.basic" zeebe:modelerTemplateVersion="3" />
     <bpmn:subProcess id="Activity_16bxle5" name="SubProcess" zeebe:modelerTemplate="subprocess" zeebe:modelerTemplateVersion="1" zeebe:modelerTemplateIcon="data:image/svg+xml,%3Csvg%20height%3D%22100%22%20width%3D%22100%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Ccircle%20r%3D%2245%22%20cx%3D%2250%22%20cy%3D%2250%22%20fill%3D%22green%22%20%2F%3E%3C%2Fsvg%3E" />
+    <bpmn:task id="Activity_04iadre" name="Falsy version" zeebe:modelerTemplate="falsy-template"></bpmn:task>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0vvlc66">
@@ -148,6 +149,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0xbqyuv" bpmnElement="Activity_1ofw5tu">
         <dc:Bounds x="800" y="240" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_04iadre_di" bpmnElement="Activity_04iadre">
+        <dc:Bounds x="410" y="690" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_16bxle5_di" bpmnElement="Activity_16bxle5" isExpanded="true">
