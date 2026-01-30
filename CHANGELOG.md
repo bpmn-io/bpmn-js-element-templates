@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+`FIX`: handle version 0 correctly during validation ([#216](https://github.com/bpmn-io/bpmn-js-element-templates/pull/216))
+
 ## 2.18.0
 
 * `FEAT`: support timer event templates ([#208](https://github.com/bpmn-io/bpmn-js-element-templates/pull/208))
