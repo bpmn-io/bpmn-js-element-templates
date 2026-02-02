@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "id": "conditional-event-template",
+  "name": "Conditional Event Template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:IntermediateCatchEvent"
+  ],
+  "elementType": {
+    "value": "bpmn:IntermediateCatchEvent",
+    "eventDefinition": "bpmn:ConditionalEventDefinition"
+  },
+  "properties": [
+    {
+      "label": "Condition Expression",
+      "type": "String",
+      "value": "=orderTotal > 100",
+      "feel": "required",
+      "binding": {
+        "type": "bpmn:ConditionalEventDefinition#property",
+        "name": "condition"
+      }
+    }
+  ]
+}

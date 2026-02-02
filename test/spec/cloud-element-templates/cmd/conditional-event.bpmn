@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_conditional" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:intermediateCatchEvent id="ConditionalEvent_1">
+      <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_1" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="ConditionalEvent_2">
+      <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_2">
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">=someVariable &gt; 10</bpmn:condition>
+      </bpmn:conditionalEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="ConditionalEvent_3" zeebe:modelerTemplate="conditional-event-template" zeebe:modelerTemplateVersion="1">
+      <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_3">
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">=myCondition</bpmn:condition>
+      </bpmn:conditionalEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:subProcess id="Activity_0yjgvxr">
+      <bpmn:intermediateCatchEvent id="ConditionalEvent_4">
+        <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_4">
+          <bpmn:extensionElements>
+          <zeebe:conditionalFilter variableNames="foo,bar" variableEvents="create,update" />
+        </bpmn:extensionElements>
+          <bpmn:condition xsi:type="bpmn:tFormalExpression">=existingCondition</bpmn:condition>
+        </bpmn:conditionalEventDefinition>
+      </bpmn:intermediateCatchEvent>
+    </bpmn:subProcess>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="ConditionalEvent_1_di" bpmnElement="ConditionalEvent_1">
+        <dc:Bounds x="230" y="50" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConditionalEvent_2_di" bpmnElement="ConditionalEvent_2">
+        <dc:Bounds x="280" y="50" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConditionalEvent_3_di" bpmnElement="ConditionalEvent_3">
+        <dc:Bounds x="330" y="50" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0yjgvxr_di" bpmnElement="Activity_0yjgvxr" isExpanded="true">
+        <dc:Bounds x="160" y="130" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConditionalEvent_4_di" bpmnElement="ConditionalEvent_4">
+        <dc:Bounds x="192" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "id": "conditional-filter-event-template",
+  "name": "Conditional Filter Event Template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:IntermediateCatchEvent"
+  ],
+  "elementType": {
+    "value": "bpmn:IntermediateCatchEvent",
+    "eventDefinition": "bpmn:ConditionalEventDefinition"
+  },
+  "properties": [
+    {
+      "label": "Variable Names",
+      "type": "String",
+      "value": "orderTotal,discount",
+      "binding": {
+        "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+        "name": "variableNames"
+      }
+    },
+    {
+      "label": "Variable Events",
+      "type": "String",
+      "value": "create,update",
+      "binding": {
+        "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+        "name": "variableEvents"
+      }
+    }
+  ]
+}

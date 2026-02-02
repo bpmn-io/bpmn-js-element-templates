@@ -9,6 +9,8 @@ import {
 } from 'min-dash';
 
 import {
+  CONDITIONAL_EVENT_DEFINITION_PROPERTY,
+  CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY,
   EXTENSION_BINDING_TYPES,
   IO_BINDING_TYPES,
   MESSAGE_BINDING_TYPES,
@@ -41,6 +43,7 @@ import {
 } from './taskDefinition';
 
 import {
+  findConditionalEventDefinition,
   findExtension,
   findTaskHeader,
   findInputParameter,
@@ -58,7 +61,8 @@ import {
   createTaskDefinition,
   createTaskHeader,
   createZeebeProperty,
-  shouldUpdate
+  shouldUpdate,
+  ensureExtension
 } from '../CreateHelper';
 
 import { createElement } from '../../utils/ElementUtil';
@@ -248,6 +252,25 @@ function getRawPropertyValue(element, property) {
     }
 
     return defaultValue;
+  }
+
+  // bpmn:ConditionalEventDefinition#property
+  if (type === CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
+    const conditionalEventDefinition = findConditionalEventDefinition(businessObject);
+
+    return conditionalEventDefinition?.get(name)?.get('body') || defaultValue;
+  }
+
+  // bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property
+  if (type === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
+    const conditionalEventDefinition = findConditionalEventDefinition(businessObject);
+
+    if (!conditionalEventDefinition) {
+      return defaultValue;
+    }
+
+    const conditionalFilter = findExtension(conditionalEventDefinition.get('extensionElements'), 'zeebe:ConditionalFilter');
+    return conditionalFilter ? conditionalFilter.get(name) : defaultValue;
   }
 
   // zeebe:calledElement
@@ -450,6 +473,59 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
         }
       });
     }
+  }
+
+  // handle conditional event definition property
+  if (type === CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
+    const conditionalEventDefinition = findConditionalEventDefinition(businessObject);
+
+    if (!conditionalEventDefinition) {
+      throw new Error('cannot set conditional property on element without ConditionalEventDefinition');
+    }
+
+    let expression = conditionalEventDefinition.get(name);
+
+    if (!expression) {
+      expression = createExpression(value, conditionalEventDefinition, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: conditionalEventDefinition,
+          properties: { [name]: expression }
+        }
+      });
+    } else {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: expression,
+          properties: { body: value || '' }
+        }
+      });
+    }
+  }
+
+  // handle conditional event definition zeebe:conditionalFilter property
+  if (type === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
+    const conditionalEventDefinition = findConditionalEventDefinition(businessObject);
+
+    if (!conditionalEventDefinition) {
+      throw new Error('cannot set conditional filter property on element without ConditionalEventDefinition');
+    }
+
+    const conditionalFilter = ensureExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter', bpmnFactory);
+
+    commands.push({
+      cmd: 'element.updateModdleProperties',
+      context: {
+        ...context,
+        moddleElement: conditionalFilter,
+        properties: { [name]: value || '' }
+      }
+    });
   }
 
   // ensure extension elements
