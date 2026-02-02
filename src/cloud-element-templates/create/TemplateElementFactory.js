@@ -14,6 +14,10 @@ import { MessagePropertyBindingProvider } from './MessagePropertyBindingProvider
 import { MessageZeebeSubscriptionBindingProvider } from './MessageZeebeSubscriptionBindingProvider';
 import { SignalPropertyBindingProvider } from './SignalPropertyBindingProvider';
 import { TimerPropertyBindingProvider } from './TimerPropertyBindingProvider';
+import {
+  ConditionalEventDefinitionPropertyBindingProvider,
+  ConditionalEventDefinitionZeebeConditionalFilterBindingProvider
+} from './ConditionalEventBindingProvider';
 import { CalledElementBindingProvider } from './CalledElementBindingProvider';
 import LinkedResourcePropertyBindingProvider from './LinkedResourceProvider';
 import ZeebeUserTaskBindingProvider from './ZeebeUserTaskBindingProvider';
@@ -31,6 +35,8 @@ import {
   PROPERTY_TYPE,
   SIGNAL_PROPERTY_TYPE,
   TIMER_EVENT_DEFINITION_PROPERTY_TYPE,
+  CONDITIONAL_EVENT_DEFINITION_PROPERTY,
+  CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY,
   ZEEBE_TASK_DEFINITION_TYPE_TYPE,
   ZEEBE_TASK_DEFINITION,
   ZEBBE_INPUT_TYPE,
@@ -70,6 +76,8 @@ export default class TemplateElementFactory {
       [MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE]: MessageZeebeSubscriptionBindingProvider,
       [SIGNAL_PROPERTY_TYPE]: SignalPropertyBindingProvider,
       [TIMER_EVENT_DEFINITION_PROPERTY_TYPE]: TimerPropertyBindingProvider,
+      [CONDITIONAL_EVENT_DEFINITION_PROPERTY]: ConditionalEventDefinitionPropertyBindingProvider,
+      [CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY]: ConditionalEventDefinitionZeebeConditionalFilterBindingProvider,
       [ZEEBE_CALLED_ELEMENT]: CalledElementBindingProvider,
       [ZEEBE_LINKED_RESOURCE_PROPERTY]: LinkedResourcePropertyBindingProvider,
       [ZEEBE_USER_TASK]: ZeebeUserTaskBindingProvider,

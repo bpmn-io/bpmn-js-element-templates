@@ -1,4 +1,5 @@
 import ConditionalBehavior from './ConditionalBehavior';
+import ConditionalEventTemplateBehavior from './ConditionalEventTemplateBehavior';
 import ReplaceBehavior from './ReplaceBehavior';
 import TimerTemplateBehavior from './TimerTemplateBehavior';
 import UpdatePropertiesOrderBehavior from './UpdatePropertiesOrderBehavior';
@@ -11,6 +12,7 @@ export default {
   __init__: [
     'elementTemplatesReplaceBehavior',
     'elementTemplatesConditionalBehavior',
+    'elementTemplatesConditionalEventTemplateBehavior',
     'elementTemplatesGeneratedValueBehavior',
     'elementTemplatesReferencedElementBehavior',
     'elementTemplatesUpdatePropertiesOrderBehavior',
@@ -20,6 +22,7 @@ export default {
   ],
   elementTemplatesReplaceBehavior: [ 'type', ReplaceBehavior ],
   elementTemplatesConditionalBehavior: [ 'type', ConditionalBehavior ],
+  elementTemplatesConditionalEventTemplateBehavior: [ 'type', ConditionalEventTemplateBehavior ],
   elementTemplatesGeneratedValueBehavior: [ 'type', GeneratedValueBehavior ],
   elementTemplatesReferencedElementBehavior: [ 'type', ReferencedElementBehavior ],
   elementTemplatesUpdatePropertiesOrderBehavior: [ 'type', UpdatePropertiesOrderBehavior ],

@@ -933,5 +933,69 @@
         }
       }
     ]
+  },
+  {
+    "name": "Conditional Start Event Template",
+    "id": "example.camunda.ConditionalStartEventTemplate",
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:ConditionalEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Condition Expression",
+        "type": "String",
+        "feel": "required",
+        "value": "=myVariable > 100",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#property",
+          "name": "condition"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Conditional Event With Conditional Filter Template",
+    "id": "example.camunda.ConditionalEventWithConditionalFilter",
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:ConditionalEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Condition",
+        "type": "String",
+        "feel": "required",
+        "value": "=true",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#property",
+          "name": "condition"
+        }
+      },
+      {
+        "label": "Variable Names",
+        "type": "String",
+        "value": "var1,var2,var3",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+          "name": "variableNames"
+        }
+      },
+      {
+        "label": "Variable Events",
+        "type": "String",
+        "value": "create,update",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+          "name": "variableEvents"
+        }
+      }
+    ]
   }
 ]
