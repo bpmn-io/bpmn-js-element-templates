@@ -215,6 +215,23 @@ export function findTimerEventDefinition(element) {
   }
 }
 
+/**
+ * Find conditional event definition in an event.
+ * @param {ModdleElement|element} element
+ */
+export function findConditionalEventDefinition(element) {
+  const businessObject = getBusinessObject(element);
+  if (is(businessObject, 'bpmn:Event')) {
+    const eventDefinitions = businessObject.get('eventDefinitions');
+
+    if (!eventDefinitions || !eventDefinitions.length) {
+      return;
+    }
+
+    return eventDefinitions.find(def => is(def, 'bpmn:ConditionalEventDefinition'));
+  }
+}
+
 export function findZeebeSubscription(message) {
   return findExtension(message, 'zeebe:Subscription');
 }

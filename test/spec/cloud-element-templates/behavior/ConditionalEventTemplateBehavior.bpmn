@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_conditional_behavior" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.42.0">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:subProcess id="EventSubProcess_1" triggeredByEvent="true">
+      <bpmn:startEvent id="Subprocess_Event" />
+      <bpmn:intermediateCatchEvent id="Subprocess_CatchEvent">
+        <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_1jeyhrm">
+          <bpmn:condition xsi:type="bpmn:tFormalExpression" />
+        </bpmn:conditionalEventDefinition>
+      </bpmn:intermediateCatchEvent>
+    </bpmn:subProcess>
+    <bpmn:startEvent id="RootEvent" />
+    <bpmn:intermediateCatchEvent id="Root_CatchEvent">
+      <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_0oy2vym">
+        <bpmn:condition xsi:type="bpmn:tFormalExpression" />
+      </bpmn:conditionalEventDefinition>
+    </bpmn:intermediateCatchEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="Event_0q15ef0_di" bpmnElement="Root_CatchEvent">
+        <dc:Bounds x="152" y="62" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EventSubProcess_1_di" bpmnElement="EventSubProcess_1" isExpanded="true">
+        <dc:Bounds x="240" y="80" width="200" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0q0r1y6_di" bpmnElement="Subprocess_Event">
+        <dc:Bounds x="262" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1rgdz7t" bpmnElement="Subprocess_CatchEvent">
+        <dc:Bounds x="352" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_02q7n6e_di" bpmnElement="RootEvent">
+        <dc:Bounds x="152" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

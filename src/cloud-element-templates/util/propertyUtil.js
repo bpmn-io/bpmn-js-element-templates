@@ -9,6 +9,8 @@ import {
 } from 'min-dash';
 
 import {
+  CONDITIONAL_EVENT_DEFINITION_PROPERTY,
+  CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY,
   EXTENSION_BINDING_TYPES,
   IO_BINDING_TYPES,
   MESSAGE_BINDING_TYPES,
@@ -41,6 +43,7 @@ import {
 } from './taskDefinition';
 
 import {
+  findConditionalEventDefinition,
   findExtension,
   findTaskHeader,
   findInputParameter,
@@ -250,6 +253,25 @@ function getRawPropertyValue(element, property) {
     return defaultValue;
   }
 
+  // bpmn:ConditionalEventDefinition#property
+  if (type === CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
+    const conditionalEventDefinition = findConditionalEventDefinition(businessObject);
+
+    return conditionalEventDefinition?.get(name)?.get('body') || defaultValue;
+  }
+
+  // bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property
+  if (type === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
+    const conditionalEventDefinition = findConditionalEventDefinition(businessObject);
+
+    if (!conditionalEventDefinition) {
+      return defaultValue;
+    }
+
+    const conditionalFilter = findExtension(conditionalEventDefinition.get('extensionElements'), 'zeebe:ConditionalFilter');
+    return conditionalFilter ? conditionalFilter.get(name) : defaultValue;
+  }
+
   // zeebe:calledElement
   if (type === ZEEBE_CALLED_ELEMENT) {
     const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
@@ -447,6 +469,88 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
           ...context,
           moddleElement: expression,
           properties: { body: value || '' }
+        }
+      });
+    }
+  }
+
+  // handle conditional event definition property
+  if (type === CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
+    const conditionalEventDefinition = findConditionalEventDefinition(businessObject);
+
+    if (!conditionalEventDefinition) {
+      throw new Error('cannot set conditional property on element without ConditionalEventDefinition');
+    }
+
+    let expression = conditionalEventDefinition.get(name);
+
+    if (!expression) {
+      expression = bpmnFactory.create('bpmn:FormalExpression', { body: value || '' });
+      expression.$parent = conditionalEventDefinition;
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: conditionalEventDefinition,
+          properties: { [name]: expression }
+        }
+      });
+    } else {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: expression,
+          properties: { body: value || '' }
+        }
+      });
+    }
+  }
+
+  // handle conditional event definition zeebe:conditionalFilter property
+  if (type === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
+    const conditionalEventDefinition = findConditionalEventDefinition(businessObject);
+
+    if (!conditionalEventDefinition) {
+      throw new Error('cannot set conditional filter property on element without ConditionalEventDefinition');
+    }
+
+    let extensionElementsCED = conditionalEventDefinition.get('extensionElements');
+
+    if (!extensionElementsCED) {
+      extensionElementsCED = createElement('bpmn:ExtensionElements', null, conditionalEventDefinition, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: conditionalEventDefinition,
+          properties: { extensionElements: extensionElementsCED }
+        }
+      });
+    }
+
+    let conditionalFilter = findExtension(extensionElementsCED, 'zeebe:ConditionalFilter');
+
+    if (!conditionalFilter) {
+      conditionalFilter = createElement('zeebe:ConditionalFilter', { [name]: value || '' }, extensionElementsCED, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElementsCED,
+          properties: { values: [ ...extensionElementsCED.get('values'), conditionalFilter ] }
+        }
+      });
+    } else {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: conditionalFilter,
+          properties: { [name]: value || '' }
         }
       });
     }
