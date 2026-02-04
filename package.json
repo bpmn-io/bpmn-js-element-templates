@@ -62,7 +62,7 @@
   "dependencies": {
     "@bpmn-io/element-templates-validator": "^2.16.0",
     "@bpmn-io/extract-process-variables": "^1.0.1",
-    "bpmnlint": "^11.6.0",
+    "bpmnlint": "^11.10.0",
     "classnames": "^2.5.1",
     "ids": "^3.0.0",
     "min-dash": "^5.0.0",
