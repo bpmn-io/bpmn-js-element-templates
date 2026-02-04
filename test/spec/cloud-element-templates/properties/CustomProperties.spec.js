@@ -1,14 +1,15 @@
 import TestContainer from 'mocha-test-container-support';
 
 import { expect } from 'chai';
-import { spy, useFakeTimers } from 'sinon';
+import { spy } from 'sinon';
 
 import {
   bootstrapPropertiesPanel,
   changeInput,
   getBpmnJS,
   withPropertiesPanel,
-  inject, setEditorValue
+  inject,
+  setEditorValue
 } from 'test/TestHelper';
 
 import {
@@ -25,7 +26,8 @@ import {
 import {
   classes as domClasses,
   query as domQuery,
-  queryAll as domQueryAll
+  queryAll as domQueryAll,
+  closest as domClosest
 } from 'min-dom';
 
 import { is } from 'bpmn-js/lib/util/ModelUtil';
@@ -2348,22 +2350,21 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
   describe('tooltip', function() {
 
-    let clock;
+    async function openTooltip(element) {
 
-    function openTooltip(element) {
-      return act(() => {
+      const tooltipContainer = domClosest(element, '.bio-properties-panel-label, bio-properties-panel-group', true);
+
+      await act(() => {
         fireEvent.mouseEnter(element);
-        clock.tick(200);
       });
-    }
 
-    beforeEach(function() {
-      clock = useFakeTimers();
-    });
+      await waitFor(
+        () => expect(domQuery('.bio-properties-panel-tooltip', tooltipContainer)).to.exist
+      );
+    }
 
     afterEach(function() {
       cleanup();
-      clock.restore();
     });
 
     beforeEach(bootstrapPropertiesPanel(tooltipDiagramXML, {
