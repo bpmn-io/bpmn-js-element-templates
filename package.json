@@ -120,7 +120,7 @@
     "npm-run-all2": "^8.0.4",
     "puppeteer": "^24.34.0",
     "raw-loader": "^4.0.2",
-    "rollup": "^4.54.0",
+    "rollup": "^4.57.1",
     "rollup-plugin-copy": "^3.5.0",
     "sinon": "^21.0.0",
     "sinon-chai": "^4.0.0",
