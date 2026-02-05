@@ -10,7 +10,7 @@ ___Note:__ Yet to be released changes appear here._
 
 * `FEAT`: support `boolean` and `number` condition for `feel: static` properties ([#195](https://github.com/bpmn-io/bpmn-js-element-templates/issues/195), [#207](https://github.com/bpmn-io/bpmn-js-element-templates/pull/207))
 * `FIX`: correct `boolean` conditions in templates not working properly ([#192](https://github.com/bpmn-io/bpmn-js-element-templates/issues/192), [#207](https://github.com/bpmn-io/bpmn-js-element-templates/pull/207))
-* `FIX`: handle version 0 correctly during validation ([#216](https://github.com/bpmn-io/bpmn-js-element-templates/pull/216))
+* `FIX`: handle version 0 correctly during validation ([#216](https://github.com/bpmn-io/bpmn-js-element-templates/pull/216), [#176](https://github.com/bpmn-io/bpmn-js-element-templates/issues/176))
 * `DEPS`: update to `ids@3.0.0`
 * `DEPS`: update to `uuid@13.0.0`
 * `DEPS`: update to `min-dom@5.2.0`
