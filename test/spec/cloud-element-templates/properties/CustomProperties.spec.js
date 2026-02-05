@@ -2352,7 +2352,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
     async function openTooltip(element) {
 
-      const tooltipContainer = domClosest(element, '.bio-properties-panel-label, bio-properties-panel-group', true);
+      const tooltipContainer = domClosest(element, '.bio-properties-panel-label, .bio-properties-panel-group', true);
 
       await act(() => {
         fireEvent.mouseEnter(element);
