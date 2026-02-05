@@ -6,7 +6,18 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
-`FIX`: handle version 0 correctly during validation ([#216](https://github.com/bpmn-io/bpmn-js-element-templates/pull/216))
+## 2.19.0
+
+* `FEAT`: support `boolean` and `number` condition for `feel: static` properties ([#195](https://github.com/bpmn-io/bpmn-js-element-templates/issues/195), [#207](https://github.com/bpmn-io/bpmn-js-element-templates/pull/207))
+* `FIX`: correct `boolean` conditions in templates not working properly ([#192](https://github.com/bpmn-io/bpmn-js-element-templates/issues/192), [#207](https://github.com/bpmn-io/bpmn-js-element-templates/pull/207))
+* `FIX`: handle version 0 correctly during validation ([#216](https://github.com/bpmn-io/bpmn-js-element-templates/pull/216))
+* `DEPS`: update to `ids@3.0.0`
+* `DEPS`: update to `uuid@13.0.0`
+* `DEPS`: update to `min-dom@5.2.0`
+* `DEPS`: update to `min-dash@5.0.0`
+* `DEPS`: update to `bpmnlint@11.10.0`
+* `DEPS`: update to `@bpmn-io/extract-process-variables@2.0.0`
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.17.0`
 
 ## 2.18.0
 
