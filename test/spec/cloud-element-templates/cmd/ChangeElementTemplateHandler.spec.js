@@ -2375,6 +2375,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         const newConditionalEventDefinition = findConditionalEventDefinition(event);
         expect(newConditionalEventDefinition).to.not.exist;
       }));
+
     });
 
 
