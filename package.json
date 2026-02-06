@@ -79,7 +79,7 @@
     "@bpmn-io/element-template-icon-renderer": "^1.0.0",
     "@bpmn-io/properties-panel": "^3.38.0",
     "@bpmn-io/variable-resolver": "^1.4.0",
-    "@camunda/linting": "^3.46.0",
+    "@camunda/linting": "^3.47.0",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-commonjs": "^29.0.0",
