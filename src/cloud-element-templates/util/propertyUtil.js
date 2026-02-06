@@ -61,7 +61,8 @@ import {
   createTaskDefinition,
   createTaskHeader,
   createZeebeProperty,
-  shouldUpdate
+  shouldUpdate,
+  ensureExtension
 } from '../CreateHelper';
 
 import { createElement } from '../../utils/ElementUtil';
@@ -485,8 +486,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     let expression = conditionalEventDefinition.get(name);
 
     if (!expression) {
-      expression = bpmnFactory.create('bpmn:FormalExpression', { body: value || '' });
-      expression.$parent = conditionalEventDefinition;
+      expression = createExpression(value, conditionalEventDefinition, bpmnFactory);
 
       commands.push({
         cmd: 'element.updateModdleProperties',
@@ -516,44 +516,16 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
       throw new Error('cannot set conditional filter property on element without ConditionalEventDefinition');
     }
 
-    let extensionElementsCED = conditionalEventDefinition.get('extensionElements');
+    const conditionalFilter = ensureExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter', bpmnFactory);
 
-    if (!extensionElementsCED) {
-      extensionElementsCED = createElement('bpmn:ExtensionElements', null, conditionalEventDefinition, bpmnFactory);
-
-      commands.push({
-        cmd: 'element.updateModdleProperties',
-        context: {
-          ...context,
-          moddleElement: conditionalEventDefinition,
-          properties: { extensionElements: extensionElementsCED }
-        }
-      });
-    }
-
-    let conditionalFilter = findExtension(extensionElementsCED, 'zeebe:ConditionalFilter');
-
-    if (!conditionalFilter) {
-      conditionalFilter = createElement('zeebe:ConditionalFilter', { [name]: value || '' }, extensionElementsCED, bpmnFactory);
-
-      commands.push({
-        cmd: 'element.updateModdleProperties',
-        context: {
-          ...context,
-          moddleElement: extensionElementsCED,
-          properties: { values: [ ...extensionElementsCED.get('values'), conditionalFilter ] }
-        }
-      });
-    } else {
-      commands.push({
-        cmd: 'element.updateModdleProperties',
-        context: {
-          ...context,
-          moddleElement: conditionalFilter,
-          properties: { [name]: value || '' }
-        }
-      });
-    }
+    commands.push({
+      cmd: 'element.updateModdleProperties',
+      context: {
+        ...context,
+        moddleElement: conditionalFilter,
+        properties: { [name]: value || '' }
+      }
+    });
   }
 
   // ensure extension elements
