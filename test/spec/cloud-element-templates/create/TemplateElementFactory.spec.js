@@ -21,6 +21,7 @@ import modelingModule from 'bpmn-js/lib/features/modeling';
 import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 
 import {
+  findConditionalEventDefinition,
   findExtension,
   findInputParameter,
   findMessage,
@@ -628,6 +629,45 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       const timeCycle = timerEventDefinition.get('timeCycle');
       expect(timeCycle).to.exist;
       expect(timeCycle.get('body')).to.equal('R/PT5M');
+    }));
+
+
+    it('should handle <bpmn:ConditionalEventDefinition#property> - condition expression', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.ConditionalStartEventTemplate');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const conditionalEventDefinition = findConditionalEventDefinition(bo);
+      expect(conditionalEventDefinition).to.exist;
+
+      const condition = conditionalEventDefinition.get('condition');
+      expect(condition.get('body')).to.equal('=myVariable > 100');
+    }));
+
+
+    it('should handle <bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property> - variableNames and variableEvents', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.ConditionalEventWithConditionalFilter');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const conditionalEventDefinition = findConditionalEventDefinition(bo);
+      expect(conditionalEventDefinition).to.exist;
+
+      const extensionElements = conditionalEventDefinition.get('extensionElements');
+      const conditionalFilter = findExtension(extensionElements, 'zeebe:ConditionalFilter');
+
+      expect(conditionalFilter.get('variableNames')).to.equal('var1,var2,var3');
+      expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
     }));
 
 
