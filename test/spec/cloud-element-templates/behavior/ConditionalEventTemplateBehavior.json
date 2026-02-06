@@ -1,0 +1,122 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Conditional Event with Variable Events Template",
+    "id": "conditional-with-variable-events-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:ConditionalEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Condition Expression",
+        "type": "String",
+        "value": "=orderTotal > 100",
+        "feel": "required",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#property",
+          "name": "condition"
+        }
+      },
+      {
+        "label": "Variable Names",
+        "type": "String",
+        "value": "orderTotal,discount",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+          "name": "variableNames"
+        }
+      },
+      {
+        "label": "Variable Events",
+        "type": "String",
+        "value": "create,update",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+          "name": "variableEvents"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Conditional Event without Variable Events Template",
+    "id": "conditional-no-variable-events-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:StartEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:StartEvent",
+      "eventDefinition": "bpmn:ConditionalEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Condition Expression",
+        "type": "String",
+        "value": "=orderTotal > 50",
+        "feel": "required",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#property",
+          "name": "condition"
+        }
+      },
+      {
+        "label": "Variable Names",
+        "type": "String",
+        "value": "orderTotal",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+          "name": "variableNames"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Conditional Event with Variable Events Template",
+    "id": "conditional-catch-with-variable-events-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:ConditionalEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Condition Expression",
+        "type": "String",
+        "value": "=orderTotal > 100",
+        "feel": "required",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#property",
+          "name": "condition"
+        }
+      },
+      {
+        "label": "Variable Names",
+        "type": "String",
+        "value": "orderTotal,discount",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+          "name": "variableNames"
+        }
+      },
+      {
+        "label": "Variable Events",
+        "type": "String",
+        "value": "create,update",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+          "name": "variableEvents"
+        }
+      }
+    ]
+  }
+]

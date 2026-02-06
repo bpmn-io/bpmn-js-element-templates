@@ -23,6 +23,7 @@ import {
 } from 'bpmn-js/lib/util/ModelUtil';
 
 import {
+  findConditionalEventDefinition,
   findExtension,
   findInputParameter,
   findMessage,
@@ -2254,6 +2255,249 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         expect(timeDuration).to.exist;
         expect(timeDuration.get('body')).to.equal('PT1H');
+      }));
+
+    });
+
+
+    describe('update bpmn:ConditionalEventDefinition#property', function() {
+
+      beforeEach(bootstrap(require('./conditional-event.bpmn').default));
+
+      const conditionTemplate = require('./conditional-event-template-condition.json');
+      const otherEventTemplate = require('./event-template-1.json');
+
+      it('should set condition', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_1');
+
+        // when
+        changeTemplate(event, conditionTemplate);
+
+        // then
+        event = elementRegistry.get('ConditionalEvent_1');
+        expectElementTemplate(event, 'conditional-event-template', 1);
+
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+
+        expect(conditionalEventDefinition).to.exist;
+
+        const condition = conditionalEventDefinition.get('condition');
+        expect(condition).to.exist;
+        expect(condition.get('body')).to.equal('=orderTotal > 100');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_1');
+
+        // when
+        changeTemplate(event, conditionTemplate);
+        commandStack.undo();
+
+        // then
+        event = elementRegistry.get('ConditionalEvent_1');
+        expectNoElementTemplate(event);
+
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+
+        expect(conditionalEventDefinition).to.exist;
+        expect(conditionalEventDefinition.get('condition')).not.to.exist;
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_1');
+
+        // when
+        changeTemplate(event, conditionTemplate);
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        event = elementRegistry.get('ConditionalEvent_1');
+        expectElementTemplate(event, 'conditional-event-template', 1);
+
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+
+        expect(conditionalEventDefinition).to.exist;
+
+        const condition = conditionalEventDefinition.get('condition');
+        expect(condition).to.exist;
+        expect(condition.get('body')).to.equal('=orderTotal > 100');
+      }));
+
+
+      it('should update existing condition', inject(function(elementRegistry) {
+
+        // given
+        const event = elementRegistry.get('ConditionalEvent_2');
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        expect(conditionalEventDefinition.get('condition')).to.exist;
+        expect(conditionalEventDefinition.get('condition').get('body')).to.equal('=someVariable > 10');
+
+        // when
+        const newEvent = changeTemplate(event, conditionTemplate);
+
+        // then
+        expectElementTemplate(newEvent, 'conditional-event-template', 1);
+
+        const newConditionalEventDefinition = findConditionalEventDefinition(newEvent);
+
+        const condition = newConditionalEventDefinition.get('condition');
+        expect(condition).to.exist;
+        expect(condition.get('body')).to.equal('=orderTotal > 100');
+      }));
+
+
+      it('should remove condition', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_2');
+
+        // when
+        event = changeTemplate(event, conditionTemplate);
+
+        // assume
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        expect(conditionalEventDefinition.get('condition').get('body')).to.equal('=orderTotal > 100');
+
+        // when
+        event = changeTemplate(event, otherEventTemplate);
+
+        // then
+        expectElementTemplate(event, 'event-template', 1);
+        const newConditionalEventDefinition = findConditionalEventDefinition(event);
+        expect(newConditionalEventDefinition).to.not.exist;
+      }));
+
+    });
+
+
+    describe('bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property', function() {
+
+      beforeEach(bootstrap(require('./conditional-event.bpmn').default));
+
+      const filterTemplate = require('./conditional-event-template-filter.json');
+      const otherEventTemplate = require('./event-template-1.json');
+
+      it('should set conditionalFilter', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_4');
+
+        // when
+        changeTemplate(event, filterTemplate);
+
+        // then
+        event = elementRegistry.get('ConditionalEvent_4');
+        expectElementTemplate(event, 'conditional-filter-event-template', 1);
+
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+
+        expect(conditionalEventDefinition).to.exist;
+
+        const conditionalFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
+        expect(conditionalFilter).to.exist;
+        expect(conditionalFilter.get('variableNames')).to.equal('orderTotal,discount');
+        expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
+      }));
+
+
+      it('should undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_4');
+
+        // when
+        event = changeTemplate(event, filterTemplate);
+
+        // assume
+        expectElementTemplate(event, 'conditional-filter-event-template', 1);
+
+        // when
+        commandStack.undo();
+
+        // then
+        event = elementRegistry.get('ConditionalEvent_4');
+        expectNoElementTemplate(event);
+      }));
+
+
+      it('should redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_4');
+
+        // when
+        event = changeTemplate(event, filterTemplate);
+
+        // assume
+        expectElementTemplate(event, 'conditional-filter-event-template', 1);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        event = elementRegistry.get('ConditionalEvent_4');
+        expectElementTemplate(event, 'conditional-filter-event-template', 1);
+      }));
+
+
+      it('should update existing conditionalFilter', inject(function(elementRegistry) {
+
+        // given
+        const event = elementRegistry.get('ConditionalEvent_4');
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        const existingFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
+        expect(existingFilter).to.exist;
+        expect(existingFilter.get('variableNames')).to.equal('foo,bar');
+        expect(existingFilter.get('variableEvents')).to.equal('create,update');
+
+        // when
+        const newEvent = changeTemplate(event, filterTemplate);
+
+        // then
+        expectElementTemplate(newEvent, 'conditional-filter-event-template', 1);
+
+        const newConditionalEventDefinition = findConditionalEventDefinition(newEvent);
+
+        const conditionalFilter = findExtension(newConditionalEventDefinition, 'zeebe:ConditionalFilter');
+        expect(conditionalFilter).to.exist;
+        expect(conditionalFilter.get('variableNames')).to.equal('orderTotal,discount');
+        expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
+      }));
+
+
+      it('should remove conditionalFilter', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_4');
+
+        // when
+        event = changeTemplate(event, filterTemplate);
+
+        // assume
+        expectElementTemplate(event, 'conditional-filter-event-template', 1);
+
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        const conditionalFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
+        expect(conditionalFilter.get('variableNames')).to.equal('orderTotal,discount');
+        expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
+
+        // when
+        event = changeTemplate(event, otherEventTemplate);
+
+        // then
+        expectElementTemplate(event, 'event-template', 1);
+        const newConditionalEventDefinition = findConditionalEventDefinition(event);
+        expect(newConditionalEventDefinition).to.not.exist;
       }));
 
     });
@@ -6802,6 +7046,196 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(updatedTimerEventDefinition.get('timeDate')).not.to.exist;
         expect(updatedTimerEventDefinition.get('timeDuration')).to.exist;
         expect(updatedTimerEventDefinition.get('timeDuration').get('body')).to.equal('PT1H');
+      }));
+
+    });
+
+
+    describe('update bpmn:ConditionalEventDefinition#property', function() {
+
+      beforeEach(bootstrap(require('./conditional-event.bpmn').default));
+
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given
+        const event = elementRegistry.get('ConditionalEvent_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: '=oldCondition',
+            binding: {
+              type: 'bpmn:ConditionalEventDefinition#property',
+              name: 'condition'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: '=newCondition',
+            binding: {
+              type: 'bpmn:ConditionalEventDefinition#property',
+              name: 'condition'
+            }
+          }
+        ]);
+
+        changeTemplate('ConditionalEvent_1', oldTemplate);
+
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        const condition = conditionalEventDefinition.get('condition');
+
+        updateBusinessObject('ConditionalEvent_1', condition, {
+          body: '=userModifiedCondition'
+        });
+
+        // when
+        changeTemplate(event, newTemplate, oldTemplate);
+
+        // then
+        const updatedConditionalEventDefinition = findConditionalEventDefinition(event);
+        const updatedCondition = updatedConditionalEventDefinition.get('condition');
+
+        expect(updatedCondition).to.exist;
+        expect(updatedCondition.get('body')).to.equal('=userModifiedCondition');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given
+        const event = elementRegistry.get('ConditionalEvent_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: '=oldCondition',
+            binding: {
+              type: 'bpmn:ConditionalEventDefinition#property',
+              name: 'condition'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: '=newCondition',
+            binding: {
+              type: 'bpmn:ConditionalEventDefinition#property',
+              name: 'condition'
+            }
+          }
+        ]);
+
+        changeTemplate('ConditionalEvent_1', oldTemplate);
+
+        // when
+        changeTemplate(event, newTemplate, oldTemplate);
+
+        // then
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        const condition = conditionalEventDefinition.get('condition');
+
+        expect(condition).to.exist;
+        expect(condition.get('body')).to.equal('=newCondition');
+      }));
+
+    });
+
+
+    describe('update bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property', function() {
+
+      beforeEach(bootstrap(require('./conditional-event.bpmn').default));
+
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given
+        const event = elementRegistry.get('ConditionalEvent_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'foo,bar',
+            binding: {
+              type: 'bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property',
+              name: 'variableNames'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'newFoo,newBar',
+            binding: {
+              type: 'bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property',
+              name: 'variableNames'
+            }
+          }
+        ]);
+
+        changeTemplate('ConditionalEvent_1', oldTemplate);
+
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        const conditionalFilter = conditionalEventDefinition.get('extensionElements').get('values').find(
+          ext => is(ext, 'zeebe:ConditionalFilter')
+        );
+
+        updateBusinessObject('ConditionalEvent_1', conditionalFilter, {
+          variableNames: 'userModified,variables'
+        });
+
+        // when
+        changeTemplate(event, newTemplate, oldTemplate);
+
+        // then
+        const updatedConditionalEventDefinition = findConditionalEventDefinition(event);
+        const updatedConditionalFilter = updatedConditionalEventDefinition.get('extensionElements').get('values').find(
+          ext => is(ext, 'zeebe:ConditionalFilter')
+        );
+
+        expect(updatedConditionalFilter).to.exist;
+        expect(updatedConditionalFilter.get('variableNames')).to.equal('userModified,variables');
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given
+        const event = elementRegistry.get('ConditionalEvent_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'foo,bar',
+            binding: {
+              type: 'bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property',
+              name: 'variableNames'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 'newFoo,newBar',
+            binding: {
+              type: 'bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property',
+              name: 'variableNames'
+            }
+          }
+        ]);
+
+        changeTemplate(event, oldTemplate);
+
+        // when
+        changeTemplate(event, newTemplate, oldTemplate);
+
+        // then
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        const conditionalFilter = conditionalEventDefinition.get('extensionElements').get('values').find(
+          ext => is(ext, 'zeebe:ConditionalFilter')
+        );
+
+        expect(conditionalFilter).to.exist;
+        expect(conditionalFilter.get('variableNames')).to.equal('newFoo,newBar');
       }));
 
     });

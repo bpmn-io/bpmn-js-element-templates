@@ -4,6 +4,7 @@ import {
 } from 'bpmn-js/lib/util/ModelUtil';
 
 import {
+  findConditionalEventDefinition,
   findExtension,
   findMessage,
   findSignal,
@@ -34,6 +35,8 @@ import {
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   SIGNAL_PROPERTY_TYPE,
   TIMER_EVENT_DEFINITION_PROPERTY_TYPE,
+  CONDITIONAL_EVENT_DEFINITION_PROPERTY,
+  CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY,
   TASK_DEFINITION_TYPES,
   ZEEBE_CALLED_DECISION,
   ZEEBE_CALLED_ELEMENT,
@@ -131,6 +134,8 @@ export default class ChangeElementTemplateHandler {
     this._updateSignal(element, oldTemplate, newTemplate);
 
     this._updateTimerEventDefinition(element, oldTemplate, newTemplate);
+
+    this._updateConditionalEventDefinition(element, oldTemplate, newTemplate);
 
     this._updateZeebeModelerTemplateOnReferencedElement(element, oldTemplate, newTemplate);
 
@@ -1028,6 +1033,182 @@ export default class ChangeElementTemplateHandler {
         }
       }
     }
+  }
+
+  /**
+   * Update bpmn:ConditionalEventDefinition properties.
+   *
+   * @param {djs.model.Base} element
+   * @param {Object} oldTemplate
+   * @param {Object} newTemplate
+   */
+  _updateConditionalEventDefinition(element, oldTemplate, newTemplate) {
+    const bpmnFactory = this._bpmnFactory;
+    const commandStack = this._commandStack;
+
+    const conditionalBindingTypes = [
+      CONDITIONAL_EVENT_DEFINITION_PROPERTY,
+      CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY
+    ];
+
+    let oldProperties = [],
+        newProperties = [];
+
+    if (oldTemplate) {
+      oldProperties = oldTemplate.properties.filter((oldProperty) => {
+        const oldBinding = oldProperty.binding,
+              oldBindingType = oldBinding.type;
+
+        return conditionalBindingTypes.includes(oldBindingType);
+      });
+    }
+
+    if (newTemplate) {
+      newProperties = newTemplate.properties.filter((newProperty) => {
+        const newBinding = newProperty.binding,
+              newBindingType = newBinding.type;
+
+        return conditionalBindingTypes.includes(newBindingType);
+      });
+    }
+
+    const removedProperties = oldProperties.filter((oldProperty) => {
+      return !newProperties.find((newProperty) =>
+        newProperty.binding.type === oldProperty.binding.type &&
+        newProperty.binding.name === oldProperty.binding.name
+      );
+    });
+
+    const conditionalEventDefinition = findConditionalEventDefinition(element);
+
+    if (!conditionalEventDefinition) {
+      return;
+    }
+
+    // Remove old conditional properties that are no longer in the template
+    removedProperties.forEach((removedProperty) => {
+      const bindingType = removedProperty.binding.type;
+      const bindingName = removedProperty.binding.name;
+
+      if (bindingType === CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
+
+        // For condition property, it's a FormalExpression
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: conditionalEventDefinition,
+          properties: {
+            [bindingName]: undefined
+          }
+        });
+      } else if (bindingType === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
+
+        // For zeebe:conditionalFilter properties (variableNames, variableEvents)
+        const conditionalFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
+        if (conditionalFilter) {
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: conditionalFilter,
+            properties: {
+              [bindingName]: undefined
+            }
+          });
+        }
+      }
+    });
+
+    if (!newProperties.length) {
+      return;
+    }
+
+    // Set new conditional properties
+    newProperties.forEach((newProperty) => {
+      const oldProperty = findOldProperty(oldTemplate, newProperty),
+            newBinding = newProperty.binding,
+            newBindingType = newBinding.type,
+            newBindingName = newBinding.name,
+            newPropertyValue = getDefaultValue(newProperty);
+
+      if (newBindingType === CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
+
+        if (oldProperty && shouldKeepValue(conditionalEventDefinition, oldProperty, newProperty)) {
+          return;
+        }
+
+        // Handle condition property - it's a FormalExpression
+        let expression = conditionalEventDefinition.get(newBindingName);
+
+        if (!expression) {
+          expression = createExpression(newPropertyValue, conditionalEventDefinition, bpmnFactory);
+
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: conditionalEventDefinition,
+            properties: {
+              [newBindingName]: expression
+            }
+          });
+        } else {
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: expression,
+            properties: {
+              body: newPropertyValue
+            }
+          });
+        }
+      }
+
+      if (newBindingType === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
+
+        // Handle zeebe:conditionalFilter properties (variableNames, variableEvents)
+        let conditionalFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
+
+        if (oldProperty && shouldKeepValue(conditionalEventDefinition, oldProperty, newProperty)) {
+          return;
+        }
+
+        if (!conditionalFilter) {
+
+          // Create extension elements if needed
+          let extensionElements = conditionalEventDefinition.get('extensionElements');
+
+          if (!extensionElements) {
+            extensionElements = bpmnFactory.create('bpmn:ExtensionElements', { values: [] });
+            extensionElements.$parent = conditionalEventDefinition;
+
+            commandStack.execute('element.updateModdleProperties', {
+              element,
+              moddleElement: conditionalEventDefinition,
+              properties: { extensionElements }
+            });
+          }
+
+          // Create conditionalFilter
+          conditionalFilter = createElement(
+            'zeebe:ConditionalFilter',
+            { [newBindingName]: newPropertyValue },
+            extensionElements,
+            bpmnFactory
+          );
+
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: extensionElements,
+            properties: {
+              values: [ ...extensionElements.get('values'), conditionalFilter ]
+            }
+          });
+        } else {
+          commandStack.execute('element.updateModdleProperties', {
+            element,
+            moddleElement: conditionalFilter,
+            properties: {
+              [newBindingName]: newPropertyValue
+            }
+          });
+        }
+      }
+    });
   }
 
   /**
@@ -2076,6 +2257,32 @@ export function findOldProperty(oldTemplate, newProperty) {
       return oldBinding.name === newBinding.name;
     });
   }
+
+  if (newBindingType === CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
+        return;
+      }
+
+      return oldBinding.name === newBinding.name;
+    });
+  }
+
+  if (newBindingType === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
+        return;
+      }
+
+      return oldBinding.name === newBinding.name;
+    });
+  }
 }
 
 /**
@@ -2221,6 +2428,15 @@ function getPropertyValue(element, property) {
 
     // the actual value is nested in an Expression
     return businessObject.get(bindingName)?.get('body');
+  }
+
+  if (bindingType === CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
+    return businessObject.get(bindingName)?.get('body');
+  }
+
+  if (bindingType === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
+    const conditionalFilter = findExtension(businessObject, 'zeebe:ConditionalFilter');
+    return conditionalFilter?.get(bindingName);
   }
 }
 
