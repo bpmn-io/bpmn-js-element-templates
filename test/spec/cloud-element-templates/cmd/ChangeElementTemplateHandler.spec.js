@@ -2265,6 +2265,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       beforeEach(bootstrap(require('./conditional-event.bpmn').default));
 
       const conditionTemplate = require('./conditional-event-template-condition.json');
+      const otherEventTemplate = require('./event-template-1.json');
 
       it('should set condition', inject(function(elementRegistry) {
 
@@ -2352,6 +2353,28 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(condition).to.exist;
         expect(condition.get('body')).to.equal('=orderTotal > 100');
       }));
+
+
+      it('should remove condition', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_2');
+
+        // when
+        event = changeTemplate(event, conditionTemplate);
+
+        // assume
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        expect(conditionalEventDefinition.get('condition').get('body')).to.equal('=orderTotal > 100');
+
+        // when
+        event = changeTemplate(event, otherEventTemplate);
+
+        // then
+        expectElementTemplate(event, 'event-template', 1);
+        const newConditionalEventDefinition = findConditionalEventDefinition(event);
+        expect(newConditionalEventDefinition).to.not.exist;
+      }));
     });
 
 
@@ -2360,6 +2383,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
       beforeEach(bootstrap(require('./conditional-event.bpmn').default));
 
       const filterTemplate = require('./conditional-event-template-filter.json');
+      const otherEventTemplate = require('./event-template-1.json');
 
       it('should set conditionalFilter', inject(function(elementRegistry) {
 
@@ -2447,6 +2471,32 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         expect(conditionalFilter).to.exist;
         expect(conditionalFilter.get('variableNames')).to.equal('orderTotal,discount');
         expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
+      }));
+
+
+      it('should remove conditionalFilter', inject(function(elementRegistry) {
+
+        // given
+        let event = elementRegistry.get('ConditionalEvent_4');
+
+        // when
+        event = changeTemplate(event, filterTemplate);
+
+        // assume
+        expectElementTemplate(event, 'conditional-filter-event-template', 1);
+
+        const conditionalEventDefinition = findConditionalEventDefinition(event);
+        const conditionalFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
+        expect(conditionalFilter.get('variableNames')).to.equal('orderTotal,discount');
+        expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
+
+        // when
+        event = changeTemplate(event, otherEventTemplate);
+
+        // then
+        expectElementTemplate(event, 'event-template', 1);
+        const newConditionalEventDefinition = findConditionalEventDefinition(event);
+        expect(newConditionalEventDefinition).to.not.exist;
       }));
 
     });
