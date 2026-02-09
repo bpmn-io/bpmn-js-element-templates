@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.20.0
+
+* `FEAT`: support `bpmn:ConditionalEventDefinition` templates ([#217](https://github.com/bpmn-io/bpmn-js-element-templates/issues/217))
+
 ## 2.19.0
 
 * `FEAT`: support `boolean` and `number` condition for `feel: static` properties ([#195](https://github.com/bpmn-io/bpmn-js-element-templates/issues/195), [#207](https://github.com/bpmn-io/bpmn-js-element-templates/pull/207))
