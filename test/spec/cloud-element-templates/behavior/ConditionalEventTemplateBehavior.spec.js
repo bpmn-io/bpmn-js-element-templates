@@ -97,6 +97,21 @@ describe('provider/cloud-element-templates - ConditionalEventTemplateBehavior', 
         expect(getBusinessObject(event).get('zeebe:modelerTemplate')).to.equal('conditional-catch-with-variable-events-template');
       }
     ));
+
+
+    it('should keep template with variableEvents for boundary catch event', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        let event = elementRegistry.get('Boundary_Event');
+
+        // when
+        event = elementTemplates.applyTemplate(event, templates[3]);
+
+        // then
+        expect(getBusinessObject(event).get('zeebe:modelerTemplate')).to.equal('conditional-boundary-event-template');
+      }
+    ));
   });
 
 

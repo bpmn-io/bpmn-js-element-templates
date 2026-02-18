@@ -15,23 +15,31 @@
         <bpmn:condition xsi:type="bpmn:tFormalExpression" />
       </bpmn:conditionalEventDefinition>
     </bpmn:intermediateCatchEvent>
+    <bpmn:task id="Activity_0np5h00" />
+    <bpmn:boundaryEvent id="Boundary_Event" attachedToRef="Activity_0np5h00" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
-      <bpmndi:BPMNShape id="Event_0q15ef0_di" bpmnElement="Root_CatchEvent">
-        <dc:Bounds x="152" y="62" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_0np5h00_di" bpmnElement="Activity_0np5h00">
+        <dc:Bounds x="160" y="100" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EventSubProcess_1_di" bpmnElement="EventSubProcess_1" isExpanded="true">
-        <dc:Bounds x="240" y="80" width="200" height="120" />
+        <dc:Bounds x="390" y="80" width="200" height="120" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0q0r1y6_di" bpmnElement="Subprocess_Event">
-        <dc:Bounds x="262" y="122" width="36" height="36" />
+        <dc:Bounds x="412" y="122" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1rgdz7t" bpmnElement="Subprocess_CatchEvent">
-        <dc:Bounds x="352" y="122" width="36" height="36" />
+        <dc:Bounds x="502" y="122" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_02q7n6e_di" bpmnElement="RootEvent">
-        <dc:Bounds x="152" y="122" width="36" height="36" />
+        <dc:Bounds x="302" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0q15ef0_di" bpmnElement="Root_CatchEvent">
+        <dc:Bounds x="302" y="62" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1mkcuu9_di" bpmnElement="Boundary_Event">
+        <dc:Bounds x="212" y="162" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
