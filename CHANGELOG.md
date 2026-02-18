@@ -6,6 +6,12 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.20.1
+
+* `FIX`: do not unlink templates with Variable Events for boundary events ([#222](https://github.com/bpmn-io/bpmn-js-element-templates/pull/222))
+* `DEPS`: update to `bpmnlint@11.12.0`
+* `DEPS`: update to `@bpmn-io/extract-process-variables@2.1.0`
+
 ## 2.20.0
 
 * `FEAT`: support `bpmn:ConditionalEventDefinition` templates ([#217](https://github.com/bpmn-io/bpmn-js-element-templates/issues/217))
