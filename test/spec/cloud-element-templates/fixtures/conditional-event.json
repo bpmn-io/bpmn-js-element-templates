@@ -7,7 +7,7 @@
     "bpmn:Event"
   ],
   "elementType": {
-    "value": "bpmn:IntermediateCatchEvent",
+    "value": "bpmn:BoundaryEvent",
     "eventDefinition": "bpmn:ConditionalEventDefinition"
   },
   "properties": [

@@ -118,5 +118,48 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Conditional Boundary Event",
+    "id": "conditional-boundary-event-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:BoundaryEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:BoundaryEvent",
+      "eventDefinition": "bpmn:ConditionalEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Condition Expression",
+        "type": "String",
+        "value": "=orderTotal > 100",
+        "feel": "required",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#property",
+          "name": "condition"
+        }
+      },
+      {
+        "label": "Variable Names",
+        "type": "String",
+        "value": "orderTotal,discount",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+          "name": "variableNames"
+        }
+      },
+      {
+        "label": "Variable Events",
+        "type": "String",
+        "value": "create,update",
+        "binding": {
+          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
+          "name": "variableEvents"
+        }
+      }
+    ]
   }
 ]

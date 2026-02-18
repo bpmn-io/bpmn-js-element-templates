@@ -77,7 +77,11 @@ export default class ConditionalEventTemplateBehavior extends CommandInterceptor
       return;
     }
 
-    if (isRootLevelEvent(element) && !is(element, 'bpmn:IntermediateCatchEvent')) {
+    if (
+      isRootLevelEvent(element) &&
+      !is(element, 'bpmn:IntermediateCatchEvent') &&
+      !is(element, 'bpmn:BoundaryEvent')
+    ) {
       elementTemplates.unlinkTemplate(element);
     }
   }
