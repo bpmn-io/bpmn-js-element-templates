@@ -18,7 +18,7 @@
       <bpmn:intermediateCatchEvent id="ConditionalEvent_4">
         <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_4">
           <bpmn:extensionElements>
-          <zeebe:conditionalFilter variableNames="foo,bar" variableEvents="create,update" />
+          <zeebe:conditionalFilter variableEvents="create,update" />
         </bpmn:extensionElements>
           <bpmn:condition xsi:type="bpmn:tFormalExpression">=existingCondition</bpmn:condition>
         </bpmn:conditionalEventDefinition>

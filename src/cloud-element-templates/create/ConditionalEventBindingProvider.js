@@ -40,7 +40,7 @@ export class ConditionalEventDefinitionPropertyBindingProvider {
 
 /**
  * Provider for `bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property` bindings.
- * Handles `variableNames` and `variableEvents` properties.
+ * Handles `variableEvents` property.
  */
 export class ConditionalEventDefinitionZeebeConditionalFilterBindingProvider {
   static create(element, options) {

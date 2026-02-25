@@ -12,15 +12,6 @@
   },
   "properties": [
     {
-      "label": "Variable Names",
-      "type": "String",
-      "value": "orderTotal,discount",
-      "binding": {
-        "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
-        "name": "variableNames"
-      }
-    },
-    {
       "label": "Variable Events",
       "type": "String",
       "value": "create,update",

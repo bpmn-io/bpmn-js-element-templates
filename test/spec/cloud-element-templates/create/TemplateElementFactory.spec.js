@@ -650,7 +650,7 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
     }));
 
 
-    it('should handle <bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property> - variableNames and variableEvents', inject(function(templateElementFactory) {
+    it('should handle <bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property> - variableEvents', inject(function(templateElementFactory) {
 
       // given
       const elementTemplate = findTemplate('example.camunda.ConditionalEventWithConditionalFilter');
@@ -666,7 +666,6 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       const extensionElements = conditionalEventDefinition.get('extensionElements');
       const conditionalFilter = findExtension(extensionElements, 'zeebe:ConditionalFilter');
 
-      expect(conditionalFilter.get('variableNames')).to.equal('var1,var2,var3');
       expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
     }));
 

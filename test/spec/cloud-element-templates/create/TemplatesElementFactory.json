@@ -979,15 +979,6 @@
         }
       },
       {
-        "label": "Variable Names",
-        "type": "String",
-        "value": "var1,var2,var3",
-        "binding": {
-          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
-          "name": "variableNames"
-        }
-      },
-      {
         "label": "Variable Events",
         "type": "String",
         "value": "create,update",
