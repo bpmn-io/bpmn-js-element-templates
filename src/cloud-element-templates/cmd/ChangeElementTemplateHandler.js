@@ -1102,7 +1102,7 @@ export default class ChangeElementTemplateHandler {
         });
       } else if (bindingType === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
 
-        // For zeebe:conditionalFilter properties (variableNames, variableEvents)
+        // For zeebe:conditionalFilter properties (variableEvents)
         const conditionalFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
         if (conditionalFilter) {
           commandStack.execute('element.updateModdleProperties', {
@@ -1160,7 +1160,7 @@ export default class ChangeElementTemplateHandler {
 
       if (newBindingType === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
 
-        // Handle zeebe:conditionalFilter properties (variableNames, variableEvents)
+        // Handle zeebe:conditionalFilter properties (variableEvents)
         let conditionalFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
 
         if (oldProperty && shouldKeepValue(conditionalEventDefinition, oldProperty, newProperty)) {

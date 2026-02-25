@@ -23,15 +23,6 @@
         }
       },
       {
-        "label": "Variable Names",
-        "type": "String",
-        "value": "orderTotal,discount",
-        "binding": {
-          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
-          "name": "variableNames"
-        }
-      },
-      {
         "label": "Variable Events",
         "type": "String",
         "value": "create,update",
@@ -64,15 +55,6 @@
           "type": "bpmn:ConditionalEventDefinition#property",
           "name": "condition"
         }
-      },
-      {
-        "label": "Variable Names",
-        "type": "String",
-        "value": "orderTotal",
-        "binding": {
-          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
-          "name": "variableNames"
-        }
       }
     ]
   },
@@ -97,15 +79,6 @@
         "binding": {
           "type": "bpmn:ConditionalEventDefinition#property",
           "name": "condition"
-        }
-      },
-      {
-        "label": "Variable Names",
-        "type": "String",
-        "value": "orderTotal,discount",
-        "binding": {
-          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
-          "name": "variableNames"
         }
       },
       {
@@ -140,15 +113,6 @@
         "binding": {
           "type": "bpmn:ConditionalEventDefinition#property",
           "name": "condition"
-        }
-      },
-      {
-        "label": "Variable Names",
-        "type": "String",
-        "value": "orderTotal,discount",
-        "binding": {
-          "type": "bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property",
-          "name": "variableNames"
         }
       },
       {

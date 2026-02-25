@@ -2404,7 +2404,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         const conditionalFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
         expect(conditionalFilter).to.exist;
-        expect(conditionalFilter.get('variableNames')).to.equal('orderTotal,discount');
         expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
       }));
 
@@ -2457,7 +2456,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         const conditionalEventDefinition = findConditionalEventDefinition(event);
         const existingFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
         expect(existingFilter).to.exist;
-        expect(existingFilter.get('variableNames')).to.equal('foo,bar');
         expect(existingFilter.get('variableEvents')).to.equal('create,update');
 
         // when
@@ -2470,7 +2468,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         const conditionalFilter = findExtension(newConditionalEventDefinition, 'zeebe:ConditionalFilter');
         expect(conditionalFilter).to.exist;
-        expect(conditionalFilter.get('variableNames')).to.equal('orderTotal,discount');
         expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
       }));
 
@@ -2488,7 +2485,6 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         const conditionalEventDefinition = findConditionalEventDefinition(event);
         const conditionalFilter = findExtension(conditionalEventDefinition, 'zeebe:ConditionalFilter');
-        expect(conditionalFilter.get('variableNames')).to.equal('orderTotal,discount');
         expect(conditionalFilter.get('variableEvents')).to.equal('create,update');
 
         // when
@@ -7155,20 +7151,20 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         const oldTemplate = createTemplate([
           {
-            value: 'foo,bar',
+            value: 'create',
             binding: {
               type: 'bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property',
-              name: 'variableNames'
+              name: 'variableEvents'
             }
           }
         ]);
 
         const newTemplate = createTemplate([
           {
-            value: 'newFoo,newBar',
+            value: 'update',
             binding: {
               type: 'bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property',
-              name: 'variableNames'
+              name: 'variableEvents'
             }
           }
         ]);
@@ -7181,7 +7177,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         );
 
         updateBusinessObject('ConditionalEvent_1', conditionalFilter, {
-          variableNames: 'userModified,variables'
+          variableEvents: 'create,update'
         });
 
         // when
@@ -7194,7 +7190,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         );
 
         expect(updatedConditionalFilter).to.exist;
-        expect(updatedConditionalFilter.get('variableNames')).to.equal('userModified,variables');
+        expect(updatedConditionalFilter.get('variableEvents')).to.equal('create,update');
       }));
 
 
@@ -7205,20 +7201,20 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         const oldTemplate = createTemplate([
           {
-            value: 'foo,bar',
+            value: 'create',
             binding: {
               type: 'bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property',
-              name: 'variableNames'
+              name: 'variableEvents'
             }
           }
         ]);
 
         const newTemplate = createTemplate([
           {
-            value: 'newFoo,newBar',
+            value: 'update',
             binding: {
               type: 'bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property',
-              name: 'variableNames'
+              name: 'variableEvents'
             }
           }
         ]);
@@ -7235,7 +7231,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         );
 
         expect(conditionalFilter).to.exist;
-        expect(conditionalFilter.get('variableNames')).to.equal('newFoo,newBar');
+        expect(conditionalFilter.get('variableEvents')).to.equal('update');
       }));
 
     });

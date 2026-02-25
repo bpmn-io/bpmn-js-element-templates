@@ -25,9 +25,8 @@ export default class ConditionalEventTemplateBehavior extends CommandInterceptor
     ], ({ context }) => {
       const { element, properties } = context;
 
-      const isRelevantPropertyChange = (
-        properties && ('variableEvents' in properties)
-      );
+      const isRelevantPropertyChange =
+        properties?.values?.some(v => v?.variableEvents !== undefined);
 
       if (!isRelevantPropertyChange) {
         return;
