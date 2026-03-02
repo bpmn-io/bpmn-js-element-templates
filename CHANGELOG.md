@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.21.0
+* `FEAT`: allow to specify visible properties panel groups via template `entriesVisible` object ([#224](https://github.com/bpmn-io/bpmn-js-element-templates/pull/224))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.19.0`
+
 ## 2.20.1
 
 * `FIX`: do not unlink templates with Variable Events for boundary events ([#222](https://github.com/bpmn-io/bpmn-js-element-templates/pull/222))
