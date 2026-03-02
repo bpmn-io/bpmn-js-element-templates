@@ -2648,7 +2648,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
                 input = domQuery(selector, entry);
 
           // assume
-          expectError(entry, `${name} - MinLength must be at least 5 characters`);
+          expectError(entry, `${name} - MinLength must be at least 5 characters.`);
 
           // when
           changeInput(input, 'FOOOOOOO');
@@ -2673,7 +2673,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
           changeInput(input, 'FOOOOOOO');
 
           // then
-          expectError(entry, `${name} - MaxLength cannot exceed 5 characters`);
+          expectError(entry, `${name} - MaxLength cannot exceed 5 characters.`);
         });
 
 
@@ -3279,7 +3279,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
                 input = domQuery('input', entry);
 
           // assume
-          expectError(entry, 'A FEEL expression with validation (min length) must be at least 5 characters');
+          expectError(entry, 'A FEEL expression with validation (min length) must be at least 5 characters.');
 
           // when
           changeInput(input, '=FOO');
@@ -3301,7 +3301,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
           changeInput(input, 'FOOBAR');
 
           // assume
-          expectError(entry, 'A FEEL expression with validation (max length) cannot exceed 5 characters');
+          expectError(entry, 'A FEEL expression with validation (max length) cannot exceed 5 characters.');
 
           // when
           changeInput(input, '=FOOBAR');
