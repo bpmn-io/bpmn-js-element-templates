@@ -311,6 +311,30 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
       })
     );
 
+
+    it('should show groups specified in entriesVisible object',
+      inject(async function(elementRegistry, selection) {
+
+        // given
+        const element = elementRegistry.get('SelectiveOutputsTask');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        expectOnlyGroups(container, [
+          'general',
+          'documentation',
+          'ElementTemplates__Template',
+          'multiInstance',
+          'outputs',
+          'Zeebe__ExecutionListeners'
+        ]);
+      })
+    );
+
   });
 
 
