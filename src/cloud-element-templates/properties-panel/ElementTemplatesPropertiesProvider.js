@@ -13,6 +13,7 @@ import { getTemplateId, getTemplateVersion } from '../Helper';
 
 import { applyConditions } from '../Condition';
 import { getPropertyValue } from '../util/propertyUtil';
+import { has, isObject } from 'min-dash';
 
 const LOWER_PRIORITY = 300;
 
@@ -166,14 +167,26 @@ function addGroupsAfter(idOrIds, groups, groupsToAdd) {
 }
 
 function getVisibleGroups(template, groups) {
-  if (!template.entriesVisible) {
-    return groups.filter(group => {
-      return (
-        ALWAYS_VISIBLE_GROUPS.includes(group.id) ||
-        group.id.startsWith('ElementTemplates__')
-      );
-    });
+  const { entriesVisible } = template;
+
+  // entriesVisible is true => show all groups
+  if (entriesVisible === true) {
+    return groups;
   }
 
-  return groups;
+  return groups.filter(group => {
+
+    // template groups are always shown
+    if (group.id.startsWith('ElementTemplates__')) {
+      return true;
+    }
+
+    // explicit true/false in entriesVisible takes priority
+    if (isObject(entriesVisible) && has(entriesVisible, group.id)) {
+      return entriesVisible[group.id];
+    }
+
+    // fallback with always-visible groups
+    return ALWAYS_VISIBLE_GROUPS.includes(group.id);
+  });
 }
