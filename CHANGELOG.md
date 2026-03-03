@@ -6,7 +6,15 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.22.0
+
+* `FEAT`: improve min and max length error messages ([#225](https://github.com/bpmn-io/bpmn-js-element-templates/pull/225))
+* `DEPS`: update to `@bpmn-io/extract-process-variables@2.2.1`
+* `DEPS`: update to `min-dom@5.3.0`
+* `DEPS`: update to `semver@7.7.4`
+
 ## 2.21.0
+
 * `FEAT`: allow to specify visible properties panel groups via template `entriesVisible` object ([#224](https://github.com/bpmn-io/bpmn-js-element-templates/pull/224))
 * `DEPS`: update to `@bpmn-io/element-templates-validator@2.19.0`
 
