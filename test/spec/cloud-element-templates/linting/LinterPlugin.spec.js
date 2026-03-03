@@ -96,7 +96,7 @@ const invalid = [
     },
     report: {
       id: 'Task_1',
-      message: 'Test Property must be at least 5 characters',
+      message: 'Test Property must be at least 5 characters.',
       propertiesPanel: { entryIds: [ 'custom-entry-constraints.minLength-0' ] },
       name: 'a'
     }
@@ -109,7 +109,7 @@ const invalid = [
     },
     report: {
       id: 'Task_1',
-      message: 'Test Property cannot exceed 5 characters',
+      message: 'Test Property cannot exceed 5 characters.',
       propertiesPanel: { entryIds: [ 'custom-entry-constraints.maxLength-0' ] },
       name: 'Very Long Name'
     }

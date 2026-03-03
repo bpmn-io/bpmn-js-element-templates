@@ -924,11 +924,11 @@ function propertyValidator(translate, property) {
     }
 
     if (maxLength && value.length > maxLength) {
-      return translate('Field cannot exceed {maxLength} characters', { maxLength });
+      return translate('Field cannot exceed {maxLength} characters.', { maxLength });
     }
 
     if (minLength && value.length < minLength) {
-      return translate('Field must be at least {minLength} characters', { minLength });
+      return translate('Field must be at least {minLength} characters.', { minLength });
     }
 
     let { pattern } = constraints;
