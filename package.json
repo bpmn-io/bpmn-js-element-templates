@@ -81,7 +81,7 @@
     "@bpmn-io/variable-resolver": "^2.0.0",
     "@camunda/linting": "^3.48.1",
     "@rollup/plugin-alias": "^6.0.0",
-    "@rollup/plugin-babel": "^6.1.0",
+    "@rollup/plugin-babel": "^7.0.0",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
