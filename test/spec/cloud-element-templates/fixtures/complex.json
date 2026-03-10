@@ -1669,6 +1669,114 @@
   },
   {
     "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Execution Listeners Template",
+    "version": 1,
+    "id": "execution-listeners-template",
+    "appliesTo": [
+      "bpmn:Task",
+      "bpmn:UserTask"
+    ],
+    "entriesVisible": {
+      "executionListeners": false
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "=template-start",
+        "binding": {
+          "type": "zeebe:executionListener",
+          "eventType": "start",
+          "retries": "=3"
+        }
+      },
+      {
+        "type": "Hidden",
+        "value": "=template-end",
+        "binding": {
+          "type": "zeebe:executionListener",
+          "eventType": "end"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "User Task Listeners Template",
+    "version": 1,
+    "id": "user-task-listeners-template",
+    "appliesTo": [
+      "bpmn:UserTask"
+    ],
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "=template-creating",
+        "binding": {
+          "type": "zeebe:taskListener",
+          "eventType": "creating"
+        }
+      },
+      {
+        "type": "Hidden",
+        "value": "=template-completing",
+        "binding": {
+          "type": "zeebe:taskListener",
+          "eventType": "completing",
+          "retries": "=5"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Combined Execution + Task Listeners Template",
+    "version": 1,
+    "id": "combined-listeners-template",
+    "appliesTo": [
+      "bpmn:UserTask"
+    ],
+    "entriesVisible": {
+      "executionListeners": false
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "=template-start",
+        "binding": {
+          "type": "zeebe:executionListener",
+          "eventType": "start",
+          "retries": "=3"
+        }
+      },
+      {
+        "type": "Hidden",
+        "value": "=template-end",
+        "binding": {
+          "type": "zeebe:executionListener",
+          "eventType": "end"
+        }
+      },
+      {
+        "type": "Hidden",
+        "value": "=template-creating",
+        "binding": {
+          "type": "zeebe:taskListener",
+          "eventType": "creating"
+        }
+      },
+      {
+        "type": "Hidden",
+        "value": "=template-completing",
+        "binding": {
+          "type": "zeebe:taskListener",
+          "eventType": "completing",
+          "retries": "=5"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
     "name": "Message Property with correlation key and a dependant property",
     "id": "message-correlation-key-dependant",
     "description": "A conditional template where the dependant property is active only when the correlation key is set.",

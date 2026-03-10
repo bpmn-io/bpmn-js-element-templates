@@ -48,7 +48,9 @@ import {
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
-  ZEEBE_TASK_SCHEDULE
+  ZEEBE_TASK_SCHEDULE,
+  ZEEBE_EXECUTION_LISTENER,
+  ZEEBE_TASK_LISTENER
 } from '../util/bindingTypes';
 
 import {
@@ -159,6 +161,10 @@ export default class ChangeElementTemplateHandler {
     this._updateAdHoc(element, oldTemplate, newTemplate);
 
     this._updateZeebeTaskSchedule(element, oldTemplate, newTemplate);
+
+    this._updateZeebeExecutionListenerProperties(element, oldTemplate, newTemplate);
+
+    this._updateZeebeTaskListenerProperties(element, oldTemplate, newTemplate);
   }
 
   _getOrCreateExtensionElements(element, businessObject = getBusinessObject(element)) {
@@ -1550,6 +1556,107 @@ export default class ChangeElementTemplateHandler {
         getPropertyName: (binding) => binding.property
       }
     );
+  }
+
+  _updateZeebeExecutionListenerProperties(element, oldTemplate, newTemplate) {
+    this._updateZeebeListeners(element, oldTemplate, newTemplate, {
+      bindingType: ZEEBE_EXECUTION_LISTENER,
+      extensionType: 'zeebe:ExecutionListeners',
+      listenerType: 'zeebe:ExecutionListener'
+    });
+  }
+
+  _updateZeebeTaskListenerProperties(element, oldTemplate, newTemplate) {
+    this._updateZeebeListeners(element, oldTemplate, newTemplate, {
+      bindingType: ZEEBE_TASK_LISTENER,
+      extensionType: 'zeebe:TaskListeners',
+      listenerType: 'zeebe:TaskListener'
+    });
+  }
+
+  _updateZeebeListeners(element, oldTemplate, newTemplate, options) {
+    const {
+      bindingType,
+      extensionType,
+      listenerType
+    } = options;
+
+    const bpmnFactory = this._bpmnFactory,
+          commandStack = this._commandStack;
+
+    const businessObject = getBusinessObject(element);
+
+    if (!businessObject) {
+      return;
+    }
+
+    const newProperties = newTemplate ? newTemplate.properties.filter((newProperty) => {
+      return newProperty.binding.type === bindingType;
+    }) : [];
+
+    // Remove existing listeners if old template specified them but new template does not.
+    if (!newProperties.length) {
+      const oldProperties = oldTemplate ? oldTemplate.properties.filter((oldProperty) => {
+        return oldProperty.binding.type === bindingType;
+      }) : [];
+
+      if (!oldProperties.length) {
+        return;
+      }
+
+      const extensionElements = businessObject.get('extensionElements');
+      const oldListeners = extensionElements && findExtension(extensionElements, extensionType);
+
+      if (!oldListeners) {
+        return;
+      }
+
+      commandStack.execute('element.updateModdleProperties', {
+        element,
+        moddleElement: extensionElements,
+        properties: {
+          values: without(extensionElements.get('values'), oldListeners)
+        }
+      });
+
+      return;
+    }
+
+    const extensionElements = this._getOrCreateExtensionElements(element, businessObject);
+    const oldListeners = findExtension(extensionElements, extensionType);
+
+    const newListeners = bpmnFactory.create(extensionType, {
+      listeners: []
+    });
+
+    newListeners.$parent = extensionElements;
+
+    newProperties.forEach((newProperty) => {
+      const { binding } = newProperty;
+      const value = getDefaultValue(newProperty);
+      const listenerProps = {
+        eventType: binding.eventType,
+        type: value,
+        retries: binding.retries
+      };
+
+      const listener = bpmnFactory.create(listenerType, listenerProps);
+
+      listener.$parent = newListeners;
+
+      newListeners.get('listeners').push(listener);
+    });
+
+    commandStack.execute('element.updateModdleProperties', {
+      element,
+      moddleElement: extensionElements,
+      properties: {
+        values: [
+          ...without(extensionElements.get('values'), oldListeners),
+          newListeners
+        ]
+      }
+    });
   }
 
   /**

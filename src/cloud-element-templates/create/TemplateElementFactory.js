@@ -28,6 +28,10 @@ import ZeebeAssignmentDefinitionBindingProvider from './AssignmentDefinitionBind
 import ZeebePriorityDefinitionBindingProvider from './PriorityDefinitionBindingProvider';
 import AdHocBindingProvider from './AdHocBindingProvider';
 import TaskScheduleBindingProvider from './TaskScheduleBindingProvider';
+import {
+  ExecutionListenerBindingProvider,
+  TaskListenerBindingProvider
+} from './ListenerBindingProvider';
 
 import {
   MESSAGE_PROPERTY_TYPE,
@@ -52,7 +56,9 @@ import {
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
-  ZEEBE_TASK_SCHEDULE
+  ZEEBE_TASK_SCHEDULE,
+  ZEEBE_EXECUTION_LISTENER,
+  ZEEBE_TASK_LISTENER
 } from '../util/bindingTypes';
 
 import { isConditionMet } from '../Condition';
@@ -87,7 +93,9 @@ export default class TemplateElementFactory {
       [ZEEBE_ASSIGNMENT_DEFINITION]: ZeebeAssignmentDefinitionBindingProvider,
       [ZEEBE_PRIORITY_DEFINITION]: ZeebePriorityDefinitionBindingProvider,
       [ZEEBE_AD_HOC]: AdHocBindingProvider,
-      [ZEEBE_TASK_SCHEDULE]: TaskScheduleBindingProvider
+      [ZEEBE_TASK_SCHEDULE]: TaskScheduleBindingProvider,
+      [ZEEBE_EXECUTION_LISTENER]: ExecutionListenerBindingProvider,
+      [ZEEBE_TASK_LISTENER]: TaskListenerBindingProvider
     };
   }
 
