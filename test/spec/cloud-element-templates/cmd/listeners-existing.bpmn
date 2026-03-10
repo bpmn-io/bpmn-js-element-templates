@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_039bbyr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
   <bpmn:process id="Process_1" isExecutable="true">
-    <bpmn:serviceTask id="Task_1" />
+    <bpmn:serviceTask id="Task_1">
+      <bpmn:extensionElements>
+        <zeebe:executionListeners>
+          <zeebe:executionListener eventType="start" type="=manual-start" retries="=1" />
+          <zeebe:executionListener eventType="end" type="=manual-end" retries="=2" />
+        </zeebe:executionListeners>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
     <bpmn:userTask id="UserTask_1">
       <bpmn:extensionElements>
         <zeebe:userTask />
+        <zeebe:executionListeners>
+          <zeebe:executionListener eventType="start" type="=manual-start" retries="=1" />
+          <zeebe:executionListener eventType="end" type="=manual-end" retries="=2" />
+        </zeebe:executionListeners>
+        <zeebe:taskListeners>
+          <zeebe:taskListener eventType="creating" type="=manual-creating" />
+        </zeebe:taskListeners>
       </bpmn:extensionElements>
     </bpmn:userTask>
   </bpmn:process>

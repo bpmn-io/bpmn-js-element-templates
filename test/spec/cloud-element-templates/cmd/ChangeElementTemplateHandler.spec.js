@@ -7464,6 +7464,286 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     });
 
+
+    describe('update zeebe execution listeners', function() {
+
+      beforeEach(bootstrap(require('./listeners-existing.bpmn').default));
+
+
+      it('should replace existing execution listeners from template', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+        const newTemplate = require('./execution-listeners-template.json');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        const executionListeners = findExtension(task, 'zeebe:ExecutionListeners');
+
+        expect(executionListeners).to.exist;
+        expect(executionListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'start',
+            type: '=template-start',
+            retries: '=3'
+          },
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'end',
+            type: '=template-end'
+          }
+        ]);
+      }));
+
+
+      it('should support undo/redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+        const newTemplate = require('./execution-listeners-template.json');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        let executionListeners = findExtension(task, 'zeebe:ExecutionListeners');
+
+        expect(executionListeners).to.exist;
+        expect(executionListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'start',
+            type: '=template-start',
+            retries: '=3'
+          },
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'end',
+            type: '=template-end'
+          }
+        ]);
+
+        // and when
+        commandStack.undo();
+
+        // then
+        executionListeners = findExtension(task, 'zeebe:ExecutionListeners');
+
+        expect(executionListeners).to.exist;
+        expect(executionListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'start',
+            type: '=manual-start',
+            retries: '=1'
+          },
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'end',
+            type: '=manual-end',
+            retries: '=2'
+          }
+        ]);
+
+        // and when
+        commandStack.redo();
+
+        // then
+        executionListeners = findExtension(task, 'zeebe:ExecutionListeners');
+
+        expect(executionListeners).to.exist;
+        expect(executionListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'start',
+            type: '=template-start',
+            retries: '=3'
+          },
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'end',
+            type: '=template-end'
+          }
+        ]);
+      }));
+
+
+      it('should not override execution listeners when template does not specify them', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        const newTemplate = createTemplate([
+          {
+            value: 'My task',
+            binding: {
+              type: 'property',
+              name: 'name'
+            }
+          }
+        ]);
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        const executionListeners = findExtension(task, 'zeebe:ExecutionListeners');
+
+        expect(executionListeners).to.exist;
+        expect(executionListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'start',
+            type: '=manual-start',
+            retries: '=1'
+          },
+          {
+            $type: 'zeebe:ExecutionListener',
+            eventType: 'end',
+            type: '=manual-end',
+            retries: '=2'
+          }
+        ]);
+      }));
+
+    });
+
+
+    describe('update zeebe task listeners', function() {
+
+      beforeEach(bootstrap(require('./listeners-existing.bpmn').default));
+
+
+      it('should replace existing task listeners from template', inject(function(elementRegistry) {
+
+        // given
+        const userTask = elementRegistry.get('UserTask_1');
+        const newTemplate = require('./task-listeners-template.json');
+
+        // when
+        changeTemplate(userTask, newTemplate);
+
+        // then
+        const taskListeners = findExtension(userTask, 'zeebe:TaskListeners');
+
+        expect(taskListeners).to.exist;
+        expect(taskListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:TaskListener',
+            eventType: 'creating',
+            type: '=template-creating'
+          },
+          {
+            $type: 'zeebe:TaskListener',
+            eventType: 'completing',
+            type: '=template-completing',
+            retries: '=5'
+          }
+        ]);
+      }));
+
+
+      it('should support undo/redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        const userTask = elementRegistry.get('UserTask_1');
+        const newTemplate = require('./task-listeners-template.json');
+
+        // when
+        changeTemplate(userTask, newTemplate);
+
+        // then
+        let taskListeners = findExtension(userTask, 'zeebe:TaskListeners');
+
+        expect(taskListeners).to.exist;
+        expect(taskListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:TaskListener',
+            eventType: 'creating',
+            type: '=template-creating'
+          },
+          {
+            $type: 'zeebe:TaskListener',
+            eventType: 'completing',
+            type: '=template-completing',
+            retries: '=5'
+          }
+        ]);
+
+        // and when
+        commandStack.undo();
+
+        // then
+        taskListeners = findExtension(userTask, 'zeebe:TaskListeners');
+
+        expect(taskListeners).to.exist;
+        expect(taskListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:TaskListener',
+            eventType: 'creating',
+            type: '=manual-creating'
+          }
+        ]);
+
+        // and when
+        commandStack.redo();
+
+        // then
+        taskListeners = findExtension(userTask, 'zeebe:TaskListeners');
+
+        expect(taskListeners).to.exist;
+        expect(taskListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:TaskListener',
+            eventType: 'creating',
+            type: '=template-creating'
+          },
+          {
+            $type: 'zeebe:TaskListener',
+            eventType: 'completing',
+            type: '=template-completing',
+            retries: '=5'
+          }
+        ]);
+      }));
+
+
+      it('should not override task listeners when template does not specify them', inject(function(elementRegistry) {
+
+        // given
+        const userTask = elementRegistry.get('UserTask_1');
+
+        const newTemplate = createTemplate([
+          {
+            value: 'My task',
+            binding: {
+              type: 'property',
+              name: 'name'
+            }
+          }
+        ]);
+
+        // when
+        changeTemplate(userTask, newTemplate);
+
+        // then
+        const taskListeners = findExtension(userTask, 'zeebe:TaskListeners');
+
+        expect(taskListeners).to.exist;
+        expect(taskListeners.get('listeners')).to.jsonEqual([
+          {
+            $type: 'zeebe:TaskListener',
+            eventType: 'creating',
+            type: '=manual-creating'
+          }
+        ]);
+      }));
+
+    });
+
   });
 
 });
