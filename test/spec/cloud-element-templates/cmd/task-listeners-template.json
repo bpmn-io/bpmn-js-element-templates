@@ -1,0 +1,26 @@
+{
+  "name": "Task Listeners Template",
+  "id": "task-listeners-template",
+  "appliesTo": [
+    "bpmn:UserTask"
+  ],
+  "properties": [
+    {
+      "type": "Hidden",
+      "value": "=template-creating",
+      "binding": {
+        "type": "zeebe:taskListener",
+        "eventType": "creating"
+      }
+    },
+    {
+      "type": "Hidden",
+      "value": "=template-completing",
+      "binding": {
+        "type": "zeebe:taskListener",
+        "eventType": "completing",
+        "retries": "=5"
+      }
+    }
+  ]
+}
