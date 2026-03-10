@@ -875,6 +875,62 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
       });
     }));
 
+
+    it('should handle <zeebe:executionListener>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.ExecutionListenersBinding');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const executionListeners = findExtension(element, 'zeebe:ExecutionListeners');
+
+      expect(executionListeners).to.exist;
+      expect(executionListeners.get('listeners')).to.jsonEqual([
+        {
+          $type: 'zeebe:ExecutionListener',
+          eventType: 'start',
+          type: '=on-start-handler'
+        },
+        {
+          $type: 'zeebe:ExecutionListener',
+          eventType: 'end',
+          type: '=on-end-handler',
+          retries: '=3'
+        }
+      ]);
+    }));
+
+
+    it('should handle <zeebe:taskListener>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.TaskListenersBinding');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const taskListeners = findExtension(element, 'zeebe:TaskListeners');
+
+      expect(taskListeners).to.exist;
+      expect(taskListeners.get('listeners')).to.jsonEqual([
+        {
+          $type: 'zeebe:TaskListener',
+          eventType: 'creating',
+          type: '=on-creating-handler'
+        },
+        {
+          $type: 'zeebe:TaskListener',
+          eventType: 'completing',
+          type: '=on-completing-handler',
+          retries: '=5'
+        }
+      ]);
+    }));
+
   });
 
 

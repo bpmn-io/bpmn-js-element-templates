@@ -32,5 +32,25 @@
     "entriesVisible": {
       "outputs": true
     }
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "hide-execution-listeners",
+    "name": "EntriesVisible={executionListeners:false}",
+    "appliesTo": [ "bpmn:ServiceTask" ],
+    "properties": [],
+    "entriesVisible": {
+      "executionListeners": false
+    }
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "show-task-listeners",
+    "name": "EntriesVisible={taskListeners:true}",
+    "appliesTo": [ "bpmn:UserTask" ],
+    "properties": [],
+    "entriesVisible": {
+      "taskListeners": true
+    }
   }
 ]

@@ -1,0 +1,19 @@
+{
+  "name": "Simple Template",
+  "id": "simple-template",
+  "appliesTo": [
+    "bpmn:Task",
+    "bpmn:UserTask"
+  ],
+  "properties": [
+    {
+      "label": "Name",
+      "type": "String",
+      "value": "My task",
+      "binding": {
+        "type": "property",
+        "name": "name"
+      }
+    }
+  ]
+}

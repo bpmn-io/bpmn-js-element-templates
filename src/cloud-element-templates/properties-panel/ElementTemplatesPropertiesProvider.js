@@ -17,6 +17,13 @@ import { has, isObject } from 'min-dash';
 
 const LOWER_PRIORITY = 300;
 
+// Mapping from template entriesVisible keys to properties panel group IDs
+const ENTRIES_VISIBLE_TO_GROUP_ID = {
+  'outputs': 'outputs',
+  'executionListeners': 'Zeebe__ExecutionListeners',
+  'taskListeners': 'Zeebe__TaskListeners'
+};
+
 const ALWAYS_VISIBLE_GROUPS = [
   'general',
   'documentation',
@@ -182,8 +189,12 @@ function getVisibleGroups(template, groups) {
     }
 
     // explicit true/false in entriesVisible takes priority
-    if (isObject(entriesVisible) && has(entriesVisible, group.id)) {
-      return entriesVisible[group.id];
+    if (isObject(entriesVisible)) {
+      for (const [ templateKey, groupId ] of Object.entries(ENTRIES_VISIBLE_TO_GROUP_ID)) {
+        if (groupId === group.id && has(entriesVisible, templateKey)) {
+          return entriesVisible[templateKey];
+        }
+      }
     }
 
     // fallback with always-visible groups

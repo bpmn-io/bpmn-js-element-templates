@@ -335,6 +335,47 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
       })
     );
 
+
+    it('should hide execution listeners when entriesVisible={executionListeners:false}',
+      inject(async function(elementRegistry, selection) {
+
+        // given
+        const element = elementRegistry.get('HideExecutionListenersTask');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        expectOnlyGroups(container, [
+          'general',
+          'documentation',
+          'ElementTemplates__Template',
+          'multiInstance'
+        ]);
+      })
+    );
+
+
+    it('should show task listeners when entriesVisible={taskListeners:true}',
+      inject(async function(elementRegistry, selection) {
+
+        // given
+        const element = elementRegistry.get('ShowTaskListenersTask');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const groups = getGroupIds(container);
+
+        expect(groups).to.contain('Zeebe__TaskListeners');
+      })
+    );
+
   });
 
 

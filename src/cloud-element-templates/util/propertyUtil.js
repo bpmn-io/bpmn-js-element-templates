@@ -35,7 +35,9 @@ import {
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
-  ZEEBE_TASK_SCHEDULE
+  ZEEBE_TASK_SCHEDULE,
+  ZEEBE_EXECUTION_LISTENER,
+  ZEEBE_TASK_LISTENER
 } from './bindingTypes';
 
 import {
@@ -343,6 +345,16 @@ function getRawPropertyValue(element, property) {
   if (type === ZEEBE_AD_HOC) {
     const adHoc = findExtension(businessObject, 'zeebe:AdHoc');
     return adHoc ? adHoc.get(bindingProperty) : defaultValue;
+  }
+
+  // zeebe:executionListener
+  if (type === ZEEBE_EXECUTION_LISTENER) {
+    return getListenerValue(businessObject, binding, 'zeebe:ExecutionListeners');
+  }
+
+  // zeebe:taskListener
+  if (type === ZEEBE_TASK_LISTENER) {
+    return getListenerValue(businessObject, binding, 'zeebe:TaskListeners');
   }
 
   // should never throw as templates are validated beforehand
@@ -1175,6 +1187,21 @@ export function validateProperty(value, property, translate = defaultTranslate) 
 }
 
 // helpers
+
+function getListenerValue(businessObject, binding, containerType) {
+  const container = findExtension(businessObject, containerType);
+
+  if (!container) {
+    return '';
+  }
+
+  const listener = container.get('listeners').find(
+    l => l.get('eventType') === binding.eventType
+  );
+
+  return listener ? listener.get('type') : '';
+}
+
 function unknownBindingError(element, property) {
   const businessObject = getBusinessObject(element);
 
