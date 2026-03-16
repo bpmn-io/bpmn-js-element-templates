@@ -33,6 +33,7 @@ import numberTemplate from '../fixtures/condition-number.json';
 
 import messageTemplates from '../fixtures/condition-message.json';
 import messageCorrelationTemplate from '../fixtures/message-correlation-key.json';
+import messageCorrelationTemplateWithDependant from '../fixtures/message-correlation-key-with-dependant.json';
 import signalTemplates from '../fixtures/condition-signal.json';
 
 import calledElementTemplate from '../fixtures/condition-called-element.json';
@@ -924,7 +925,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       }));
 
       beforeEach(inject(function(elementTemplates) {
-        elementTemplates.set([ messageCorrelationTemplate ]);
+        elementTemplates.set([ messageCorrelationTemplate, messageCorrelationTemplateWithDependant ]);
       }));
 
 
@@ -949,6 +950,18 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         // then
         const correlationKeyEntry = domQuery('[data-entry-id="custom-entry-message-correlation-key-rendering-1"]', container);
         expect(correlationKeyEntry).not.to.exist;
+      }));
+
+
+      it.only('should not create correlation key if disallowed', inject(async function(elementTemplates, modeling) {
+
+        // when
+        const element = createWithTemplate(messageCorrelationTemplateWithDependant);
+
+        // then
+        const message = findMessage(getBusinessObject(element));
+        const subscription = findZeebeSubscription(message);
+        expect(subscription).not.to.exist;
       }));
 
     });
@@ -2073,6 +2086,19 @@ function changeTemplate(element, newTemplate, oldTemplate) {
     elementTemplates.set(templates);
 
     return elementTemplates.applyTemplate(element, newTemplate);
+  });
+}
+
+function createWithTemplate(newTemplate, parent) {
+  const templates = [];
+
+  newTemplate && templates.push(newTemplate);
+
+  return getBpmnJS().invoke(function(elementTemplates, modeling, canvas) {
+    elementTemplates.set(templates);
+    const element = elementTemplates.createElement(newTemplate);
+
+    return modeling.createShape(element, { x: 100, y: 100 }, parent || canvas.getRootElement());
   });
 }
 
