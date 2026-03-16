@@ -1,0 +1,47 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Message Property with correlation key and a dependant property",
+  "id": "message-correlation-key-dependant",
+  "description": "A conditional template where the dependant property is active only when the correlation key is set.",
+  "appliesTo": [
+    "bpmn:Event"
+  ],
+  "elementType": {
+    "value": "bpmn:StartEvent",
+    "eventDefinition": "bpmn:MessageEventDefinition"
+  },
+  "properties": [
+    {
+      "label": "name",
+      "type": "Hidden",
+      "value": "one",
+      "binding": {
+        "type": "bpmn:Message#property",
+        "name": "name"
+      }
+    },
+    {
+      "label": "Correlation Key",
+      "id": "correlationKey",
+      "type": "String",
+      "value": "correlationKey",
+      "binding": {
+        "type": "bpmn:Message#zeebe:subscription#property",
+        "name": "correlationKey"
+      }
+    },
+    {
+      "label": "Depending on whether correlation key is active",
+      "type": "String",
+      "value": "dependant",
+      "binding": {
+        "type": "zeebe:output",
+        "source": "correlationKey"
+      },
+      "condition": {
+        "property": "correlationKey",
+        "isActive": true
+      }
+    }
+  ]
+}
