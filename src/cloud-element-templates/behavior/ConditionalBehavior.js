@@ -34,7 +34,8 @@ export default class ConditionalBehavior extends CommandInterceptor {
     this.preExecute([
       'element.updateProperties',
       'element.updateModdleProperties',
-      'element.move'
+      'shape.move',
+      'shape.create'
     ], this._saveConditionalState, true, this);
 
     // (2) check if we need to apply post-conditional updates
@@ -48,7 +49,8 @@ export default class ConditionalBehavior extends CommandInterceptor {
       'element.updateProperties',
       'element.updateModdleProperties',
       'propertiesPanel.zeebe.changeTemplate',
-      'element.move'
+      'shape.move',
+      'shape.create'
     ], this._applyConditions, true, this);
 
     // (3) set conditions before changing the template
@@ -58,9 +60,7 @@ export default class ConditionalBehavior extends CommandInterceptor {
   }
 
   _saveConditionalState(context) {
-    const {
-      element
-    } = context;
+    const element = context.element || context.shape;
 
     const template = this._elementTemplates.get(element);
 
@@ -73,10 +73,11 @@ export default class ConditionalBehavior extends CommandInterceptor {
 
   _applyConditions(context, event) {
     const {
-      element,
       newTemplate,
       oldTemplateWithConditions
     } = context;
+
+    const element = context.element || context.shape;
 
     // do not apply conditions if we only update meta information
     if (isMetaUpdate(event, context)) {

@@ -14,7 +14,7 @@ export function applyConditions(element, elementTemplate) {
   const { properties } = elementTemplate;
 
   const filteredProperties = properties.filter(property => {
-    return isPropertyAllowed(element, property) && isConditionMet(element, properties, property);
+    return isConditionMet(element, properties, property);
   });
 
   return {
@@ -24,6 +24,11 @@ export function applyConditions(element, elementTemplate) {
 }
 
 export function isConditionMet(element, properties, property) {
+
+  if (!isPropertyAllowed(element, property)) {
+    return false;
+  }
+
   const { condition } = property;
 
   // If no condition is defined, return true.
@@ -48,13 +53,15 @@ function isSimpleConditionMet(element, properties, condition) {
   const { property: propertyId, equals, oneOf, isActive } = condition;
 
   if (typeof isActive !== 'undefined') {
-    const relatedCondition = properties.find(p => p.id === propertyId);
+    const relatedProperty = properties.find(p => p.id === propertyId);
 
-    if (!relatedCondition) {
+    if (!relatedProperty) {
       return !isActive;
     }
 
-    return isActive ? isConditionMet(element, properties, relatedCondition) : !isConditionMet(element, properties, relatedCondition);
+    const isRelatedActive = isConditionMet(element, properties, relatedProperty);
+
+    return isActive ? isRelatedActive : !isRelatedActive;
   }
 
   const property = properties.find(p => p.id === propertyId);
