@@ -956,7 +956,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       it('should create element with correlation and dependant properties in an event subprocess', inject(async function(elementRegistry) {
 
         // given
-        const eventSubProcess = elementRegistry.get('Activity_0exjy73');
+        const eventSubProcess = elementRegistry.get('EventSubProcess');
 
         // when
         const element = createWithTemplate(messageCorrelationTemplateWithDependant, eventSubProcess);
