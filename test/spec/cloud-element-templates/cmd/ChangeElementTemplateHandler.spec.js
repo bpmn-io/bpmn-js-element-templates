@@ -4410,6 +4410,78 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
         ]);
       }));
 
+
+      describe('with visible outputs (entriesVisible.outputs === true)', function() {
+
+        beforeEach(bootstrap(require('./user-defined-outputs.bpmn').default));
+
+
+        it('should preserve user-defined outputs on apply', inject(function(elementRegistry) {
+
+          // given
+          const task = elementRegistry.get('Task_without_template');
+          const newTemplate = require('./user-outputs-template-1.json');
+
+          // when
+          changeTemplate(task, newTemplate);
+
+          // then
+          const ioMapping = findExtension(task, 'zeebe:IoMapping');
+
+          expect(ioMapping).to.exist;
+
+          expect(ioMapping.get('zeebe:inputParameters')).to.jsonEqual([
+            {
+              $type: 'zeebe:Input',
+              source: 'input-1-value',
+              target: 'input-1-target'
+            }
+          ]);
+
+          expect(ioMapping.get('zeebe:outputParameters')).to.jsonEqual([
+            {
+              $type: 'zeebe:Output',
+              source: 'user-output-source',
+              target: 'user-output-target'
+            }
+          ]);
+        }));
+
+
+        it('should preserve user-defined outputs on update', inject(function(elementRegistry) {
+
+          // given
+          const task = elementRegistry.get('Task_with_template');
+          const oldTemplate = require('./user-outputs-template-1.json');
+          const newTemplate = require('./user-outputs-template-2.json');
+
+          // when
+          changeTemplate(task, newTemplate, oldTemplate);
+
+          // then
+          const ioMapping = findExtension(task, 'zeebe:IoMapping');
+
+          expect(ioMapping).to.exist;
+
+          expect(ioMapping.get('zeebe:inputParameters')).to.jsonEqual([
+            {
+              $type: 'zeebe:Input',
+              source: 'input-1-new-value',
+              target: 'input-1-target'
+            }
+          ]);
+
+          expect(ioMapping.get('zeebe:outputParameters')).to.jsonEqual([
+            {
+              $type: 'zeebe:Output',
+              source: 'user-output-source',
+              target: 'user-output-target'
+            }
+          ]);
+        }));
+
+      });
+
     });
 
 

@@ -26,6 +26,7 @@ import {
 
 import {
   find,
+  isObject,
   without
 } from 'min-dash';
 
@@ -378,13 +379,19 @@ export default class ChangeElementTemplateHandler {
         return;
       }
 
-      commandStack.execute('element.updateModdleProperties', {
-        element,
-        moddleElement: businessObject,
-        properties: {
-          values: without(businessObject.get('values'), ioMapping)
-        }
-      });
+      // If outputs are visible and user-managed, skip ioMapping cleanup to prevent removing user-defined outputs
+      const hasVisibleOutputs = isOutputsVisibleWithTemplate(newTemplate)
+        && ioMapping.get('outputParameters')?.length;
+
+      if (!hasVisibleOutputs) {
+        commandStack.execute('element.updateModdleProperties', {
+          element,
+          moddleElement: businessObject,
+          properties: {
+            values: without(businessObject.get('values'), ioMapping)
+          }
+        });
+      }
     }
 
     if (!ioMapping) {
@@ -405,9 +412,14 @@ export default class ChangeElementTemplateHandler {
       ? ioMapping.get('zeebe:inputParameters').slice()
       : [];
 
-    const oldOutputs = ioMapping.get('zeebe:outputParameters')
+    let oldOutputs = ioMapping.get('zeebe:outputParameters')
       ? ioMapping.get('zeebe:outputParameters').slice()
       : [];
+
+    // If outputs are visible and user-managed, skip user-defined output cleanup entirely
+    if (isOutputsVisibleWithTemplate(newTemplate)) {
+      oldOutputs = [];
+    }
 
     let propertyName;
 
@@ -2495,3 +2507,16 @@ function getEventDefinitionType(element) {
 
   return eventDefinition.$type;
 }
+
+/**
+ * Check if a template defines outputs as visible for the user (entriesVisible.outputs === true).
+ *
+ * @param {Object} template
+ * @returns {boolean}
+ */
+function isOutputsVisibleWithTemplate(template) {
+  return template &&
+    isObject(template.entriesVisible) &&
+    template.entriesVisible.outputs === true;
+}
+
