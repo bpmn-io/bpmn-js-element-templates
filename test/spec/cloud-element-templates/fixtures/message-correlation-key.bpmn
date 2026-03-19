@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_165ah7c" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0-alpha.1" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.2.0">
   <bpmn:process id="Process_0vvlc66" isExecutable="true">
-    <bpmn:subProcess id="Activity_0exjy73" triggeredByEvent="true">
+    <bpmn:subProcess id="EventSubProcess" triggeredByEvent="true">
       <bpmn:startEvent id="MessageStartSubprocess">
         <bpmn:messageEventDefinition id="MessageEventDefinition_1n4teqw" />
       </bpmn:startEvent>
@@ -28,7 +28,7 @@
       <bpmndi:BPMNShape id="Event_0t0yt4q_di" bpmnElement="MessageIntermediate">
         <dc:Bounds x="392" y="92" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_01wsyz0_di" bpmnElement="Activity_0exjy73" isExpanded="true">
+      <bpmndi:BPMNShape id="Activity_01wsyz0_di" bpmnElement="EventSubProcess" isExpanded="true">
         <dc:Bounds x="250" y="220" width="350" height="200" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_15z79dd_di" bpmnElement="MessageStartSubprocess">
