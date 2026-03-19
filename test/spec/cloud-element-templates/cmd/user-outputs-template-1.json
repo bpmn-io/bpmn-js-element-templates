@@ -1,0 +1,28 @@
+{
+  "name": "User Outputs Template v1",
+  "version": 1,
+  "id": "user-outputs-template",
+  "appliesTo": [
+    "bpmn:ServiceTask"
+  ],
+  "entriesVisible": {
+    "outputs": true
+  },
+  "properties": [
+    {
+      "type": "String",
+      "value": "task-type-value",
+      "binding": {
+        "type": "zeebe:taskDefinition:type"
+      }
+    },
+    {
+      "type": "String",
+      "value": "input-1-value",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "input-1-target"
+      }
+    }
+  ]
+}
