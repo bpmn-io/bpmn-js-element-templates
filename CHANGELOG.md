@@ -6,6 +6,9 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.23.0
+
+* `FEAT`: add support of templating execution and task listeners ([#230](https://github.com/bpmn-io/bpmn-js-element-templates/pull/230))
 * `FIX`: preserve user-defined outputs when apply/update template with `entriesVisible.outputs === true` ([#233](https://github.com/bpmn-io/bpmn-js-element-templates/pull/233))
 * `FIX`: restrict usage of template-defined `zeebe:output` bindings with `entriesVisible.outputs === true` ([#233](https://github.com/bpmn-io/bpmn-js-element-templates/pull/233))
 * `DEPS`: update to `@bpmn-io/element-templates-validator@2.20.1`
