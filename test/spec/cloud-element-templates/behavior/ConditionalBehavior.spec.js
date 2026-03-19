@@ -953,13 +953,15 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       }));
 
 
-      it('should create element with correlation and dependant settings if allowed', inject(async function(elementRegistry) {
+      it('should create element with correlation and dependant properties in an event subprocess', inject(async function(elementRegistry) {
 
-        // given - create templated start event in the event subprocess (correlation is allowed)
+        // given
         const eventSubProcess = elementRegistry.get('Activity_0exjy73');
+
+        // when
         const element = createWithTemplate(messageCorrelationTemplateWithDependant, eventSubProcess);
 
-        // then - correlation key is created
+        // then
         const message = findMessage(getBusinessObject(element));
         const subscription = findZeebeSubscription(message);
         expect(subscription).to.exist;
@@ -974,7 +976,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       }));
 
 
-      it('should not create element with correlation and dependant settings if disallowed', inject(async function(elementTemplates, modeling) {
+      it('should create element without correlation and dependant properties in the root', inject(async function(elementTemplates, modeling) {
 
         // given - create templated start event in process root (correlation is disallowed)
         const element = createWithTemplate(messageCorrelationTemplateWithDependant);
@@ -988,6 +990,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const ioMapping = findExtension(getBusinessObject(element), 'zeebe:IoMapping');
         expect(ioMapping).not.to.exist;
       }));
+
 
       it('should remove correlation and dependant settings when moved out of event subprocess',
         inject(async function(elementRegistry, elementTemplates, modeling) {
