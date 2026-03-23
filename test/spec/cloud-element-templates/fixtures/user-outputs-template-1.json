@@ -1,6 +1,7 @@
 {
-  "name": "User Outputs Template v2",
-  "version": 2,
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "User Outputs Template v1",
+  "version": 1,
   "id": "user-outputs-template",
   "appliesTo": [
     "bpmn:ServiceTask"
@@ -11,14 +12,15 @@
   "properties": [
     {
       "type": "String",
-      "value": "task-type-new-value",
+      "value": "task-type-value",
       "binding": {
-        "type": "zeebe:taskDefinition:type"
+        "type": "zeebe:taskDefinition",
+        "property": "type"
       }
     },
     {
       "type": "String",
-      "value": "input-1-new-value",
+      "value": "input-1-value",
       "binding": {
         "type": "zeebe:input",
         "name": "input-1-target"
