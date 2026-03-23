@@ -381,7 +381,7 @@ export default class ChangeElementTemplateHandler {
 
       // If outputs are visible and user-managed, skip ioMapping cleanup to prevent removing user-defined outputs
       const hasVisibleOutputs = isOutputsVisibleWithTemplate(newTemplate)
-        && ioMapping.get('outputParameters')?.length;
+        && ioMapping.get('outputParameters').length;
 
       if (!hasVisibleOutputs) {
         commandStack.execute('element.updateModdleProperties', {
