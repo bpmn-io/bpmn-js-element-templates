@@ -4420,7 +4420,7 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           // given
           const task = elementRegistry.get('Task_without_template');
-          const newTemplate = require('./user-outputs-template-1.json');
+          const newTemplate = require('../fixtures/user-outputs-template-1.json');
 
           // when
           changeTemplate(task, newTemplate);
@@ -4452,8 +4452,8 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           // given
           const task = elementRegistry.get('Task_with_template');
-          const oldTemplate = require('./user-outputs-template-1.json');
-          const newTemplate = require('./user-outputs-template-2.json');
+          const oldTemplate = require('../fixtures/user-outputs-template-1.json');
+          const newTemplate = require('../fixtures/user-outputs-template-2.json');
 
           // when
           changeTemplate(task, newTemplate, oldTemplate);
