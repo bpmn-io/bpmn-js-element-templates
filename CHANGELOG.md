@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FIX`: preserve user-defined outputs when apply/update template with `entriesVisible.outputs === true` ([#233](https://github.com/bpmn-io/bpmn-js-element-templates/pull/233))
+* `FIX`: restrict usage of template-defined `zeebe:output` bindings with `entriesVisible.outputs === true` ([#233](https://github.com/bpmn-io/bpmn-js-element-templates/pull/233))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.20.1`
+
 ## 2.22.0
 
 * `FEAT`: improve min and max length error messages ([#225](https://github.com/bpmn-io/bpmn-js-element-templates/pull/225))
