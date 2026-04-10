@@ -14,6 +14,10 @@
       "import": "./dist/core.esm.js",
       "require": "./dist/core.js"
     },
+    "./util": {
+      "import": "./dist/util.esm.js",
+      "require": "./dist/util.js"
+    },
     "./dist/assets/*.css": "./dist/assets/*.css",
     "./dist/*.js": "./dist/*.js",
     "./package.json": "./package.json"
