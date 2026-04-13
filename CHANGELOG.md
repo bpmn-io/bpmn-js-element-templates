@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.23.1
+
+* `FIX`: use a fallback for missing label in validation ([#237](https://github.com/bpmn-io/bpmn-js-element-templates/pull/237))
+
 ## 2.23.0
 
 * `FEAT`: add support of templating execution and task listeners ([#230](https://github.com/bpmn-io/bpmn-js-element-templates/pull/230))

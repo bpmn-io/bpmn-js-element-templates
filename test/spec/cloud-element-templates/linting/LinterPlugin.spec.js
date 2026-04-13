@@ -162,6 +162,68 @@ const invalid = [
       propertiesPanel: { entryIds: [ 'custom-entry-constraints.conditional-1' ] },
       name: 'foo'
     }
+  },
+  {
+    name: 'Min Length (no label)',
+    moddleElement: createProcess('<bpmn:task id="Task_1" name="a" zeebe:modelerTemplate="constraints.minLength.noLabel" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Must be at least 5 characters.',
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.minLength.noLabel-0' ] },
+      name: 'a'
+    }
+  },
+  {
+    name: 'Max Length (no label)',
+    moddleElement: createProcess('<bpmn:task id="Task_1" name="Very Long Name" zeebe:modelerTemplate="constraints.maxLength.noLabel" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Cannot exceed 5 characters.',
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.maxLength.noLabel-0' ] },
+      name: 'Very Long Name'
+    }
+  },
+  {
+    name: 'Not Empty (no label)',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.notEmpty.noLabel" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Must not be empty.',
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.notEmpty.noLabel-0' ] }
+    }
+  },
+  {
+    name: 'Pattern (no label)',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.pattern.noLabel" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Must match pattern A+B.',
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.pattern.noLabel-0' ] }
+    }
+  },
+  {
+    name: 'Pattern (custom message, no label)',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.pattern-custom-message.noLabel" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'This is a custom message',
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.pattern-custom-message.noLabel-0' ] }
+    }
   }
 ];
 

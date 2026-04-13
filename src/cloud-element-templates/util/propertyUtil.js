@@ -1151,7 +1151,9 @@ export function validateProperty(value, property, translate = defaultTranslate) 
   } = constraints;
 
   if (notEmpty && isEmpty(value)) {
-    return `${label} ${translate('must not be empty.')}`;
+    return label
+      ? translate('{label} must not be empty.', { label })
+      : translate('Must not be empty.');
   }
 
   if (property.feel && isFeel(value)) {
@@ -1159,11 +1161,15 @@ export function validateProperty(value, property, translate = defaultTranslate) 
   }
 
   if (maxLength && (value || '').length > maxLength) {
-    return `${label} ${translate('cannot exceed {maxLength} characters.', { maxLength })}`;
+    return label
+      ? translate('{label} cannot exceed {maxLength} characters.', { label, maxLength })
+      : translate('Cannot exceed {maxLength} characters.', { maxLength });
   }
 
   if (minLength && (value || '').length < minLength) {
-    return `${label} ${translate('must be at least {minLength} characters.', { minLength })}`;
+    return label
+      ? translate('{label} must be at least {minLength} characters.', { label, minLength })
+      : translate('Must be at least {minLength} characters.', { minLength });
   }
 
   let { pattern } = constraints;
@@ -1178,10 +1184,14 @@ export function validateProperty(value, property, translate = defaultTranslate) 
 
     if (!matchesPattern(value, pattern)) {
       if (message) {
-        return `${label} ${translate(message)}`;
+        return label
+          ? translate('{label} {message}', { label, message })
+          : translate(message);
       }
 
-      return `${label} ${translate('must match pattern {pattern}.', { pattern })}`;
+      return label
+        ? translate('{label} must match pattern {pattern}.', { label, pattern })
+        : translate('Must match pattern {pattern}.', { pattern });
     }
   }
 }
