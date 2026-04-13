@@ -88,6 +88,17 @@
           "type": "property",
           "name": "string-editable-true"
         }
+      },
+      {
+        "label": "feel required string editable=false",
+        "type": "String",
+        "feel": "required",
+        "editable": false,
+        "value": "=feel required value",
+        "binding": {
+          "type": "property",
+          "name": "feel-required-string"
+        }
       }
     ]
   }

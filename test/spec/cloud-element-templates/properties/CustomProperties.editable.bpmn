@@ -4,7 +4,7 @@
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_0344xap</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:task id="Task" zeebe:modelerTemplate="com.zeebe.example.editable" string="string editable=false" text="text editable=false" boolean="true" string-editable-unset="string editable unset" string-editable-true="string editable=true">
+    <bpmn:task id="Task" zeebe:modelerTemplate="com.zeebe.example.editable" string="string editable=false" text="text editable=false" boolean="true" string-editable-unset="string editable unset" string-editable-true="string editable=true" feel-required-string="=feel required value">
       <bpmn:extensionElements>
         <zeebe:ioMapping>
           <zeebe:input target="dropdown" source="GET" />

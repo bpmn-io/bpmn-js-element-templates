@@ -2607,6 +2607,20 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       expect(input).to.have.property('disabled', true);
     });
+
+
+    it('should disable FEEL input when editable=false', async function() {
+
+      // when
+      await expectSelected('Task');
+
+      // then
+      const entry = findEntry('custom-entry-com.zeebe.example.editable-6', container),
+            editor = findEditor(entry);
+
+      expect(editor).to.exist;
+      expect(editor.contentEditable).to.equal('false');
+    });
   });
 
 
