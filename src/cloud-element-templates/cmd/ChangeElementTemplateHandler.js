@@ -63,6 +63,7 @@ import {
 } from '../../utils/ElementUtil';
 import { removeMessage, removeSignal } from '../util/rootElementUtil';
 import { isExpression, createExpression } from '../util/bpmnExpressionUtil';
+import { createListenerHeaders } from '../util/listenerHeadersUtil';
 
 /**
  * @typedef {import('bpmn-js/lib/model/Types').Element} Element
@@ -1625,24 +1626,19 @@ export default class ChangeElementTemplateHandler {
     const extensionElements = this._getOrCreateExtensionElements(element, businessObject);
     const oldListeners = findExtension(extensionElements, extensionType);
 
-    const newListeners = bpmnFactory.create(extensionType, {
-      listeners: []
-    });
-
-    newListeners.$parent = extensionElements;
+    const newListeners = createElement(extensionType, { listeners: [] }, extensionElements, bpmnFactory);
 
     newProperties.forEach((newProperty) => {
       const { binding } = newProperty;
       const value = getDefaultValue(newProperty);
-      const listenerProps = {
+
+      const listener = createElement(listenerType, {
         eventType: binding.eventType,
         type: value,
         retries: binding.retries
-      };
+      }, newListeners, bpmnFactory);
 
-      const listener = bpmnFactory.create(listenerType, listenerProps);
-
-      listener.$parent = newListeners;
+      createListenerHeaders(listener, binding.headers, bpmnFactory);
 
       newListeners.get('listeners').push(listener);
     });
