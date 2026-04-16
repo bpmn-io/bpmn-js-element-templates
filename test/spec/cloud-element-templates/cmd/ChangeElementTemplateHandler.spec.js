@@ -7698,6 +7698,45 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(executionListeners).not.to.exist;
         }));
 
+      it('should apply execution listeners with headers', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+        const newTemplate = require('./execution-listeners-headers-template.json');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        const executionListeners = findExtension(task, 'zeebe:ExecutionListeners');
+
+        expect(executionListeners).to.exist;
+
+        const listeners = executionListeners.get('listeners');
+        expect(listeners).to.have.length(2);
+
+        // first listener has headers
+        expect(listeners[0]).to.jsonEqual({
+          $type: 'zeebe:ExecutionListener',
+          eventType: 'start',
+          type: '=template-start',
+          retries: '=3',
+          headers: {
+            $type: 'zeebe:TaskHeaders',
+            values: [
+              { $type: 'zeebe:Header', key: 'header-1', value: 'value-1' },
+              { $type: 'zeebe:Header', key: 'header-2', value: 'value-2' }
+            ]
+          }
+        });
+
+        // second listener has no headers
+        expect(listeners[1]).to.jsonEqual({
+          $type: 'zeebe:ExecutionListener',
+          eventType: 'end',
+          type: '=template-end'
+        });
+      }));
     });
 
 

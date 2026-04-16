@@ -1,0 +1,35 @@
+{
+  "name": "Execution Listeners with Headers",
+  "version": 1,
+  "id": "execution-listeners-headers-template",
+  "appliesTo": [
+    "bpmn:Task",
+    "bpmn:UserTask"
+  ],
+  "entriesVisible": {
+    "executionListeners": false
+  },
+  "properties": [
+    {
+      "type": "Hidden",
+      "value": "=template-start",
+      "binding": {
+        "type": "zeebe:executionListener",
+        "eventType": "start",
+        "retries": "=3",
+        "headers": [
+          { "key": "header-1", "value": "value-1" },
+          { "key": "header-2", "value": "value-2" }
+        ]
+      }
+    },
+    {
+      "type": "Hidden",
+      "value": "=template-end",
+      "binding": {
+        "type": "zeebe:executionListener",
+        "eventType": "end"
+      }
+    }
+  ]
+}
