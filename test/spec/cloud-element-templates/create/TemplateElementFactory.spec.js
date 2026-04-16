@@ -904,6 +904,45 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
     }));
 
 
+    it('should handle <zeebe:executionListener> with headers', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('example.camunda.ExecutionListenersWithHeadersBinding');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const executionListeners = findExtension(element, 'zeebe:ExecutionListeners');
+
+      expect(executionListeners).to.exist;
+
+      const listeners = executionListeners.get('listeners');
+      expect(listeners).to.have.length(2);
+
+      // first listener has headers
+      expect(listeners[0]).to.jsonEqual({
+        $type: 'zeebe:ExecutionListener',
+        eventType: 'start',
+        type: '=on-start-handler',
+        headers: {
+          $type: 'zeebe:TaskHeaders',
+          values: [
+            { $type: 'zeebe:Header', key: 'header-1', value: 'value-1' },
+            { $type: 'zeebe:Header', key: 'header-2', value: 'value-2' }
+          ]
+        }
+      });
+
+      // second listener has no headers
+      expect(listeners[1]).to.jsonEqual({
+        $type: 'zeebe:ExecutionListener',
+        eventType: 'end',
+        type: '=on-end-handler'
+      });
+    }));
+
+
     it('should handle <zeebe:taskListener>', inject(function(templateElementFactory) {
 
       // given

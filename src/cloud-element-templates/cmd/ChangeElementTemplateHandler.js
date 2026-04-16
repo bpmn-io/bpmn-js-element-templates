@@ -63,6 +63,7 @@ import {
 } from '../../utils/ElementUtil';
 import { removeMessage, removeSignal } from '../util/rootElementUtil';
 import { isExpression, createExpression } from '../util/bpmnExpressionUtil';
+import { createListenerHeaders } from '../util/listenerHeadersUtil';
 
 /**
  * @typedef {import('bpmn-js/lib/model/Types').Element} Element
@@ -1643,6 +1644,8 @@ export default class ChangeElementTemplateHandler {
       const listener = bpmnFactory.create(listenerType, listenerProps);
 
       listener.$parent = newListeners;
+
+      createListenerHeaders(listener, binding.headers, bpmnFactory);
 
       newListeners.get('listeners').push(listener);
     });

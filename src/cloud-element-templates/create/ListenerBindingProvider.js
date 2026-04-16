@@ -4,6 +4,8 @@ import {
 
 import { getDefaultValue } from '../Helper';
 
+import { createListenerHeaders } from '../util/listenerHeadersUtil';
+
 
 export class ExecutionListenerBindingProvider {
   static create(element, options) {
@@ -58,4 +60,6 @@ function createListener(element, property, bpmnFactory, options) {
   listener.$parent = listenersContainer;
 
   listenersContainer.get('listeners').push(listener);
+
+  createListenerHeaders(listener, binding.headers, bpmnFactory);
 }
