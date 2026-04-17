@@ -98,7 +98,7 @@
     "camunda-bpmn-moddle": "^7.0.1",
     "chai": "^6.2.2",
     "copy-webpack-plugin": "^14.0.0",
-    "cross-env": "^10.0.0",
+    "cross-env": "^10.1.0",
     "diagram-js": "^15.11.0",
     "downloadjs": "^1.4.7",
     "eslint": "^9.39.2",
