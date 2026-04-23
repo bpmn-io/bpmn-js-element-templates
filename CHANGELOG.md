@@ -6,7 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.24.0
+
 * `FEAT`: add support of execution listeners templates with headers ([#238](https://github.com/bpmn-io/bpmn-js-element-templates/pull/238))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.21.0`
 
 ## 2.23.1
 
