@@ -2241,6 +2241,19 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(input.className).to.include('auto-resize');
       });
 
+
+      it('should display JSON editor for language=json', async function() {
+
+        // when
+        await expectSelected('jsonTask');
+
+        // then
+        const entry = findEntry('custom-entry-my.example.custom-language-json-0', container);
+
+        expect(entry).to.exist;
+        expect(entry.querySelector('.bio-properties-panel-json-editor')).to.exist;
+      });
+
     });
 
   });
