@@ -2241,6 +2241,51 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(input.className).to.include('auto-resize');
       });
 
+
+      describe('language=json', function() {
+
+        it('should display JSON editor for language=json', async function() {
+
+          // when
+          await expectSelected('jsonTask');
+
+          // then
+          const entry = findEntry('custom-entry-my.example.custom-language-json-0', container);
+
+          expect(entry).to.exist;
+          expect(entry.querySelector('.bio-properties-panel-json-editor')).to.exist;
+        });
+
+
+        it('should validate JSON editor against template constraints (e.g. notEmpty)', async function() {
+
+          // when
+          await expectSelected('jsonTask');
+
+          // then
+          await waitFor(() => {
+            const entry = findEntry('custom-entry-my.example.custom-language-json-0', container);
+            expectError(entry, 'JSON payload must not be empty.');
+          });
+        });
+
+
+        it('should prefer feel over language=json', async function() {
+
+          // when
+          await expectSelected('feelWithJsonTask');
+
+          // then
+          const entry = findEntry('custom-entry-my.example.custom-language-feel-json-0', container);
+
+          const feelIcon = domQuery('.bio-properties-panel-feel-icon', entry);
+
+          expect(feelIcon).to.exist;
+          expect(entry.querySelector('.bio-properties-panel-json-editor')).not.to.exist;
+        });
+
+      });
+
     });
 
   });
