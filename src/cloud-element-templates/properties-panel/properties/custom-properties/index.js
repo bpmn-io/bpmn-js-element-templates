@@ -10,7 +10,8 @@ import {
   isTextAreaEntryEdited,
   isTextFieldEntryEdited,
   isFeelEntryEdited,
-  isNumberFieldEntryEdited
+  isNumberFieldEntryEdited,
+  isJsonEditorEntryEdited
 } from '@bpmn-io/properties-panel';
 
 import {
@@ -29,6 +30,7 @@ import { TextAreaProperty } from './TextAreaProperty';
 import { StringProperty } from './StringProperty';
 import { FeelProperty } from './FeelProperty';
 import { FeelTextAreaProperty } from './FeelTextAreaProperty';
+import { JsonEditorProperty } from './JsonEditorProperty';
 import { DropdownProperty } from './DropdownProperty';
 import { BooleanProperty } from './BooleanProperty';
 import { NumberProperty } from './NumberProperty';
@@ -123,7 +125,7 @@ function addCustomGroup(groups, props) {
 }
 
 function createCustomEntry(id, element, property) {
-  let { type, feel } = property;
+  let { type, feel, language } = property;
 
   if (!type) {
     type = getDefaultType(property);
@@ -188,6 +190,14 @@ function createCustomEntry(id, element, property) {
         id,
         component: FeelTextAreaProperty,
         isEdited: createIsEdited(isFeelEntryEdited, element, property),
+        property
+      };
+    }
+    if (language === 'json') {
+      return {
+        id,
+        component: JsonEditorProperty,
+        isEdited: createIsEdited(isJsonEditorEntryEdited, element, property),
         property
       };
     }

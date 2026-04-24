@@ -1857,5 +1857,26 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Custom field with language JSON",
+    "id": "my.example.custom-language-json",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "label": "JSON payload",
+        "type": "Text",
+        "language": "json",
+        "value": "{}",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "jsonPayload"
+        },
+        "optional": true
+      }
+    ]
   }
 ]
