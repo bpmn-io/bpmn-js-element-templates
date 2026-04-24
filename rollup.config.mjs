@@ -55,6 +55,23 @@ export default [
     ],
     external: externalDependencies(),
     plugins: corePlugins()
+  },
+  {
+    input: 'src/util.js',
+    output: [
+      {
+        sourcemap: true,
+        format: 'commonjs',
+        file: 'dist/util.js'
+      },
+      {
+        sourcemap: true,
+        format: 'esm',
+        file: 'dist/util.esm.js'
+      }
+    ],
+    external: externalDependencies(),
+    plugins: corePlugins()
   }
 ];
 
