@@ -8,9 +8,7 @@ import {
 
 import semverCompare from 'semver-compare';
 
-import {
-  validRange as isSemverRangeValid
-} from 'semver';
+import { isSatisfied } from '@bpmn-io/semver-compat';
 
 import {
   validate as validateAgainstSchema,
@@ -146,7 +144,7 @@ export class Validator {
 
     forEach(template.engines, (rangeStr, engine) => {
 
-      if (!isSemverRangeValid(rangeStr)) {
+      if (isSatisfied(rangeStr, '0.0.0') === null) {
         err = this._logError(new Error(
           `Engine <${engine}> specifies invalid semver range <${rangeStr}>`
         ), template);

@@ -1,8 +1,7 @@
 import {
   find,
   isString,
-  isUndefined,
-  reduce
+  isUndefined
 } from 'min-dash';
 
 import {
@@ -14,7 +13,7 @@ import {
   isCompatible as _isCompatible
 } from './Helper';
 
-import { coerce, valid as isSemverValid } from 'semver';
+import { getCoerced } from '@bpmn-io/semver-compat';
 
 { /* Required to break up imports, see https://github.com/babel/babel/issues/15156 */ }
 
@@ -132,7 +131,7 @@ export default class ElementTemplates {
    * @returns {Array<ElementTemplate>}
    */
   getCompatible(elementOrTemplateId, enginesOverrides = {}, options = {}) {
-    const overridenEngines = this._coerceEngines({ ...this._engines, ...enginesOverrides });
+    const overridenEngines = { ...this._engines, ...enginesOverrides };
     const templatesById = buildTemplatesById(this._templates, overridenEngines);
 
     return findTemplates(elementOrTemplateId, templatesById, {
@@ -174,28 +173,10 @@ export default class ElementTemplates {
     // we provide <elementTemplates> engine with the current
     // package version; templates may use that engine to declare
     // compatibility with this library
-    engines = {
+    return getCoerced({
       elementTemplates: packageVersion,
       ...engines
-    };
-
-    return reduce(engines, (validEngines, version, engine) => {
-
-      const coercedVersion = coerce(version);
-
-      if (!isSemverValid(coercedVersion)) {
-        console.error(
-          new Error(`Engine <${ engine }> specifies unparseable version <${version}>`)
-        );
-
-        return validEngines;
-      }
-
-      return {
-        ...validEngines,
-        [ engine ]: coercedVersion.raw
-      };
-    }, {});
+    });
   }
 
   /**
@@ -214,7 +195,7 @@ export default class ElementTemplates {
    *
    * @param {any} template
    *
-   * @return { Record<string, { required: string, found: string } } - incompatible engines along with their template and local versions
+   * @return { Record<string, { required: string, actual: string }> } - incompatible engines along with their template and local versions
    */
   getIncompatibleEngines(template) {
     return _getIncompatibleEngines(template, this._engines);
