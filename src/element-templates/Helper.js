@@ -5,7 +5,6 @@ import { is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 import {
   filter,
   flatten,
-  has,
   isNil,
   isObject,
   isString,
@@ -14,9 +13,7 @@ import {
   values
 } from 'min-dash';
 
-import {
-  satisfies as isSemverCompatible
-} from 'semver';
+import { getCompatible } from '@bpmn-io/semver-compat';
 
 /**
  * The BPMN 2.0 extension attribute name under
@@ -40,21 +37,17 @@ export const TEMPLATE_VERSION_ATTR = 'camunda:modelerTemplateVersion';
  * @param {Object} template
  * @param {Object} checkEngines
  *
- * @return {Object}
+ * @return { Record<string, { required: string, actual: string }> } - incompatible engines along with their template and local versions
  */
 export function getIncompatibleEngines(template, checkEngines) {
-  const templateEngines = template.engines;
+  const templateEngines = template.engines || {};
+  const compatible = getCompatible(templateEngines, checkEngines);
 
-  return reduce(templateEngines, (result, _, engine) => {
-
-    if (!has(checkEngines, engine)) {
-      return result;
-    }
-
-    if (!isSemverCompatible(checkEngines[engine], templateEngines[engine])) {
+  return reduce(templateEngines, (result, required, engine) => {
+    if (engine in checkEngines && !(engine in compatible)) {
       result[engine] = {
         actual: checkEngines[engine],
-        required: templateEngines[engine]
+        required
       };
     }
 
