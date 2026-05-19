@@ -7,15 +7,11 @@ import {
 import semverCompare from 'semver-compare';
 
 import {
-  validRange as isSemverRangeValid
-} from 'semver';
-
-import {
   validateZeebe as validateAgainstSchema,
   getZeebeSchemaPackage as getTemplateSchemaPackage,
   getZeebeSchemaVersion as getTemplateSchemaVersion
 } from '@bpmn-io/element-templates-validator';
-import { forEach, isNil } from 'min-dash';
+import { isNil } from 'min-dash';
 
 const SUPPORTED_SCHEMA_VERSION = getTemplateSchemaVersion();
 const SUPPORTED_SCHEMA_PACKAGE = getTemplateSchemaPackage();
@@ -108,21 +104,5 @@ export class Validator extends BaseValidator {
 
   isSchemaValid(schema) {
     return schema && schema.includes(SUPPORTED_SCHEMA_PACKAGE);
-  }
-
-  _validateEngines(template) {
-
-    let err;
-
-    forEach(template.engines, (rangeStr, engine) => {
-
-      if (!isSemverRangeValid(rangeStr)) {
-        err = this._logError(new Error(
-          `Engine <${engine}> specifies invalid semver range <${rangeStr}>`
-        ), template);
-      }
-    });
-
-    return err;
   }
 }
