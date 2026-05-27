@@ -27,7 +27,9 @@ export class CalledElementBehavior extends CommandInterceptor {
   _ensureNoPropagation(context) {
     const { element } = context;
 
-    if (!this._elementTemplates.get(element)) {
+    const template = this._elementTemplates.get(element);
+
+    if (!template) {
       return;
     }
 
@@ -45,6 +47,10 @@ export class CalledElementBehavior extends CommandInterceptor {
       'propagateAllChildVariables',
       'propagateAllParentVariables'
     ]) {
+      if (hasTemplateBinding(template, property)) {
+        continue;
+      }
+
       if (calledElement.get(property) !== false) {
         this._modeling.updateModdleProperties(element, calledElement, {
           [property]: false
@@ -59,3 +65,12 @@ CalledElementBehavior.$inject = [
   'modeling',
   'elementTemplates'
 ];
+
+
+// helpers /////////////////
+
+function hasTemplateBinding(template, property) {
+  return template.properties.some(
+    p => p.binding.type === 'zeebe:calledElement' && p.binding.property === property
+  );
+}

@@ -1422,6 +1422,58 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(calledElement).to.exist;
       expect(calledElement).to.have.property('processId', '');
     }));
+
+
+    it('should toggle calledElement propagateAllParentVariables', async function() {
+
+      // given
+      const element = await expectSelected('CalledElement_propagate'),
+            businessObject = getBusinessObject(element);
+
+      const entry = findEntry('custom-entry-calledElement-propagate-1', container),
+            input = findInput('checkbox', entry);
+
+      // when - toggle to true
+      fireEvent.click(input);
+
+      // then
+      const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+      expect(calledElement).to.exist;
+      expect(calledElement).to.have.property('propagateAllParentVariables', true);
+
+      // when - toggle back to false
+      fireEvent.click(input);
+
+      // then
+      expect(calledElement).to.have.property('propagateAllParentVariables', false);
+    });
+
+
+    it('should toggle calledElement propagateAllChildVariables', async function() {
+
+      // given
+      const element = await expectSelected('CalledElement_propagate'),
+            businessObject = getBusinessObject(element);
+
+      const entry = findEntry('custom-entry-calledElement-propagate-2', container),
+            input = findInput('checkbox', entry);
+
+      // when - toggle to true
+      fireEvent.click(input);
+
+      // then
+      const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+
+      expect(calledElement).to.exist;
+      expect(calledElement).to.have.property('propagateAllChildVariables', true);
+
+      // when - toggle back to false
+      fireEvent.click(input);
+
+      // then
+      expect(calledElement).to.have.property('propagateAllChildVariables', false);
+    });
   });
 
 

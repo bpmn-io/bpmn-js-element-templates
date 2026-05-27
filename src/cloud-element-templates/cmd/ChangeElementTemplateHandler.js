@@ -2436,6 +2436,12 @@ function shouldKeepValue(element, oldProperty, newProperty) {
     return propertyChanged(element, oldProperty);
   }
 
+  // For Boolean type `!!value` check below would keep moddle schema defaults
+  // (e.g. propagateAllParentVariables=true), preventing the template from overriding.
+  if (newProperty.type === 'Boolean') {
+    return false;
+  }
+
   // keep existing property value
   return !!(getPropertyValue(element, newProperty));
 }

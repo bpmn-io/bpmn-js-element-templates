@@ -827,7 +827,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     const propertyName = binding.property;
 
     const properties = {
-      [ propertyName ]: value || ''
+      [ propertyName ]: property.type === 'Boolean' ? value : value || ''
     };
 
     if (calledElement) {
