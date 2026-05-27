@@ -46,5 +46,46 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "io.camunda.examples.PaymentWithPropagation",
+    "name": "Payment with propagation",
+    "description": "Payment process with propagation property",
+    "appliesTo": [
+      "bpmn:CallActivity"
+    ],
+    "elementType": {
+      "value": "bpmn:CallActivity"
+    },
+    "properties": [
+      {
+        "label": "Process ID",
+        "type": "String",
+        "value": "myProcess",
+        "binding": {
+          "type": "zeebe:calledElement",
+          "property": "processId"
+        }
+      },
+      {
+        "label": "Propagate all parent variables",
+        "type": "Boolean",
+        "value": false,
+        "binding": {
+          "type": "zeebe:calledElement",
+          "property": "propagateAllParentVariables"
+        }
+      },
+      {
+        "label": "Propagate all child variables",
+        "type": "Boolean",
+        "value": false,
+        "binding": {
+          "type": "zeebe:calledElement",
+          "property": "propagateAllChildVariables"
+        }
+      }
+    ]
   }
 ]

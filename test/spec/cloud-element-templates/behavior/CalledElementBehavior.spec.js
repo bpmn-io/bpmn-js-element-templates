@@ -135,6 +135,28 @@ describe('CalledElementBehavior', function() {
         expect(getPropagation(task)).to.be.null;
       })
     );
+
+
+    it('should NOT enforce propagation=false when template binds to property', inject(
+      function(elementRegistry, modeling) {
+
+        // given
+        const callActivity = elementRegistry.get('TemplatedWithPropagation');
+        const calledElement = getCalledElement(callActivity);
+
+        // when - toggle propagateAllParentVariables to true
+        modeling.updateModdleProperties(callActivity, calledElement, {
+          propagateAllParentVariables: true,
+          propagateAllChildVariables: true,
+        });
+
+        // then
+        expect(getPropagation(callActivity)).to.eql({
+          propagateAllParentVariables: true,
+          propagateAllChildVariables: true,
+        });
+      })
+    );
   });
 });
 

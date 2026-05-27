@@ -13,6 +13,11 @@
       </bpmn:extensionElements>
     </bpmn:callActivity>
     <bpmn:task id="Task" name="foo" />
+    <bpmn:callActivity id="TemplatedWithPropagation" zeebe:modelerTemplate="io.camunda.examples.PaymentWithPropagation">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="myProcess" propagateAllChildVariables="false" propagateAllParentVariables="false" />
+      </bpmn:extensionElements>
+    </bpmn:callActivity>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0kgt465">
@@ -30,6 +35,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_di" bpmnElement="Task">
         <dc:Bounds x="310" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TemplatedWithPropagation_di" bpmnElement="TemplatedWithPropagation">
+        <dc:Bounds x="460" y="80" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

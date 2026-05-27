@@ -788,6 +788,44 @@
   },
   {
     "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "calledElement-propagate",
+    "name": "Call Activity with propagate",
+    "description": "Call activity with propagation variable bindings",
+    "appliesTo": [
+      "bpmn:CallActivity"
+    ],
+    "properties": [
+      {
+        "label": "Process ID",
+        "type": "String",
+        "value": "paymentProcess",
+        "binding": {
+          "type": "zeebe:calledElement",
+          "property": "processId"
+        }
+      },
+      {
+        "label": "Propagate all parent variables",
+        "type": "Boolean",
+        "value": false,
+        "binding": {
+          "type": "zeebe:calledElement",
+          "property": "propagateAllParentVariables"
+        }
+      },
+      {
+        "label": "Propagate all child variables",
+        "type": "Boolean",
+        "value": false,
+        "binding": {
+          "type": "zeebe:calledElement",
+          "property": "propagateAllChildVariables"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
     "name": "Decision with zeebe:calledDecision",
     "id": "calledDecision",
     "description": "A reusable rule template",
