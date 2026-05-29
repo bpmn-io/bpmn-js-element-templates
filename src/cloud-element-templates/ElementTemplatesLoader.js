@@ -25,7 +25,8 @@ export default class ElementTemplatesLoader extends TemplatesLoader {
     const errors = validator.getErrors(),
           validTemplates = validator.getValidTemplates();
 
-    elementTemplates.set(validTemplates);
+    // elementTemplates.set(validTemplates);
+    elementTemplates.set(templates);
 
     if (errors.length) {
       this._templateErrors(errors);

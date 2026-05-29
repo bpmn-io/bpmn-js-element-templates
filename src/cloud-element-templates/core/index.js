@@ -1,5 +1,6 @@
 import ElementTemplates from '../ElementTemplates';
 import ElementTemplatesLoader from '../ElementTemplatesLoader';
+import ConnectionInstances from './ConnectionInstances';
 
 import commandsModule from '../cmd';
 import createModule from '../create';
@@ -15,5 +16,6 @@ export default {
     'elementTemplatesLoader'
   ],
   elementTemplates: [ 'type', ElementTemplates ],
-  elementTemplatesLoader: [ 'type', ElementTemplatesLoader ]
+  elementTemplatesLoader: [ 'type', ElementTemplatesLoader ],
+  connectionInstances: [ 'type', ConnectionInstances ]
 };

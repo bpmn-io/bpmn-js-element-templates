@@ -14,15 +14,21 @@ import { createElement } from '../utils/ElementUtil';
  *
  * @return {ModdleElement}
  */
-export function createInputParameter(binding, value, bpmnFactory) {
+export function createInputParameter(binding, value, bpmnFactory, options = {}) {
   const {
     name
   } = binding;
 
-  return bpmnFactory.create('zeebe:Input', {
+  const properties = {
     source: value,
     target: name
-  });
+  };
+
+  if (options.configurationTemplate) {
+    properties.modelerConfigurationTemplate = options.configurationTemplate;
+  }
+
+  return bpmnFactory.create('zeebe:Input', properties);
 }
 
 /**
