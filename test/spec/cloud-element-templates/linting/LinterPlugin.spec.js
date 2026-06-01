@@ -4,6 +4,7 @@ import RuleTester from 'bpmnlint/lib/testers/rule-tester';
 import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/linting';
 import validateRule from 'src/cloud-element-templates/linting/rules/element-templates-validate';
 import compatibilityRule from 'src/cloud-element-templates/linting/rules/element-templates-compatibility';
+import updateRule from 'src/cloud-element-templates/linting/rules/element-templates-update';
 
 import templates from './LinterPlugin.json';
 
@@ -227,6 +228,44 @@ const invalid = [
   }
 ];
 
+const upToDate = [
+  {
+    name: 'Task with template at latest version',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="updatable" zeebe:modelerTemplateVersion="2" />'),
+    config: {
+      templates
+    }
+  },
+  {
+    name: 'Task without template',
+    moddleElement: createProcess('<bpmn:task id="Task_1" />'),
+    config: {
+      templates
+    }
+  },
+  {
+    name: 'Template without version (unversioned)',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.empty" />'),
+    config: {
+      templates
+    }
+  }
+];
+
+const outdated = [
+  {
+    name: 'Task with template at version 1 (newer version 2 available)',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="updatable" zeebe:modelerTemplateVersion="1" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Element has updated template available.'
+    }
+  }
+];
+
 const compatible = [
   {
     name: 'Template compatible',
@@ -308,6 +347,11 @@ describe('cloud-element-templates/linting', function() {
     invalid: incompatible
   });
 
+  RuleTester.verify('element-templates/update', updateRule, {
+    valid: upToDate,
+    invalid: outdated
+  });
+
 
   it('should create the plugin within performance constraints', function() {
 
@@ -355,6 +399,24 @@ describe('cloud-element-templates/linting', function() {
 
       // when
       compatibilityRule({ templates });
+      i++;
+    }
+
+    // then
+    // no error (timeout)
+  });
+
+
+  it('should create `update` rule within performance constraints', function() {
+
+    // given
+    this.timeout(100);
+
+    let i = 0;
+    while (i < 1000) {
+
+      // when
+      updateRule({ templates });
       i++;
     }
 

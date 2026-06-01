@@ -369,5 +369,25 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "updatable",
+    "id": "updatable",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "updatable",
+    "id": "updatable",
+    "version": 2,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
   }
 ]
