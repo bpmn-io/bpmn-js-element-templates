@@ -12,6 +12,7 @@ import StaticResolver from 'bpmnlint/lib/resolver/static-resolver';
 
 import validate from './rules/element-templates-validate';
 import compatibility from './rules/element-templates-compatibility';
+import update from './rules/element-templates-update';
 
 
 import { BpmnModdle } from 'bpmn-moddle';
@@ -38,12 +39,14 @@ export const ElementTemplateLinterPlugin = function(templates) {
     config: {
       rules: {
         'element-templates/validate': [ 'error', { templates: lastValidTemplates } ],
-        'element-templates/compatibility': [ 'warn', { templates: lastValidTemplates } ]
+        'element-templates/compatibility': [ 'warn', { templates: lastValidTemplates } ],
+        'element-templates/update': [ 'info', { templates: lastValidTemplates } ]
       }
     },
     resolver: new StaticResolver({
       'rule:bpmnlint-plugin-element-templates/validate': validate,
-      'rule:bpmnlint-plugin-element-templates/compatibility': compatibility
+      'rule:bpmnlint-plugin-element-templates/compatibility': compatibility,
+      'rule:bpmnlint-plugin-element-templates/update': update
     })
   };
 };
