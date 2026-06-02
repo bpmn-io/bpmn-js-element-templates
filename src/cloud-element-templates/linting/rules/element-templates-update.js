@@ -11,6 +11,7 @@
 import ElementTemplates from '../../ElementTemplates';
 import EventBus from 'diagram-js/lib/core/EventBus';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
+import { getEnginesConfig } from './utils';
 
 export default function({ templates = [] }) {
 
@@ -23,6 +24,10 @@ export default function({ templates = [] }) {
   elementTemplates.set(templates);
 
   function check(node, reporter) {
+
+    if (is(node, 'bpmn:Definitions')) {
+      elementTemplates.setEngines(getEnginesConfig(node));
+    }
 
     if (!is(node, 'bpmn:FlowElement')) {
       return;

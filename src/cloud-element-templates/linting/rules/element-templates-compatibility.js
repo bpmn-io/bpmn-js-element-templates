@@ -12,6 +12,7 @@ import ElementTemplates from '../../ElementTemplates';
 import EventBus from 'diagram-js/lib/core/EventBus';
 
 import { is } from 'bpmn-js/lib/util/ModelUtil';
+import { getEnginesConfig } from './utils';
 
 export default function({ templates = [] }) {
 
@@ -72,20 +73,6 @@ export default function({ templates = [] }) {
 };
 
 // helpers //////////////////////
-
-function getEnginesConfig(definitions) {
-  const engines = {};
-
-  const executionPlatform = definitions.get('modeler:executionPlatform');
-  const executionPlatformVersion = definitions.get('modeler:executionPlatformVersion');
-
-  if (executionPlatform === 'Camunda Cloud' && executionPlatformVersion) {
-    engines.camunda = executionPlatformVersion;
-  }
-
-  return engines;
-}
-
 
 function getIncompatibilityText(engine, { actual, required }, updateAvailable) {
   const message =

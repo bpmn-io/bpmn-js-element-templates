@@ -389,5 +389,28 @@
       "bpmn:Task"
     ],
     "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "updatable-incompatible-update",
+    "id": "updatable-incompatible-update",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "updatable-incompatible-update",
+    "id": "updatable-incompatible-update",
+    "version": 2,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "engines": {
+      "camunda": ">=9.0"
+    },
+    "properties": []
   }
 ]
