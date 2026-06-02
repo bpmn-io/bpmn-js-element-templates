@@ -249,6 +249,13 @@ const upToDate = [
     config: {
       templates
     }
+  },
+  {
+    name: 'Task with template at latest compatible version (newer version incompatible with platform)',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="updatable-incompatible-update" zeebe:modelerTemplateVersion="1" />'),
+    config: {
+      templates
+    }
   }
 ];
 
