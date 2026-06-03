@@ -6,7 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.25.0
+
+* `FEAT`: add `update` lint rule to find element templates that need updating ([#250](https://github.com/bpmn-io/bpmn-js-element-templates/pull/250))
 * `FEAT`: use JSON editor for custom template properties with `language=json` ([#244](https://github.com/bpmn-io/bpmn-js-element-templates/pull/244))
+* `CHORE`: use `@bpmn-io/semver-compat` instead of `semver` for engines compatibility ([#248](https://github.com/bpmn-io/bpmn-js-element-templates/pull/248))
 
 ## 2.24.0
 
