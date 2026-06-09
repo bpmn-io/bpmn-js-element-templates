@@ -34,7 +34,7 @@ import templates from './fixtures/simple';
 import falsyVersionTemplate from './fixtures/falsy-version';
 import complexTemplates from './fixtures/complex';
 import integrationTemplates from './fixtures/integration';
-import { findExtensions, findExtension } from 'src/cloud-element-templates/Helper';
+import { findExtensions, findExtension, findZeebeProperty } from 'src/cloud-element-templates/Helper';
 import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
 import { findMessage, findSignal } from 'src/cloud-element-templates/Helper';
 import { isExpanded } from 'bpmn-js/lib/util/DiUtil';
@@ -1000,6 +1000,63 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         expect(element.parent).to.eql(processElement);
       })
     );
+
+
+    describe('with preset', function() {
+
+      const template = require('./fixtures/preset.json')[0];
+
+
+      it('should apply preset values', inject(function(elementTemplates) {
+
+        // when
+        const element = elementTemplates.createElement(template, { presetId: 'createItem' });
+
+        // then
+        const zeebeProperties = findExtension(element, 'zeebe:Properties');
+
+        expect(findZeebeProperty(zeebeProperties, { name: 'operation' }).get('value')).to.equal('create');
+      }));
+
+
+      it('should activate conditional property controlled by preset', inject(function(elementTemplates) {
+
+        // when
+        const element = elementTemplates.createElement(template, { presetId: 'createItem' });
+
+        // then
+        const zeebeProperties = findExtension(element, 'zeebe:Properties');
+
+        expect(findZeebeProperty(zeebeProperties, { name: 'createMode' }).get('value')).to.equal('draft');
+      }));
+
+
+      it('should apply template defaults when no preset given', inject(function(elementTemplates) {
+
+        // when
+        const element = elementTemplates.createElement(template);
+
+        // then
+        const zeebeProperties = findExtension(element, 'zeebe:Properties');
+
+        expect(findZeebeProperty(zeebeProperties, { name: 'operation' }).get('value')).to.equal('default');
+        expect(findZeebeProperty(zeebeProperties, { name: 'createMode' })).not.to.exist;
+      }));
+
+
+      it('should apply template normally for unknown preset', inject(function(elementTemplates) {
+
+        // when
+        const element = elementTemplates.createElement(template, { presetId: 'unknown' });
+
+        // then
+        const zeebeProperties = findExtension(element, 'zeebe:Properties');
+
+        expect(findZeebeProperty(zeebeProperties, { name: 'operation' }).get('value')).to.equal('default');
+        expect(findZeebeProperty(zeebeProperties, { name: 'createMode' })).not.to.exist;
+      }));
+
+    });
 
   });
 

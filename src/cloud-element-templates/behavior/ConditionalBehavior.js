@@ -74,7 +74,8 @@ export default class ConditionalBehavior extends CommandInterceptor {
   _applyConditions(context, event) {
     const {
       newTemplate,
-      oldTemplateWithConditions
+      oldTemplateWithConditions,
+      options
     } = context;
 
     const element = context.element || context.shape;
@@ -107,7 +108,8 @@ export default class ConditionalBehavior extends CommandInterceptor {
     const changeContext = {
       element,
       newTemplate: template,
-      oldTemplate
+      oldTemplate,
+      options
     };
 
     this._commandStack.execute('propertiesPanel.zeebe.changeTemplate', changeContext);

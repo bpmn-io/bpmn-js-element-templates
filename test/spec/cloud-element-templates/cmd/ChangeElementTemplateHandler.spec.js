@@ -7916,6 +7916,146 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
   });
 
+
+  describe('apply preset', function() {
+
+    beforeEach(bootstrap(require('./task.bpmn').default));
+
+    const newTemplate = require('./preset-template.json');
+
+
+    it('should apply preset values on top of template defaults', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        elementTemplates.set([ newTemplate ]);
+
+        // when
+        elementTemplates.applyTemplate(task, newTemplate, { presetId: 'createItem' });
+
+        // then
+        const zeebeProperties = findExtension(task, 'zeebe:Properties');
+
+        expect(findZeebeProperty(zeebeProperties, { name: 'operation' }).get('value')).to.equal('create');
+        expect(findZeebeProperty(zeebeProperties, { name: 'resource' }).get('value')).to.equal('item');
+      }
+    ));
+
+
+    it('should apply template defaults for properties not in preset', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        elementTemplates.set([ newTemplate ]);
+
+        // when
+        elementTemplates.applyTemplate(task, newTemplate, { presetId: 'createItem' });
+
+        // then
+        const taskDefinition = findExtension(task, 'zeebe:TaskDefinition');
+
+        expect(taskDefinition.get('type')).to.equal('default-type');
+      }
+    ));
+
+
+    it('should apply preset value onto conditional property controlled by preset', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+        const template = require('./preset-conditional-template.json');
+
+        elementTemplates.set([ template ]);
+
+        // when
+        elementTemplates.applyTemplate(task, template, { presetId: 'createIssue' });
+
+        // then
+        const zeebeProperties = findExtension(task, 'zeebe:Properties');
+
+        expect(findZeebeProperty(zeebeProperties, { name: 'operationGroup' }).get('value')).to.equal('issues');
+        expect(findZeebeProperty(zeebeProperties, { name: 'operationType' }).get('value')).to.equal('createIssue');
+      }
+    ));
+
+
+    describe('switching preset on the same template', function() {
+
+      const switchTemplate = require('./preset-switch-template.json');
+
+
+      it('should switch the discriminator to the new preset value', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const task = elementRegistry.get('Task_1');
+
+          elementTemplates.set([ switchTemplate ]);
+          elementTemplates.applyTemplate(task, switchTemplate, { presetId: 'createOp' });
+
+          // when
+          elementTemplates.applyTemplate(task, switchTemplate, { presetId: 'deleteOp' });
+
+          // then
+          const zeebeProperties = findExtension(task, 'zeebe:Properties');
+
+          expect(findZeebeProperty(zeebeProperties, { name: 'operation' }).get('value')).to.equal('delete');
+        }
+      ));
+
+
+      it('should replace the previous operation\'s conditional properties', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const task = elementRegistry.get('Task_1');
+
+          elementTemplates.set([ switchTemplate ]);
+          elementTemplates.applyTemplate(task, switchTemplate, { presetId: 'createOp' });
+
+          // when
+          elementTemplates.applyTemplate(task, switchTemplate, { presetId: 'deleteOp' });
+
+          // then
+          const zeebeProperties = findExtension(task, 'zeebe:Properties');
+
+          expect(findZeebeProperty(zeebeProperties, { name: 'createField' })).not.to.exist;
+          expect(findZeebeProperty(zeebeProperties, { name: 'deleteField' }).get('value')).to.equal('delete-default');
+        }
+      ));
+
+    });
+
+
+    it('should preserve operation configuration on version update without preset', inject(
+      function(elementRegistry, elementTemplates) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+        const template = require('./preset-switch-template.json');
+        const templateV2 = { ...template, version: 2 };
+
+        elementTemplates.set([ template, templateV2 ]);
+        elementTemplates.applyTemplate(task, template, { presetId: 'createOp' });
+
+        // when
+        elementTemplates.applyTemplate(task, templateV2);
+
+        // then
+        const zeebeProperties = findExtension(task, 'zeebe:Properties');
+
+        expect(findZeebeProperty(zeebeProperties, { name: 'operation' }).get('value')).to.equal('create');
+        expect(findZeebeProperty(zeebeProperties, { name: 'createField' }).get('value')).to.equal('create-default');
+      }
+    ));
+
+  });
+
 });
 
 

@@ -1,0 +1,114 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Preset template",
+    "id": "com.camunda.example.Presettemplate",
+    "version": 1,
+    "description": "Example template with operation presets",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "id": "taskType",
+        "type": "Hidden",
+        "value": "io.camunda:preset-template:1",
+        "binding": {
+          "type": "zeebe:taskDefinition:type"
+        }
+      },
+      {
+        "id": "operation",
+        "label": "Operation",
+        "type": "String",
+        "value": "default",
+        "group": "operation",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "operation"
+        }
+      },
+      {
+        "id": "createMode",
+        "label": "Create mode",
+        "type": "Dropdown",
+        "value": "draft",
+        "group": "operation",
+        "condition": {
+          "property": "operation",
+          "equals": "create"
+        },
+        "choices": [
+          { "name": "Draft", "value": "draft" },
+          { "name": "Published", "value": "published" }
+        ],
+        "binding": {
+          "type": "zeebe:property",
+          "name": "createMode"
+        }
+      },
+      {
+        "id": "deleteMode",
+        "label": "Delete mode",
+        "type": "Dropdown",
+        "value": "soft",
+        "group": "operation",
+        "condition": {
+          "property": "operation",
+          "equals": "delete"
+        },
+        "choices": [
+          { "name": "Soft delete", "value": "soft" },
+          { "name": "Hard delete", "value": "hard" }
+        ],
+        "binding": {
+          "type": "zeebe:property",
+          "name": "deleteMode"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "id": "operation",
+        "label": "Operation"
+      }
+    ],
+    "presets": [
+      {
+        "id": "createItem",
+        "properties": {
+          "operation": "create"
+        }
+      },
+      {
+        "id": "deleteItem",
+        "properties": {
+          "operation": "delete"
+        }
+      }
+    ],
+    "steps": [
+      {
+        "name": "Items",
+        "description": "Manage items",
+        "steps": [
+          {
+            "name": "Create Item",
+            "description": "Create a new item",
+            "keywords": [ "create item", "add item" ],
+            "presetId": "createItem"
+          },
+          {
+            "name": "Delete Item",
+            "description": "Delete an existing item",
+            "keywords": [ "delete item", "remove item" ],
+            "presetId": "deleteItem"
+          }
+        ]
+      }
+    ]
+  }
+]

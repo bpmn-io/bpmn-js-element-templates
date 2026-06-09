@@ -1,0 +1,67 @@
+{
+  "name": "Preset Switch Template",
+  "id": "preset-switch-template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:ServiceTask"
+  ],
+  "properties": [
+    {
+      "id": "operation",
+      "label": "Operation",
+      "type": "Dropdown",
+      "value": "none",
+      "choices": [
+        { "name": "None", "value": "none" },
+        { "name": "Create", "value": "create" },
+        { "name": "Delete", "value": "delete" }
+      ],
+      "binding": {
+        "type": "zeebe:property",
+        "name": "operation"
+      }
+    },
+    {
+      "id": "createField",
+      "label": "Create field",
+      "type": "String",
+      "value": "create-default",
+      "condition": {
+        "property": "operation",
+        "equals": "create"
+      },
+      "binding": {
+        "type": "zeebe:property",
+        "name": "createField"
+      }
+    },
+    {
+      "id": "deleteField",
+      "label": "Delete field",
+      "type": "String",
+      "value": "delete-default",
+      "condition": {
+        "property": "operation",
+        "equals": "delete"
+      },
+      "binding": {
+        "type": "zeebe:property",
+        "name": "deleteField"
+      }
+    }
+  ],
+  "presets": [
+    {
+      "id": "createOp",
+      "properties": {
+        "operation": "create"
+      }
+    },
+    {
+      "id": "deleteOp",
+      "properties": {
+        "operation": "delete"
+      }
+    }
+  ]
+}
