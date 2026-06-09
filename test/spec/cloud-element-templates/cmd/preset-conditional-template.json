@@ -1,0 +1,43 @@
+{
+  "name": "Preset Conditional Template",
+  "id": "preset-conditional-template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:ServiceTask"
+  ],
+  "properties": [
+    {
+      "id": "operationGroup",
+      "label": "Operation group",
+      "type": "String",
+      "value": "default-group",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "operationGroup"
+      }
+    },
+    {
+      "id": "operationType",
+      "label": "Operation type",
+      "type": "String",
+      "value": "default-type",
+      "condition": {
+        "property": "operationGroup",
+        "equals": "issues"
+      },
+      "binding": {
+        "type": "zeebe:property",
+        "name": "operationType"
+      }
+    }
+  ],
+  "presets": [
+    {
+      "id": "createIssue",
+      "properties": {
+        "operationGroup": "issues",
+        "operationType": "createIssue"
+      }
+    }
+  ]
+}

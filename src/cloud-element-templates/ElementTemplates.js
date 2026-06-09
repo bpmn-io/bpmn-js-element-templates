@@ -16,6 +16,11 @@ import { isTimerTemplateApplicable } from './util/timerUtil';
  */
 
 /**
+ * @typedef {Object} ElementTemplateOptions
+ * @property {string} [presetId] Preset to apply on top of the template
+ */
+
+/**
  * Filters to determine whether a template is applicable to a given element.
  * @type {Array<(template: ElementTemplate, element: Element) => boolean>}
  */
@@ -107,14 +112,16 @@ export default class ElementTemplates extends DefaultElementTemplates {
    * called from the create-append anything menu.
    *
    * @param {ElementTemplate} template
+   * @param {ElementTemplateOptions} [options]
+   *
    * @returns {djs.model.Base}
    */
-  createElement(template) {
+  createElement(template, options = {}) {
     if (!template) {
       throw new Error('template is missing');
     }
 
-    const element = this._templateElementFactory.create(template);
+    const element = this._templateElementFactory.create(template, options);
 
     return element;
   }
@@ -124,16 +131,18 @@ export default class ElementTemplates extends DefaultElementTemplates {
    *
    * @param {Element} element
    * @param {ElementTemplate} newTemplate
+   * @param {ElementTemplateOptions} [options]
    *
    * @return {Element} the updated element
    */
-  applyTemplate(element, newTemplate) {
+  applyTemplate(element, newTemplate, options = {}) {
     const oldTemplate = this.get(element);
 
     const context = {
       element,
       newTemplate,
-      oldTemplate
+      oldTemplate,
+      options
     };
 
     const event = oldTemplate?.id === newTemplate?.id ? 'update' : 'apply';

@@ -1,0 +1,47 @@
+{
+  "name": "Preset Template",
+  "id": "preset-template",
+  "version": 1,
+  "appliesTo": [
+    "bpmn:ServiceTask"
+  ],
+  "properties": [
+    {
+      "id": "taskType",
+      "type": "String",
+      "value": "default-type",
+      "binding": {
+        "type": "zeebe:taskDefinition:type"
+      }
+    },
+    {
+      "id": "operation",
+      "label": "Operation",
+      "type": "String",
+      "value": "default-operation",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "operation"
+      }
+    },
+    {
+      "id": "resource",
+      "label": "Resource",
+      "type": "String",
+      "value": "default-resource",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "resource"
+      }
+    }
+  ],
+  "presets": [
+    {
+      "id": "createItem",
+      "properties": {
+        "operation": "create",
+        "resource": "item"
+      }
+    }
+  ]
+}

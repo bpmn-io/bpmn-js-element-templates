@@ -63,6 +63,11 @@ import {
 
 import { isConditionMet } from '../Condition';
 import { isSubprocess } from '../../utils/ElementUtil';
+import { applyPreset } from '../util/presetUtil';
+
+/**
+ * @typedef {import('../ElementTemplates').ElementTemplateOptions} ElementTemplateOptions
+ */
 
 export default class TemplateElementFactory {
 
@@ -103,9 +108,13 @@ export default class TemplateElementFactory {
    * Create an element based on an element template.
    *
    * @param {ElementTemplate} template
+   * @param {ElementTemplateOptions} [options]
+   *
    * @returns {djs.model.Base}
    */
-  create(template) {
+  create(template, options = {}) {
+
+    template = applyPreset(template, options.presetId);
 
     const {
       properties

@@ -61,12 +61,14 @@ import {
   createElement,
   getRoot
 } from '../../utils/ElementUtil';
+import { applyPreset } from '../util/presetUtil';
 import { removeMessage, removeSignal } from '../util/rootElementUtil';
 import { isExpression, createExpression } from '../util/bpmnExpressionUtil';
 import { createListenerHeaders } from '../util/listenerHeadersUtil';
 
 /**
  * @typedef {import('bpmn-js/lib/model/Types').Element} Element
+ * @typedef {import('../ElementTemplates').ElementTemplateOptions} ElementTemplateOptions
  */
 
 /**
@@ -94,16 +96,18 @@ export default class ChangeElementTemplateHandler {
    * @param {Element} context.element
    * @param {Object} [context.oldTemplate]
    * @param {Object} [context.newTemplate]
+   * @param {ElementTemplateOptions} [context.options]
    * @param {boolean} [context.removeProperties=false]
    */
   preExecute(context) {
     const {
-      newTemplate,
       oldTemplate,
-      removeProperties = false
+      removeProperties = false,
+      options = {}
     } = context;
 
     let element = context.element;
+    let newTemplate = context.newTemplate;
 
     // update zeebe:modelerTemplate attribute
     this._updateZeebeModelerTemplate(element, newTemplate);
@@ -117,6 +121,9 @@ export default class ChangeElementTemplateHandler {
     if (!newTemplate && !removeProperties) {
       return;
     }
+
+    // resolve preset
+    newTemplate = context.newTemplate = applyPreset(newTemplate, options.presetId);
 
     // update properties
     this._updateProperties(element, oldTemplate, newTemplate);
@@ -2412,6 +2419,11 @@ export function findOldProperty(oldTemplate, newProperty) {
  * @returns {boolean}
  */
 function shouldKeepValue(element, oldProperty, newProperty) {
+
+  // preset values are authoritative and always (re-)applied
+  if (newProperty._presetValue) {
+    return false;
+  }
 
   // "Hidden" values are treated as a constant
   if (newProperty.type === 'Hidden') {
