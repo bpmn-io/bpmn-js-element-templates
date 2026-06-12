@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "id": "calledElement-propagate",
+  "name": "Call Activity with propagation",
+  "appliesTo": [
+    "bpmn:CallActivity"
+  ],
+  "properties": [
+    {
+      "label": "Propagate all parent variables",
+      "type": "Boolean",
+      "value": false,
+      "binding": {
+        "type": "zeebe:calledElement",
+        "property": "propagateAllParentVariables"
+      }
+    }
+  ]
+}

@@ -2572,6 +2572,31 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('apply zeebe:calledElement Boolean binding', function() {
+
+      beforeEach(bootstrap(require('./called-element-propagate.bpmn').default));
+
+      const newTemplate = require('./called-element-propagate.json');
+
+
+      it('should override moddle default <propagateAllParentVariables=true> with template <false>',
+        inject(function(elementRegistry) {
+
+          // given
+          let callActivity = elementRegistry.get('CallActivity_1');
+
+          // when
+          changeTemplate(callActivity, newTemplate);
+
+          // then
+          callActivity = elementRegistry.get('CallActivity_1');
+          const calledElement = findExtension(callActivity, 'zeebe:CalledElement');
+
+          expect(calledElement).to.have.property('propagateAllParentVariables', false);
+        }));
+    });
+
+
     describe('create message with zeebe:modelerTemplate', function() {
 
       beforeEach(bootstrap(require('./event.bpmn').default));
