@@ -86,7 +86,6 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-replace": "^6.0.3",
     "@testing-library/preact": "^2.0.1",
-    "@testing-library/preact-hooks": "^1.1.0",
     "assert": "^2.1.0",
     "babel-loader": "^10.1.1",
     "babel-plugin-istanbul": "^8.0.0",
