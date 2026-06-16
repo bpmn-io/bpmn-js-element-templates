@@ -42,6 +42,7 @@ import conditionTemplates from './TemplateElementFactory.conditions.json';
 import completionConditionTemplates from '../fixtures/completion-condition.json';
 
 import subprocessTemplates from '../fixtures/subprocess.json';
+import presetTemplate from '../cmd/preset-template.json';
 
 
 describe('provider/cloud-element-templates - TemplateElementFactory', function() {
@@ -82,6 +83,20 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
     expect(element).to.exist;
     expect(extensionElements).to.exist;
     expect(extensionElements.get('values')).to.have.length(3);
+  }));
+
+
+  it('should apply preset values on create', inject(function(templateElementFactory) {
+
+    // when
+    const element = templateElementFactory.create(presetTemplate, { presetId: 'createItem' });
+
+    const businessObject = getBusinessObject(element);
+
+    // then
+    expectTaskDefinitionType(businessObject, 'default-type');
+    expectZeebePropertyValue(businessObject, 'create');
+    expectZeebePropertyValue(businessObject, 'item');
   }));
 
 

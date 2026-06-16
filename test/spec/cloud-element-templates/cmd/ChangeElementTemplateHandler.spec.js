@@ -7984,6 +7984,34 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     ));
 
 
+    it('should undo and redo preset application', inject(
+      function(commandStack, elementRegistry, elementTemplates) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        elementTemplates.set([ newTemplate ]);
+
+        elementTemplates.applyTemplate(task, newTemplate, { presetId: 'createItem' });
+
+        // when
+        commandStack.undo();
+
+        // then
+        expectNoElementTemplate(task);
+
+        // when
+        commandStack.redo();
+
+        // then
+        const zeebeProperties = findExtension(task, 'zeebe:Properties');
+
+        expect(findZeebeProperty(zeebeProperties, { name: 'operation' }).get('value')).to.equal('create');
+        expect(findZeebeProperty(zeebeProperties, { name: 'resource' }).get('value')).to.equal('item');
+      }
+    ));
+
+
     describe('switching preset on the same template', function() {
 
       const switchTemplate = require('./preset-switch-template.json');
