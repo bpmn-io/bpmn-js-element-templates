@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.26.0
+
+* `FEAT`: support applying templates with presets ([#252](https://github.com/bpmn-io/bpmn-js-element-templates/pull/252))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.22.0`
+
 ## 2.25.0
 
 * `FEAT`: add `update` lint rule to find element templates that need updating ([#250](https://github.com/bpmn-io/bpmn-js-element-templates/pull/250))
