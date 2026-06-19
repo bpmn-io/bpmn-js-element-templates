@@ -34,6 +34,7 @@ import {
   ZEEBE_SCRIPT_TASK,
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
+  ZEEBE_JOB_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
   ZEEBE_TASK_SCHEDULE,
   ZEEBE_EXECUTION_LISTENER,
@@ -340,6 +341,12 @@ function getRawPropertyValue(element, property) {
     const priorityDefinition = findExtension(businessObject, 'zeebe:PriorityDefinition');
 
     return priorityDefinition ? priorityDefinition.get(bindingProperty) : defaultValue;
+  }
+
+  if (type === ZEEBE_JOB_PRIORITY_DEFINITION) {
+    const jobPriorityDefinition = findExtension(businessObject, 'zeebe:JobPriorityDefinition');
+
+    return jobPriorityDefinition ? jobPriorityDefinition.get(bindingProperty) : defaultValue;
   }
 
   if (type === ZEEBE_AD_HOC) {
@@ -1082,6 +1089,38 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
           ...context,
           moddleElement: extensionElements,
           properties: { values: [ ...extensionElements.get('values'), priorityDefinition ] }
+        }
+      });
+    }
+  }
+
+  // zeebe:jobPriorityDefinition
+  if (type === ZEEBE_JOB_PRIORITY_DEFINITION) {
+    let jobPriorityDefinition = findExtension(element, 'zeebe:JobPriorityDefinition');
+    const propertyName = binding.property;
+
+    const properties = {
+      [ propertyName ]: value || ''
+    };
+
+    if (jobPriorityDefinition) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: jobPriorityDefinition
+        }
+      });
+    } else {
+      jobPriorityDefinition = createElement('zeebe:JobPriorityDefinition', properties, extensionElements, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), jobPriorityDefinition ] }
         }
       });
     }

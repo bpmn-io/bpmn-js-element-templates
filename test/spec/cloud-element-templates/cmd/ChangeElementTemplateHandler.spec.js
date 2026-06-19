@@ -3717,6 +3717,93 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('zeebe:jobPriorityDefinition', function() {
+
+      beforeEach(bootstrap(require('./job-priority-definition.bpmn').default));
+
+      const newTemplate = require('./job-priority-definition.json');
+
+      it('should execute', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('ServiceTask_1');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        expectElementTemplate(task, 'com.camunda.example.JobPriorityDefinition');
+
+        const jobPriorityDefinition = findExtension(task, 'zeebe:JobPriorityDefinition');
+
+        expect(jobPriorityDefinition).to.exist;
+        expect(jobPriorityDefinition).to.have.property('priority', 10);
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('ServiceTask_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        task = elementRegistry.get('ServiceTask_1');
+        expectNoElementTemplate(task);
+
+        const jobPriorityDefinition = findExtension(task, 'zeebe:JobPriorityDefinition');
+
+        expect(jobPriorityDefinition).not.to.exist;
+
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('ServiceTask_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        task = elementRegistry.get('ServiceTask_1');
+        expectElementTemplate(task, 'com.camunda.example.JobPriorityDefinition');
+
+        const jobPriorityDefinition = findExtension(task, 'zeebe:JobPriorityDefinition');
+
+        expect(jobPriorityDefinition).to.exist;
+        expect(jobPriorityDefinition).to.have.property('priority', 10);
+      }));
+
+
+      it('should not override existing', inject(function(elementRegistry) {
+
+        // given
+        const task = elementRegistry.get('ServiceTask_jobPriorityDefinition');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        const jobPriorityDefinition = findExtension(task, 'zeebe:JobPriorityDefinition');
+
+        expect(jobPriorityDefinition).to.exist;
+
+        // Should keep the old values, not override with newTemplate's values
+        expect(jobPriorityDefinition).to.have.property('priority', '5');
+
+      }));
+    });
+
+
     describe('zeebe:taskSchedule', function() {
 
       beforeEach(bootstrap(require('./task-schedule.bpmn').default));
@@ -6884,6 +6971,96 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
         expect(priorityDefinition).to.exist;
         expect(priorityDefinition.get('priority')).to.equal(10);
+      }));
+    });
+
+
+    describe('update zeebe:JobPriorityDefinition', function() {
+
+      beforeEach(bootstrap(require('./job-priority-definition.bpmn').default));
+
+      it('property changed', inject(function(elementRegistry) {
+
+        // given a user applies a template and updates a property
+        let task = elementRegistry.get('ServiceTask_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 5,
+            binding: {
+              type: 'zeebe:jobPriorityDefinition',
+              property: 'priority'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 10,
+            binding: {
+              type: 'zeebe:jobPriorityDefinition',
+              property: 'priority'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('ServiceTask_1');
+        let jobPriorityDefinition = findExtension(task, 'zeebe:JobPriorityDefinition');
+
+        updateBusinessObject('ServiceTask_1', jobPriorityDefinition, {
+          priority: 7
+        });
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        jobPriorityDefinition = findExtension(task, 'zeebe:JobPriorityDefinition');
+
+        expect(jobPriorityDefinition).to.exist;
+        expect(jobPriorityDefinition.get('priority')).to.equal(7);
+      }));
+
+
+      it('property unchanged', inject(function(elementRegistry) {
+
+        // given a user applies a template and does not update a property
+        let task = elementRegistry.get('ServiceTask_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 5,
+            binding: {
+              type: 'zeebe:jobPriorityDefinition',
+              property: 'priority'
+            }
+          }
+        ]);
+
+        const newTemplate = createTemplate([
+          {
+            value: 10,
+            binding: {
+              type: 'zeebe:jobPriorityDefinition',
+              property: 'priority'
+            }
+          }
+        ]);
+
+        changeTemplate(task, oldTemplate);
+
+        task = elementRegistry.get('ServiceTask_1');
+
+        // when
+        changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        const jobPriorityDefinition = findExtension(task, 'zeebe:JobPriorityDefinition');
+
+        expect(jobPriorityDefinition).to.exist;
+        expect(jobPriorityDefinition.get('priority')).to.equal(10);
       }));
     });
 
