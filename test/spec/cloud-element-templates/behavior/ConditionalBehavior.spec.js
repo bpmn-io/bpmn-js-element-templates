@@ -29,6 +29,7 @@ import chainedConditionsComplexTemplate from './ConditionalBehavior.condition-ch
 import chainedConditionsSharedBindingTemplate from './ConditionalBehavior.condition-chained-shared-binding.json';
 import dependentDropdownsTemplate from './ConditionalBehavior.dependent-dropdowns.json';
 import booleanTemplate from '../fixtures/condition-boolean.json';
+import isEmptyTemplate from '../fixtures/condition-is-empty.json';
 import numberTemplate from '../fixtures/condition-number.json';
 
 import messageTemplates from '../fixtures/condition-message.json';
@@ -2110,6 +2111,150 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         expectZeebePropertyValueByKey(businessObject, 'booleanStaticFeelProp', '=false');
         expectZeebePropertyValueByKey(businessObject, 'inputForInactiveStaticFeelCheckbox');
       }));
+    });
+
+
+    describe('isEmpty', function() {
+
+      it('should match when property is empty', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+
+        // when
+        const businessObject = getBusinessObject(element);
+
+        // then
+        const zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
+        expect(zeebeProperties.find(p => p.name === 'showIfEmpty')).to.exist;
+        expect(zeebeProperties.find(p => p.name === 'showIfNotEmpty')).to.not.exist;
+      }));
+
+
+      it('should not match when property has a value', inject(function(modeling) {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+
+        // when
+        const property = findExtension(element, 'zeebe:Properties').get('properties').find(p => p.name === 'stringProp');
+        modeling.updateModdleProperties(element, property, {
+          value: 'some value'
+        });
+
+        // then
+        const businessObject = getBusinessObject(element);
+        const zeebeProperties = findExtension(businessObject, 'zeebe:Properties').get('properties');
+        expect(zeebeProperties.find(p => p.name === 'showIfEmpty')).to.not.exist;
+        expectZeebePropertyValueByKey(businessObject, 'showIfNotEmpty');
+      }));
+
+
+      it('should match for Dropdown with empty value', inject(function(modeling) {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+
+        // assume - no dropdown value set initially
+        let zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
+        expect(zeebeProperties.find(p => p.name === 'showIfDropdownEmpty')).to.exist;
+        expect(zeebeProperties.find(p => p.name === 'showIfDropdownNotEmpty')).to.not.exist;
+
+        // when - select a dropdown value
+        const property = zeebeProperties.find(p => p.name === 'dropdownProp');
+        modeling.updateModdleProperties(element, property, { value: 'a' });
+
+        // then
+        const businessObject = getBusinessObject(element);
+        zeebeProperties = findExtension(businessObject, 'zeebe:Properties').get('properties');
+        expect(zeebeProperties.find(p => p.name === 'showIfDropdownEmpty')).to.not.exist;
+        expectZeebePropertyValueByKey(businessObject, 'showIfDropdownNotEmpty');
+      }));
+
+
+      it('should match for Number with no input', inject(function(modeling) {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+
+        // assume - no number value set initially
+        let zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
+        expect(zeebeProperties.find(p => p.name === 'showIfNumberEmpty')).to.exist;
+        expect(zeebeProperties.find(p => p.name === 'showIfNumberNotEmpty')).to.not.exist;
+
+        // when - enter a number value
+        const property = zeebeProperties.find(p => p.name === 'numberProp');
+        modeling.updateModdleProperties(element, property, { value: '42' });
+
+        // then
+        const businessObject = getBusinessObject(element);
+        zeebeProperties = findExtension(businessObject, 'zeebe:Properties').get('properties');
+        expect(zeebeProperties.find(p => p.name === 'showIfNumberEmpty')).to.not.exist;
+        expectZeebePropertyValueByKey(businessObject, 'showIfNumberNotEmpty');
+      }));
+
+
+      it('should match for zeebe:input when source is empty', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+
+        // then
+        expect(findZeebeProperty(element, 'showIfInputEmpty')).to.exist;
+        expect(findZeebeProperty(element, 'showIfInputNotEmpty')).to.not.exist;
+      }));
+
+
+      it('should not match for zeebe:input when source has a value', inject(function(modeling) {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+        const businessObject = getBusinessObject(element);
+
+        // when
+        const ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
+        const inputParam = ioMapping.get('inputParameters').find(p => p.target === 'inputProp');
+        modeling.updateModdleProperties(element, inputParam, { source: '=credential.value' });
+
+        // then
+        expect(findZeebeProperty(element, 'showIfInputEmpty')).to.not.exist;
+        expectZeebeProperty(businessObject, 'showIfInputNotEmpty');
+      }));
+
+
+      it('should match for optional zeebe:input when binding is absent from XML', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+        const businessObject = getBusinessObject(element);
+
+        // assume - optional binding with no value is not written to XML at all
+        const ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
+        expect(ioMapping && ioMapping.get('inputParameters').find(p => p.target === 'optionalInputProp')).to.not.exist;
+
+        // then - isEmpty: true fires even for absent (not just empty-valued) binding
+        expect(findZeebeProperty(element, 'showIfOptionalEmpty')).to.exist;
+        expect(findZeebeProperty(element, 'showIfOptionalNotEmpty')).to.not.exist;
+      }));
+
+
+      it('should evaluate inside allMatch', inject(function(modeling) {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+
+        // assume - stringProp and dropdownProp are both empty → allMatch fires
+        expect(findZeebeProperty(element, 'showIfBothEmpty')).to.exist;
+
+        // when - set stringProp to a value (breaks allMatch)
+        modeling.updateModdleProperties(element, findZeebeProperty(element, 'stringProp'), {
+          value: 'something'
+        });
+
+        // then
+        expect(findZeebeProperty(element, 'showIfBothEmpty')).to.not.exist;
+      }));
+
     });
   });
 

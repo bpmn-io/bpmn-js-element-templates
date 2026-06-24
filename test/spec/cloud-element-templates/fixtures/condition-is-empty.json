@@ -1,0 +1,215 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "IsEmpty Condition",
+  "id": "example.com.condition.isEmpty",
+  "description": "A conditional template for isEmpty.",
+  "appliesTo": ["bpmn:Task"],
+  "properties": [
+    {
+      "id": "stringProp",
+      "type": "String",
+      "label": "String property",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "stringProp"
+      }
+    },
+    {
+      "id": "showIfEmpty",
+      "type": "String",
+      "label": "Show if stringProp is empty",
+      "value": "visible when empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfEmpty"
+      },
+      "condition": {
+        "property": "stringProp",
+        "isEmpty": true
+      }
+    },
+    {
+      "id": "showIfNotEmpty",
+      "type": "String",
+      "label": "Show if stringProp is not empty",
+      "value": "visible when not empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfNotEmpty"
+      },
+      "condition": {
+        "property": "stringProp",
+        "isEmpty": false
+      }
+    },
+    {
+      "id": "dropdownProp",
+      "type": "Dropdown",
+      "label": "Dropdown property",
+      "choices": [
+        { "name": "Option A", "value": "a" },
+        { "name": "Option B", "value": "b" }
+      ],
+      "binding": {
+        "type": "zeebe:property",
+        "name": "dropdownProp"
+      }
+    },
+    {
+      "id": "showIfDropdownEmpty",
+      "type": "String",
+      "label": "Show if dropdownProp is empty",
+      "value": "visible when dropdown empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfDropdownEmpty"
+      },
+      "condition": {
+        "property": "dropdownProp",
+        "isEmpty": true
+      }
+    },
+    {
+      "id": "showIfDropdownNotEmpty",
+      "type": "String",
+      "label": "Show if dropdownProp is not empty",
+      "value": "visible when dropdown not empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfDropdownNotEmpty"
+      },
+      "condition": {
+        "property": "dropdownProp",
+        "isEmpty": false
+      }
+    },
+    {
+      "id": "numberProp",
+      "type": "Number",
+      "label": "Number property",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "numberProp"
+      }
+    },
+    {
+      "id": "showIfNumberEmpty",
+      "type": "String",
+      "label": "Show if numberProp is empty",
+      "value": "visible when number empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfNumberEmpty"
+      },
+      "condition": {
+        "property": "numberProp",
+        "isEmpty": true
+      }
+    },
+    {
+      "id": "showIfNumberNotEmpty",
+      "type": "String",
+      "label": "Show if numberProp is not empty",
+      "value": "visible when number not empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfNumberNotEmpty"
+      },
+      "condition": {
+        "property": "numberProp",
+        "isEmpty": false
+      }
+    },
+    {
+      "id": "inputProp",
+      "type": "String",
+      "label": "Input property (zeebe:input)",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "inputProp"
+      }
+    },
+    {
+      "id": "showIfInputEmpty",
+      "type": "String",
+      "label": "Show if inputProp is empty",
+      "value": "visible when input empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfInputEmpty"
+      },
+      "condition": {
+        "property": "inputProp",
+        "isEmpty": true
+      }
+    },
+    {
+      "id": "showIfInputNotEmpty",
+      "type": "String",
+      "label": "Show if inputProp is not empty",
+      "value": "visible when input not empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfInputNotEmpty"
+      },
+      "condition": {
+        "property": "inputProp",
+        "isEmpty": false
+      }
+    },
+    {
+      "id": "optionalInputProp",
+      "type": "String",
+      "label": "Optional input property (zeebe:input, optional)",
+      "optional": true,
+      "binding": {
+        "type": "zeebe:input",
+        "name": "optionalInputProp"
+      }
+    },
+    {
+      "id": "showIfOptionalEmpty",
+      "type": "String",
+      "label": "Show if optionalInputProp is empty",
+      "value": "visible when optional input empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfOptionalEmpty"
+      },
+      "condition": {
+        "property": "optionalInputProp",
+        "isEmpty": true
+      }
+    },
+    {
+      "id": "showIfOptionalNotEmpty",
+      "type": "String",
+      "label": "Show if optionalInputProp is not empty",
+      "value": "visible when optional input not empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfOptionalNotEmpty"
+      },
+      "condition": {
+        "property": "optionalInputProp",
+        "isEmpty": false
+      }
+    },
+    {
+      "id": "showIfBothEmpty",
+      "type": "String",
+      "label": "Show if stringProp and dropdownProp are both empty",
+      "value": "visible when both empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfBothEmpty"
+      },
+      "condition": {
+        "allMatch": [
+          { "property": "stringProp", "isEmpty": true },
+          { "property": "dropdownProp", "isEmpty": true }
+        ]
+      }
+    }
+  ]
+}
