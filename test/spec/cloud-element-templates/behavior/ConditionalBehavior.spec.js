@@ -635,7 +635,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
           });
 
           // then
-          const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+          const zeebeProperties = findZeebeProperties(businessObject);
 
           expect(zeebeProperties).to.exist;
           expect(zeebeProperties.get('zeebe:properties')).to.have.lengthOf(1);
@@ -656,7 +656,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
           });
 
           // then
-          expectZeebePropertyValue(businessObject, '');
+          expect(findZeebeProperty(businessObject, 'someName').value).to.eql('');
 
           // when
           modeling.updateProperties(element, {
@@ -664,7 +664,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
           });
 
           // then
-          expectZeebePropertyValue(businessObject, 'nameProp=foobar');
+          expect(findZeebeProperty(businessObject, 'someName').value).to.eql('nameProp=foobar');
         })
       );
 
@@ -681,13 +681,13 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         });
 
         // assume
-        expect(findExtension(businessObject, 'zeebe:Properties')).to.exist;
+        expect(findZeebeProperties(businessObject)).to.exist;
 
         // when
         commandStack.undo();
 
         // then
-        expect(findExtension(businessObject, 'zeebe:Properties')).not.to.exist;
+        expect(findZeebeProperties(businessObject)).not.to.exist;
       }));
 
 
@@ -711,7 +711,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         commandStack.redo();
 
         // then
-        const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+        const zeebeProperties = findZeebeProperties(businessObject);
 
         expect(zeebeProperties).to.exist;
         expect(zeebeProperties.get('zeebe:properties')).to.have.lengthOf(1);
@@ -733,7 +733,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         });
 
         // then
-        const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+        const zeebeProperties = findZeebeProperties(businessObject);
         expect(zeebeProperties).not.to.exist;
       })
     );
@@ -1077,7 +1077,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       // given
       const element = elementRegistry.get('SubscriptionEvent_1');
       const businessObject = getBusinessObject(element);
-      const property = findExtension(businessObject, 'zeebe:Properties').get('properties')[0];
+      const property = findZeebeProperties(businessObject).get('properties')[0];
 
       // when
       modeling.updateModdleProperties(element, property, {
@@ -1101,7 +1101,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       // given
       const element = elementRegistry.get('SubscriptionEvent_1');
       const businessObject = getBusinessObject(element);
-      const property = findExtension(businessObject, 'zeebe:Properties').get('properties')[0];
+      const property = findZeebeProperties(businessObject).get('properties')[0];
 
       // when
       modeling.updateModdleProperties(element, property, {
@@ -1980,7 +1980,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const businessObject = getBusinessObject(element);
 
         // then
-        expectZeebePropertyValueByKey(businessObject, 'text-static');
+        expectZeebeProperty(businessObject, 'text-static');
       }));
 
 
@@ -1993,7 +1993,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const businessObject = getBusinessObject(element);
 
         // then
-        expectZeebePropertyValueByKey(businessObject, 'text-optional');
+        expectZeebeProperty(businessObject, 'text-optional');
       }));
 
 
@@ -2006,7 +2006,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const businessObject = getBusinessObject(element);
 
         // then
-        expectZeebePropertyValueByKey(businessObject, 'text-required');
+        expectZeebeProperty(businessObject, 'text-required');
       }));
 
 
@@ -2021,7 +2021,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         // then
         // Even though number-string = "100", its type is Number;
         // therefore, a compare-with-number property should be considered valid (number-string = 100).
-        expectZeebePropertyValueByKey(businessObject, 'compare-with-number');
+        expectZeebeProperty(businessObject, 'compare-with-number');
       }));
 
 
@@ -2034,7 +2034,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const businessObject = getBusinessObject(element);
 
         // then
-        expectZeebePropertyValueByKey(businessObject, 'compare-number-with-number');
+        expectZeebeProperty(businessObject, 'compare-number-with-number');
       }));
 
     });
@@ -2051,8 +2051,8 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const businessObject = getBusinessObject(element);
 
         // then
-        expectZeebePropertyValueByKey(businessObject, 'booleanStaticProp', '=true');
-        expectZeebePropertyValueByKey(businessObject, 'inputForActiveStaticCheckbox');
+        expectZeebeProperty(businessObject, 'booleanStaticProp', '=true');
+        expectZeebeProperty(businessObject, 'inputForActiveStaticCheckbox');
 
         const zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
 
@@ -2073,8 +2073,8 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
         // then
         const businessObject = getBusinessObject(element);
-        expectZeebePropertyValueByKey(businessObject, 'booleanStaticProp', '=false');
-        expectZeebePropertyValueByKey(businessObject, 'inputForInactiveStaticCheckbox');
+        expectZeebeProperty(businessObject, 'booleanStaticProp', '=false');
+        expectZeebeProperty(businessObject, 'inputForInactiveStaticCheckbox');
       }));
 
 
@@ -2087,8 +2087,8 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const businessObject = getBusinessObject(element);
 
         // then
-        expectZeebePropertyValueByKey(businessObject, 'booleanStaticFeelProp', '=true');
-        expectZeebePropertyValueByKey(businessObject, 'inputForActiveStaticFeelCheckbox');
+        expectZeebeProperty(businessObject, 'booleanStaticFeelProp', '=true');
+        expectZeebeProperty(businessObject, 'inputForActiveStaticFeelCheckbox');
 
         const zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
         expect(zeebeProperties.find(p => p.name === 'inputForInactiveStaticFeelCheckbox')).to.not.exist;
@@ -2108,8 +2108,8 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
 
         // then
         const businessObject = getBusinessObject(element);
-        expectZeebePropertyValueByKey(businessObject, 'booleanStaticFeelProp', '=false');
-        expectZeebePropertyValueByKey(businessObject, 'inputForInactiveStaticFeelCheckbox');
+        expectZeebeProperty(businessObject, 'booleanStaticFeelProp', '=false');
+        expectZeebeProperty(businessObject, 'inputForInactiveStaticFeelCheckbox');
       }));
     });
 
@@ -2121,13 +2121,9 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         // given
         const element = changeTemplate('Task_1', isEmptyTemplate);
 
-        // when
-        const businessObject = getBusinessObject(element);
-
         // then
-        const zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
-        expect(zeebeProperties.find(p => p.name === 'showIfEmpty')).to.exist;
-        expect(zeebeProperties.find(p => p.name === 'showIfNotEmpty')).to.not.exist;
+        expect(findZeebeProperty(element, 'showIfEmpty')).to.exist;
+        expect(findZeebeProperty(element, 'showIfNotEmpty')).to.not.exist;
       }));
 
 
@@ -2137,16 +2133,14 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const element = changeTemplate('Task_1', isEmptyTemplate);
 
         // when
-        const property = findExtension(element, 'zeebe:Properties').get('properties').find(p => p.name === 'stringProp');
-        modeling.updateModdleProperties(element, property, {
+        modeling.updateModdleProperties(element, findZeebeProperty(element, 'stringProp'), {
           value: 'some value'
         });
 
         // then
         const businessObject = getBusinessObject(element);
-        const zeebeProperties = findExtension(businessObject, 'zeebe:Properties').get('properties');
-        expect(zeebeProperties.find(p => p.name === 'showIfEmpty')).to.not.exist;
-        expectZeebePropertyValueByKey(businessObject, 'showIfNotEmpty');
+        expect(findZeebeProperty(element, 'showIfEmpty')).to.not.exist;
+        expectZeebeProperty(businessObject, 'showIfNotEmpty');
       }));
 
 
@@ -2156,19 +2150,16 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const element = changeTemplate('Task_1', isEmptyTemplate);
 
         // assume - no dropdown value set initially
-        let zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
-        expect(zeebeProperties.find(p => p.name === 'showIfDropdownEmpty')).to.exist;
-        expect(zeebeProperties.find(p => p.name === 'showIfDropdownNotEmpty')).to.not.exist;
+        expect(findZeebeProperty(element, 'showIfDropdownEmpty')).to.exist;
+        expect(findZeebeProperty(element, 'showIfDropdownNotEmpty')).to.not.exist;
 
         // when - select a dropdown value
-        const property = zeebeProperties.find(p => p.name === 'dropdownProp');
-        modeling.updateModdleProperties(element, property, { value: 'a' });
+        modeling.updateModdleProperties(element, findZeebeProperty(element, 'dropdownProp'), { value: 'a' });
 
         // then
         const businessObject = getBusinessObject(element);
-        zeebeProperties = findExtension(businessObject, 'zeebe:Properties').get('properties');
-        expect(zeebeProperties.find(p => p.name === 'showIfDropdownEmpty')).to.not.exist;
-        expectZeebePropertyValueByKey(businessObject, 'showIfDropdownNotEmpty');
+        expect(findZeebeProperty(element, 'showIfDropdownEmpty')).to.not.exist;
+        expectZeebeProperty(businessObject, 'showIfDropdownNotEmpty');
       }));
 
 
@@ -2178,19 +2169,16 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const element = changeTemplate('Task_1', isEmptyTemplate);
 
         // assume - no number value set initially
-        let zeebeProperties = findExtension(element, 'zeebe:Properties').get('properties');
-        expect(zeebeProperties.find(p => p.name === 'showIfNumberEmpty')).to.exist;
-        expect(zeebeProperties.find(p => p.name === 'showIfNumberNotEmpty')).to.not.exist;
+        expect(findZeebeProperty(element, 'showIfNumberEmpty')).to.exist;
+        expect(findZeebeProperty(element, 'showIfNumberNotEmpty')).to.not.exist;
 
         // when - enter a number value
-        const property = zeebeProperties.find(p => p.name === 'numberProp');
-        modeling.updateModdleProperties(element, property, { value: '42' });
+        modeling.updateModdleProperties(element, findZeebeProperty(element, 'numberProp'), { value: '42' });
 
         // then
         const businessObject = getBusinessObject(element);
-        zeebeProperties = findExtension(businessObject, 'zeebe:Properties').get('properties');
-        expect(zeebeProperties.find(p => p.name === 'showIfNumberEmpty')).to.not.exist;
-        expectZeebePropertyValueByKey(businessObject, 'showIfNumberNotEmpty');
+        expect(findZeebeProperty(element, 'showIfNumberEmpty')).to.not.exist;
+        expectZeebeProperty(businessObject, 'showIfNumberNotEmpty');
       }));
 
 
@@ -2328,24 +2316,25 @@ function expectTaskHeaderValue(businessObject, value) {
   expect(taskHeaders[0].value).to.eql(value);
 }
 
-function expectZeebePropertyValue(businessObject, value) {
-  const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
-  const properties = zeebeProperties.get('zeebe:properties');
-
-  expect(zeebeProperties).to.exist;
-  expect(properties).to.have.lengthOf(1);
-  expect(properties[0].value).to.eql(value);
+function findZeebeProperties(element) {
+  return findExtension(getBusinessObject(element), 'zeebe:Properties');
 }
 
-function expectZeebePropertyValueByKey(businessObject, key, value) {
-  const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+function findZeebeProperty(element, key) {
+  const zeebeProperties = findZeebeProperties(element);
+
+  return zeebeProperties && zeebeProperties.get('properties').find(p => p.name === key);
+}
+
+function expectZeebeProperty(businessObject, key, value) {
+  const zeebeProperties = findZeebeProperties(businessObject);
   const properties = zeebeProperties.get('zeebe:properties');
 
   const property = properties.find(p => p.name === key);
 
-  expect(property).to.exist;
+  expect(property, `<zeebe:property name="${ key }" />`).to.exist;
 
   if (value) {
-    expect(property.value).to.eql(value);
+    expect(property).to.have.property('value', value);
   }
 }
