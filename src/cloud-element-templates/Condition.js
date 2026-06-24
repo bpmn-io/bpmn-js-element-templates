@@ -50,7 +50,7 @@ export function isConditionMet(element, properties, property) {
 }
 
 function isSimpleConditionMet(element, properties, condition) {
-  const { property: propertyId, equals, oneOf, isActive } = condition;
+  const { property: propertyId, equals, oneOf, isActive, isEmpty } = condition;
 
   if (typeof isActive !== 'undefined') {
     const relatedProperty = properties.find(p => p.id === propertyId);
@@ -68,6 +68,12 @@ function isSimpleConditionMet(element, properties, condition) {
 
   if (!property) {
     return false;
+  }
+
+  if (hasProperty(condition, 'isEmpty')) {
+    const value = getPropertyValue(element, property);
+    const isPropertyEmpty = value === undefined || value === null || value === '';
+    return isEmpty ? isPropertyEmpty : !isPropertyEmpty;
   }
 
   if (hasProperty(condition, 'equals')) {
