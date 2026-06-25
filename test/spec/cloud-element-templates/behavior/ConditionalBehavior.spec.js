@@ -638,7 +638,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
           const zeebeProperties = findZeebeProperties(businessObject);
 
           expect(zeebeProperties).to.exist;
-          expect(zeebeProperties.get('zeebe:properties')).to.have.lengthOf(1);
+          expect(zeebeProperties.get('properties')).to.have.lengthOf(1);
         })
       );
 
@@ -714,7 +714,7 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
         const zeebeProperties = findZeebeProperties(businessObject);
 
         expect(zeebeProperties).to.exist;
-        expect(zeebeProperties.get('zeebe:properties')).to.have.lengthOf(1);
+        expect(zeebeProperties.get('properties')).to.have.lengthOf(1);
       }));
 
     });
@@ -2328,7 +2328,7 @@ function findZeebeProperty(element, key) {
 
 function expectZeebeProperty(businessObject, key, value) {
   const zeebeProperties = findZeebeProperties(businessObject);
-  const properties = zeebeProperties.get('zeebe:properties');
+  const properties = zeebeProperties.get('properties');
 
   const property = properties.find(p => p.name === key);
 
