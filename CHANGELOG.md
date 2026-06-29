@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.27.0
+
+* `FEAT`: support `isEmpty` condition for `zeebe` element templates ([#259](https://github.com/bpmn-io/bpmn-js-element-templates/pull/259))
+
 ## 2.26.0
 
 * `FEAT`: support applying templates with presets ([#252](https://github.com/bpmn-io/bpmn-js-element-templates/pull/252))
