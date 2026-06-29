@@ -41,7 +41,7 @@ import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 
 import CamundaModdle from 'camunda-bpmn-moddle/resources/camunda';
 import ModelerModdle from 'modeler-moddle/resources/modeler';
-import ZeebeModdle from 'src/cloud-element-templates/core/ZeebeModdleExtended';
+import ZeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
 
 import CloudElementTemplatesPropertiesProviderModule from 'src/cloud-element-templates';
 import ElementTemplatesPropertiesProviderModule from 'src/element-templates';
@@ -474,11 +474,17 @@ const SAMPLE_CONNECTIONS = [
   }
 ];
 
+const FETCH_DELAY = 1500; // ms — simulated network latency for demo
+
 const MockConfigurationInstancesModule = {
 
   __init__: [ function(configurationInstances) {
 
-    // Do NOT call setInstances — leave isLoaded() = false to demo loading state
+    // Register a fetch function with simulated delay
+    configurationInstances.setFetchFn(async () => {
+      await new Promise(resolve => setTimeout(resolve, FETCH_DELAY));
+      return [ ...SAMPLE_CONNECTIONS ];
+    });
   } ]
 };
 

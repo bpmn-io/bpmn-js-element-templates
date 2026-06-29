@@ -360,6 +360,21 @@
   color: var(--color-grey-225-10-55, #7d8186);
 }
 
+.bio-properties-panel-connection-chooser-refreshing {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 10px;
+  color: var(--color-grey-225-10-55, #7d8186);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+}
+
 .bio-properties-panel-connection-chooser-popover-list {
   margin: 0;
   padding: 0;

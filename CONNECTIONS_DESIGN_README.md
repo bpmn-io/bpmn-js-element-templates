@@ -51,6 +51,74 @@ sequenceDiagram
     ConfigurationProperty->>CommandStack: stamp modelerConfigurationTemplate, modelerConfigurationName
 ```
 
+## Bootstrap & Extraction Flow
+
+```mermaid
+sequenceDiagram
+    participant Host as Host App (Web Modeler)
+    participant ETL as ElementTemplatesLoader
+    participant ET as ElementTemplates
+    participant CT as ConfigurationTemplates
+
+    Host->>ETL: provide templates JSON
+    ETL->>ET: elementTemplates.set(templates)
+    ET->>ET: index by id/version
+    ET-->>CT: fires elementTemplates.changed
+    CT->>CT: _extract() — collects configurationTemplates from all ETs
+    CT-->>CT: fires configurationTemplates.changed
+```
+
+`ElementTemplates.set()` is the trigger. It fires `elementTemplates.changed`, which `ConfigurationTemplates` listens to. No manual wiring needed — the core module registers `ConfigurationTemplates` in `__init__` so it subscribes on bootstrap.
+
+## Configuration Instances Update Flow
+
+```mermaid
+sequenceDiagram
+    participant Host as Host App (Web Modeler)
+    participant CI as ConfigurationInstances
+    participant ClusterAPI as Cluster API
+    participant CP as ConfigurationProperty
+
+    Host->>CI: setFetchFn(async () => fetch(...))
+    Note over CI: fetchFn registered once at bootstrap
+
+    CP->>CI: getByTemplateRef(id, minVersion)
+    CI->>CI: _isStale()? → yes
+    CI-->>CP: returns cached data immediately
+    CI->>CI: _refresh()
+    CI-->>CP: fires configurationInstances.fetching
+    CP->>CP: shows "Refreshing…" in popover
+    CI->>ClusterAPI: await fetchFn()
+    ClusterAPI-->>CI: instances[]
+    CI->>CI: _lastFetchedAt = now
+    CI-->>CP: fires configurationInstances.changed
+    CP->>CP: re-render with fresh data
+```
+
+### Caching Strategy
+
+| Aspect | Behavior |
+|--------|----------|
+| Pattern | Stale-while-revalidate |
+| TTL | Configurable via `config.configurationInstances.ttl` (default 30s) |
+| Trigger | Lazy — `getAll()` / `getByTemplateRef()` check staleness |
+| During refresh | Stale data served; popover shows "Refreshing…" |
+| Force refresh | `invalidate()` — e.g. after creating an instance in Hub modal |
+| Push fallback | `setInstances()` still works (tests, mocks); resets cache timestamp |
+
+### Host App Setup
+
+```js
+const configurationInstances = modeler.get('configurationInstances');
+
+configurationInstances.setFetchFn(async () => {
+  const response = await fetch(`/clusters/${clusterId}/variables?kind=CREDENTIAL`);
+  return response.json();
+});
+```
+
+No polling or timers needed on the host side. The service handles refresh internally.
+
 ## Element Template Schema
 
 ```json
@@ -96,9 +164,9 @@ Engine ignores `modeler*` attributes.
 
 **ConfigurationTemplates service** — automatically extracts `configurationTemplates` from all element templates on `elementTemplates.changed`. Provides `get(id, version?)`, `getAll()`, `getLatest()`. Fires `configurationTemplates.changed`.
 
-**ConfigurationInstances service** — mock-backed registry populated via `setInstances()`. Fires `configurationInstances.changed` on update. `getByTemplateRef(id, minVersion)` splits results into `{ compatible, incompatible }`.
+**ConfigurationInstances service** — stale-while-revalidate cache. Host registers a `fetchFn`; the service refreshes lazily on access when TTL expires. Fires `configurationInstances.fetching` (start) and `configurationInstances.changed` (done). `setInstances()` still works for push/mocking. API: `getAll()`, `getByTemplateRef(id, minVersion)`, `invalidate()`, `isFetching()`, `isLoaded()`.
 
-**Moddle extension** — adds `modelerConfigurationTemplate` and `modelerConfigurationName` as attributes on `zeebe:Input` and `zeebe:Property`. Merges into zeebe descriptor at runtime (production target: `zeebe-bpmn-moddle`).
+**Moddle extension** — `modelerConfigurationTemplate` and `modelerConfigurationName` attributes on `zeebe:Input` and `zeebe:Property`. Lives upstream in [`zeebe-bpmn-moddle#configuration-template-support`](https://github.com/camunda/zeebe-bpmn-moddle/tree/configuration-template-support).
 
 **Cached name fallback** — when instances aren't loaded, reads `modelerConfigurationName` from the input element to show "Validating…" or "Not found on cluster".
 
@@ -108,7 +176,7 @@ Engine ignores `modeler*` attributes.
 
 | Area | Path |
 |------|------|
-| Moddle | `src/cloud-element-templates/core/ZeebeModdleExtended.js` |
+| Moddle | `zeebe-bpmn-moddle` (branch: `configuration-template-support`) |
 | Configuration Templates | `src/cloud-element-templates/core/ConfigurationTemplates.js` |
 | Configuration Instances | `src/cloud-element-templates/core/ConfigurationInstances.js` |
 | Core module | `src/cloud-element-templates/core/index.js` |

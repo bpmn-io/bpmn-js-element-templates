@@ -67,18 +67,26 @@ export function ConfigurationProperty(props) {
   );
 
   const [ loaded, setLoaded ] = useState(configurationInstances.isLoaded());
+  const [ fetching, setFetching ] = useState(configurationInstances.isFetching());
 
   useEffect(() => {
-    const callback = () => {
+    const onChanged = () => {
       setResult(configurationInstances.getByTemplateRef(templateRef, templateVersion));
       setLoaded(configurationInstances.isLoaded());
+      setFetching(configurationInstances.isFetching());
     };
 
-    eventBus.on('configurationInstances.changed', callback);
-    callback();
+    const onFetching = () => {
+      setFetching(true);
+    };
+
+    eventBus.on('configurationInstances.changed', onChanged);
+    eventBus.on('configurationInstances.fetching', onFetching);
+    onChanged();
 
     return () => {
-      eventBus.off('configurationInstances.changed', callback);
+      eventBus.off('configurationInstances.changed', onChanged);
+      eventBus.off('configurationInstances.fetching', onFetching);
     };
   }, [ eventBus, configurationInstances, templateRef, templateVersion ]);
 
@@ -281,6 +289,7 @@ export function ConfigurationProperty(props) {
               incompatible={ incompatible }
               selected={ selected }
               onSelect={ select }
+              fetching={ fetching }
               templateVersion={ templateVersion }
               translate={ translate } />
           )
@@ -433,6 +442,7 @@ function MissingConnection(props) {
 
 function ConnectionPopover(props) {
   const {
+    fetching,
     incompatible = [],
     instances,
     onSelect,
@@ -445,6 +455,10 @@ function ConnectionPopover(props) {
     <div class="bio-properties-panel-connection-chooser-popover">
       <div class="bio-properties-panel-connection-chooser-popover-header">
         { translate('Available connections') }
+        { fetching
+          ? <span class="bio-properties-panel-connection-chooser-refreshing">{ translate('Refreshing…') }</span>
+          : null
+        }
       </div>
 
       {

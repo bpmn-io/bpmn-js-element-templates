@@ -124,7 +124,7 @@
     "sinon": "^22.0.0",
     "sinon-chai": "^4.0.0",
     "webpack": "^5.106.2",
-    "zeebe-bpmn-moddle": "^1.13.0"
+    "zeebe-bpmn-moddle": "github:camunda/zeebe-bpmn-moddle#configuration-template-support"
   },
   "peerDependencies": {
     "@bpmn-io/properties-panel": ">= 3.41.3",
