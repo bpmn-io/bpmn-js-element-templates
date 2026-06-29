@@ -10,6 +10,7 @@ const DIST_DIR = path.join(__dirname, '../../dist');
 const EXPORTS = [
   'bpmn-js-element-templates',
   'bpmn-js-element-templates/core',
+  'bpmn-js-element-templates/util',
   'bpmn-js-element-templates/dist/assets/element-templates.css',
   'bpmn-js-element-templates/package.json'
 ];
@@ -17,6 +18,10 @@ const EXPORTS = [
 describe('modules', function() {
 
   it('should expose CJS bundle', verifyExists('index.js'));
+
+  it('should expose util CJS bundle', verifyExists('util.js'));
+
+  it('should expose util ESM bundle', verifyExists('util.esm.js'));
 
 });
 
