@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.23.2
+
+* `FIX`: add previously missing `canceling` task listener event type ([camunda/element-templates-json-schema#255](https://github.com/camunda/element-templates-json-schema/pull/255))
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.20.1`
+
 ## 2.23.1
 
 * `FIX`: use a fallback for missing label in validation ([#237](https://github.com/bpmn-io/bpmn-js-element-templates/pull/237))
