@@ -474,9 +474,9 @@ const SAMPLE_CONNECTIONS = [
   }
 ];
 
-const MockConnectionInstancesModule = {
+const MockConfigurationInstancesModule = {
 
-  __init__: [ function(connectionInstances) {
+  __init__: [ function(configurationInstances) {
 
     // Do NOT call setInstances — leave isLoaded() = false to demo loading state
   } ]
@@ -580,7 +580,7 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
           CreateAppendElementTemplatesModule,
           ChangeEnginesModule,
           LogTemplateErrorsModule,
-          MockConnectionInstancesModule,
+          MockConfigurationInstancesModule,
           LintingModule
         ],
         moddleExtensions: {
@@ -670,22 +670,11 @@ function createTestUI(modeler) {
   }
 
   // --- Connection instances modal ---
-  const connectionInstances = modeler.get('connectionInstances', false);
+  const configurationInstances = modeler.get('configurationInstances', false);
 
-  if (connectionInstances) {
+  const configurationTemplates = modeler.get('configurationTemplates', false);
 
-    // Known connection templates (extracted from element templates)
-    const CONNECTION_TEMPLATES = [
-      {
-        id: 'io.camunda:slack-connection:1',
-        name: 'Slack Connection',
-        version: 2,
-        icon: SLACK_ICON,
-        properties: [
-          { key: 'slackOauthToken', label: 'Slack API Token', type: 'String', required: true }
-        ]
-      }
-    ];
+  if (configurationInstances) {
 
     // Toggle button
     const toggleBtn = domify('<button class="ci-toggle-btn">⚙ Connections</button>');
@@ -716,8 +705,8 @@ function createTestUI(modeler) {
     };
 
     const renderModal = (modal) => {
-      const all = connectionInstances.getAll();
-      const loaded = connectionInstances.isLoaded();
+      const all = configurationInstances.getAll();
+      const loaded = configurationInstances.isLoaded();
 
       modal.innerHTML = `
         <div class="ci-modal-header">
@@ -769,8 +758,8 @@ function createTestUI(modeler) {
           );
 
           li.querySelector('button').addEventListener('click', () => {
-            const updated = connectionInstances.getAll().filter((_, i) => i !== idx);
-            connectionInstances.setInstances(updated);
+            const updated = configurationInstances.getAll().filter((_, i) => i !== idx);
+            configurationInstances.setInstances(updated);
             renderModal(modal);
           });
 
@@ -783,10 +772,10 @@ function createTestUI(modeler) {
       // Random creation
       modal.querySelector('[data-action="random"]').addEventListener('click', () => {
         const id = Math.random().toString(36).slice(2, 7);
-        const current = connectionInstances.getAll();
+        const current = configurationInstances.getAll();
         const authTypes = [ 'Bearer token', 'OAuth2', 'Bot token' ];
 
-        connectionInstances.setInstances([
+        configurationInstances.setInstances([
           ...current,
           {
             name: 'slack_' + id,
@@ -807,7 +796,7 @@ function createTestUI(modeler) {
       const formContainer = modal.querySelector('.ci-form-container');
 
       modal.querySelector('[data-action="explicit"]').addEventListener('click', () => {
-        const tmpl = CONNECTION_TEMPLATES[0]; // only Slack for now
+        const tmpl = configurationTemplates.getLatest()[0]; // first available
 
         formContainer.innerHTML = '';
 
@@ -866,9 +855,9 @@ function createTestUI(modeler) {
             return;
           }
 
-          const current = connectionInstances.getAll();
+          const current = configurationInstances.getAll();
 
-          connectionInstances.setInstances([
+          configurationInstances.setInstances([
             ...current,
             {
               name,
@@ -891,12 +880,12 @@ function createTestUI(modeler) {
 
       // Bulk actions
       modal.querySelector('[data-action="load-samples"]').addEventListener('click', () => {
-        connectionInstances.setInstances([ ...SAMPLE_CONNECTIONS ]);
+        configurationInstances.setInstances([ ...SAMPLE_CONNECTIONS ]);
         renderModal(modal);
       });
 
       modal.querySelector('[data-action="mark-loaded"]').addEventListener('click', () => {
-        connectionInstances.setInstances([]);
+        configurationInstances.setInstances([]);
         renderModal(modal);
       });
     };

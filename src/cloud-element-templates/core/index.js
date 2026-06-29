@@ -1,6 +1,7 @@
 import ElementTemplates from '../ElementTemplates';
 import ElementTemplatesLoader from '../ElementTemplatesLoader';
-import ConnectionInstances from './ConnectionInstances';
+import ConfigurationInstances from './ConfigurationInstances';
+import ConfigurationTemplates from './ConfigurationTemplates';
 
 import commandsModule from '../cmd';
 import createModule from '../create';
@@ -13,9 +14,11 @@ export default {
     createModule
   ],
   __init__: [
-    'elementTemplatesLoader'
+    'elementTemplatesLoader',
+    'configurationTemplates'
   ],
   elementTemplates: [ 'type', ElementTemplates ],
   elementTemplatesLoader: [ 'type', ElementTemplatesLoader ],
-  connectionInstances: [ 'type', ConnectionInstances ]
+  configurationInstances: [ 'type', ConfigurationInstances ],
+  configurationTemplates: [ 'type', ConfigurationTemplates ]
 };

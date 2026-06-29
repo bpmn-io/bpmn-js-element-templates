@@ -8,7 +8,7 @@
  *   authType?: string,
  *   status?: 'active' | 'inactive',
  *   icon?: string
- * } } ConnectionInstance
+ * } } ConfigurationInstance
  */
 
 /**
@@ -16,14 +16,14 @@
  * `kind = CREDENTIAL`).
  *
  * For the prototype this is mock-backed: instances are injected via
- * `setInstances()`. A future `ConnectionInstancesLoader` would populate this
- * from the cluster API.
+ * `setInstances()`. A future `ConfigurationInstancesLoader` would populate
+ * this from the cluster API.
  */
-export default class ConnectionInstances {
+export default class ConfigurationInstances {
   constructor(eventBus) {
     this._eventBus = eventBus;
 
-    /** @type {ConnectionInstance[]} */
+    /** @type {ConfigurationInstance[]} */
     this._instances = [];
 
     /** @type {boolean} */
@@ -33,13 +33,13 @@ export default class ConnectionInstances {
   /**
    * Replace the set of available instances and notify listeners.
    *
-   * @param {ConnectionInstance[]} instances
+   * @param {ConfigurationInstance[]} instances
    */
   setInstances(instances) {
     this._instances = instances || [];
     this._loaded = true;
 
-    this._eventBus.fire('connectionInstances.changed', {
+    this._eventBus.fire('configurationInstances.changed', {
       instances: this._instances
     });
   }
@@ -56,7 +56,7 @@ export default class ConnectionInstances {
   /**
    * Get all available instances.
    *
-   * @returns {ConnectionInstance[]}
+   * @returns {ConfigurationInstance[]}
    */
   getAll() {
     return this._instances;
@@ -68,7 +68,7 @@ export default class ConnectionInstances {
    *
    * @param {string} templateRef - configuration template ID
    * @param {number} [minVersion] - minimum version floor (inclusive)
-   * @returns {{ compatible: ConnectionInstance[], incompatible: ConnectionInstance[] }}
+   * @returns {{ compatible: ConfigurationInstance[], incompatible: ConfigurationInstance[] }}
    */
   getByTemplateRef(templateRef, minVersion) {
     const compatible = [];
@@ -93,4 +93,4 @@ export default class ConnectionInstances {
   }
 }
 
-ConnectionInstances.$inject = [ 'eventBus' ];
+ConfigurationInstances.$inject = [ 'eventBus' ];

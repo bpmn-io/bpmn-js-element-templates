@@ -1,15 +1,23 @@
 # Connection Chooser Prototype
 
-Properties-panel picker for reusable connection instances. Stores selection as a FEEL expression + cached metadata on `zeebe:input`.
+Properties-panel picker for reusable configuration instances. Stores selection as a FEEL expression + cached metadata on `zeebe:input`.
 
 ## Architecture
 
 ```mermaid
 flowchart TD
     ET["Element Template<br/>(type: Configuration)"] -->|dispatches to| CP["ConfigurationProperty<br/>component"]
-    CP -->|queries| CI["ConnectionInstances<br/>service"]
+    CP -->|queries| CI["ConfigurationInstances<br/>service"]
     CI -->|filters by| TR["configurationTemplate +<br/>configurationTemplateVersion"]
     CP -->|on selection writes| XML["zeebe:input<br/>source + modeler* attrs"]
+
+    subgraph "Services (core module)"
+        CT["ConfigurationTemplates"] -->|extracts from| ETS["ElementTemplates"]
+        CI["ConfigurationInstances"]
+    end
+
+    ETS -->|elementTemplates.changed| CT
+    CT -->|configurationTemplates.changed| Consumers["Consumers (e.g. Hub modal)"]
 
     subgraph "UI States"
         S1["Placeholder (empty)"]
@@ -31,12 +39,12 @@ flowchart TD
 sequenceDiagram
     participant User
     participant ConfigurationProperty
-    participant ConnectionInstances
+    participant ConfigurationInstances
     participant CommandStack
 
     User->>ConfigurationProperty: clicks placeholder
-    ConfigurationProperty->>ConnectionInstances: getByTemplateRef(id, minVersion)
-    ConnectionInstances-->>ConfigurationProperty: { compatible, incompatible }
+    ConfigurationProperty->>ConfigurationInstances: getByTemplateRef(id, minVersion)
+    ConfigurationInstances-->>ConfigurationProperty: { compatible, incompatible }
     ConfigurationProperty->>User: shows popover with rows
     User->>ConfigurationProperty: selects instance
     ConfigurationProperty->>CommandStack: set source = "=camunda.vars.env.<name>"
@@ -86,7 +94,9 @@ Engine ignores `modeler*` attributes.
 
 **Dispatcher** routes to `ConfigurationProperty` when `type === 'Configuration'` or `configurationTemplate`/`templateRef`/`schemaRef` is present.
 
-**ConnectionInstances service** — mock-backed registry populated via `setInstances()`. Fires `connectionInstances.changed` on update. `getByTemplateRef(id, minVersion)` splits results into `{ compatible, incompatible }`.
+**ConfigurationTemplates service** — automatically extracts `configurationTemplates` from all element templates on `elementTemplates.changed`. Provides `get(id, version?)`, `getAll()`, `getLatest()`. Fires `configurationTemplates.changed`.
+
+**ConfigurationInstances service** — mock-backed registry populated via `setInstances()`. Fires `configurationInstances.changed` on update. `getByTemplateRef(id, minVersion)` splits results into `{ compatible, incompatible }`.
 
 **Moddle extension** — adds `modelerConfigurationTemplate` and `modelerConfigurationName` as attributes on `zeebe:Input` and `zeebe:Property`. Merges into zeebe descriptor at runtime (production target: `zeebe-bpmn-moddle`).
 
@@ -99,10 +109,13 @@ Engine ignores `modeler*` attributes.
 | Area | Path |
 |------|------|
 | Moddle | `src/cloud-element-templates/core/ZeebeModdleExtended.js` |
-| Service | `src/cloud-element-templates/core/ConnectionInstances.js` |
+| Configuration Templates | `src/cloud-element-templates/core/ConfigurationTemplates.js` |
+| Configuration Instances | `src/cloud-element-templates/core/ConfigurationInstances.js` |
+| Core module | `src/cloud-element-templates/core/index.js` |
 | Component | `src/cloud-element-templates/properties-panel/properties/custom-properties/ConfigurationProperty.js` |
 | Dispatcher | `src/cloud-element-templates/properties-panel/properties/custom-properties/index.js` |
 | Setter | `src/cloud-element-templates/CreateHelper.js` |
 | Styles | `assets/element-templates.css` |
 | Fixture | `test/spec/cloud-element-templates/fixtures/connections-design.json` |
+| Tests | `test/spec/cloud-element-templates/ConfigurationTemplates.spec.js` |
 | Demo | `test/spec/Example.spec.js` |

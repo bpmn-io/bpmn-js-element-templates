@@ -59,28 +59,28 @@ export function ConfigurationProperty(props) {
         commandStack = useService('commandStack'),
         translate = useService('translate'),
         eventBus = useService('eventBus'),
-        connectionInstances = useService('connectionInstances');
+        configurationInstances = useService('configurationInstances');
 
   // re-render when available instances change
   const [ result, setResult ] = useState(
-    connectionInstances.getByTemplateRef(templateRef, templateVersion)
+    configurationInstances.getByTemplateRef(templateRef, templateVersion)
   );
 
-  const [ loaded, setLoaded ] = useState(connectionInstances.isLoaded());
+  const [ loaded, setLoaded ] = useState(configurationInstances.isLoaded());
 
   useEffect(() => {
     const callback = () => {
-      setResult(connectionInstances.getByTemplateRef(templateRef, templateVersion));
-      setLoaded(connectionInstances.isLoaded());
+      setResult(configurationInstances.getByTemplateRef(templateRef, templateVersion));
+      setLoaded(configurationInstances.isLoaded());
     };
 
-    eventBus.on('connectionInstances.changed', callback);
+    eventBus.on('configurationInstances.changed', callback);
     callback();
 
     return () => {
-      eventBus.off('connectionInstances.changed', callback);
+      eventBus.off('configurationInstances.changed', callback);
     };
-  }, [ eventBus, connectionInstances, templateRef, templateVersion ]);
+  }, [ eventBus, configurationInstances, templateRef, templateVersion ]);
 
   const instances = result.compatible;
   const incompatible = result.incompatible;
