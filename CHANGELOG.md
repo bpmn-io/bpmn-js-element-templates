@@ -9,6 +9,8 @@ ___Note:__ Yet to be released changes appear here._
 ## 2.27.0
 
 * `FEAT`: support `isEmpty` condition for `zeebe` element templates ([#259](https://github.com/bpmn-io/bpmn-js-element-templates/pull/259))
+* `DEPS`: update to `uuid@14.0.1`
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.23.0`
 
 ## 2.26.0
 
