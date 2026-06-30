@@ -116,15 +116,15 @@
   width: 216px;
 }
 
-/* connection chooser */
-.bio-properties-panel-connection-chooser {
+/* configuration chooser */
+.bio-properties-panel-configuration-chooser {
   position: relative;
   margin: 2px 32px 6px 12px;
   padding-bottom: 10px;
 }
 
 /* placeholder trigger (no selection) */
-.bio-properties-panel-connection-chooser-placeholder {
+.bio-properties-panel-configuration-chooser-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,28 +141,28 @@
   outline: none;
 }
 
-.bio-properties-panel-connection-chooser-placeholder:hover:not(:disabled) {
+.bio-properties-panel-configuration-chooser-placeholder:hover:not(:disabled) {
   border-color: var(--color-grey-225-10-55, #7d8186);
   background-color: var(--color-grey-225-10-97, #f7f8f8);
 }
 
-.bio-properties-panel-connection-chooser-placeholder:focus-visible {
+.bio-properties-panel-configuration-chooser-placeholder:focus-visible {
   box-shadow: 0 0 0 2px var(--color-blue-205-100-50, #1a75ff);
 }
 
-.bio-properties-panel-connection-chooser-placeholder:disabled {
+.bio-properties-panel-configuration-chooser-placeholder:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-.bio-properties-panel-connection-chooser-placeholder-plus {
+.bio-properties-panel-configuration-chooser-placeholder-plus {
   font-size: 14px;
   font-weight: 600;
   line-height: 1;
 }
 
-/* selected connection card */
-.bio-properties-panel-connection-chooser-selected {
+/* selected configuration card */
+.bio-properties-panel-configuration-chooser-selected {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -175,13 +175,13 @@
   outline: none;
 }
 
-.bio-properties-panel-connection-chooser-selected:hover {
+.bio-properties-panel-configuration-chooser-selected:hover {
   border-color: var(--color-blue-205-100-50, #1a75ff);
   background-color: var(--color-blue-205-100-95, #eef4ff);
 }
 
 /* loading state */
-.bio-properties-panel-connection-chooser-loading {
+.bio-properties-panel-configuration-chooser-loading {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -192,23 +192,23 @@
   background-color: var(--color-grey-225-10-97, #f7f8f8);
 }
 
-.bio-properties-panel-connection-chooser-loading-shimmer {
+.bio-properties-panel-configuration-chooser-loading-shimmer {
   flex: 0 0 auto;
   width: 28px;
   height: 28px;
   border-radius: 6px;
   background: linear-gradient(90deg, #e6e8ea 25%, #f0f1f2 50%, #e6e8ea 75%);
   background-size: 200% 100%;
-  animation: connection-shimmer 1.5s infinite;
+  animation: configuration-shimmer 1.5s infinite;
 }
 
-@keyframes connection-shimmer {
+@keyframes configuration-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-/* missing connection state */
-.bio-properties-panel-connection-chooser-missing {
+/* missing configuration state */
+.bio-properties-panel-configuration-chooser-missing {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -221,27 +221,27 @@
   outline: none;
 }
 
-.bio-properties-panel-connection-chooser-missing:hover {
+.bio-properties-panel-configuration-chooser-missing:hover {
   border-color: #e09730;
   background-color: #fef3e0;
 }
 
-.bio-properties-panel-connection-chooser-missing:focus-visible {
+.bio-properties-panel-configuration-chooser-missing:focus-visible {
   box-shadow: 0 0 0 2px #f0ad4e;
 }
 
-.bio-properties-panel-connection-chooser-missing-icon {
+.bio-properties-panel-configuration-chooser-missing-icon {
   flex: 0 0 auto;
   font-size: 18px;
   line-height: 1;
 }
 
-.bio-properties-panel-connection-chooser-selected:focus-visible {
+.bio-properties-panel-configuration-chooser-selected:focus-visible {
   box-shadow: 0 0 0 2px var(--color-blue-205-100-50, #1a75ff);
 }
 
 /* logo */
-.bio-properties-panel-connection-chooser-logo {
+.bio-properties-panel-configuration-chooser-logo {
   flex: 0 0 auto;
   width: 28px;
   height: 28px;
@@ -249,7 +249,7 @@
   object-fit: contain;
 }
 
-.bio-properties-panel-connection-chooser-logo--placeholder {
+.bio-properties-panel-configuration-chooser-logo--placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -259,21 +259,21 @@
 }
 
 /* text block */
-.bio-properties-panel-connection-chooser-text {
+.bio-properties-panel-configuration-chooser-text {
   display: flex;
   flex-direction: column;
   min-width: 0;
   flex: 1 1 auto;
 }
 
-.bio-properties-panel-connection-chooser-title {
+.bio-properties-panel-configuration-chooser-title {
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.bio-properties-panel-connection-chooser-subtitle {
+.bio-properties-panel-configuration-chooser-subtitle {
   font-size: 12px;
   color: var(--color-grey-225-10-55, #7d8186);
   overflow: hidden;
@@ -281,12 +281,12 @@
   white-space: nowrap;
 }
 
-.bio-properties-panel-connection-chooser-varname {
+.bio-properties-panel-configuration-chooser-varname {
   font-family: monospace;
 }
 
 /* status badge */
-.bio-properties-panel-connection-chooser-badge {
+.bio-properties-panel-configuration-chooser-badge {
   flex: 0 0 auto;
   padding: 2px 8px;
   border-radius: 1000px;
@@ -295,18 +295,18 @@
   text-transform: lowercase;
 }
 
-.bio-properties-panel-connection-chooser-badge--active {
+.bio-properties-panel-configuration-chooser-badge--active {
   background-color: #e6f9ee;
   color: #288852;
 }
 
-.bio-properties-panel-connection-chooser-badge--inactive {
+.bio-properties-panel-configuration-chooser-badge--inactive {
   background-color: var(--color-grey-225-10-90, #e6e8ea);
   color: var(--color-grey-225-10-35, #4d5258);
 }
 
 /* menu (...) button */
-.bio-properties-panel-connection-chooser-menu {
+.bio-properties-panel-configuration-chooser-menu {
   flex: 0 0 auto;
   padding: 0 6px;
   border: none;
@@ -318,17 +318,17 @@
   border-radius: 4px;
 }
 
-.bio-properties-panel-connection-chooser-menu:hover:not(:disabled) {
+.bio-properties-panel-configuration-chooser-menu:hover:not(:disabled) {
   background-color: var(--color-grey-225-10-90, #e6e8ea);
 }
 
-.bio-properties-panel-connection-chooser-menu:disabled {
+.bio-properties-panel-configuration-chooser-menu:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
 /* popover */
-.bio-properties-panel-connection-chooser-popover {
+.bio-properties-panel-configuration-chooser-popover {
   position: absolute;
   z-index: 100;
   left: 0;
@@ -341,7 +341,7 @@
   overflow: hidden;
 }
 
-.bio-properties-panel-connection-chooser-popover-header {
+.bio-properties-panel-configuration-chooser-popover-header {
   padding: 8px 12px;
   color: var(--color-grey-225-10-55, #7d8186);
   font-size: 11px;
@@ -353,14 +353,14 @@
   justify-content: space-between;
 }
 
-.bio-properties-panel-connection-chooser-popover-hint {
+.bio-properties-panel-configuration-chooser-popover-hint {
   font-weight: 400;
   text-transform: none;
   letter-spacing: normal;
   color: var(--color-grey-225-10-55, #7d8186);
 }
 
-.bio-properties-panel-connection-chooser-refreshing {
+.bio-properties-panel-configuration-chooser-refreshing {
   font-weight: 400;
   text-transform: none;
   letter-spacing: normal;
@@ -375,13 +375,13 @@
 }
 }
 
-.bio-properties-panel-connection-chooser-popover-list {
+.bio-properties-panel-configuration-chooser-popover-list {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.bio-properties-panel-connection-chooser-popover-row {
+.bio-properties-panel-configuration-chooser-popover-row {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -390,25 +390,25 @@
   outline: none;
 }
 
-.bio-properties-panel-connection-chooser-popover-row:hover,
-.bio-properties-panel-connection-chooser-popover-row:focus-visible {
+.bio-properties-panel-configuration-chooser-popover-row:hover,
+.bio-properties-panel-configuration-chooser-popover-row:focus-visible {
   background-color: var(--color-blue-205-100-95, #eef4ff);
 }
 
-.bio-properties-panel-connection-chooser-popover-row--selected {
+.bio-properties-panel-configuration-chooser-popover-row--selected {
   background-color: var(--color-blue-205-100-95, #eef4ff);
 }
 
-.bio-properties-panel-connection-chooser-popover-row--blocked {
+.bio-properties-panel-configuration-chooser-popover-row--blocked {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.bio-properties-panel-connection-chooser-popover-row--blocked:hover {
+.bio-properties-panel-configuration-chooser-popover-row--blocked:hover {
   background-color: transparent;
 }
 
-.bio-properties-panel-connection-chooser-blocked-badge {
+.bio-properties-panel-configuration-chooser-blocked-badge {
   flex: 0 0 auto;
   padding: 2px 8px;
   border-radius: 10px;
@@ -418,12 +418,12 @@
   color: #e65100;
 }
 
-.bio-properties-panel-connection-chooser-popover-section {
+.bio-properties-panel-configuration-chooser-popover-section {
   border-top: 1px solid var(--color-grey-225-10-90, #e6e8ea);
 }
 
-/* create connection footer */
-.bio-properties-panel-connection-chooser-create {
+/* create configuration footer */
+.bio-properties-panel-configuration-chooser-create {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -439,19 +439,19 @@
   outline: none;
 }
 
-.bio-properties-panel-connection-chooser-create:hover,
-.bio-properties-panel-connection-chooser-create:focus-visible {
+.bio-properties-panel-configuration-chooser-create:hover,
+.bio-properties-panel-configuration-chooser-create:focus-visible {
   background-color: var(--color-blue-205-100-95, #eef4ff);
 }
 
-.bio-properties-panel-connection-chooser-empty {
+.bio-properties-panel-configuration-chooser-empty {
   padding: 10px 12px;
   color: var(--color-grey-225-10-55, #7d8186);
   font-style: italic;
 }
 
 /* context menu (... actions) */
-.bio-properties-panel-connection-chooser-context-menu {
+.bio-properties-panel-configuration-chooser-context-menu {
   position: absolute;
   z-index: 11;
   right: 0;
@@ -464,7 +464,7 @@
   overflow: hidden;
 }
 
-.bio-properties-panel-connection-chooser-context-menu-item {
+.bio-properties-panel-configuration-chooser-context-menu-item {
   display: block;
   width: 100%;
   padding: 8px 12px;
@@ -477,16 +477,16 @@
   outline: none;
 }
 
-.bio-properties-panel-connection-chooser-context-menu-item:hover,
-.bio-properties-panel-connection-chooser-context-menu-item:focus-visible {
+.bio-properties-panel-configuration-chooser-context-menu-item:hover,
+.bio-properties-panel-configuration-chooser-context-menu-item:focus-visible {
   background-color: var(--color-grey-225-10-97, #f7f8f8);
 }
 
-.bio-properties-panel-connection-chooser-context-menu-item--danger {
+.bio-properties-panel-configuration-chooser-context-menu-item--danger {
   color: var(--color-red-360-100-45, #e60000);
 }
 
-.bio-properties-panel-connection-chooser-context-menu-item--danger:hover,
-.bio-properties-panel-connection-chooser-context-menu-item--danger:focus-visible {
+.bio-properties-panel-configuration-chooser-context-menu-item--danger:hover,
+.bio-properties-panel-configuration-chooser-context-menu-item--danger:focus-visible {
   background-color: #fff0f0;
 }

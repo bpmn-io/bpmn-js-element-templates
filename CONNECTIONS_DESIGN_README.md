@@ -1,4 +1,4 @@
-# Connection Chooser Prototype
+# Configuration Chooser Prototype
 
 Properties-panel picker for reusable configuration instances. Stores selection as a FEEL expression + cached metadata on `zeebe:input`.
 
@@ -131,6 +131,8 @@ No polling or timers needed on the host side. The service handles refresh intern
   }],
   "properties": [{
     "type": "Configuration",
+    "label": "Slack connection",
+    "placeholder": "Select Slack connection",
     "configurationTemplate": "io.camunda:slack-connection:1",
     "configurationTemplateVersion": 2,
     "binding": { "name": "token", "type": "zeebe:input" }
@@ -138,6 +140,7 @@ No polling or timers needed on the host side. The service handles refresh intern
 }
 ```
 
+- `placeholder` — author-controlled empty-state label for the chooser button (falls back to "Select configuration" if omitted)
 - `configurationTemplate` — filters instances by this ID
 - `configurationTemplateVersion` — minimum version floor; instances below are shown as "incompatible"
 - `configurationTemplates` — embedded schema defining the JSON object stored server-side (Hub renders it; Modeler only uses `id`/`version` for filtering)

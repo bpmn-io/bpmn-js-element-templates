@@ -12,7 +12,7 @@ import { propertyGetter, propertySetter } from './util';
 import { findExtension, findInputParameter } from '../../../Helper';
 
 /**
- * FEEL expression referencing a connection instance as a cluster variable.
+ * FEEL expression referencing a configuration instance as a cluster variable.
  *
  * @param {string} name
  * @returns {string}
@@ -22,12 +22,12 @@ function toReference(name) {
 }
 
 /**
- * Connection chooser.
+ * Configuration chooser.
  *
  * Renders a bespoke picker (NOT a plain select): a dashed placeholder that
- * opens a popover listing the connection instances compatible with the
- * property's `templateRef`. Once chosen, the connection is shown as a card.
- * The stored value is a FEEL expression referencing the chosen connection as a
+ * opens a popover listing the configuration instances compatible with the
+ * property's `templateRef`. Once chosen, the configuration is shown as a card.
+ * The stored value is a FEEL expression referencing the chosen configuration as a
  * cluster variable (`=camunda.vars.env.<name>`); clearing the selection
  * removes the binding.
  */
@@ -42,6 +42,7 @@ export function ConfigurationProperty(props) {
     description,
     editable,
     label,
+    placeholder,
     tooltip,
     configurationTemplate,
     configurationTemplateVersion,
@@ -103,7 +104,7 @@ export function ConfigurationProperty(props) {
     [ bpmnFactory, commandStack, element, property ]
   );
 
-  // Wrap setter to stamp connection metadata on the zeebe:input
+  // Wrap setter to stamp configuration metadata on the zeebe:input
   const setValue = useCallback((value) => {
     baseSetValue(value);
 
@@ -148,7 +149,7 @@ export function ConfigurationProperty(props) {
   const value = getValue();
   const selected = instances.find(({ name }) => toReference(name) === value);
 
-  // Read cached connection metadata from the zeebe:input element
+  // Read cached configuration metadata from the zeebe:input element
   const cachedName = useMemo(() => {
     if (!value || !property.binding || property.binding.type !== 'zeebe:input') {
       return null;
@@ -224,7 +225,7 @@ export function ConfigurationProperty(props) {
   return (
     <div
       ref={ ref }
-      class="bio-properties-panel-connection-chooser"
+      class="bio-properties-panel-configuration-chooser"
       data-entry-id={ id }>
       <label class="bio-properties-panel-label">
         { translate(label) }
@@ -245,7 +246,7 @@ export function ConfigurationProperty(props) {
       {
         selected
           ? (
-            <SelectedConnection
+            <SelectedConfiguration
               instance={ selected }
               disabled={ disabled }
               menuOpen={ menuOpen }
@@ -255,11 +256,11 @@ export function ConfigurationProperty(props) {
           )
           : value && !loaded
             ? (
-              <LoadingConnection cachedName={ cachedName } translate={ translate } />
+              <LoadingConfiguration cachedName={ cachedName } translate={ translate } />
             )
             : value && loaded && !selected
               ? (
-                <MissingConnection
+                <MissingConfiguration
                   value={ value }
                   cachedName={ cachedName }
                   disabled={ disabled }
@@ -271,12 +272,12 @@ export function ConfigurationProperty(props) {
               : (
                 <button
                   type="button"
-                  class="bio-properties-panel-connection-chooser-placeholder"
+                  class="bio-properties-panel-configuration-chooser-placeholder"
                   disabled={ disabled }
                   aria-expanded={ open }
                   onClick={ toggleOpen }>
-                  <span class="bio-properties-panel-connection-chooser-placeholder-plus">+</span>
-                  { translate('Select connection') }
+                  <span class="bio-properties-panel-configuration-chooser-placeholder-plus">+</span>
+                  { placeholder || translate('Select configuration') }
                 </button>
               )
       }
@@ -284,7 +285,7 @@ export function ConfigurationProperty(props) {
       {
         open
           ? (
-            <ConnectionPopover
+            <ConfigurationPopover
               instances={ instances }
               incompatible={ incompatible }
               selected={ selected }
@@ -299,7 +300,7 @@ export function ConfigurationProperty(props) {
       {
         menuOpen
           ? (
-            <ConnectionContextMenu
+            <ConfigurationContextMenu
               onGoTo={ () => { setMenuOpen(false); } }
               onRemove={ () => select(null) }
               translate={ translate } />
@@ -310,7 +311,7 @@ export function ConfigurationProperty(props) {
   );
 }
 
-function SelectedConnection(props) {
+function SelectedConfiguration(props) {
   const {
     disabled,
     instance,
@@ -322,25 +323,25 @@ function SelectedConnection(props) {
 
   return (
     <div
-      class="bio-properties-panel-connection-chooser-selected"
+      class="bio-properties-panel-configuration-chooser-selected"
       role="button"
       tabIndex={ disabled ? -1 : 0 }
       onClick={ disabled ? null : onClick }
       onKeyDown={ disabled ? null : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } }>
-      <ConnectionLogo instance={ instance } />
-      <span class="bio-properties-panel-connection-chooser-text">
-        <span class="bio-properties-panel-connection-chooser-title">
+      <ConfigurationLogo instance={ instance } />
+      <span class="bio-properties-panel-configuration-chooser-text">
+        <span class="bio-properties-panel-configuration-chooser-title">
           { instance.displayName || instance.name }
         </span>
-        <span class="bio-properties-panel-connection-chooser-subtitle">
+        <span class="bio-properties-panel-configuration-chooser-subtitle">
           { instance.authType ? `${ instance.authType } · ` : null }
-          <span class="bio-properties-panel-connection-chooser-varname">{ instance.name }</span>
+          <span class="bio-properties-panel-configuration-chooser-varname">{ instance.name }</span>
         </span>
       </span>
-      <ConnectionStatus status={ instance.status } translate={ translate } />
+      <ConfigurationStatus status={ instance.status } translate={ translate } />
       <button
         type="button"
-        class="bio-properties-panel-connection-chooser-menu"
+        class="bio-properties-panel-configuration-chooser-menu"
         title={ translate('More actions') }
         aria-label={ translate('More actions') }
         aria-expanded={ menuOpen }
@@ -352,20 +353,20 @@ function SelectedConnection(props) {
   );
 }
 
-function ConnectionContextMenu(props) {
+function ConfigurationContextMenu(props) {
   const { onGoTo, onRemove, translate } = props;
 
   return (
-    <div class="bio-properties-panel-connection-chooser-context-menu">
+    <div class="bio-properties-panel-configuration-chooser-context-menu">
       <button
         type="button"
-        class="bio-properties-panel-connection-chooser-context-menu-item"
+        class="bio-properties-panel-configuration-chooser-context-menu-item"
         onClick={ onGoTo }>
-        { translate('Go to connection') }
+        { translate('Go to configuration') }
       </button>
       <button
         type="button"
-        class="bio-properties-panel-connection-chooser-context-menu-item bio-properties-panel-connection-chooser-context-menu-item--danger"
+        class="bio-properties-panel-configuration-chooser-context-menu-item bio-properties-panel-configuration-chooser-context-menu-item--danger"
         onClick={ onRemove }>
         { translate('Remove') }
       </button>
@@ -373,18 +374,18 @@ function ConnectionContextMenu(props) {
   );
 }
 
-function LoadingConnection(props) {
+function LoadingConfiguration(props) {
   const { cachedName, translate } = props;
 
   return (
-    <div class="bio-properties-panel-connection-chooser-loading">
-      <span class="bio-properties-panel-connection-chooser-loading-shimmer" />
-      <span class="bio-properties-panel-connection-chooser-text">
-        <span class="bio-properties-panel-connection-chooser-title">
-          { cachedName || translate('Loading connection…') }
+    <div class="bio-properties-panel-configuration-chooser-loading">
+      <span class="bio-properties-panel-configuration-chooser-loading-shimmer" />
+      <span class="bio-properties-panel-configuration-chooser-text">
+        <span class="bio-properties-panel-configuration-chooser-title">
+          { cachedName || translate('Loading configuration…') }
         </span>
         { cachedName
-          ? <span class="bio-properties-panel-connection-chooser-subtitle">
+          ? <span class="bio-properties-panel-configuration-chooser-subtitle">
               { translate('Validating…') }
             </span>
           : null
@@ -394,7 +395,7 @@ function LoadingConnection(props) {
   );
 }
 
-function MissingConnection(props) {
+function MissingConfiguration(props) {
   const {
     cachedName,
     disabled,
@@ -412,23 +413,23 @@ function MissingConnection(props) {
 
   return (
     <div
-      class="bio-properties-panel-connection-chooser-missing"
+      class="bio-properties-panel-configuration-chooser-missing"
       role="button"
       tabIndex={ disabled ? -1 : 0 }
       onClick={ disabled ? null : onClick }
       onKeyDown={ disabled ? null : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } }>
-      <span class="bio-properties-panel-connection-chooser-missing-icon">⚠</span>
-      <span class="bio-properties-panel-connection-chooser-text">
-        <span class="bio-properties-panel-connection-chooser-title">
-          { cachedName || translate('Connection not found') }
+      <span class="bio-properties-panel-configuration-chooser-missing-icon">⚠</span>
+      <span class="bio-properties-panel-configuration-chooser-text">
+        <span class="bio-properties-panel-configuration-chooser-title">
+          { cachedName || translate('Configuration not found') }
         </span>
-        <span class="bio-properties-panel-connection-chooser-subtitle">
+        <span class="bio-properties-panel-configuration-chooser-subtitle">
           { cachedName ? translate('Not found on cluster') : refName }
         </span>
       </span>
       <button
         type="button"
-        class="bio-properties-panel-connection-chooser-menu"
+        class="bio-properties-panel-configuration-chooser-menu"
         title={ translate('More actions') }
         aria-label={ translate('More actions') }
         aria-expanded={ menuOpen }
@@ -440,7 +441,7 @@ function MissingConnection(props) {
   );
 }
 
-function ConnectionPopover(props) {
+function ConfigurationPopover(props) {
   const {
     fetching,
     incompatible = [],
@@ -452,11 +453,11 @@ function ConnectionPopover(props) {
   } = props;
 
   return (
-    <div class="bio-properties-panel-connection-chooser-popover">
-      <div class="bio-properties-panel-connection-chooser-popover-header">
-        { translate('Available connections') }
+    <div class="bio-properties-panel-configuration-chooser-popover">
+      <div class="bio-properties-panel-configuration-chooser-popover-header">
+        { translate('Available configurations') }
         { fetching
-          ? <span class="bio-properties-panel-connection-chooser-refreshing">{ translate('Refreshing…') }</span>
+          ? <span class="bio-properties-panel-configuration-chooser-refreshing">{ translate('Refreshing…') }</span>
           : null
         }
       </div>
@@ -464,10 +465,10 @@ function ConnectionPopover(props) {
       {
         instances.length
           ? (
-            <ul class="bio-properties-panel-connection-chooser-popover-list">
+            <ul class="bio-properties-panel-configuration-chooser-popover-list">
               {
                 instances.map((instance) => (
-                  <ConnectionRow
+                  <ConfigurationRow
                     key={ instance.name }
                     instance={ instance }
                     selected={ selected === instance }
@@ -478,8 +479,8 @@ function ConnectionPopover(props) {
             </ul>
           )
           : (
-            <div class="bio-properties-panel-connection-chooser-empty">
-              { translate('No compatible connections available.') }
+            <div class="bio-properties-panel-configuration-chooser-empty">
+              { translate('No compatible configurations available.') }
             </div>
           )
       }
@@ -487,20 +488,20 @@ function ConnectionPopover(props) {
       {
         incompatible.length
           ? (
-            <div class="bio-properties-panel-connection-chooser-popover-section">
-              <div class="bio-properties-panel-connection-chooser-popover-header">
+            <div class="bio-properties-panel-configuration-chooser-popover-section">
+              <div class="bio-properties-panel-configuration-chooser-popover-header">
                 { translate('Needs upgrade') }
                 { templateVersion != null
-                  ? <span class="bio-properties-panel-connection-chooser-popover-hint">
+                  ? <span class="bio-properties-panel-configuration-chooser-popover-hint">
                       { translate('Requires v') }{ templateVersion }{ translate('+') }
                     </span>
                   : null
                 }
               </div>
-              <ul class="bio-properties-panel-connection-chooser-popover-list">
+              <ul class="bio-properties-panel-configuration-chooser-popover-list">
                 {
                   incompatible.map((instance) => (
-                    <ConnectionRow
+                    <ConfigurationRow
                       key={ instance.name }
                       instance={ instance }
                       blocked
@@ -515,16 +516,16 @@ function ConnectionPopover(props) {
 
       <button
         type="button"
-        class="bio-properties-panel-connection-chooser-create"
+        class="bio-properties-panel-configuration-chooser-create"
         onClick={ () => onSelect(null) }>
-        <span class="bio-properties-panel-connection-chooser-placeholder-plus">+</span>
-        { translate('Create connection') }
+        <span class="bio-properties-panel-configuration-chooser-placeholder-plus">+</span>
+        { translate('Create configuration') }
       </button>
     </div>
   );
 }
 
-function ConnectionRow(props) {
+function ConfigurationRow(props) {
   const {
     blocked,
     instance,
@@ -547,14 +548,14 @@ function ConnectionRow(props) {
     }
   };
 
-  const classes = [ 'bio-properties-panel-connection-chooser-popover-row' ];
+  const classes = [ 'bio-properties-panel-configuration-chooser-popover-row' ];
 
   if (selected) {
-    classes.push('bio-properties-panel-connection-chooser-popover-row--selected');
+    classes.push('bio-properties-panel-configuration-chooser-popover-row--selected');
   }
 
   if (blocked) {
-    classes.push('bio-properties-panel-connection-chooser-popover-row--blocked');
+    classes.push('bio-properties-panel-configuration-chooser-popover-row--blocked');
   }
 
   return (
@@ -566,33 +567,33 @@ function ConnectionRow(props) {
       aria-disabled={ blocked }
       onClick={ blocked ? null : onSelect }
       onKeyDown={ onKeyDown }
-      title={ blocked ? translate('Connection needs upgrade') : null }>
-      <ConnectionLogo instance={ instance } />
-      <span class="bio-properties-panel-connection-chooser-text">
-        <span class="bio-properties-panel-connection-chooser-title">
+      title={ blocked ? translate('Configuration needs upgrade') : null }>
+      <ConfigurationLogo instance={ instance } />
+      <span class="bio-properties-panel-configuration-chooser-text">
+        <span class="bio-properties-panel-configuration-chooser-title">
           { instance.displayName || instance.name }
         </span>
-        <span class="bio-properties-panel-connection-chooser-subtitle">
+        <span class="bio-properties-panel-configuration-chooser-subtitle">
           { meta ? `${ meta } · ` : null }
-          <span class="bio-properties-panel-connection-chooser-varname">{ instance.name }</span>
+          <span class="bio-properties-panel-configuration-chooser-varname">{ instance.name }</span>
           { versionSuffix }
         </span>
       </span>
       { blocked
-        ? <span class="bio-properties-panel-connection-chooser-blocked-badge">{ translate('upgrade needed') }</span>
-        : <ConnectionStatus status={ instance.status } translate={ translate } />
+        ? <span class="bio-properties-panel-configuration-chooser-blocked-badge">{ translate('upgrade needed') }</span>
+        : <ConfigurationStatus status={ instance.status } translate={ translate } />
       }
     </li>
   );
 }
 
-function ConnectionLogo(props) {
+function ConfigurationLogo(props) {
   const { instance } = props;
 
   if (instance.icon) {
     return (
       <img
-        class="bio-properties-panel-connection-chooser-logo"
+        class="bio-properties-panel-configuration-chooser-logo"
         src={ instance.icon }
         alt="" />
     );
@@ -601,13 +602,13 @@ function ConnectionLogo(props) {
   const initial = (instance.displayName || instance.name || '?').charAt(0).toUpperCase();
 
   return (
-    <span class="bio-properties-panel-connection-chooser-logo bio-properties-panel-connection-chooser-logo--placeholder">
+    <span class="bio-properties-panel-configuration-chooser-logo bio-properties-panel-configuration-chooser-logo--placeholder">
       { initial }
     </span>
   );
 }
 
-function ConnectionStatus(props) {
+function ConfigurationStatus(props) {
   const { status, translate } = props;
 
   if (!status) {
@@ -615,8 +616,8 @@ function ConnectionStatus(props) {
   }
 
   const classes = [
-    'bio-properties-panel-connection-chooser-badge',
-    `bio-properties-panel-connection-chooser-badge--${ status }`
+    'bio-properties-panel-configuration-chooser-badge',
+    `bio-properties-panel-configuration-chooser-badge--${ status }`
   ];
 
   return (
@@ -627,11 +628,11 @@ function ConnectionStatus(props) {
 }
 
 /**
- * Whether the connection chooser has a non-empty selection.
+ * Whether the configuration chooser has a non-empty selection.
  *
  * @param {HTMLElement} node
  * @returns {boolean}
  */
-export function isConnectionChooserEdited(node) {
-  return !!domQuery('.bio-properties-panel-connection-chooser-selected', node);
+export function isConfigurationChooserEdited(node) {
+  return !!domQuery('.bio-properties-panel-configuration-chooser-selected', node);
 }

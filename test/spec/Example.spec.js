@@ -404,7 +404,7 @@ const LogTemplateErrorsModule = {
 
 const SLACK_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI3IiBoZWlnaHQ9IjEyNyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMjcuMiA4MGMwIDcuMy01LjkgMTMuMi0xMy4yIDEzLjJDNi43IDkzLjIuOCA4Ny4zLjggODBjMC03LjMgNS45LTEzLjIgMTMuMi0xMy4yaDEzLjJWODB6bTYuNiAwYzAtNy4zIDUuOS0xMy4yIDEzLjItMTMuMiA3LjMgMCAxMy4yIDUuOSAxMy4yIDEzLjJ2MzNjMCA3LjMtNS45IDEzLjItMTMuMiAxMy4yLTcuMyAwLTEzLjItNS45LTEzLjItMTMuMlY4MHoiIGZpbGw9IiNFMDFFNUEiLz4KICA8cGF0aCBkPSJNNDcgMjdjLTcuMyAwLTEzLjItNS45LTEzLjItMTMuMkMzMy44IDYuNSAzOS43LjYgNDcgLjZjNy4zIDAgMTMuMiA1LjkgMTMuMiAxMy4yVjI3SDQ3em0wIDYuN2M3LjMgMCAxMy4yIDUuOSAxMy4yIDEzLjIgMCA3LjMtNS45IDEzLjItMTMuMiAxMy4ySDEzLjlDNi42IDYwLjEuNyA1NC4yLjcgNDYuOWMwLTcuMyA1LjktMTMuMiAxMy4yLTEzLjJINDd6IiBmaWxsPSIjMzZDNUYwIi8+CiAgPHBhdGggZD0iTTk5LjkgNDYuOWMwLTcuMyA1LjktMTMuMiAxMy4yLTEzLjIgNy4zIDAgMTMuMiA1LjkgMTMuMiAxMy4yIDAgNy4zLTUuOSAxMy4yLTEzLjIgMTMuMkg5OS45VjQ2Ljl6bS02LjYgMGMwIDcuMy01LjkgMTMuMi0xMy4yIDEzLjItNy4zIDAtMTMuMi01LjktMTMuMi0xMy4yVjEzLjhDNjYuOSA2LjUgNzIuOC42IDgwLjEuNmM3LjMgMCAxMy4yIDUuOSAxMy4yIDEzLjJ2MzMuMXoiIGZpbGw9IiMyRUI2N0QiLz4KICA8cGF0aCBkPSJNODAuMSA5OS44YzcuMyAwIDEzLjIgNS45IDEzLjIgMTMuMiAwIDcuMy01LjkgMTMuMi0xMy4yIDEzLjItNy4zIDAtMTMuMi01LjktMTMuMi0xMy4yVjk5LjhoMTMuMnptMC02LjZjLTcuMyAwLTEzLjItNS45LTEzLjItMTMuMiAwLTcuMyA1LjktMTMuMiAxMy4yLTEzLjJoMzMuMWM3LjMgMCAxMy4yIDUuOSAxMy4yIDEzLjIgMCA3LjMtNS45IDEzLjItMTMuMiAxMy4ySDgwLjF6IiBmaWxsPSIjRUNCMjJFIi8+Cjwvc3ZnPgo=';
 
-const SAMPLE_CONNECTIONS = [
+const SAMPLE_CONFIGURATIONS = [
   {
     name: 'slackProduction',
     displayName: 'Slack Production',
@@ -483,7 +483,7 @@ const MockConfigurationInstancesModule = {
     // Register a fetch function with simulated delay
     configurationInstances.setFetchFn(async () => {
       await new Promise(resolve => setTimeout(resolve, FETCH_DELAY));
-      return [ ...SAMPLE_CONNECTIONS ];
+      return [ ...SAMPLE_CONFIGURATIONS ];
     });
   } ]
 };
@@ -678,7 +678,7 @@ function createTestUI(modeler) {
     propertiesPanel.attachTo(propertiesPanelParent);
   }
 
-  // --- Connection instances modal ---
+  // --- Configuration instances modal ---
   const configurationInstances = modeler.get('configurationInstances', false);
 
   const configurationTemplates = modeler.get('configurationTemplates', false);
@@ -686,7 +686,7 @@ function createTestUI(modeler) {
   if (configurationInstances) {
 
     // Toggle button
-    const toggleBtn = domify('<button class="ci-toggle-btn">⚙ Connections</button>');
+    const toggleBtn = domify('<button class="ci-toggle-btn">⚙ Configurations</button>');
     container.appendChild(toggleBtn);
 
     let backdrop = null;
@@ -719,7 +719,7 @@ function createTestUI(modeler) {
 
       modal.innerHTML = `
         <div class="ci-modal-header">
-          <h3>Connection Instances (Hub simulation)</h3>
+          <h3>Configuration Instances (Hub simulation)</h3>
           <button data-close>&times;</button>
         </div>
         <div class="ci-modal-body">
@@ -728,7 +728,7 @@ function createTestUI(modeler) {
             <div class="ci-list-container"></div>
           </div>
           <div class="ci-section">
-            <h4>Create new connection</h4>
+            <h4>Create new configuration</h4>
             <div class="ci-create-actions">
               <button data-action="random">Create random (Slack)</button>
               <button data-action="explicit">Create from template…</button>
@@ -751,7 +751,7 @@ function createTestUI(modeler) {
       const listContainer = modal.querySelector('.ci-list-container');
 
       if (all.length === 0) {
-        listContainer.innerHTML = '<p class="ci-empty">No connection instances available.</p>';
+        listContainer.innerHTML = '<p class="ci-empty">No configuration instances available.</p>';
       } else {
         const list = domify('<ul class="ci-instance-list"></ul>');
 
@@ -801,7 +801,7 @@ function createTestUI(modeler) {
         renderModal(modal);
       });
 
-      // Explicit creation — render connection template form
+      // Explicit creation — render configuration template form
       const formContainer = modal.querySelector('.ci-form-container');
 
       modal.querySelector('[data-action="explicit"]').addEventListener('click', () => {
@@ -830,7 +830,7 @@ function createTestUI(modeler) {
             </div>
             <hr/>
             <p style="font-size:11px;color:#666;margin:4px 0 8px;">
-              Below: connection template properties (the JSON object stored as cluster variable)
+              Below: configuration template properties (the JSON object stored as cluster variable)
             </p>
             ${ tmpl.properties.map(p =>
               `<div class="ci-form-row">
@@ -839,7 +839,7 @@ function createTestUI(modeler) {
               </div>`
             ).join('') }
             <div class="ci-form-actions">
-              <button data-primary data-action="submit">Create connection</button>
+              <button data-primary data-action="submit">Create configuration</button>
               <button data-action="cancel">Cancel</button>
             </div>
           </div>`
@@ -889,7 +889,7 @@ function createTestUI(modeler) {
 
       // Bulk actions
       modal.querySelector('[data-action="load-samples"]').addEventListener('click', () => {
-        configurationInstances.setInstances([ ...SAMPLE_CONNECTIONS ]);
+        configurationInstances.setInstances([ ...SAMPLE_CONFIGURATIONS ]);
         renderModal(modal);
       });
 

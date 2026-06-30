@@ -108,6 +108,7 @@
       {
         "id": "connection",
         "label": "Slack connection",
+        "placeholder": "Select Slack connection",
         "type": "String",
         "templateRef": "io.camunda:slack-connection:1",
         "templateVersion": 2,
