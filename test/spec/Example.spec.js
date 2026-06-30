@@ -597,6 +597,9 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
           parent: null
         },
         elementTemplates,
+        configurationInstances: {
+          ttl: 10000
+        },
         linting: {
           active: true
         }
