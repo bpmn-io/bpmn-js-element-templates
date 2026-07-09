@@ -14,9 +14,9 @@
       "import": "./dist/core.esm.js",
       "require": "./dist/core.js"
     },
-    "./util": {
-      "import": "./dist/util.esm.js",
-      "require": "./dist/util.js"
+    "./cloud/util": {
+      "import": "./dist/cloud/util.esm.js",
+      "require": "./dist/cloud/util.js"
     },
     "./dist/assets/*.css": "./dist/assets/*.css",
     "./dist/*.js": "./dist/*.js",

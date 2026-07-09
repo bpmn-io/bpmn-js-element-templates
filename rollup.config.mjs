@@ -57,17 +57,17 @@ export default [
     plugins: corePlugins()
   },
   {
-    input: 'src/util.js',
+    input: 'src/cloud/util.js',
     output: [
       {
         sourcemap: true,
         format: 'commonjs',
-        file: 'dist/util.js'
+        file: 'dist/cloud/util.js'
       },
       {
         sourcemap: true,
         format: 'esm',
-        file: 'dist/util.esm.js'
+        file: 'dist/cloud/util.esm.js'
       }
     ],
     external: externalDependencies(),
