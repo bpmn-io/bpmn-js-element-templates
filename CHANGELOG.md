@@ -6,6 +6,7 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FEAT`: support `businessId` in the `zeebe:calledElement` binding ([#269](https://github.com/bpmn-io/bpmn-js-element-templates/pull/269))
 * `FEAT`: support job priority via `zeebe:jobPriorityDefinition` binding
 * `FIX`: assign `$parent` property in all cases for I/O mapping ([#265](https://github.com/bpmn-io/bpmn-js-element-templates/pull/265))
 

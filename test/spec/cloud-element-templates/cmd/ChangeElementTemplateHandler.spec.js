@@ -2572,6 +2572,76 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('update zeebe:calledElement businessId', function() {
+
+      beforeEach(bootstrap(require('./task.bpmn').default));
+
+      const newTemplate = require('./called-element-business-id.json');
+
+
+      it('execute', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        // when
+        changeTemplate(task, newTemplate);
+
+        // then
+        task = elementRegistry.get('Task_1');
+        expectElementTemplate(task, 'calledElementBusinessId');
+
+        const calledElement = findExtension(task, 'zeebe:CalledElement');
+
+        expect(calledElement).to.exist;
+        expect(calledElement).to.have.property('processId', 'paymentProcess');
+        expect(calledElement).to.have.property('businessId', '=order.customerId');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        task = elementRegistry.get('Task_1');
+        expectNoElementTemplate(task);
+
+        const calledElement = findExtension(task, 'zeebe:CalledElement');
+
+        expect(calledElement).not.to.exist;
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        changeTemplate(task, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        task = elementRegistry.get('Task_1');
+
+        const calledElement = findExtension(task, 'zeebe:CalledElement');
+
+        expect(calledElement).to.exist;
+        expect(calledElement).to.have.property('businessId', '=order.customerId');
+      }));
+
+    });
+
+
     describe('apply zeebe:calledElement Boolean binding', function() {
 
       beforeEach(bootstrap(require('./called-element-propagate.bpmn').default));
