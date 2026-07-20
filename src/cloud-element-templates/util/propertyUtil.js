@@ -676,7 +676,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
 
       // do not persist empty parameters when configured as <optional>
       if (shouldUpdate(value, property)) {
-        const newZeebeInputParameter = createInputParameter(binding, value, bpmnFactory);
+        const newZeebeInputParameter = createInputParameter(binding, value, bpmnFactory, ioMapping);
         values.push(newZeebeInputParameter);
       }
 
@@ -697,7 +697,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
 
       // do not persist empty parameters when configured as <optional>
       if (shouldUpdate(value, property)) {
-        const newZeebeOutputParameter = createOutputParameter(binding, value, bpmnFactory);
+        const newZeebeOutputParameter = createOutputParameter(binding, value, bpmnFactory, ioMapping);
         values.push(newZeebeOutputParameter);
       }
 

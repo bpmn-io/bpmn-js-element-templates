@@ -26,8 +26,7 @@ export default class InputBindingProvider {
       return;
     }
 
-    const input = createInputParameter(binding, value, bpmnFactory);
-    input.$parent = ioMapping;
+    const input = createInputParameter(binding, value, bpmnFactory, ioMapping);
     ioMapping.get('inputParameters').push(input);
   }
 }

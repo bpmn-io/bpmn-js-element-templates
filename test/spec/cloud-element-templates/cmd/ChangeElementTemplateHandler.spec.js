@@ -5087,15 +5087,15 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
           changeTemplate('Task_1', oldTemplate);
 
+          let ioMapping = findExtension(task, 'zeebe:IoMapping');
+
           const input = createInputParameter({
             name: 'input-1-target'
-          }, 'input-1-changed-source', bpmnFactory);
+          }, 'input-1-changed-source', bpmnFactory, ioMapping);
 
           const output = createOutputParameter({
             source: 'output-1-source'
-          }, 'output-1-changed-target', bpmnFactory);
-
-          let ioMapping = findExtension(task, 'zeebe:IoMapping');
+          }, 'output-1-changed-target', bpmnFactory, ioMapping);
 
           updateBusinessObject('Task_1', ioMapping, {
             inputParameters: [ input ],
