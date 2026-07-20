@@ -13,6 +13,10 @@ import { getTemplateId, getTemplateVersion } from '../Helper';
 
 import { applyConditions } from '../Condition';
 import { getPropertyValue } from '../util/propertyUtil';
+import { pathEquals } from '@bpmn-io/moddle-utils';
+
+import { getBindingPath } from '../util/bindingPath';
+import { getPropertyEntryId } from '../util/customPropertyEntryIds';
 import { has, isObject } from 'min-dash';
 
 const LOWER_PRIORITY = 300;
@@ -99,6 +103,37 @@ export default class ElementTemplatesPropertiesProvider {
 
   _shouldShowTemplateProperties(element) {
     return getTemplateId(element) || this._elementTemplates.getAll(element).length;
+  }
+
+  /**
+   * Resolve the id of the entry that renders the given businessObject-relative
+   * moddle property path, if a templated property is bound to it. Used by
+   * `propertiesPanel#getEntryId` to shadow the standard entry with the
+   * template's `custom-entry-*` one when a template applies.
+   *
+   * @param {djs.model.Base} element
+   * @param {(string|number)[]} path
+   *
+   * @return {string|null}
+   */
+  getEntryId(element, path) {
+    const template = this._elementTemplates.get(element);
+
+    if (!template) {
+      return null;
+    }
+
+    const conditioned = applyConditions(element, template);
+
+    for (const property of conditioned.properties) {
+      const bindingPath = getBindingPath(element, property.binding);
+
+      if (bindingPath && pathEquals(bindingPath, path)) {
+        return getPropertyEntryId(conditioned, property);
+      }
+    }
+
+    return null;
   }
 }
 

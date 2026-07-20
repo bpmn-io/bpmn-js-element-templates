@@ -34,12 +34,24 @@ import {
 } from 'bpmn-js-properties-panel';
 import elementTemplatesModule from 'src/cloud-element-templates';
 
+import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
+
+import {
+  findExtension,
+  findInputParameter
+} from 'src/cloud-element-templates/Helper';
+
+import { getBindingPath } from 'src/cloud-element-templates/util/bindingPath';
+import { getPropertyEntryId } from 'src/cloud-element-templates/util/customPropertyEntryIds';
+
 import diagramXML from './ElementTemplatesPropertiesProvider.bpmn';
 import templates from './ElementTemplatesPropertiesProvider.json';
 import entriesVisibleDiagramXML from './ElementTemplatesPropertiesProvider.entries-visible.bpmn';
 import entriesVisibleTemplates from './ElementTemplatesPropertiesProvider.entries-visible.json';
 import booleanXML from './ElementTemplatesPropertiesProvider.boolean.bpmn';
 import booleanTemplates from './ElementTemplatesPropertiesProvider.boolean.json';
+import getEntryIdXML from './ElementTemplatesPropertiesProvider.getEntryId.bpmn';
+import getEntryIdTemplates from './ElementTemplatesPropertiesProvider.getEntryId.json';
 
 import conditionTemplate from '../fixtures/condition.json';
 import multipleConditionTemplate from '../fixtures/multiple-conditions.json';
@@ -1065,6 +1077,193 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         const group = domQuery('[data-group-id="group-documentation"]', container);
 
         expect(group).to.exist;
+      })
+    );
+
+  });
+
+
+  describe('getEntryId', function() {
+
+    beforeEach(bootstrapPropertiesPanel(getEntryIdXML, {
+      container,
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        BpmnPropertiesProvider,
+        ZeebePropertiesProvider,
+        elementTemplatesModule,
+        modelingModule
+      ],
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      },
+      debounceInput: false,
+      elementTemplates: getEntryIdTemplates
+    }));
+
+
+    it('should resolve a templated zeebe:input to its custom entry id', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider, selection) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[0]);
+        });
+        await act(() => selection.select(task));
+
+        const template = elementTemplates.get(task);
+        const businessObject = getBusinessObject(task);
+
+        // independently locate the moddle node the input is written to,
+        // without going through `getBindingPath` itself
+        const ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
+        const extensionIndex = businessObject.get('extensionElements').get('values').indexOf(ioMapping);
+        const inputParameter = findInputParameter(ioMapping, { name: 'inputVar' });
+        const parameterIndex = ioMapping.get('inputParameters').indexOf(inputParameter);
+
+        const expectedPath = [
+          'extensionElements', 'values', extensionIndex, 'inputParameters', parameterIndex, 'source'
+        ];
+
+        // when
+        const path = getBindingPath(task, { type: 'zeebe:input', name: 'inputVar' });
+
+        // then (path shape matches the contract, independent of getEntryId)
+        expect(path).to.eql(expectedPath);
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getEntryId(task, path);
+
+        // then (resolves to the same id the panel actually rendered)
+        const property = template.properties.find(p => p.id === 'input-1');
+        expect(entryId).to.equal(getPropertyEntryId(template, property));
+
+        const renderedEntry = domQuery(`[data-entry-id="${entryId}"]`, container);
+        expect(renderedEntry).to.exist;
+      })
+    );
+
+
+    it('should resolve a templated zeebe:taskHeader to its custom entry id', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[0]);
+        });
+
+        const path = getBindingPath(task, { type: 'zeebe:taskHeader', key: 'headerKey' });
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getEntryId(task, path);
+
+        // then
+        const template = elementTemplates.get(task);
+        const property = template.properties.find(p => p.id === 'header-1');
+        expect(entryId).to.equal(getPropertyEntryId(template, property));
+      })
+    );
+
+
+    it('should resolve a templated plain property to its custom entry id', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[0]);
+        });
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getEntryId(task, [ 'name' ]);
+
+        // then
+        const template = elementTemplates.get(task);
+        const property = template.properties.find(p => p.id === 'name-1');
+        expect(entryId).to.equal(getPropertyEntryId(template, property));
+      })
+    );
+
+
+    it('should return null when no template applies to the element', inject(
+      function(elementRegistry, elementTemplatesPropertiesProvider) {
+
+        // given
+        const task = elementRegistry.get('Task_2');
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getEntryId(task, [ 'name' ]);
+
+        // then
+        expect(entryId).to.be.null;
+      })
+    );
+
+
+    it('should return null when the path is not bound by any template property', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[0]);
+        });
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getEntryId(task, [ 'documentation', 0, 'text' ]);
+
+        // then
+        expect(entryId).to.be.null;
+      })
+    );
+
+
+    it('should return null once its condition becomes unmet', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider, selection) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[0]);
+        });
+        await act(() => selection.select(task));
+
+        const template = elementTemplates.get(task);
+        const toggleProperty = template.properties.find(p => p.id === 'toggle');
+        const conditionalProperty = template.properties.find(p => p.id === 'conditional-1');
+
+        const businessObject = getBusinessObject(task);
+        const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+        const conditionalNode = zeebeProperties.get('properties')
+          .find(p => p.get('name') === 'conditionalProp');
+
+        const extensionIndex = businessObject.get('extensionElements').get('values').indexOf(zeebeProperties);
+        const propertyIndex = zeebeProperties.get('properties').indexOf(conditionalNode);
+        const path = [ 'extensionElements', 'values', extensionIndex, 'properties', propertyIndex, 'value' ];
+
+        // assume (condition met: entry resolves to the templated property)
+        expect(elementTemplatesPropertiesProvider.getEntryId(task, path))
+          .to.equal(getPropertyEntryId(template, conditionalProperty));
+
+        // when (toggle off the condition-driving checkbox)
+        const toggleEntry = domQuery(
+          `[data-entry-id="${ getPropertyEntryId(template, toggleProperty) }"]`, container
+        );
+        const checkbox = domQuery('input[type=\'checkbox\']', toggleEntry);
+
+        await act(() => checkbox.click());
+
+        // then (condition no longer met: the provider defers, even though the
+        // moddle location referenced by `path` may still physically hold data)
+        expect(elementTemplatesPropertiesProvider.getEntryId(task, path)).to.be.null;
       })
     );
 
