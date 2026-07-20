@@ -14,6 +14,8 @@ import { is } from 'bpmn-js/lib/util/ModelUtil';
 
 import { getPropertyValue, validateProperty } from '../../util/propertyUtil';
 
+import { getPropertyEntryId } from '../../util/customPropertyEntryIds';
+
 import { applyConditions } from '../../Condition';
 
 export default function({ templates = [] }) {
@@ -70,7 +72,7 @@ export default function({ templates = [] }) {
         error,
         {
           propertiesPanel: {
-            entryIds: [ getEntryId(property, template) ]
+            entryIds: [ getPropertyEntryId(template, property) ]
           },
           name: node.name
         }
@@ -83,20 +85,3 @@ export default function({ templates = [] }) {
   };
 
 };
-
-// helpers //////////////////////
-
-function getEntryId(property, template) {
-  const index = template.properties
-    .filter(p => p.group === property.group)
-    .indexOf(property);
-
-  const path = [ 'custom-entry', template.id ];
-
-  if (property.group) {
-    path.push(property.group);
-  }
-
-  path.push(index);
-  return path.join('-');
-}
