@@ -25,8 +25,7 @@ export default class OutputBindingProvider {
       return;
     }
 
-    const output = createOutputParameter(binding, value, bpmnFactory);
-    output.$parent = ioMapping;
+    const output = createOutputParameter(binding, value, bpmnFactory, ioMapping);
     ioMapping.get('outputParameters').push(output);
   }
 }

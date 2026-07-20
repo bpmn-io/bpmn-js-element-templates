@@ -494,14 +494,12 @@ export default class ChangeElementTemplateHandler {
         if (newBindingType === 'zeebe:input') {
           propertyName = 'inputParameters';
 
-          newInputOrOutput = createInputParameter(newBinding, newPropertyValue, bpmnFactory);
+          newInputOrOutput = createInputParameter(newBinding, newPropertyValue, bpmnFactory, ioMapping);
         } else {
           propertyName = 'outputParameters';
 
-          newInputOrOutput = createOutputParameter(newBinding, newPropertyValue, bpmnFactory);
+          newInputOrOutput = createOutputParameter(newBinding, newPropertyValue, bpmnFactory, ioMapping);
         }
-
-        newInputOrOutput.$parent = ioMapping;
 
         commandStack.execute('element.updateModdleProperties', {
           element,

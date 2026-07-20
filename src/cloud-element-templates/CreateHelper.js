@@ -11,18 +11,19 @@ import { createElement } from '../utils/ElementUtil';
  * @param {PropertyBinding} binding
  * @param {String} value
  * @param {BpmnFactory} bpmnFactory
+ * @param {ModdleElement} ioMapping
  *
  * @return {ModdleElement}
  */
-export function createInputParameter(binding, value, bpmnFactory) {
+export function createInputParameter(binding, value, bpmnFactory, ioMapping) {
   const {
     name
   } = binding;
 
-  return bpmnFactory.create('zeebe:Input', {
+  return createElement('zeebe:Input', {
     source: value,
     target: name
-  });
+  }, ioMapping, bpmnFactory);
 }
 
 /**
@@ -32,18 +33,19 @@ export function createInputParameter(binding, value, bpmnFactory) {
  * @param {PropertyBinding} binding
  * @param {String} value
  * @param {BpmnFactory} bpmnFactory
+ * @param {ModdleElement} ioMapping
  *
  * @return {ModdleElement}
  */
-export function createOutputParameter(binding, value, bpmnFactory) {
+export function createOutputParameter(binding, value, bpmnFactory, ioMapping) {
   const {
     source
   } = binding;
 
-  return bpmnFactory.create('zeebe:Output', {
+  return createElement('zeebe:Output', {
     source,
     target: value
-  });
+  }, ioMapping, bpmnFactory);
 }
 
 /**

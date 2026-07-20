@@ -652,6 +652,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         source: 'foo@bar',
         target: 'input-1-target'
       });
+      expect(inputParameter.$parent).to.equal(ioMapping);
     }));
 
 
@@ -782,6 +783,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         source: 'output-1-source',
         target: 'foo@bar'
       });
+      expect(outputParameter.$parent).to.equal(ioMapping);
     }));
 
 
