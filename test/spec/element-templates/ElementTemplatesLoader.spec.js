@@ -175,9 +175,7 @@ describe('provider/element-templates - ElementTemplatesLoader', function() {
       inject(function(elementTemplatesLoader, eventBus) {
 
         // given
-        const errorListener = spy(function() {
-          console.log(arguments);
-        });
+        const errorListener = spy();
 
         eventBus.on('elementTemplates.errors', errorListener);
 
