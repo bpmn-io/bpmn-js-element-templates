@@ -26,6 +26,7 @@ import {
 
 import { groupByGroupId, findCustomGroup } from './util';
 import { getPropertyValue } from '../../../util/propertyUtil';
+import { getPropertyEntryId } from '../../../util/customPropertyEntryIds';
 import { TextAreaProperty } from './TextAreaProperty';
 import { StringProperty } from './StringProperty';
 import { FeelProperty } from './FeelProperty';
@@ -48,7 +49,6 @@ export function CustomProperties(props) {
   const groups = [];
 
   const {
-    id,
     properties,
     groups: propertyGroups
   } = elementTemplate;
@@ -67,11 +67,11 @@ export function CustomProperties(props) {
 
     addCustomGroup(groups, {
       element,
+      elementTemplate,
       id: `ElementTemplates__CustomProperties-${groupId}`,
       label: translate(group.label),
       openByDefault: group.openByDefault,
       properties: properties,
-      templateId: `${id}-${groupId}`,
       tooltip: PropertyTooltip({ tooltip: group.tooltip })
     });
   });
@@ -82,8 +82,8 @@ export function CustomProperties(props) {
       id: 'ElementTemplates__CustomProperties',
       label: translate('Custom properties'),
       element,
-      properties: defaultProps,
-      templateId: id
+      elementTemplate,
+      properties: defaultProps
     });
   }
 
@@ -94,11 +94,11 @@ function addCustomGroup(groups, props) {
 
   const {
     element,
+    elementTemplate,
     id,
     label,
     openByDefault = false,
     properties,
-    templateId,
     tooltip
   } = props;
 
@@ -111,8 +111,8 @@ function addCustomGroup(groups, props) {
     tooltip
   };
 
-  properties.forEach((property, index) => {
-    const entry = createCustomEntry(`custom-entry-${ templateId }-${ index }`, element, property);
+  properties.forEach((property) => {
+    const entry = createCustomEntry(getPropertyEntryId(elementTemplate, property), element, property);
 
     if (entry) {
       customPropertiesGroup.entries.push(entry);
