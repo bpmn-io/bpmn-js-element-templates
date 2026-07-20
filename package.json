@@ -62,6 +62,7 @@
   "dependencies": {
     "@bpmn-io/element-templates-validator": "^2.25.0",
     "@bpmn-io/extract-process-variables": "^2.2.1",
+    "@bpmn-io/moddle-utils": "^0.3.0",
     "@bpmn-io/semver-compat": "^0.1.0",
     "bpmnlint": "^11.12.1",
     "classnames": "^2.5.1",

@@ -1,0 +1,67 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Entry Id Template",
+    "id": "entry-id-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "properties": [
+      {
+        "id": "input-1",
+        "type": "String",
+        "label": "Input",
+        "value": "=defaultInput",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "inputVar"
+        }
+      },
+      {
+        "id": "header-1",
+        "type": "String",
+        "label": "Header",
+        "value": "headerValue",
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "headerKey"
+        }
+      },
+      {
+        "id": "toggle",
+        "type": "Boolean",
+        "label": "Toggle",
+        "value": true,
+        "binding": {
+          "type": "zeebe:property",
+          "name": "toggle"
+        }
+      },
+      {
+        "id": "conditional-1",
+        "type": "String",
+        "label": "Conditional",
+        "value": "conditionalValue",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "conditionalProp"
+        },
+        "condition": {
+          "property": "toggle",
+          "equals": true
+        }
+      },
+      {
+        "id": "name-1",
+        "type": "String",
+        "label": "Name",
+        "value": "templated-name",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        }
+      }
+    ]
+  }
+]
