@@ -1866,6 +1866,24 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(jobPriorityDefinition).to.have.property('priority', 20);
     });
 
+    it('should change, setting priority value to 0', async function() {
+
+      // given
+      const element = await expectSelected('ServiceTask_jobPriority'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-com.camunda.example.JobPriorityDefinition-1', container),
+            input = findInput('number', entry);
+
+      changeInput(input, '0');
+
+      // then
+      const jobPriorityDefinition = findExtension(businessObject, 'zeebe:JobPriorityDefinition');
+      expect(jobPriorityDefinition).to.exist;
+      expect(jobPriorityDefinition).to.have.property('priority', 0);
+    });
+
 
     it('should change, creating zeebe:jobPriorityDefinition if non-existing', inject(async function(elementTemplates, elementRegistry) {
 
