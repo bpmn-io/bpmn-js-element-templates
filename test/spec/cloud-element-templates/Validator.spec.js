@@ -301,6 +301,23 @@ describe('provider/cloud-element-templates - Validator', function() {
     });
 
 
+    it('should accept zeebe:jobPriorityDefinition binding', function() {
+
+      // given
+      const templates = new Validator(moddle);
+
+      const templateDescriptor = require('./fixtures/job-priority-definition');
+
+      // when
+      templates.addAll(templateDescriptor);
+
+      // then
+      expect(errors(templates)).to.be.empty;
+
+      expect(valid(templates)).to.have.length(templateDescriptor.length);
+    });
+
+
     it('should reject missing name', function() {
 
       // given

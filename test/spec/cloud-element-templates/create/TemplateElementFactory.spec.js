@@ -853,6 +853,26 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
     }));
 
 
+    it('should handle <zeebe:jobPriorityDefinition>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('com.camunda.example.JobPriorityDefinition');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const jobPriorityDefinition = findExtension(bo, 'zeebe:JobPriorityDefinition');
+
+      expect(jobPriorityDefinition).to.exist;
+      expect(jobPriorityDefinition).to.jsonEqual({
+        $type: 'zeebe:JobPriorityDefinition',
+        priority: 10
+      });
+    }));
+
+
     it('should handle <zeebe:adHoc>', inject(function(templateElementFactory) {
 
       // given

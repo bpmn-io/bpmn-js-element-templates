@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FEAT`: support job priority via `zeebe:jobPriorityDefinition` binding
+
 ## 2.27.0
 
 * `FEAT`: support `isEmpty` condition for `zeebe` element templates ([#259](https://github.com/bpmn-io/bpmn-js-element-templates/pull/259))

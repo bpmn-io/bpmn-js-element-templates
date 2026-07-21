@@ -26,6 +26,7 @@ import { ScriptTaskBindingProvider } from './ScriptTaskBindingProvider';
 import ZeebeFormDefinitionBindingProvider from './FormDefinitionBindingProvider';
 import ZeebeAssignmentDefinitionBindingProvider from './AssignmentDefinitionBindingProvider';
 import ZeebePriorityDefinitionBindingProvider from './PriorityDefinitionBindingProvider';
+import ZeebeJobPriorityDefinitionBindingProvider from './JobPriorityDefinitionBindingProvider';
 import AdHocBindingProvider from './AdHocBindingProvider';
 import TaskScheduleBindingProvider from './TaskScheduleBindingProvider';
 import {
@@ -55,6 +56,7 @@ import {
   ZEEBE_SCRIPT_TASK,
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
+  ZEEBE_JOB_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
   ZEEBE_TASK_SCHEDULE,
   ZEEBE_EXECUTION_LISTENER,
@@ -97,6 +99,7 @@ export default class TemplateElementFactory {
       [ZEEBE_SCRIPT_TASK]: ScriptTaskBindingProvider,
       [ZEEBE_ASSIGNMENT_DEFINITION]: ZeebeAssignmentDefinitionBindingProvider,
       [ZEEBE_PRIORITY_DEFINITION]: ZeebePriorityDefinitionBindingProvider,
+      [ZEEBE_JOB_PRIORITY_DEFINITION]: ZeebeJobPriorityDefinitionBindingProvider,
       [ZEEBE_AD_HOC]: AdHocBindingProvider,
       [ZEEBE_TASK_SCHEDULE]: TaskScheduleBindingProvider,
       [ZEEBE_EXECUTION_LISTENER]: ExecutionListenerBindingProvider,
