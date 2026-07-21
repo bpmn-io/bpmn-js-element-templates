@@ -47,6 +47,7 @@ import {
   ZEEBE_FORM_DEFINITION,
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
+  ZEEBE_JOB_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
   ZEEBE_TASK_SCHEDULE,
   ZEEBE_EXECUTION_LISTENER,
@@ -165,6 +166,8 @@ export default class ChangeElementTemplateHandler {
     this._updateZeebeAssignmentDefinition(element, oldTemplate, newTemplate);
 
     this._updateZeebePriorityDefinition(element, oldTemplate, newTemplate);
+
+    this._updateZeebeJobPriorityDefinition(element, oldTemplate, newTemplate);
 
     this._updateAdHoc(element, oldTemplate, newTemplate);
 
@@ -1539,6 +1542,19 @@ export default class ChangeElementTemplateHandler {
     );
   }
 
+  _updateZeebeJobPriorityDefinition(element, oldTemplate, newTemplate) {
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: [ ZEEBE_JOB_PRIORITY_DEFINITION ],
+        extensionType: 'zeebe:JobPriorityDefinition',
+        getPropertyName: (binding) => binding.property
+      }
+    );
+  }
+
   _updateAdHoc(element, oldTemplate, newTemplate) {
     this._updateSingleExtensionElement(
       element,
@@ -2341,6 +2357,19 @@ export function findOldProperty(oldTemplate, newProperty) {
     });
   }
 
+  if (newBindingType === ZEEBE_JOB_PRIORITY_DEFINITION) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_JOB_PRIORITY_DEFINITION) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
+
   if (newBindingType === ZEEBE_AD_HOC) {
     return oldProperties.find(oldProperty => {
       const oldBinding = oldProperty.binding,
@@ -2546,6 +2575,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_PRIORITY_DEFINITION) {
+    return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === ZEEBE_JOB_PRIORITY_DEFINITION) {
     return businessObject.get(bindingProperty);
   }
 

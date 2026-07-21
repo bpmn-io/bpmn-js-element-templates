@@ -124,6 +124,12 @@
         <zeebe:priorityDefinition priority="10" />
       </bpmn:extensionElements>
     </bpmn:userTask>
+    <bpmn:serviceTask id="ServiceTask_jobPriority" name="jobPriority" zeebe:modelerTemplate="com.camunda.example.JobPriorityDefinition">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="myTask" />
+        <zeebe:jobPriorityDefinition priority="10" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
     <bpmn:adHocSubProcess id="AdHocSubProcess_1" name="zeebe:adHoc" zeebe:modelerTemplate="com.camunda.example.AdHoc">
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="ad-hoc-job-worker" />
@@ -271,6 +277,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_priority_di" bpmnElement="UserTask_priority">
         <dc:Bounds x="290" y="1030" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_jobPriority_di" bpmnElement="ServiceTask_jobPriority">
+        <dc:Bounds x="450" y="1030" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1kj2zmg_di" bpmnElement="AdHocSubProcess_1" isExpanded="true">

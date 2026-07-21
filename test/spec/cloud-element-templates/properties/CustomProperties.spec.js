@@ -1829,6 +1829,71 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('zeebe:jobPriorityDefinition', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('ServiceTask_jobPriority');
+
+      // then
+      const entry = findEntry('custom-entry-com.camunda.example.JobPriorityDefinition-1', container),
+            input = findInput('number', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('10');
+    });
+
+
+    it('should change, setting priority value', async function() {
+
+      // given
+      const element = await expectSelected('ServiceTask_jobPriority'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-com.camunda.example.JobPriorityDefinition-1', container),
+            input = findInput('number', entry);
+
+      changeInput(input, '20');
+
+      // then
+      expect(input.value).to.equal('20');
+
+      const jobPriorityDefinition = findExtension(businessObject, 'zeebe:JobPriorityDefinition');
+      expect(jobPriorityDefinition).to.exist;
+      expect(jobPriorityDefinition).to.have.property('priority', 20);
+    });
+
+
+    it('should change, creating zeebe:jobPriorityDefinition if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const template = templates.find(t => t.id === 'com.camunda.example.JobPriorityDefinition');
+      let task = elementRegistry.get('Task_1');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+
+      // then
+      task = elementRegistry.get('Task_1');
+      const jobPriorityDefinition = findExtension(getBusinessObject(task), 'zeebe:JobPriorityDefinition');
+
+      const entry = findEntry('custom-entry-com.camunda.example.JobPriorityDefinition-1', container),
+            input = findInput('number', entry);
+
+      expect(entry).to.exist;
+      expect(input).to.exist;
+      expect(input.value).to.equal('10');
+      expect(jobPriorityDefinition).to.have.property('priority', 10);
+    }));
+
+  });
+
+
   describe('zeebe:taskSchedule', function() {
 
     it('should display', async function() {
