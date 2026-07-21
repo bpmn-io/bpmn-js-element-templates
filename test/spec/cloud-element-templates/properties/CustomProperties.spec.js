@@ -1909,6 +1909,63 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(jobPriorityDefinition).to.have.property('priority', 10);
     }));
 
+    it('should create zeebe:jobPriorityDefinition for conditioned property', inject(async function(commandStack, elementTemplates, elementRegistry) {
+
+      // given
+      const template = templates.find(t => t.id === 'com.camunda.example.ConditionalJobPriorityDefinition');
+      let task = elementRegistry.get('Task_1');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(task, template);
+      });
+
+      // then
+      task = elementRegistry.get('Task_1');
+      const businessObject = getBusinessObject(task);
+      let jobPriorityDefinition = findExtension(businessObject, 'zeebe:JobPriorityDefinition');
+
+      expect(jobPriorityDefinition).not.to.exist;
+
+      // when
+      const setPriorityEntry = findEntry('custom-entry-com.camunda.example.ConditionalJobPriorityDefinition-1', container),
+            setPriorityInput = findInput('text', setPriorityEntry);
+
+      changeInput(setPriorityInput, 'on');
+
+      await waitFor(() => {
+        const priorityEntry = findEntry('custom-entry-com.camunda.example.ConditionalJobPriorityDefinition-2', container);
+
+        expect(priorityEntry).to.exist;
+      });
+
+      jobPriorityDefinition = findExtension(businessObject, 'zeebe:JobPriorityDefinition');
+      expect(jobPriorityDefinition).to.exist;
+
+      const extensionElements = businessObject.get('extensionElements');
+
+      commandStack.execute('element.updateModdleProperties', {
+        element: task,
+        moddleElement: extensionElements,
+        properties: {
+          values: extensionElements.get('values').filter((value) => value !== jobPriorityDefinition)
+        }
+      });
+
+      jobPriorityDefinition = findExtension(businessObject, 'zeebe:JobPriorityDefinition');
+      expect(jobPriorityDefinition).not.to.exist;
+
+      const priorityEntry = findEntry('custom-entry-com.camunda.example.ConditionalJobPriorityDefinition-2', container),
+            priorityInput = findInput('number', priorityEntry);
+
+      changeInput(priorityInput, '0');
+
+      // then
+      jobPriorityDefinition = findExtension(businessObject, 'zeebe:JobPriorityDefinition');
+      expect(jobPriorityDefinition).to.exist;
+      expect(jobPriorityDefinition).to.have.property('priority', 0);
+    }));
+
   });
 
 

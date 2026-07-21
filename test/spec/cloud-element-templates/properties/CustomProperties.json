@@ -1104,6 +1104,49 @@
   },
   {
     "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "ConditionalJobPriorityDefinition",
+    "id": "com.camunda.example.ConditionalJobPriorityDefinition",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "myTask",
+        "binding": {
+          "type": "zeebe:taskDefinition:type"
+        }
+      },
+      {
+        "id": "set-priority",
+        "label": "Set Priority",
+        "type": "String",
+        "value": "off",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "setPriority"
+        }
+      },
+      {
+        "label": "Priority",
+        "description": "Priority for job",
+        "type": "Number",
+        "condition": {
+          "property": "set-priority",
+          "equals": "on"
+        },
+        "binding": {
+          "type": "zeebe:jobPriorityDefinition",
+          "property": "priority"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
     "name": "Custom Properties",
     "id": "com.camunda.example.TaskSchedule",
     "appliesTo": [
