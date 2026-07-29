@@ -14,6 +14,7 @@ import {
   MESSAGE_PROPERTY_TYPE,
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   SIGNAL_PROPERTY_TYPE,
+  TIMER_EVENT_DEFINITION_PROPERTY_TYPE,
   CONDITIONAL_EVENT_DEFINITION_PROPERTY,
   CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY,
   ZEEBE_CALLED_ELEMENT,
@@ -23,8 +24,11 @@ import {
   ZEEBE_SCRIPT_TASK,
   ZEEBE_ASSIGNMENT_DEFINITION,
   ZEEBE_PRIORITY_DEFINITION,
+  ZEEBE_JOB_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
-  ZEEBE_TASK_SCHEDULE
+  ZEEBE_TASK_SCHEDULE,
+  ZEEBE_EXECUTION_LISTENER,
+  ZEEBE_TASK_LISTENER
 } from './bindingTypes';
 
 import {
@@ -39,6 +43,7 @@ import {
   findOutputParameter,
   findSignal,
   findTaskHeader,
+  findTimerEventDefinition,
   findZeebeProperty,
   findZeebeSubscription
 } from '../Helper';
@@ -110,11 +115,23 @@ export function getBindingPath(element, binding) {
   case ZEEBE_PRIORITY_DEFINITION:
     return getExtensionBindingPath(businessObject, 'zeebe:PriorityDefinition', binding.property);
 
+  case ZEEBE_JOB_PRIORITY_DEFINITION:
+    return getExtensionBindingPath(businessObject, 'zeebe:JobPriorityDefinition', binding.property);
+
   case ZEEBE_AD_HOC:
     return getExtensionBindingPath(businessObject, 'zeebe:AdHoc', binding.property);
 
   case ZEEBE_LINKED_RESOURCE_PROPERTY:
     return getLinkedResourceBindingPath(businessObject, binding);
+
+  case TIMER_EVENT_DEFINITION_PROPERTY_TYPE:
+    return getTimerBindingPath(businessObject, binding);
+
+  case ZEEBE_EXECUTION_LISTENER:
+    return getListenerBindingPath(businessObject, binding, 'zeebe:ExecutionListeners');
+
+  case ZEEBE_TASK_LISTENER:
+    return getListenerBindingPath(businessObject, binding, 'zeebe:TaskListeners');
 
   case CONDITIONAL_EVENT_DEFINITION_PROPERTY:
     return getConditionalEventDefinitionBindingPath(businessObject, binding);
@@ -123,8 +140,8 @@ export function getBindingPath(element, binding) {
     return getConditionalFilterBindingPath(businessObject, binding);
 
   // Not (yet) path-resolvable — the provider defers (returns null) so the
-  // standard entry answers. Known gaps: zeebe:userTask, zeebe:executionListener,
-  // zeebe:taskListener and bpmn:TimerEventDefinition#property.
+  // standard entry answers. Known gap: zeebe:userTask, a marker binding that
+  // has no bound property and renders no entry to resolve to.
   default:
     return null;
   }
@@ -147,6 +164,48 @@ function getExtensionBindingPath(businessObject, extensionType, field) {
   const extensionIndex = getExtensionIndex(businessObject, extension);
 
   return [ 'extensionElements', 'values', extensionIndex, field ];
+}
+
+/**
+ * Path to the (first) timer event definition's expression property, e.g.
+ * `[ 'eventDefinitions', <index>, 'timeDuration' ]`. Mirrors the leaf the Zeebe
+ * resolver keys on (`bpmn:TimerEventDefinition#<timeCycle|timeDate|timeDuration>`).
+ */
+function getTimerBindingPath(businessObject, binding) {
+  const timerEventDefinition = findTimerEventDefinition(businessObject);
+
+  if (!timerEventDefinition) {
+    return null;
+  }
+
+  const index = businessObject.get('eventDefinitions').indexOf(timerEventDefinition);
+
+  return [ 'eventDefinitions', index, binding.name ];
+}
+
+/**
+ * Path to a listener's `type` within its container's `listeners` collection,
+ * e.g. `[ 'extensionElements', 'values', <index>, 'listeners', <index>, 'type' ]`.
+ * The listener is matched by its `eventType`, mirroring `getListenerValue`.
+ */
+function getListenerBindingPath(businessObject, binding, containerType) {
+  const container = findExtension(businessObject, containerType);
+
+  if (!container) {
+    return null;
+  }
+
+  const listeners = container.get('listeners');
+
+  const index = listeners.findIndex(listener => listener.get('eventType') === binding.eventType);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const extensionIndex = getExtensionIndex(businessObject, container);
+
+  return [ 'extensionElements', 'values', extensionIndex, 'listeners', index, 'type' ];
 }
 
 function getIoBindingPath(businessObject, binding, type) {

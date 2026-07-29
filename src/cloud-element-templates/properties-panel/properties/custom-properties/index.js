@@ -124,7 +124,14 @@ function addCustomGroup(groups, props) {
   }
 }
 
-function createCustomEntry(id, element, property) {
+/**
+ * Build the properties panel entry descriptor for a template property, or
+ * `undefined` when the property renders no entry (e.g. a `Hidden` property or a
+ * binding without a renderable default type). Exported so the provider's
+ * `getEntryId` can use it as the single source of "does this property render",
+ * keeping id resolution in lock-step with what the panel actually shows.
+ */
+export function createCustomEntry(id, element, property) {
   let { type, feel, language } = property;
 
   if (!type) {
