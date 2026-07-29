@@ -17,6 +17,7 @@ import { pathEquals } from '@bpmn-io/moddle-utils';
 
 import { getBindingPath } from '../util/bindingPath';
 import { getPropertyEntryId } from '../util/customPropertyEntryIds';
+import { createCustomEntry } from './properties/custom-properties';
 import { has, isObject } from 'min-dash';
 
 const LOWER_PRIORITY = 300;
@@ -129,7 +130,13 @@ export default class ElementTemplatesPropertiesProvider {
       const bindingPath = getBindingPath(element, property.binding);
 
       if (bindingPath && pathEquals(bindingPath, path)) {
-        return getPropertyEntryId(conditioned, property);
+        const entryId = getPropertyEntryId(conditioned, property);
+
+        // only resolve to a property that actually renders an entry (e.g. not
+        // Hidden), so the resolved id is guaranteed to exist in the panel
+        if (createCustomEntry(entryId, element, property)) {
+          return entryId;
+        }
       }
     }
 

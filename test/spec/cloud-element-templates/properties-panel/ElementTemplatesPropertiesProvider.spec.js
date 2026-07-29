@@ -38,7 +38,8 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import {
   findExtension,
-  findInputParameter
+  findInputParameter,
+  findTimerEventDefinition
 } from 'src/cloud-element-templates/Helper';
 
 import { getBindingPath } from 'src/cloud-element-templates/util/bindingPath';
@@ -1264,6 +1265,107 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         // then (condition no longer met: the provider defers, even though the
         // moddle location referenced by `path` may still physically hold data)
         expect(elementTemplatesPropertiesProvider.getEntryId(task, path)).to.be.null;
+      })
+    );
+
+
+    it('should resolve a templated zeebe:jobPriorityDefinition to its rendered entry id', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider, selection) {
+
+        // given
+        const serviceTask = elementRegistry.get('ServiceTask_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(serviceTask, getEntryIdTemplates[1]);
+        });
+        await act(() => selection.select(serviceTask));
+
+        const template = elementTemplates.get(serviceTask);
+
+        // when
+        const path = getBindingPath(serviceTask, {
+          type: 'zeebe:jobPriorityDefinition',
+          property: 'priority'
+        });
+        const entryId = elementTemplatesPropertiesProvider.getEntryId(serviceTask, path);
+
+        // then (resolves to the same id the panel actually rendered)
+        const property = template.properties.find(p => p.id === 'priority-1');
+        expect(entryId).to.equal(getPropertyEntryId(template, property));
+
+        expect(domQuery(`[data-entry-id="${entryId}"]`, container)).to.exist;
+      })
+    );
+
+
+    it('should resolve a templated bpmn:TimerEventDefinition property to its rendered entry id', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider, selection) {
+
+        // given
+        const timerEvent = elementRegistry.get('TimerEvent_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(timerEvent, getEntryIdTemplates[2]);
+        });
+
+        // re-fetch as applying an elementType template morphs the element
+        const templatedEvent = elementRegistry.get('TimerEvent_1');
+
+        await act(() => selection.select(templatedEvent));
+
+        const template = elementTemplates.get(templatedEvent);
+        const businessObject = getBusinessObject(templatedEvent);
+
+        // independently locate the moddle node the duration is written to
+        const timerEventDefinition = findTimerEventDefinition(businessObject);
+        const definitionIndex = businessObject.get('eventDefinitions').indexOf(timerEventDefinition);
+        const expectedPath = [ 'eventDefinitions', definitionIndex, 'timeDuration' ];
+
+        // when
+        const path = getBindingPath(templatedEvent, {
+          type: 'bpmn:TimerEventDefinition#property',
+          name: 'timeDuration'
+        });
+
+        // then (path shape matches the contract, independent of getEntryId)
+        expect(path).to.eql(expectedPath);
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getEntryId(templatedEvent, path);
+
+        // then (resolves to the same id the panel actually rendered)
+        const property = template.properties.find(p => p.id === 'duration-1');
+        expect(entryId).to.equal(getPropertyEntryId(template, property));
+
+        expect(domQuery(`[data-entry-id="${entryId}"]`, container)).to.exist;
+      })
+    );
+
+
+    it('should defer a Hidden zeebe:executionListener binding (no rendered entry)', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider, selection) {
+
+        // given a template whose listener binding is Hidden (renders nothing)
+        const task = elementRegistry.get('Task_2');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[3]);
+        });
+        await act(() => selection.select(task));
+
+        // the binding still inverts to a concrete moddle path...
+        const path = getBindingPath(task, {
+          type: 'zeebe:executionListener',
+          eventType: 'start'
+        });
+        expect(path).to.exist;
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getEntryId(task, path);
+
+        // then (...but no entry renders, so the provider defers rather than
+        // resolving to an id that is not in the panel)
+        expect(entryId).to.be.null;
       })
     );
 
