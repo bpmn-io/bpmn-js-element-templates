@@ -15,7 +15,8 @@ import { find, forEach, groupBy } from 'min-dash';
  * @param {Object} elementTemplate the applied template (conditions already applied)
  * @param {Object} property a property of that template
  *
- * @return {string|null} the entry id, or `null` if the property is not rendered
+ * @return {string|null} the entry id, or `null` if the property is not part of
+ *   the template
  */
 export function getPropertyEntryId(elementTemplate, property) {
   const {
