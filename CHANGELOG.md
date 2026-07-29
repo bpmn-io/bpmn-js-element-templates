@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.29.0
+
+* `FEAT`: implement `propertiesPanelProvider#getEntryId` ([#266](https://github.com/bpmn-io/bpmn-js-element-templates/pull/266))
+
 ## 2.28.0
 
 * `FEAT`: support `businessId` in the `zeebe:calledElement` binding ([#269](https://github.com/bpmn-io/bpmn-js-element-templates/pull/269))
