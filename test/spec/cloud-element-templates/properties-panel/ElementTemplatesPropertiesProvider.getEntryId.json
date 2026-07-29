@@ -63,5 +63,74 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Job Priority Template",
+    "id": "job-priority-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "id": "priority-1",
+        "type": "Number",
+        "label": "Priority",
+        "value": 10,
+        "binding": {
+          "type": "zeebe:jobPriorityDefinition",
+          "property": "priority"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Timer Duration Template",
+    "id": "timer-duration-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:IntermediateCatchEvent"
+    ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:TimerEventDefinition"
+    },
+    "properties": [
+      {
+        "id": "duration-1",
+        "type": "String",
+        "label": "Duration",
+        "value": "PT1H",
+        "binding": {
+          "type": "bpmn:TimerEventDefinition#property",
+          "name": "timeDuration"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Execution Listener Template",
+    "id": "execution-listener-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "entriesVisible": {
+      "executionListeners": false
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "=template-start",
+        "binding": {
+          "type": "zeebe:executionListener",
+          "eventType": "start",
+          "retries": "=3"
+        }
+      }
+    ]
   }
 ]

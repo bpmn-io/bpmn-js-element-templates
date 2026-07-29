@@ -565,6 +565,111 @@ describe('cloud-element-templates/util - bindingPath', function() {
     });
 
 
+    describe('zeebe:jobPriorityDefinition', function() {
+
+      it('should resolve priority', function() {
+
+        // given
+        const jobPriorityDefinition = create('zeebe:JobPriorityDefinition', { priority: '50' });
+
+        const serviceTask = create('bpmn:ServiceTask', {
+          id: 'ServiceTask_1',
+          extensionElements: withExtensionElements([ jobPriorityDefinition ])
+        });
+
+        const binding = { type: 'zeebe:jobPriorityDefinition', property: 'priority' };
+
+        // when
+        const path = getBindingPath(serviceTask, binding);
+
+        // then
+        expect(path).to.eql([ 'extensionElements', 'values', 0, 'priority' ]);
+      });
+
+    });
+
+
+    describe('bpmn:TimerEventDefinition#property', function() {
+
+      it('should resolve the timer expression property', function() {
+
+        // given
+        const timerEventDefinition = create('bpmn:TimerEventDefinition', {
+          timeDuration: create('bpmn:FormalExpression', { body: 'PT1H' })
+        });
+
+        const catchEvent = create('bpmn:IntermediateCatchEvent', {
+          id: 'IntermediateCatchEvent_1',
+          eventDefinitions: [ timerEventDefinition ]
+        });
+
+        const binding = { type: 'bpmn:TimerEventDefinition#property', name: 'timeDuration' };
+
+        // when
+        const path = getBindingPath(catchEvent, binding);
+
+        // then
+        expect(path).to.eql([ 'eventDefinitions', 0, 'timeDuration' ]);
+      });
+
+    });
+
+
+    describe('zeebe:executionListener', function() {
+
+      it('should resolve the matching listener type', function() {
+
+        // given
+        const listeners = [
+          create('zeebe:ExecutionListener', { eventType: 'start', type: 'a' }),
+          create('zeebe:ExecutionListener', { eventType: 'end', type: 'b' })
+        ];
+
+        const executionListeners = create('zeebe:ExecutionListeners', { listeners });
+
+        const serviceTask = create('bpmn:ServiceTask', {
+          id: 'ServiceTask_1',
+          extensionElements: withExtensionElements([ executionListeners ])
+        });
+
+        const binding = { type: 'zeebe:executionListener', eventType: 'end' };
+
+        // when
+        const path = getBindingPath(serviceTask, binding);
+
+        // then
+        expect(path).to.eql([ 'extensionElements', 'values', 0, 'listeners', 1, 'type' ]);
+      });
+
+    });
+
+
+    describe('zeebe:taskListener', function() {
+
+      it('should resolve the matching listener type', function() {
+
+        // given
+        const taskListeners = create('zeebe:TaskListeners', {
+          listeners: [ create('zeebe:TaskListener', { eventType: 'assigning', type: 'a' }) ]
+        });
+
+        const userTask = create('bpmn:UserTask', {
+          id: 'UserTask_1',
+          extensionElements: withExtensionElements([ taskListeners ])
+        });
+
+        const binding = { type: 'zeebe:taskListener', eventType: 'assigning' };
+
+        // when
+        const path = getBindingPath(userTask, binding);
+
+        // then
+        expect(path).to.eql([ 'extensionElements', 'values', 0, 'listeners', 0, 'type' ]);
+      });
+
+    });
+
+
     describe('zeebe:linkedResource', function() {
 
       it('should resolve the property of the matching linked resource', function() {
@@ -650,12 +755,12 @@ describe('cloud-element-templates/util - bindingPath', function() {
 
     describe('unsupported bindings', function() {
 
-      it('should return null for an unknown binding type', function() {
+      it('should return null for a deferred binding type (zeebe:userTask)', function() {
 
         // given
-        const task = create('bpmn:ServiceTask', { id: 'ServiceTask_1' });
+        const task = create('bpmn:UserTask', { id: 'UserTask_1' });
 
-        const binding = { type: 'zeebe:executionListener', eventType: 'start' };
+        const binding = { type: 'zeebe:userTask' };
 
         // when
         const path = getBindingPath(task, binding);
@@ -917,6 +1022,54 @@ describe('cloud-element-templates/util - bindingPath', function() {
         const path = getBindingPath(boundaryEvent, {
           type: 'bpmn:ConditionalEventDefinition#zeebe:conditionalFilter#property', name: 'variableEvents'
         });
+
+        // then
+        expect(path).to.be.null;
+      });
+
+
+      it('timer event definition missing', function() {
+
+        // given
+        const task = create('bpmn:ServiceTask', { id: 'ServiceTask_1' });
+
+        // when
+        const path = getBindingPath(task, {
+          type: 'bpmn:TimerEventDefinition#property', name: 'timeDuration'
+        });
+
+        // then
+        expect(path).to.be.null;
+      });
+
+
+      it('execution listeners extension missing', function() {
+
+        // given
+        const task = create('bpmn:ServiceTask', { id: 'ServiceTask_1' });
+
+        // when
+        const path = getBindingPath(task, { type: 'zeebe:executionListener', eventType: 'start' });
+
+        // then
+        expect(path).to.be.null;
+      });
+
+
+      it('execution listener not matched', function() {
+
+        // given
+        const executionListeners = create('zeebe:ExecutionListeners', {
+          listeners: [ create('zeebe:ExecutionListener', { eventType: 'start', type: 'a' }) ]
+        });
+
+        const task = create('bpmn:ServiceTask', {
+          id: 'ServiceTask_1',
+          extensionElements: withExtensionElements([ executionListeners ])
+        });
+
+        // when
+        const path = getBindingPath(task, { type: 'zeebe:executionListener', eventType: 'end' });
 
         // then
         expect(path).to.be.null;
