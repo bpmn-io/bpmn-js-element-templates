@@ -3,6 +3,7 @@ import {
   forEach,
   isArray,
   isNil,
+  isObject,
   isString
 } from 'min-dash';
 
@@ -56,6 +57,15 @@ export class Validator {
    * @return {Validator}
    */
   add(template) {
+
+    // templates are untrusted input and may have any shape; reject anything
+    // that is not a proper template object rather than blowing up on it
+    if (!isObject(template)) {
+      this._logError('template must be an object');
+
+      return this;
+    }
+
     const err = this._validateTemplate(template);
 
     let id, version;
