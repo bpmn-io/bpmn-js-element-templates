@@ -673,6 +673,34 @@ describe('provider/cloud-element-templates - Validator', function() {
   });
 
 
+  describe('broken / untrusted templates', function() {
+
+    it('should reject non-object entries without throwing', function() {
+
+      // given
+      const validator = new Validator(moddle);
+
+      // templates are untrusted input and may have any shape
+      const nonObjects = [ null, undefined, 'foo', 123, true, [] ];
+
+      // when
+      const add = () => validator.addAll(nonObjects);
+
+      // then
+      expect(add).not.to.throw();
+
+      // each non-object entry is reported ...
+      expect(errors(validator)).to.eql(nonObjects.map(function() {
+        return 'template must be an object';
+      }));
+
+      // ... and none is treated as valid
+      expect(valid(validator)).to.be.empty;
+    });
+
+  });
+
+
   describe('error <template> reference', function() {
 
     const SCHEMA = 'https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json';
