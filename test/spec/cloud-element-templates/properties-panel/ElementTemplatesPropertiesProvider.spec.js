@@ -1192,6 +1192,31 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
     );
 
 
+    it('should resolve a property with undeclared group to its rendered default-group entry id', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider, selection) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[4]);
+        });
+        await act(() => selection.select(task));
+
+        const template = elementTemplates.get(task);
+        const property = template.properties.find(p => p.id === 'name-undeclared-group');
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getEntryId(task, [ 'name' ]);
+
+        // then
+        expect(entryId).to.equal(getPropertyEntryId(template, property));
+        expect(entryId).to.equal('custom-entry-undeclared-group-template-0');
+        expect(domQuery(`[data-entry-id="${entryId}"]`, container)).to.exist;
+      })
+    );
+
+
     it('should return null when no template applies to the element', inject(
       function(elementRegistry, elementTemplatesPropertiesProvider) {
 
