@@ -672,4 +672,64 @@ describe('provider/cloud-element-templates - Validator', function() {
 
   });
 
+
+  describe('error <template> reference', function() {
+
+    const SCHEMA = 'https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json';
+
+    it('should attach the source template to logged errors', function() {
+
+      // given
+      const validator = new Validator(moddle);
+
+      // a schema-invalid template (<optional> not supported for property binding)
+      const template = {
+        $schema: SCHEMA,
+        name: 'Invalid',
+        id: 'com.example.invalid',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [
+          {
+            type: 'String',
+            optional: true,
+            binding: {
+              type: 'property',
+              name: 'name'
+            }
+          }
+        ]
+      };
+
+      // when
+      validator.add(template);
+
+      // then
+      const loggedErrors = validator.getErrors();
+
+      expect(loggedErrors).to.have.length.above(0);
+
+      loggedErrors.forEach(function(error) {
+        expect(error.template).to.equal(template);
+      });
+    });
+
+
+    it('should not attach a template to template-less errors', function() {
+
+      // given
+      const validator = new Validator(moddle);
+
+      // when
+      // not an array => generic error without a source template
+      validator.addAll('not-an-array');
+
+      // then
+      const [ error ] = validator.getErrors();
+
+      expect(error).to.exist;
+      expect(error.template).not.to.exist;
+    });
+
+  });
+
 });
