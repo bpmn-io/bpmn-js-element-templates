@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.30.0
+
+* `FEAT`: attach `template` to template errors ([#273](https://github.com/bpmn-io/bpmn-js-element-templates/pull/273))
+* `FIX`: do not emit errors for skipped, `engines` incompatible templates ([#273](https://github.com/bpmn-io/bpmn-js-element-templates/pull/273))
+
 ## 2.29.0
 
 * `FEAT`: implement `propertiesPanelProvider#getEntryId` ([#266](https://github.com/bpmn-io/bpmn-js-element-templates/pull/266))
