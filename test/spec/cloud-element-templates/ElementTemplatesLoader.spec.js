@@ -285,4 +285,181 @@ describe('provider/cloud-element-templates - ElementTemplatesLoader', function()
 
   });
 
+
+  describe('integration: loading + error handling', function() {
+
+    // a diagram with a task that already has VALID_INCOMPATIBLE applied
+    const APPLIED_DIAGRAM_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:task id="AppliedTask" zeebe:modelerTemplate="valid.incompatible" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="AppliedTask_di" bpmnElement="AppliedTask">
+        <dc:Bounds x="100" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>`;
+
+    // templates whose <engines> have arbitrary, non-object shapes
+    const MALFORMED_SHAPES = [
+      {
+        $schema: SCHEMA,
+        name: 'Engines String',
+        id: 'engines.string',
+        engines: 'foo',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: []
+      },
+      {
+        $schema: SCHEMA,
+        name: 'Engines Array',
+        id: 'engines.array',
+        engines: [ 1, 2 ],
+        appliesTo: [ 'bpmn:Task' ],
+        properties: []
+      },
+      {
+        $schema: SCHEMA,
+        name: 'Engines Null Value',
+        id: 'engines.null',
+        engines: { camunda: null },
+        appliesTo: [ 'bpmn:Task' ],
+        properties: []
+      }
+    ];
+
+
+    describe('engine-INCOMPATIBLE template applied to an element', function() {
+
+      // regression guard: a template that is incompatible with the host engines
+      // but already applied to an element must remain resolvable, so the
+      // element keeps working ("working regardless" of incompatibility). It is
+      // only excluded from *selection*, never dropped from the registry.
+      beforeEach(bootstrap([ VALID_INCOMPATIBLE ], ENGINES, APPLIED_DIAGRAM_XML));
+
+
+      it('should still resolve for the element it is applied to', inject(
+        function(elementRegistry, elementTemplates) {
+
+          // given
+          const task = elementRegistry.get('AppliedTask');
+
+          // when
+          const template = elementTemplates.get(task);
+
+          // then
+          expect(template).to.exist;
+          expect(template.id).to.eql('valid.incompatible');
+        }
+      ));
+
+    });
+
+
+    describe('mixed templates', function() {
+
+      beforeEach(bootstrap([
+        VALID_COMPATIBLE,
+        INVALID_COMPATIBLE,
+        INVALID_INCOMPATIBLE,
+        VALID_INCOMPATIBLE
+      ]));
+
+
+      it('should suppress incompatible errors but keep valid templates loaded', inject(
+        function(elementTemplatesLoader, elementTemplates, eventBus) {
+
+          // given
+          const errorListener = spy();
+
+          eventBus.on('elementTemplates.errors', errorListener);
+
+          // when
+          elementTemplatesLoader.reload();
+
+          // then
+          // only the schema-invalid _compatible_ template reports an error;
+          // the schema-invalid _incompatible_ one is suppressed
+          expect(errorListener).to.have.been.calledOnce;
+
+          const { errors } = errorListener.getCall(0).args[0];
+
+          expect(errors).to.have.length(1);
+
+          // both schema-valid templates are loaded (compatible + incompatible),
+          // so elements they are applied to keep working
+          const loaded = elementTemplates.getAll().map(t => t.id).sort();
+
+          expect(loaded).to.eql([ 'valid.compatible', 'valid.incompatible' ]);
+
+          // but only the compatible one is offered for selection
+          expect(elementTemplates.getLatest('valid.compatible')).to.have.length(1);
+          expect(elementTemplates.getLatest('valid.incompatible')).to.be.empty;
+        }
+      ));
+
+    });
+
+
+    describe('broken / untrusted templates', function() {
+
+      describe('malformed <engines> shapes', function() {
+
+        beforeEach(bootstrap([ VALID_COMPATIBLE, ...MALFORMED_SHAPES ]));
+
+
+        it('should not break loading of valid templates', inject(
+          function(elementTemplatesLoader, elementTemplates) {
+
+            // when
+            const load = () => elementTemplatesLoader.reload();
+
+            // then
+            expect(load).not.to.throw();
+
+            // and the valid template still loads
+            const loaded = elementTemplates.getAll();
+
+            expect(loaded.map(t => t.id)).to.include('valid.compatible');
+          }
+        ));
+
+      });
+
+
+      describe('non-array templates', function() {
+
+        const loadTemplates = function(done) {
+          done(null, { not: 'an array' });
+        };
+
+        beforeEach(bootstrap(loadTemplates));
+
+
+        it('should report an error without throwing', inject(
+          function(elementTemplatesLoader, eventBus) {
+
+            // given
+            const errorListener = spy();
+
+            eventBus.on('elementTemplates.errors', errorListener);
+
+            // when
+            const load = () => elementTemplatesLoader.reload();
+
+            // then
+            expect(load).not.to.throw();
+            expect(errorListener).to.have.been.called;
+          }
+        ));
+
+      });
+
+    });
+
+  });
+
 });
