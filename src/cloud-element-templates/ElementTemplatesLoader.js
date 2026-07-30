@@ -16,20 +16,8 @@ export default class ElementTemplatesLoader extends TemplatesLoader {
     this._elementTemplates = elementTemplates;
   }
 
-  setTemplates(templates) {
-    const elementTemplates = this._elementTemplates,
-          moddle = this._moddle;
-
-    const validator = new Validator(moddle).addAll(templates);
-
-    const errors = validator.getErrors(),
-          validTemplates = validator.getValidTemplates();
-
-    elementTemplates.set(validTemplates);
-
-    if (errors.length) {
-      this._templateErrors(errors);
-    }
+  _createValidator() {
+    return new Validator(this._moddle);
   }
 }
 
