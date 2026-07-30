@@ -132,5 +132,33 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Undeclared Group Template",
+    "id": "undeclared-group-template",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "groups": [
+      {
+        "id": "declared-group",
+        "label": "Declared Group"
+      }
+    ],
+    "properties": [
+      {
+        "id": "name-undeclared-group",
+        "type": "String",
+        "label": "Name",
+        "group": "missing-group",
+        "value": "templated-name",
+        "binding": {
+          "type": "property",
+          "name": "name"
+        }
+      }
+    ]
   }
 ]
