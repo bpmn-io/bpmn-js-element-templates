@@ -243,6 +243,13 @@ export class Validator {
       err = new Error(err);
     }
 
+    // keep a reference to the source template so consumers can associate an
+    // error with the template that produced it (e.g. to suppress errors for
+    // templates that are incompatible with the host environment)
+    if (template) {
+      err.template = template;
+    }
+
     this._errors.push(err);
 
     return err;
