@@ -1097,6 +1097,34 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       expect(changeSpy).to.have.been.calledOnce;
     }));
 
+
+    it('should not blow up on malformed templates', inject(function(elementTemplates) {
+
+      // given
+      // templates are untrusted input and may have any shape
+      const malformed = [
+        null,
+        undefined,
+        'foo',
+        123,
+        true,
+        [],
+        {},
+        { id: 'no-engines' },
+        { id: 'broken-engines', engines: 'nope' },
+        { id: 'broken-engine-range', engines: { camunda: 123 } }
+      ];
+
+      // when
+      expect(function() {
+        elementTemplates.set(malformed);
+      }).not.to.throw();
+
+      // then
+      // well-formed entries are still indexed
+      expect(elementTemplates.get('no-engines')).to.exist;
+    }));
+
   });
 
 
