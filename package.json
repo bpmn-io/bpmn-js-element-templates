@@ -123,7 +123,7 @@
     "rollup-plugin-copy": "^3.5.0",
     "sinon": "^22.1.0",
     "sinon-chai": "^4.0.0",
-    "webpack": "5.106.2",
+    "webpack": "^5.108.4",
     "zeebe-bpmn-moddle": "^1.17.0"
   },
   "peerDependencies": {
