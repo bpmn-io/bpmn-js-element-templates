@@ -2,9 +2,9 @@ import { isArray } from 'min-dash';
 
 import handleLegacyScopes from 'src/element-templates/util/handleLegacyScopes';
 
-
-
 import { expect } from 'chai';
+
+
 describe('provider/element-template - handleLegacyScopes', function() {
 
   it('should transform legacy scopes descriptor', function() {
