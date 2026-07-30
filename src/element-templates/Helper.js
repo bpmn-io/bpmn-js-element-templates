@@ -79,6 +79,13 @@ export function buildTemplatesById(templates, engines) {
   const templatesById = {};
 
   templates.forEach((template) => {
+
+    // templates are untrusted input and may have any shape; skip anything that
+    // is not a proper template object so we don't blow up on malformed entries
+    if (!isObject(template)) {
+      return;
+    }
+
     const id = template.id;
     const version = isUndefined(template.version) ? '_' : template.version;
 

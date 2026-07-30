@@ -360,6 +360,32 @@ describe('cloud-element-templates/linting', function() {
   });
 
 
+  it('should not blow up on malformed templates', function() {
+
+    // given
+    // templates are untrusted input and may have any shape
+    const malformed = [
+      null,
+      undefined,
+      'foo',
+      123,
+      true,
+      [],
+      {},
+      { id: 'broken-engines', engines: 'nope' },
+      { id: 'broken-engine-range', engines: { camunda: 123 } }
+    ];
+
+    // when
+    expect(function() {
+      ElementTemplateLinterPlugin(malformed);
+      validateRule({ templates: malformed });
+      compatibilityRule({ templates: malformed });
+      updateRule({ templates: malformed });
+    }).not.to.throw();
+  });
+
+
   it('should create the plugin within performance constraints', function() {
 
     // given
