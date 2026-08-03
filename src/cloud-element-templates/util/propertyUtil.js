@@ -387,7 +387,7 @@ function getBooleanPropertyValue(value) {
 
 const NO_OP = null;
 
-export function setPropertyValue(bpmnFactory, commandStack, element, property, value) {
+export function setPropertyValue(bpmnFactory, commandStack, element, property, value, additionalProperties) {
   let businessObject = getBusinessObject(element);
 
   const {
@@ -676,7 +676,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
 
       // do not persist empty parameters when configured as <optional>
       if (shouldUpdate(value, property)) {
-        const newZeebeInputParameter = createInputParameter(binding, value, bpmnFactory, ioMapping);
+        const newZeebeInputParameter = createInputParameter(binding, value, bpmnFactory, ioMapping, additionalProperties);
         values.push(newZeebeInputParameter);
       }
 
@@ -781,7 +781,7 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     const properties = zeebeProperties.get('properties').filter((property) => property !== oldZeebeProperty);
 
     if (shouldUpdate(value, property)) {
-      const newZeebeProperty = createZeebeProperty(binding, value, bpmnFactory);
+      const newZeebeProperty = createZeebeProperty(binding, value, bpmnFactory, additionalProperties);
 
       properties.push(newZeebeProperty);
     }

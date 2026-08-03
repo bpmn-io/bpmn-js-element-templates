@@ -1,0 +1,35 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Configuration metadata cleanup",
+    "id": "configuration-metadata-cleanup",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "id": "propertyConfiguration",
+        "label": "Property configuration",
+        "type": "Configuration",
+        "configurationTemplate": "io.camunda:slack-connection:1",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "propertyConfiguration"
+        }
+      },
+      {
+        "id": "inputConfiguration",
+        "label": "Input configuration",
+        "type": "Configuration",
+        "configurationTemplate": "io.camunda:slack-connection:1",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "inputConfiguration"
+        }
+      }
+    ]
+  }
+]
