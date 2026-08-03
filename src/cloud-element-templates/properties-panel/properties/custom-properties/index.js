@@ -35,7 +35,7 @@ import { JsonEditorProperty } from './JsonEditorProperty';
 import { DropdownProperty } from './DropdownProperty';
 import { BooleanProperty } from './BooleanProperty';
 import { NumberProperty } from './NumberProperty';
-
+import { ConfigurationProperty, isConfigurationChooserEdited } from './ConfigurationProperty';
 
 export function CustomProperties(props) {
   const {
@@ -136,6 +136,15 @@ export function createCustomEntry(id, element, property) {
 
   if (!type) {
     type = getDefaultType(property);
+  }
+
+  if (type === 'Configuration' || property.configurationTemplate) {
+    return {
+      id,
+      component: ConfigurationProperty,
+      isEdited: createIsEdited(isConfigurationChooserEdited, element, property),
+      property
+    };
   }
 
   if (feel === 'required') {

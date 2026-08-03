@@ -91,6 +91,8 @@ import bpmnExpressionTemplates from '../fixtures/completion-condition.json';
 
 import complexPropertyTemplates from './CustomProperties.complex-property.json';
 
+import configurationMetadataCleanupTemplates from './CustomProperties.configuration-metadata-cleanup.json';
+
 import timerDiagramXML from './CustomProperties.timer.bpmn';
 import timerElementTemplates from './CustomProperties.timer.json';
 
@@ -1091,6 +1093,877 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('configuration labels', function() {
+
+    it('should use the property label or configuration template name', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-labels',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'destinationConfiguration',
+          label: 'Destination AWS credential',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:aws-credential:1',
+          binding: {
+            type: 'zeebe:property',
+            name: 'destinationConfiguration'
+          }
+        }, {
+          id: 'configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:aws-credential:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ],
+        configurationTemplates: [ {
+          id: 'io.camunda:aws-credential:1',
+          kind: 'CREDENTIAL',
+          name: 'AWS Credential',
+          version: 2,
+          properties: []
+        } ]
+      };
+
+      configurationInstances.setState({
+        instances: [],
+        clusterSelected: true
+      });
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const labeledEntry = findEntry('custom-entry-configuration-labels-0', container),
+            fallbackEntry = findEntry('custom-entry-configuration-labels-1', container);
+
+      // then
+      expect(domQuery('.bio-properties-panel-label', labeledEntry).textContent).to.equal('Destination AWS credential');
+      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', labeledEntry).textContent).to.equal('+Choose destination AWS credential');
+      expect(domQuery('.bio-properties-panel-label', fallbackEntry).textContent).to.equal('AWS Credential');
+      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', fallbackEntry).textContent).to.equal('+Choose AWS Credential');
+
+      // when
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', fallbackEntry));
+      });
+
+      // then
+      expect(domQuery('.bio-properties-panel-configuration-chooser-empty', fallbackEntry).textContent).to.equal('AWS Credential not present in connected cluster');
+
+      // when
+      await act(() => {
+        configurationInstances.setInstances([ {
+          name: 'awsProduction',
+          metadata: {
+            kind: 'CREDENTIAL',
+            displayName: 'AWS Production',
+            configurationTemplate: 'io.camunda:aws-credential:1',
+            configurationTemplateVersion: 2
+          }
+        } ]);
+      });
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', fallbackEntry));
+
+      await act(() => {
+        configurationInstances.setInstances([ {
+          name: 'awsProduction',
+          metadata: {
+            kind: 'CREDENTIAL',
+            displayName: 'AWS Production',
+            configurationTemplate: 'io.camunda:aws-credential:1',
+            configurationTemplateVersion: 1
+          }
+        } ]);
+      });
+
+      // then
+      expect(domQuery('.bio-properties-panel-configuration-chooser-missing', fallbackEntry).textContent).to.contain('AWS Production');
+
+      // when
+      await act(() => {
+        configurationInstances.setState({
+          instances: [ {
+            name: 'awsProduction',
+            metadata: {
+              kind: 'CREDENTIAL',
+              displayName: 'AWS Production',
+              configurationTemplate: 'io.camunda:other-credential:1',
+              configurationTemplateVersion: 2
+            }
+          } ],
+          permissions: {
+            update: true
+          }
+        });
+      });
+
+      // then
+      const typeMismatch = domQuery('.bio-properties-panel-configuration-chooser-missing', fallbackEntry);
+
+      expect(typeMismatch.textContent).to.contain('AWS Production');
+      expect(typeMismatch.textContent).to.contain('Incompatible configuration type');
+      expect(typeMismatch.textContent).not.to.contain('AWS Credential');
+      expect(typeMismatch.textContent).not.to.contain('io.camunda:other-credential:1');
+
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', fallbackEntry));
+
+      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', fallbackEntry)).not.to.exist;
+    }));
+
+
+    it('should clear metadata when removing a configuration', inject(async function(elementTemplates, configurationInstances, commandStack) {
+
+      // given
+      const element = await expectSelected('RestTask_noData'),
+            businessObject = getBusinessObject(element);
+      const template = configurationMetadataCleanupTemplates[0];
+      const instance = {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      };
+
+      configurationInstances.setInstances([ instance ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const propertyEntry = findEntry('custom-entry-configuration-metadata-cleanup-0', container),
+            inputEntry = findEntry('custom-entry-configuration-metadata-cleanup-1', container);
+
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', propertyEntry));
+      });
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', propertyEntry));
+
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', inputEntry));
+      });
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', inputEntry));
+
+      // when
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', inputEntry));
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item--danger', inputEntry));
+
+      // then
+      const ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
+
+      expect(findInputParameter(ioMapping, { name: 'inputConfiguration' })).to.jsonEqual({
+        $type: 'zeebe:Input',
+        source: '',
+        target: 'inputConfiguration'
+      });
+
+      // when
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', propertyEntry));
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item--danger', propertyEntry));
+
+      // then
+      const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+
+      expect(findZeebeProperty(zeebeProperties, { name: 'propertyConfiguration' })).to.jsonEqual({
+        $type: 'zeebe:Property',
+        name: 'propertyConfiguration',
+        value: ''
+      });
+
+      commandStack.undo();
+
+      expect(findZeebeProperty(zeebeProperties, { name: 'propertyConfiguration' })).to.jsonEqual({
+        $type: 'zeebe:Property',
+        name: 'propertyConfiguration',
+        value: '=camunda.vars.env.slackProduction',
+        modelerConfigurationTemplate: 'io.camunda:slack-connection:1',
+        modelerConfigurationName: 'Slack Production'
+      });
+    }));
+
+  });
+
+
+  describe('configuration', function() {
+
+    it('should store metadata on zeebe:Property', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData'),
+            businessObject = getBusinessObject(element);
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+
+      expect(placeholder.textContent).to.equal('+Choose configuration');
+
+      // when
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container)).to.exist;
+      });
+
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container));
+
+      // then
+      const zeebeProperties = findExtension(businessObject, 'zeebe:Properties'),
+            zeebeProperty = findZeebeProperty(zeebeProperties, { name: 'configuration' });
+
+      expect(zeebeProperty).to.jsonEqual({
+        $type: 'zeebe:Property',
+        name: 'configuration',
+        value: '=camunda.vars.env.slackProduction',
+        modelerConfigurationTemplate: 'io.camunda:slack-connection:1',
+        modelerConfigurationName: 'Slack Production'
+      });
+
+    }));
+
+
+    it('should store metadata on zeebe:Input', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData'),
+            businessObject = getBusinessObject(element);
+      const template = {
+        id: 'configuration-input',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:input',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-input-0', container),
+            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container)).to.exist;
+      });
+
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container));
+
+      // then
+      const ioMapping = findExtension(businessObject, 'zeebe:IoMapping'),
+            inputParameter = findInputParameter(ioMapping, { name: 'configuration' });
+
+      expect(inputParameter).to.jsonEqual({
+        $type: 'zeebe:Input',
+        source: '=camunda.vars.env.slackProduction',
+        target: 'configuration',
+        modelerConfigurationTemplate: 'io.camunda:slack-connection:1',
+        modelerConfigurationName: 'Slack Production'
+      });
+
+    }));
+
+
+    it('should hide creation and show only the remove action for an offline configuration', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      template.configurationTemplates = [ {
+        id: 'io.camunda:slack-connection:1',
+        kind: 'CREDENTIAL',
+        name: 'Slack Connection',
+        version: 2,
+        properties: [],
+        icon: {
+          contents: 'data:image/svg+xml;base64,offline-icon'
+        }
+      } ];
+
+      configurationInstances.setInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+
+      configurationInstances.setState({
+        instances: [],
+        clusterSelected: false
+      });
+
+      await waitFor(() => {
+        expect(domQuery('.bio-properties-panel-configuration-chooser-selected', entry)).to.exist;
+        expect(domQuery('.bio-properties-panel-configuration-chooser-selected--offline', entry)).to.exist;
+        expect(domQuery('.bio-properties-panel-configuration-chooser-logo', entry).getAttribute('src')).to.equal('data:image/svg+xml;base64,offline-icon');
+        expect(domQuery('.bio-properties-panel-configuration-chooser-missing', entry)).not.to.exist;
+      });
+
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-selected', entry));
+
+      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).not.to.exist;
+      expect(domQuery('.bio-properties-panel-configuration-chooser-create', entry)).not.to.exist;
+
+      // when
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
+
+      // then
+      const menuItems = domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry);
+
+      expect(menuItems).to.have.length(1);
+      expect(menuItems[0].textContent).to.equal('Remove');
+    }));
+
+
+    it('should distinguish a missing configuration from a load error', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setState({
+        instances: [ {
+          name: 'slackProduction',
+          metadata: {
+            kind: 'CREDENTIAL',
+            displayName: 'Slack Production',
+            configurationTemplate: 'io.camunda:slack-connection:1',
+            configurationTemplateVersion: 2
+          }
+        } ],
+        clusterSelected: true
+      });
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container);
+
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+      });
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+
+      // when - successful empty response
+      await act(() => {
+        configurationInstances.setState({
+          instances: [],
+          error: false
+        });
+      });
+
+      // then
+      expect(entry.textContent).to.contain('Not found on cluster');
+      expect(entry.textContent).not.to.contain('Could not load configurations');
+
+      // when - failed response
+      await act(() => {
+        configurationInstances.setState({
+          error: true,
+          permissions: {
+            create: false,
+            update: false
+          }
+        });
+      });
+
+      // then
+      const error = domQuery('.bio-properties-panel-configuration-chooser-error', entry);
+
+      expect(error).to.exist;
+      expect(error.textContent).to.contain('Slack Production');
+      expect(error.textContent).to.contain('Could not load configurations');
+      expect(entry.textContent).not.to.contain('Not found on cluster');
+
+      fireEvent.click(error);
+
+      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).not.to.exist;
+
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
+
+      const menuItems = domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry);
+
+      expect(menuItems).to.have.length(1);
+      expect(menuItems[0].textContent).to.equal('Remove');
+    }));
+
+
+    it('should fire configuration.create', inject(async function(elementTemplates, eventBus, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const property = {
+        id: 'configuration',
+        label: 'Configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:slack-connection:1',
+        configurationTemplateVersion: 2,
+        binding: {
+          type: 'zeebe:property',
+          name: 'configuration'
+        }
+      };
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ property ]
+      };
+      const createSpy = spy();
+
+      configurationInstances.setState({
+        clusterSelected: true
+      });
+      eventBus.on('configuration.create', createSpy);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+
+      // when
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      expect(domQuery('.bio-properties-panel-configuration-chooser-create', entry)).not.to.exist;
+
+      await act(() => {
+        configurationInstances.setState({
+          permissions: {
+            create: true
+          }
+        });
+      });
+
+      await waitFor(() => {
+        expect(domQuery('.bio-properties-panel-configuration-chooser-create', entry)).to.exist;
+      });
+
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-create', entry));
+
+      // then
+      expect(createSpy).to.have.been.calledOnce;
+      const [ event ] = createSpy.firstCall.args;
+
+      expect(event.element).to.equal(element);
+      expect(event.property).to.equal(property);
+      expect(event.configurationTemplate).to.equal('io.camunda:slack-connection:1');
+      expect(event.configurationTemplateVersion).to.equal(2);
+      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).to.not.exist;
+    }));
+
+
+    it('should select a compatible configuration.created instance', inject(async function(elementTemplates, eventBus, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData'),
+            businessObject = getBusinessObject(element);
+      const property = {
+        id: 'configuration',
+        label: 'Configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:slack-connection:1',
+        configurationTemplateVersion: 2,
+        binding: {
+          type: 'zeebe:property',
+          name: 'configuration'
+        }
+      };
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ property ]
+      };
+      const instance = {
+        name: 'newSlack',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'New Slack',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      };
+
+      configurationInstances.setState({
+        clusterSelected: true
+      });
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      // when - incompatible completion for this chooser
+      await act(() => {
+        eventBus.fire('configuration.created', {
+          element,
+          property,
+          instance: {
+            ...instance,
+            metadata: {
+              ...instance.metadata,
+              configurationTemplateVersion: 1
+            }
+          }
+        });
+      });
+
+      // then
+      let zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+
+      expect(findZeebeProperty(zeebeProperties, { name: 'configuration' }).value).not.to.equal('=camunda.vars.env.newSlack');
+
+      // when - compatible completion for another chooser
+      await act(() => {
+        eventBus.fire('configuration.created', {
+          element,
+          property: { ...property },
+          instance
+        });
+      });
+
+      // then
+      zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+
+      expect(findZeebeProperty(zeebeProperties, { name: 'configuration' }).value).not.to.equal('=camunda.vars.env.newSlack');
+
+      // when - compatible completion for this chooser
+      await act(() => {
+        eventBus.fire('configuration.created', {
+          element,
+          property,
+          instance
+        });
+      });
+
+      // then
+      zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+      const zeebeProperty = findZeebeProperty(zeebeProperties, { name: 'configuration' });
+
+      expect(zeebeProperty).to.jsonEqual({
+        $type: 'zeebe:Property',
+        name: 'configuration',
+        value: '=camunda.vars.env.newSlack',
+        modelerConfigurationTemplate: 'io.camunda:slack-connection:1',
+        modelerConfigurationName: 'New Slack'
+      });
+    }));
+
+
+    it('should fire configuration.edit when update is permitted', inject(async function(elementTemplates, eventBus, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const property = {
+        id: 'configuration',
+        label: 'Configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:slack-connection:1',
+        configurationTemplateVersion: 2,
+        binding: {
+          type: 'zeebe:property',
+          name: 'configuration'
+        }
+      };
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ property ]
+      };
+      const instance = {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      };
+      const editSpy = spy();
+
+      configurationInstances.setState({
+        instances: [ instance ],
+        clusterSelected: true
+      });
+      eventBus.on('configuration.edit', editSpy);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container);
+
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+      });
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
+
+      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', entry)).not.to.exist;
+
+      await act(() => {
+        configurationInstances.setState({
+          permissions: {
+            update: true
+          }
+        });
+      });
+
+      const edit = domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', entry);
+
+      expect(edit.textContent).to.equal('Edit');
+
+      // when
+      fireEvent.click(edit);
+
+      // then
+      expect(editSpy).to.have.been.calledOnce;
+      const [ event ] = editSpy.firstCall.args;
+
+      expect(event.element).to.equal(element);
+      expect(event.property).to.equal(property);
+      expect(event.instance).to.equal(instance);
+      expect(event.configurationTemplate).to.equal('io.camunda:slack-connection:1');
+      expect(event.configurationTemplateVersion).to.equal(2);
+    }));
+
+
+    it('should fire configuration.upgrade for a resolved below-floor instance', inject(async function(elementTemplates, eventBus, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const property = {
+        id: 'configuration',
+        label: 'Configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:slack-connection:1',
+        configurationTemplateVersion: 2,
+        binding: {
+          type: 'zeebe:property',
+          name: 'configuration'
+        }
+      };
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ property ]
+      };
+      const compatibleInstance = {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      };
+      const outdatedInstance = {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 1
+        }
+      };
+      const upgradeSpy = spy();
+
+      configurationInstances.setState({
+        instances: [ compatibleInstance ],
+        clusterSelected: true,
+        permissions: {
+          update: true
+        }
+      });
+      eventBus.on('configuration.upgrade', upgradeSpy);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container);
+
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+      });
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+
+      await act(() => {
+        configurationInstances.setState({
+          instances: [ outdatedInstance ]
+        });
+      });
+
+      const missing = domQuery('.bio-properties-panel-configuration-chooser-missing', entry);
+
+      expect(missing).to.exist;
+      expect(missing.textContent).to.contain('Version 1 · Requires version 2+');
+
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
+
+      const upgrade = domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', entry);
+
+      expect(upgrade.textContent).to.equal('Upgrade');
+
+      // when
+      fireEvent.click(upgrade);
+
+      // then
+      expect(upgradeSpy).to.have.been.calledOnce;
+      const [ event ] = upgradeSpy.firstCall.args;
+
+      expect(event.element).to.equal(element);
+      expect(event.property).to.equal(property);
+      expect(event.instance).to.equal(outdatedInstance);
+      expect(event.configurationTemplate).to.equal('io.camunda:slack-connection:1');
+      expect(event.configurationTemplateVersion).to.equal(2);
+    }));
+
+  });
+
+
   describe('bpmn:Message#property', function() {
 
 
@@ -1547,7 +2420,6 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const task = elementRegistry.get('BusinessRuleTask_empty');
 
 
-
       // when
       await act(() => {
         elementTemplates.applyTemplate(task, template);
@@ -1565,9 +2437,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(calledDecision).to.exist;
       expect(calledDecision).to.have.property('resultVariable', 'aResultVariableName');
       expect(calledDecision).to.have.property('decisionId', 'aReusableRule');
-    })
-    );
-
+    }));
 
   });
 
@@ -1633,6 +2503,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(formDefinition).to.exist;
       expect(formDefinition).to.have.property('formId', 'aFormId');
     }));
+
   });
 
 
@@ -1788,6 +2659,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(assignmentDefinition).to.have.property('candidateGroups', 'aCandidateGroup, anotherCandidateGroup');
       expect(assignmentDefinition).to.have.property('candidateUsers', 'aCandidateUser');
     }));
+
   });
 
 
@@ -1893,6 +2765,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(jobPriorityDefinition).to.have.property('priority', 20);
     });
 
+
     it('should change, setting priority value to 0', async function() {
 
       // given
@@ -1935,6 +2808,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(input.value).to.equal('10');
       expect(jobPriorityDefinition).to.have.property('priority', 10);
     }));
+
 
     it('should create zeebe:jobPriorityDefinition for conditioned property', inject(async function(commandStack, elementTemplates, elementRegistry) {
 
@@ -2308,6 +3182,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(timeDate).to.exist;
       expect(timeDate.get('body')).to.equal('2025-12-25T10:00:00Z');
     }));
+
   });
 
 
@@ -2609,6 +3484,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       expect(description).to.not.exist;
     });
+
   });
 
 
@@ -2774,6 +3650,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       // then
       expect(tooltipWrapper).to.not.exist;
     });
+
   });
 
 
@@ -2885,6 +3762,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(editor).to.exist;
       expect(editor.contentEditable).to.equal('false');
     });
+
   });
 
 
@@ -3041,6 +3919,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expectValid(entry);
       })
     );
+
   });
 
 
@@ -3253,6 +4132,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(domQuery('.bio-properties-panel-dot', group), 'marker should be removed').not.to.exist;
       });
     });
+
   });
 
 
@@ -3298,7 +4178,6 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     });
 
 
-
     it('should be marked as edited for generated values when input is cleared', function() {
 
       // given
@@ -3314,6 +4193,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(domQuery('.bio-properties-panel-dot', group)).to.exist;
       });
     });
+
   });
 
 
@@ -3725,8 +4605,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       // then
       expect(input.textContent).to.eql('Placeholder');
     });
-  });
 
+  });
 
 });
 
