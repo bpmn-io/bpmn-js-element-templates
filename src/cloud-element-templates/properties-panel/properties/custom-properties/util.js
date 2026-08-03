@@ -64,8 +64,8 @@ export function propertyGetter(element, property) {
 }
 
 export function propertySetter(bpmnFactory, commandStack, element, property) {
-  return function setValue(value) {
-    return setPropertyValue(bpmnFactory, commandStack, element, property, value);
+  return function setValue(value, additionalProperties) {
+    return setPropertyValue(bpmnFactory, commandStack, element, property, value, additionalProperties);
   };
 }
 
