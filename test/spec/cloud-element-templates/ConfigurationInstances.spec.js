@@ -75,7 +75,8 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
       selectableInstances: [],
       loading: true,
       error: false,
-      clusterSelected: false,
+      available: false,
+      unavailableMessage: null,
       permissions: {
         create: false,
         update: false
@@ -94,7 +95,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
       } ],
       loading: false,
       error: false,
-      clusterSelected: true,
+      available: true,
       permissions: {
         create: true,
         update: true
@@ -105,7 +106,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
     expect(configurationInstances.getSelectableInstances()).to.have.length(1);
     expect(configurationInstances.isLoading()).to.be.false;
     expect(configurationInstances.hasError()).to.be.false;
-    expect(configurationInstances.isClusterSelected()).to.be.true;
+    expect(configurationInstances.isAvailable()).to.be.true;
     expect(configurationInstances.canCreate()).to.be.true;
     expect(configurationInstances.canUpdate()).to.be.true;
     expect(changedSpy).to.have.been.calledTwice;
@@ -113,7 +114,8 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
       selectableInstances: configurationInstances.getSelectableInstances(),
       loading: false,
       error: false,
-      clusterSelected: true,
+      available: true,
+      unavailableMessage: null,
       permissions: {
         create: true,
         update: true
@@ -127,10 +129,15 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
     expect(configurationInstances.hasError()).to.be.true;
 
     // when
-    configurationInstances.setState({ clusterSelected: false });
+    configurationInstances.setState({
+      available: false,
+      unavailableMessage: 'No cluster selected'
+    });
 
     // then
     expect(configurationInstances.hasError()).to.be.false;
+    expect(configurationInstances.isAvailable()).to.be.false;
+    expect(configurationInstances.getUnavailableMessage()).to.equal('No cluster selected');
     expect(configurationInstances.canCreate()).to.be.false;
     expect(configurationInstances.canUpdate()).to.be.false;
   });
@@ -151,12 +158,23 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
 
     configurationInstances.setState({
       referencedInstances: [ instance ],
-      clusterSelected: true
+      available: true
     });
 
     // then
     expect(configurationInstances.getReferencedInstanceByName('slack-production')).to.equal(instance);
     expect(configurationInstances.getReferencedInstanceByName('missing')).not.to.exist;
+
+    // when
+    configurationInstances.setState({
+      available: false
+    });
+    configurationInstances.setState({
+      available: true
+    });
+
+    // then
+    expect(configurationInstances.getReferencedInstanceByName('slack-production')).not.to.exist;
   });
 
 
@@ -176,7 +194,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
     configurationInstances.setState({
       selectableInstances: [],
       referencedInstances: [ resolvedInstance ],
-      clusterSelected: true
+      available: true
     });
 
     // then

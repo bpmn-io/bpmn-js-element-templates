@@ -39,7 +39,10 @@ export default class ConfigurationInstances {
     this._error = false;
 
     /** @type {boolean} */
-    this._clusterSelected = false;
+    this._available = false;
+
+    /** @type {string|null} */
+    this._unavailableMessage = null;
 
     /** @type {{ create: boolean, update: boolean }} */
     this._permissions = {
@@ -58,7 +61,7 @@ export default class ConfigurationInstances {
     this.setState({
       selectableInstances,
       error: false,
-      clusterSelected: true
+      available: true
     });
   }
 
@@ -89,7 +92,7 @@ export default class ConfigurationInstances {
   /**
    * Update host-provided configuration instance state and notify listeners.
    *
-  * @param {{ selectableInstances?: ConfigurationInstance[], referencedInstances?: ConfigurationInstance[], loading?: boolean, error?: boolean, clusterSelected?: boolean, permissions?: ConfigurationPermissions }} state
+  * @param {{ selectableInstances?: ConfigurationInstance[], referencedInstances?: ConfigurationInstance[], loading?: boolean, error?: boolean, available?: boolean, unavailableMessage?: string, permissions?: ConfigurationPermissions }} state
    */
   setState(state) {
     if ('selectableInstances' in state) {
@@ -118,8 +121,12 @@ export default class ConfigurationInstances {
       this._error = !!state.error;
     }
 
-    if ('clusterSelected' in state) {
-      this._clusterSelected = !!state.clusterSelected;
+    if ('available' in state) {
+      this._available = !!state.available;
+    }
+
+    if ('unavailableMessage' in state) {
+      this._unavailableMessage = state.unavailableMessage || null;
     }
 
     if ('permissions' in state) {
@@ -131,20 +138,23 @@ export default class ConfigurationInstances {
       };
     }
 
-    if (!this._clusterSelected) {
+    if (!this._available) {
       this._error = false;
       this._permissions = {
         create: false,
         update: false
       };
       this._referencedInstancesByName = {};
+    } else {
+      this._unavailableMessage = null;
     }
 
     this._eventBus.fire('configurationInstances.changed', {
       selectableInstances: this._selectableInstances,
       loading: this._loading,
       error: this._error,
-      clusterSelected: this._clusterSelected,
+      available: this._available,
+      unavailableMessage: this._unavailableMessage,
       permissions: this._permissions
     });
   }
@@ -168,13 +178,21 @@ export default class ConfigurationInstances {
   }
 
   /**
-   * Whether the host has selected a cluster whose configuration instances can
-   * be queried.
+  * Whether configuration instances can be queried and managed.
    *
    * @returns {boolean}
    */
-  isClusterSelected() {
-    return this._clusterSelected;
+  isAvailable() {
+    return this._available;
+  }
+
+  /**
+   * Get the host-provided reason configuration instances are unavailable.
+   *
+   * @returns {string|null}
+   */
+  getUnavailableMessage() {
+    return this._unavailableMessage;
   }
 
   /**
