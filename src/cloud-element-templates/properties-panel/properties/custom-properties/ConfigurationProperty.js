@@ -1,6 +1,7 @@
 import { useService } from 'bpmn-js-properties-panel';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from '@bpmn-io/properties-panel/preact/hooks';
+import { CreateIcon } from '@bpmn-io/properties-panel';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
@@ -101,7 +102,8 @@ export function ConfigurationProperty(props) {
   );
   const [ loading, setLoading ] = useState(configurationInstances.isLoading());
   const [ error, setError ] = useState(configurationInstances.hasError());
-  const [ clusterSelected, setClusterSelected ] = useState(configurationInstances.isClusterSelected());
+  const [ available, setAvailable ] = useState(configurationInstances.isAvailable());
+  const [ unavailableMessage, setUnavailableMessage ] = useState(configurationInstances.getUnavailableMessage());
   const [ canCreate, setCanCreate ] = useState(configurationInstances.canCreate());
   const [ canUpdate, setCanUpdate ] = useState(configurationInstances.canUpdate());
 
@@ -110,7 +112,8 @@ export function ConfigurationProperty(props) {
       setResult(configurationInstances.getSelectableByConfigurationTemplate(configurationTemplate, minimumConfigurationTemplateVersion));
       setLoading(configurationInstances.isLoading());
       setError(configurationInstances.hasError());
-      setClusterSelected(configurationInstances.isClusterSelected());
+      setAvailable(configurationInstances.isAvailable());
+      setUnavailableMessage(configurationInstances.getUnavailableMessage());
       setCanCreate(configurationInstances.canCreate());
       setCanUpdate(configurationInstances.canUpdate());
     };
@@ -177,6 +180,21 @@ export function ConfigurationProperty(props) {
   const [ open, setOpen ] = useState(false);
   const [ menuOpen, setMenuOpen ] = useState(false);
   const ref = useRef(null);
+  const availabilityRef = useRef({ error, available });
+
+  useEffect(() => {
+    const previousAvailability = availabilityRef.current;
+
+    availabilityRef.current = { error, available };
+
+    if (
+      (!previousAvailability.error && error)
+      || (previousAvailability.available && !available)
+    ) {
+      setOpen(false);
+      setMenuOpen(false);
+    }
+  }, [ error, available ]);
 
   // close popover/menu on outside click
   useEffect(() => {
@@ -282,13 +300,13 @@ export function ConfigurationProperty(props) {
   }, [ eventBus, element, property, boundInstance, configurationTemplate, configurationTemplateVersion ]);
 
   const toggleOpen = useCallback(() => {
-    if (disabled || error || !clusterSelected) {
+    if (disabled || error || !available) {
       return;
     }
 
     setMenuOpen(false);
     setOpen(value => !value);
-  }, [ disabled, error, clusterSelected ]);
+  }, [ disabled, error, available ]);
 
   const toggleMenu = useCallback((event) => {
     if (disabled) {
@@ -346,7 +364,7 @@ export function ConfigurationProperty(props) {
               ? (
                 <LoadingConfiguration cachedName={ cachedName } translate={ translate } />
               )
-              : value && !selected && clusterSelected
+              : value && !selected && available
                 ? (
                   <MissingConfiguration
                     value={ value }
@@ -423,7 +441,6 @@ export function ConfigurationProperty(props) {
               instances={ instances }
               selected={ selected }
               canCreate={ canCreate }
-              configurationLabel={ configurationLabel }
               onCreate={ createConfiguration }
               onSelect={ select }
               loading={ loading }
@@ -528,13 +545,25 @@ function ConfigurationContextMenu(props) {
 
 function LoadingConfiguration(props) {
   const { cachedName, translate } = props;
+  const name = cachedName || translate('Configuration');
+  const instance = {
+    name,
+    metadata: {
+      displayName: name
+    }
+  };
 
   return (
-    <div class="bio-properties-panel-configuration-chooser-loading">
-      <span class="bio-properties-panel-configuration-chooser-loading-shimmer" />
+    <div
+      class="bio-properties-panel-configuration-chooser-loading"
+      role="status">
+      <ConfigurationLogo instance={ instance } />
       <span class="bio-properties-panel-configuration-chooser-text">
         <span class="bio-properties-panel-configuration-chooser-title">
-          { cachedName || translate('Loading...') }
+          { name }
+        </span>
+        <span class="bio-properties-panel-configuration-chooser-subtitle">
+          { translate('Loading configuration') }
         </span>
       </span>
     </div>
@@ -555,7 +584,7 @@ function ErrorConfiguration(props) {
 
   return (
     <div class="bio-properties-panel-configuration-chooser-missing bio-properties-panel-configuration-chooser-error">
-      <span class="bio-properties-panel-configuration-chooser-missing-icon">⚠</span>
+      <ConfigurationLogo warning />
       <span class="bio-properties-panel-configuration-chooser-text">
         <span class="bio-properties-panel-configuration-chooser-title">
           { cachedName || refName }
@@ -603,7 +632,7 @@ function MissingConfiguration(props) {
       tabIndex={ disabled ? -1 : 0 }
       onClick={ disabled ? null : onClick }
       onKeyDown={ disabled ? null : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } }>
-      <span class="bio-properties-panel-configuration-chooser-missing-icon">⚠</span>
+      <ConfigurationLogo warning />
       <span class="bio-properties-panel-configuration-chooser-text">
         <span class="bio-properties-panel-configuration-chooser-title">
           {
@@ -689,7 +718,6 @@ function OfflineConfiguration(props) {
 function ConfigurationPopover(props) {
   const {
     canCreate,
-    configurationLabel,
     instances,
     loading,
     onCreate,
@@ -702,7 +730,13 @@ function ConfigurationPopover(props) {
     <div class="bio-properties-panel-configuration-chooser-popover">
       {
         loading
-          ? <span class="bio-properties-panel-configuration-chooser-refreshing">{ translate('Loading...') }</span>
+          ? (
+            <span
+              class="bio-properties-panel-configuration-chooser-refreshing"
+              role="status">
+              { translate('Refreshing configurations...') }
+            </span>
+          )
           : null
       }
 
@@ -727,8 +761,7 @@ function ConfigurationPopover(props) {
               {
                 loading
                   ? translate('Loading...')
-                  : translate('{configuration} not present in connected cluster')
-                    .replace('{configuration}', configurationLabel)
+                  : translate('No compatible configurations are available in the connected cluster')
               }
             </div>
           )
@@ -741,7 +774,9 @@ function ConfigurationPopover(props) {
               type="button"
               class="bio-properties-panel-configuration-chooser-create"
               onClick={ onCreate }>
-              <span class="bio-properties-panel-configuration-chooser-placeholder-plus">+</span>
+              <CreateIcon
+                class="bio-properties-panel-configuration-chooser-create-icon"
+                aria-hidden="true" />
               { translate('Create') }
             </button>
           )
@@ -793,7 +828,15 @@ function ConfigurationRow(props) {
 }
 
 function ConfigurationLogo(props) {
-  const { instance } = props;
+  const { instance, warning } = props;
+
+  if (warning) {
+    return (
+      <span class="bio-properties-panel-configuration-chooser-logo bio-properties-panel-configuration-chooser-logo--placeholder bio-properties-panel-configuration-chooser-logo--warning">
+        !
+      </span>
+    );
+  }
 
   if (instance.icon) {
     return (

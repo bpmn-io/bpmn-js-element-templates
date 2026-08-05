@@ -1156,7 +1156,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       configurationInstances.setState({
         selectableInstances: [],
-        clusterSelected: true
+        available: true,
+        loading: true
       });
       elementTemplates.set([ ...templates, template ]);
 
@@ -1169,9 +1170,9 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // then
       expect(domQuery('.bio-properties-panel-label', labeledEntry).textContent).to.equal('Destination AWS credential');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', labeledEntry).textContent).to.equal('+Choose destination AWS credential');
+      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', labeledEntry).textContent).to.equal('Choose destination AWS credential');
       expect(domQuery('.bio-properties-panel-label', fallbackEntry).textContent).to.equal('AWS Credential');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', fallbackEntry).textContent).to.equal('+Choose AWS Credential');
+      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', fallbackEntry).textContent).to.equal('Choose AWS Credential');
 
       // when
       await act(() => {
@@ -1179,7 +1180,18 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // then
-      expect(domQuery('.bio-properties-panel-configuration-chooser-empty', fallbackEntry).textContent).to.equal('AWS Credential not present in connected cluster');
+      const refreshing = domQuery('.bio-properties-panel-configuration-chooser-refreshing', fallbackEntry);
+
+      expect(refreshing.getAttribute('role')).to.equal('status');
+      expect(refreshing.textContent).to.contain('Refreshing configurations...');
+
+      // when
+      await act(() => {
+        configurationInstances.setLoading(false);
+      });
+
+      // then
+      expect(domQuery('.bio-properties-panel-configuration-chooser-empty', fallbackEntry).textContent).to.equal('No compatible configurations are available in the connected cluster');
 
       // when
       await act(() => {
@@ -1193,6 +1205,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
           }
         } ]);
       });
+
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', fallbackEntry));
 
       await act(() => {
@@ -1274,7 +1287,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       configurationInstances.setState({
         selectableInstances: [],
-        clusterSelected: true
+        available: true
       });
       elementTemplates.set([ ...templates, template ]);
 
@@ -1286,7 +1299,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // then
       expect(domQuery('.bio-properties-panel-label', entry).textContent).to.equal('AWS Credential');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry).textContent).to.equal('+Choose AWS Credential');
+      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry).textContent).to.equal('Choose AWS Credential');
     }));
 
 
@@ -1363,6 +1376,78 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
     }));
 
+
+    it('should update metadata when replacing a configuration', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData'),
+            businessObject = getBusinessObject(element);
+      const template = configurationMetadataCleanupTemplates[0];
+      const production = {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      };
+      const development = {
+        name: 'slackDevelopment',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Development',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      };
+
+      configurationInstances.setSelectableInstances([ production, development ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const propertyEntry = findEntry('custom-entry-configuration-metadata-cleanup-0', container),
+            inputEntry = findEntry('custom-entry-configuration-metadata-cleanup-1', container);
+
+      const select = async (entry, index) => {
+        await act(() => {
+          fireEvent.click(domQuery(
+            '.bio-properties-panel-configuration-chooser-placeholder, .bio-properties-panel-configuration-chooser-selected',
+            entry
+          ));
+        });
+        fireEvent.click(domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry)[ index ]);
+      };
+
+      await select(propertyEntry, 0);
+      await select(inputEntry, 0);
+      await select(propertyEntry, 1);
+      await select(inputEntry, 1);
+
+      // then
+      const zeebeProperties = findExtension(businessObject, 'zeebe:Properties'),
+            ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
+
+      expect(findZeebeProperty(zeebeProperties, { name: 'propertyConfiguration' })).to.jsonEqual({
+        $type: 'zeebe:Property',
+        name: 'propertyConfiguration',
+        value: '=camunda.vars.env.slackDevelopment',
+        modelerConfigurationTemplate: 'io.camunda:slack-connection:1',
+        modelerConfigurationName: 'Slack Development'
+      });
+      expect(findInputParameter(ioMapping, { name: 'inputConfiguration' })).to.jsonEqual({
+        $type: 'zeebe:Input',
+        source: '=camunda.vars.env.slackDevelopment',
+        target: 'inputConfiguration',
+        modelerConfigurationTemplate: 'io.camunda:slack-connection:1',
+        modelerConfigurationName: 'Slack Development'
+      });
+    }));
+
+
   });
 
 
@@ -1410,7 +1495,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container),
             placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
 
-      expect(placeholder.textContent).to.equal('+Choose configuration');
+      expect(placeholder.textContent).to.equal('Choose configuration');
 
       // when
       await act(() => {
@@ -1421,7 +1506,9 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container)).to.exist;
       });
 
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container));
+      fireEvent.keyDown(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container), {
+        key: ' '
+      });
 
       // then
       const zeebeProperties = findExtension(businessObject, 'zeebe:Properties'),
@@ -1434,6 +1521,14 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         modelerConfigurationTemplate: 'io.camunda:slack-connection:1',
         modelerConfigurationName: 'Slack Production'
       });
+
+      // when
+      fireEvent.keyDown(domQuery('.bio-properties-panel-configuration-chooser-selected', entry), {
+        key: 'Enter'
+      });
+
+      // then
+      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).to.exist;
 
     }));
 
@@ -1562,9 +1657,11 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
 
-      configurationInstances.setState({
-        selectableInstances: [],
-        clusterSelected: false
+      await act(() => {
+        configurationInstances.setState({
+          selectableInstances: [],
+          available: false
+        });
       });
 
       await waitFor(() => {
@@ -1587,6 +1684,199 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       expect(menuItems).to.have.length(1);
       expect(menuItems[0].textContent).to.equal('Remove');
+    }));
+
+
+    it('should show a static loading state for a selected configuration', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setState({
+        selectableInstances: [ {
+          name: 'slackProduction',
+          metadata: {
+            kind: 'CREDENTIAL',
+            displayName: 'Slack Production',
+            configurationTemplate: 'io.camunda:slack-connection:1',
+            configurationTemplateVersion: 2
+          }
+        } ],
+        available: true
+      });
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container);
+
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+      });
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+
+      // when
+      await act(() => {
+        configurationInstances.setState({
+          selectableInstances: [],
+          loading: true
+        });
+      });
+
+      // then
+      const loading = domQuery('.bio-properties-panel-configuration-chooser-loading', entry);
+
+      expect(loading).to.exist;
+      expect(loading.getAttribute('role')).to.equal('status');
+      expect(loading.textContent).to.contain('Slack Production');
+      expect(loading.textContent).to.contain('Loading configuration');
+      expect(domQuery('.bio-properties-panel-configuration-chooser-loading-shimmer', entry)).not.to.exist;
+    }));
+
+
+    it('should show the host-provided unavailable message for an unselected configuration', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setState({
+        selectableInstances: [ {
+          name: 'slackProduction',
+          metadata: {
+            kind: 'CREDENTIAL',
+            displayName: 'Slack Production',
+            configurationTemplate: 'io.camunda:slack-connection:1',
+            configurationTemplateVersion: 2
+          }
+        } ],
+        available: true,
+        error: false
+      });
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).to.exist;
+
+      // when
+      await act(() => {
+        configurationInstances.setState({
+          available: false,
+          unavailableMessage: 'No cluster selected'
+        });
+      });
+
+      // then
+      const unavailable = domQuery('.bio-properties-panel-configuration-chooser-unavailable', entry);
+
+      expect(placeholder.disabled).to.be.true;
+      expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-unavailable');
+      expect(unavailable.getAttribute('role')).to.equal('status');
+      expect(unavailable.textContent).to.equal('No cluster selected');
+      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).not.to.exist;
+    }));
+
+
+    it('should show an error message for an unselected configuration when loading fails', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setState({
+        available: true,
+        error: true
+      });
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry),
+            error = domQuery('.bio-properties-panel-configuration-chooser-unavailable--error', entry);
+
+      // then
+      expect(placeholder.disabled).to.be.true;
+      expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-error');
+      expect(error.getAttribute('role')).to.equal('status');
+      expect(error.textContent).to.equal('Could not load configurations');
+
+      // when
+      await act(() => {
+        configurationInstances.setState({
+          error: false
+        });
+      });
+
+      // then
+      expect(placeholder.disabled).to.be.false;
+      expect(domQuery('.bio-properties-panel-configuration-chooser-unavailable--error', entry)).not.to.exist;
     }));
 
 
@@ -1623,7 +1913,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
             configurationTemplateVersion: 2
           }
         } ],
-        clusterSelected: true
+        available: true
       });
       elementTemplates.set([ ...templates, template ]);
 
@@ -1650,6 +1940,10 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(entry.textContent).to.contain('Not found on cluster');
       expect(entry.textContent).not.to.contain('Could not load configurations');
 
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
+
+      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry)).to.exist;
+
       // when - failed response
       await act(() => {
         configurationInstances.setState({
@@ -1668,6 +1962,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(error.textContent).to.contain('Slack Production');
       expect(error.textContent).to.contain('Could not load configurations');
       expect(entry.textContent).not.to.contain('Not found on cluster');
+      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry)).not.to.exist;
 
       fireEvent.click(error);
 
@@ -1708,7 +2003,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const createSpy = spy();
 
       configurationInstances.setState({
-        clusterSelected: true
+        available: true
       });
       eventBus.on('configuration.create', createSpy);
       elementTemplates.set([ ...templates, template ]);
@@ -1788,7 +2083,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       };
 
       configurationInstances.setState({
-        clusterSelected: true
+        available: true
       });
       elementTemplates.set([ ...templates, template ]);
 
@@ -1894,7 +2189,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       configurationInstances.setState({
         selectableInstances: [ instance ],
-        clusterSelected: true
+        available: true
       });
       eventBus.on('configuration.edit', editSpy);
       elementTemplates.set([ ...templates, template ]);
@@ -1994,7 +2289,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       configurationInstances.setState({
         selectableInstances: [ compatibleInstance ],
-        clusterSelected: true,
+        available: true,
         permissions: {
           update: true
         }
@@ -2029,7 +2324,9 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(missing).to.exist;
       expect(missing.textContent).to.contain('Version 1 · Requires version 2+');
 
-      fireEvent.click(missing);
+      fireEvent.keyDown(missing, {
+        key: 'Enter'
+      });
 
       const rows = domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry);
 
