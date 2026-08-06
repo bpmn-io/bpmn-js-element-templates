@@ -185,6 +185,32 @@ describe('provider/cloud-element-templates - ConfigurationTemplates', function()
       })
     );
 
+
+    it('should keep the first definition for a repeated template identity',
+      inject(function(elementTemplates, configurationTemplates) {
+
+        // when
+        elementTemplates.set([ {
+          id: 'example.first',
+          configurationTemplates: [ {
+            id: 'io.camunda:example-credential:1',
+            name: 'First definition',
+            version: 1
+          } ]
+        }, {
+          id: 'example.second',
+          configurationTemplates: [ {
+            id: 'io.camunda:example-credential:1',
+            name: 'Conflicting later definition',
+            version: 1
+          } ]
+        } ]);
+
+        // then
+        expect(configurationTemplates.get('io.camunda:example-credential:1', 1).name).to.equal('First definition');
+      })
+    );
+
   });
 
 
