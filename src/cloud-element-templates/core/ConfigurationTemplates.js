@@ -111,7 +111,7 @@ export default class ConfigurationTemplates {
           map[id] = {};
         }
 
-        // highest version wins on collision within same id+version
+        // Keep the first definition for an identical id and version.
         if (!map[id][version]) {
           map[id][version] = ct;
         }

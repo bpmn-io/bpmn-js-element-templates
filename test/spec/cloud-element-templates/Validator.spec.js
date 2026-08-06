@@ -20,10 +20,173 @@ describe('provider/cloud-element-templates - Validator', function() {
     return validator.getValidTemplates();
   }
 
+  function warnings(validator) {
+    return validator.getWarnings().map(function(warning) {
+      return warning.message;
+    });
+  }
+
   let moddle;
 
   beforeEach(function() {
     moddle = new BpmnModdle();
+  });
+
+  function createTemplate(id, configurationTemplate) {
+    return {
+      $schema: 'https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json',
+      id,
+      name: id,
+      appliesTo: [ 'bpmn:Task' ],
+      properties: [],
+      configurationTemplates: [ configurationTemplate ]
+    };
+  }
+
+  function createConfigurationTemplate(overrides = {}) {
+    return {
+      id: 'io.camunda:example-credential:1',
+      name: 'Example Credential',
+      version: 1,
+      kind: 'CREDENTIAL',
+      properties: [ {
+        id: 'apiKey',
+        label: 'API key',
+        type: 'String',
+        binding: {
+          type: 'property',
+          name: 'apiKey'
+        }
+      } ],
+      ...overrides
+    };
+  }
+
+
+  describe('embedded configuration templates', function() {
+
+    it('should accept canonically equivalent repeated definitions', function() {
+
+      // given
+      const templates = new Validator(moddle);
+      const configurationTemplate = createConfigurationTemplate();
+      const reorderedConfigurationTemplate = {
+        properties: configurationTemplate.properties,
+        kind: configurationTemplate.kind,
+        version: configurationTemplate.version,
+        name: configurationTemplate.name,
+        id: configurationTemplate.id
+      };
+
+      // when
+      templates.addAll([
+        createTemplate('example.one', configurationTemplate),
+        createTemplate('example.two', reorderedConfigurationTemplate)
+      ]);
+
+      // then
+      expect(errors(templates)).to.be.empty;
+      expect(valid(templates)).to.have.length(2);
+    });
+
+
+    it('should warn and preserve every template with a conflicting repeated definition', function() {
+
+      // given
+      const templates = new Validator(moddle);
+
+      // when
+      templates.addAll([
+        createTemplate('example.one', createConfigurationTemplate()),
+        createTemplate('example.two', createConfigurationTemplate({
+          name: 'Different Credential'
+        }))
+      ]);
+
+      // then
+      expect(errors(templates)).to.be.empty;
+      expect(valid(templates)).to.have.length(2);
+      expect(warnings(templates)).to.have.length(1);
+      expect(warnings(templates)[0]).to.contain('template(id: <example.two>, name: <example.two>): configuration template id <io.camunda:example-credential:1> and version <1> conflicts with the first embedded definition and will be ignored');
+    });
+
+
+    it('should reject incomplete embedded configuration templates', function() {
+
+      // given
+      const templates = new Validator(moddle);
+
+      // when
+      templates.addAll([
+        createTemplate('example.invalid', {
+          id: 'io.camunda:example-credential:1'
+        })
+      ]);
+
+      // then
+      expect(valid(templates)).to.be.empty;
+      expect(errors(templates)).to.include(
+        'template(id: <example.invalid>, name: <example.invalid>): configuration template name must be a non-empty string'
+      );
+    });
+
+  });
+
+
+  describe('configuration properties', function() {
+
+    it('should reject a configuration property without a template reference', function() {
+
+      // given
+      const templates = new Validator(moddle);
+      const template = createTemplate('example.invalid', createConfigurationTemplate());
+
+      template.properties = [ {
+        id: 'configuration',
+        type: 'Configuration',
+        binding: {
+          type: 'zeebe:input',
+          name: 'configuration'
+        }
+      } ];
+
+      // when
+      templates.addAll([ template ]);
+
+      // then
+      expect(valid(templates)).to.be.empty;
+      expect(errors(templates)).to.include(
+        'template(id: <example.invalid>, name: <example.invalid>): configuration property requires a configurationTemplate'
+      );
+    });
+
+
+    it('should reject a configuration property with an unsupported binding', function() {
+
+      // given
+      const templates = new Validator(moddle);
+      const template = createTemplate('example.invalid', createConfigurationTemplate());
+
+      template.properties = [ {
+        id: 'configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:example-credential:1',
+        binding: {
+          type: 'zeebe:taskDefinition',
+          name: 'configuration'
+        }
+      } ];
+
+      // when
+      templates.addAll([ template ]);
+
+      // then
+      expect(valid(templates)).to.be.empty;
+      expect(errors(templates)).to.include(
+        'template(id: <example.invalid>, name: <example.invalid>): configuration property binding must be zeebe:input or zeebe:property'
+      );
+    });
+
   });
 
 
