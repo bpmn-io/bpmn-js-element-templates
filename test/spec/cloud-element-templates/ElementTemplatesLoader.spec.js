@@ -3,6 +3,10 @@ import TestContainer from 'mocha-test-container-support';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 
+import ElementTemplatesLoader from 'src/cloud-element-templates/ElementTemplatesLoader';
+
+import { BpmnModdle } from 'bpmn-moddle';
+
 import { bootstrapModeler, inject } from 'test/TestHelper';
 
 import coreModule from 'bpmn-js/lib/core';
@@ -458,7 +462,130 @@ describe('provider/cloud-element-templates - ElementTemplatesLoader', function()
 
       });
 
+
+      describe('configuration validation', function() {
+
+        it('should load templates and emit a warning for a conflicting embedded configuration template', function() {
+
+          // given
+          const elementTemplates = createElementTemplates();
+          const loader = createLoader(elementTemplates);
+          const templates = [
+            createTemplate('example.first', createConfigurationTemplate()),
+            createTemplate('example.second', createConfigurationTemplate({
+              name: 'Different Credential'
+            }))
+          ];
+
+          // when
+          loader.setTemplates(templates);
+
+          // then
+          expect(elementTemplates.set).to.have.been.calledWith(templates);
+          const warningCall = elementTemplates._fire.getCalls().find(({ args }) => args[0] === 'warnings'),
+                [ , { warnings } ] = warningCall.args;
+
+          expect(warnings).to.have.length(1);
+          expect(warnings[0].message).to.contain('template(id: <example.second>, name: <example.second>): configuration template id <io.camunda:example-credential:1> and version <1> conflicts with the first embedded definition and will be ignored');
+        });
+
+
+        it('should only register valid element templates', function() {
+
+          // given
+          const elementTemplates = createElementTemplates();
+          const loader = createLoader(elementTemplates);
+          const templates = [
+            createTemplate('example.duplicate', createConfigurationTemplate()),
+            createTemplate('example.duplicate', createConfigurationTemplate())
+          ];
+
+          // when
+          loader.setTemplates(templates);
+
+          // then
+          expect(elementTemplates.set).to.have.been.calledOnce;
+          expect(elementTemplates.set.firstCall.args[0]).to.eql([ templates[0] ]);
+          const errorCall = elementTemplates._fire.getCalls().find(({ args }) => args[0] === 'errors'),
+                [ , { errors } ] = errorCall.args;
+
+          expect(errors).to.have.length(1);
+          expect(errors[0].message).to.contain('template id <example.duplicate> already used');
+        });
+
+
+        it('should report invalid configurationTemplates without aborting the load', function() {
+
+          // given
+          const elementTemplates = createElementTemplates();
+          const loader = createLoader(elementTemplates);
+          const template = createTemplate('example.invalid-configuration-templates', createConfigurationTemplate());
+
+          template.configurationTemplates = {};
+
+          // when
+          loader.setTemplates([ template ]);
+
+          // then
+          expect(elementTemplates.set).to.have.been.calledOnce;
+          expect(elementTemplates.set.firstCall.args[0]).to.eql([]);
+          const errorCall = elementTemplates._fire.getCalls().find(({ args }) => args[0] === 'errors'),
+                [ , { errors } ] = errorCall.args;
+
+          expect(errors).not.to.be.empty;
+        });
+
+      });
+
     });
+
+
+    function createLoader(elementTemplates) {
+      return new ElementTemplatesLoader(
+        [],
+        { on() {} },
+        elementTemplates,
+        new BpmnModdle()
+      );
+    }
+
+    function createElementTemplates() {
+      return {
+        set: spy(),
+        _fire: spy(),
+        isCompatible: () => true
+      };
+    }
+
+    function createTemplate(id, configurationTemplate) {
+      return {
+        $schema: SCHEMA,
+        id,
+        name: id,
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [],
+        configurationTemplates: [ configurationTemplate ]
+      };
+    }
+
+    function createConfigurationTemplate(overrides = {}) {
+      return {
+        id: 'io.camunda:example-credential:1',
+        name: 'Example Credential',
+        version: 1,
+        kind: 'CREDENTIAL',
+        properties: [ {
+          id: 'apiKey',
+          label: 'API key',
+          type: 'String',
+          binding: {
+            type: 'property',
+            name: 'apiKey'
+          }
+        } ],
+        ...overrides
+      };
+    }
 
   });
 
