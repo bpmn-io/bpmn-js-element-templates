@@ -13,7 +13,69 @@ import modelingModule from 'bpmn-js/lib/features/modeling';
 import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
 
 import diagramXML from './ElementTemplates.bpmn';
-import connectionsDesignTemplates from './fixtures/connections-design.json';
+
+const configurationTemplateDescriptors = [
+  {
+    id: 'io.camunda.connectors.Slack.v1',
+    configurationTemplates: [
+      {
+        id: 'io.camunda:slack-connection:1',
+        name: 'Slack Connection',
+        version: 1,
+        kind: 'CREDENTIAL',
+        properties: []
+      }
+    ]
+  },
+  {
+    id: 'io.camunda.connectors.Slack.v2',
+    configurationTemplates: [
+      {
+        id: 'io.camunda:slack-connection:1',
+        name: 'Slack Connection',
+        version: 2,
+        kind: 'CREDENTIAL',
+        properties: []
+      }
+    ]
+  },
+  {
+    id: 'io.camunda.examples.Configuration.v1',
+    properties: [
+      {
+        id: 'configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:example-configuration:1',
+        configurationTemplateVersion: 1,
+        optional: true,
+        binding: {
+          type: 'zeebe:input',
+          name: 'configuration'
+        }
+      }
+    ],
+    configurationTemplates: [
+      {
+        id: 'io.camunda:example-configuration:1',
+        name: 'Example configuration',
+        version: 1,
+        kind: 'CREDENTIAL',
+        properties: [
+          {
+            id: 'apiKey',
+            label: 'API key',
+            type: 'String',
+            secret: true,
+            binding: {
+              type: 'property',
+              name: 'apiKey'
+            }
+          }
+        ]
+      }
+    ]
+  }
+];
 
 
 describe('provider/cloud-element-templates - ConfigurationTemplates', function() {
@@ -36,7 +98,7 @@ describe('provider/cloud-element-templates - ConfigurationTemplates', function()
       inject(function(elementTemplates, configurationTemplates) {
 
         // when
-        elementTemplates.set(connectionsDesignTemplates);
+        elementTemplates.set(configurationTemplateDescriptors);
 
         // then
         const all = configurationTemplates.getAll();
@@ -51,7 +113,7 @@ describe('provider/cloud-element-templates - ConfigurationTemplates', function()
       inject(function(elementTemplates, configurationTemplates) {
 
         // when
-        elementTemplates.set(connectionsDesignTemplates);
+        elementTemplates.set(configurationTemplateDescriptors);
 
         // then
         const template = configurationTemplates.get('io.camunda:example-configuration:1');
@@ -72,7 +134,7 @@ describe('provider/cloud-element-templates - ConfigurationTemplates', function()
           }
         });
 
-        const example = connectionsDesignTemplates.find(({ id }) => id === 'io.camunda.examples.Configuration.v1');
+        const example = configurationTemplateDescriptors.find(({ id }) => id === 'io.camunda.examples.Configuration.v1');
         const chooser = example.properties.find(({ id }) => id === 'configuration');
 
         expect(chooser).to.include({
@@ -94,7 +156,7 @@ describe('provider/cloud-element-templates - ConfigurationTemplates', function()
       inject(function(elementTemplates, configurationTemplates) {
 
         // given
-        elementTemplates.set(connectionsDesignTemplates);
+        elementTemplates.set(configurationTemplateDescriptors);
 
         expect(configurationTemplates.getAll()).to.have.length.greaterThan(0);
 
@@ -116,7 +178,7 @@ describe('provider/cloud-element-templates - ConfigurationTemplates', function()
         eventBus.on('configurationTemplates.changed', changedSpy);
 
         // when
-        elementTemplates.set(connectionsDesignTemplates);
+        elementTemplates.set(configurationTemplateDescriptors);
 
         // then
         expect(changedSpy).to.have.been.calledOnce;
@@ -129,7 +191,7 @@ describe('provider/cloud-element-templates - ConfigurationTemplates', function()
   describe('#get', function() {
 
     beforeEach(inject(function(elementTemplates) {
-      elementTemplates.set(connectionsDesignTemplates);
+      elementTemplates.set(configurationTemplateDescriptors);
     }));
 
 
@@ -189,7 +251,7 @@ describe('provider/cloud-element-templates - ConfigurationTemplates', function()
   describe('#getLatest', function() {
 
     beforeEach(inject(function(elementTemplates) {
-      elementTemplates.set(connectionsDesignTemplates);
+      elementTemplates.set(configurationTemplateDescriptors);
     }));
 
 
