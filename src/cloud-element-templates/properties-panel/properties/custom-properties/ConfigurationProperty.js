@@ -89,13 +89,15 @@ export function ConfigurationProperty(props) {
         configurationTemplates = useService('configurationTemplates'),
         configurationInstances = useService('configurationInstances');
 
-  const templateName = configurationTemplates.get(configurationTemplate, configurationTemplateVersion)?.name;
+  const configurationTemplateDefinition = configurationTemplates.get(configurationTemplate, configurationTemplateVersion)
+    || configurationTemplates.get(configurationTemplate);
+  const templateName = configurationTemplateDefinition?.name;
   const configurationLabel = translate(label || templateName || 'Configuration');
   const chooserLabel = label ? toSentenceFragment(configurationLabel) : configurationLabel;
 
   // re-render when available instances change
   const [ result, setResult ] = useState(
-    configurationInstances.getByConfigurationTemplate(configurationTemplate, minimumConfigurationTemplateVersion)
+    configurationInstances.getSelectableByConfigurationTemplate(configurationTemplate, minimumConfigurationTemplateVersion)
   );
   const [ loading, setLoading ] = useState(configurationInstances.isLoading());
   const [ error, setError ] = useState(configurationInstances.hasError());
@@ -105,7 +107,7 @@ export function ConfigurationProperty(props) {
 
   useEffect(() => {
     const onChanged = () => {
-      setResult(configurationInstances.getByConfigurationTemplate(configurationTemplate, minimumConfigurationTemplateVersion));
+      setResult(configurationInstances.getSelectableByConfigurationTemplate(configurationTemplate, minimumConfigurationTemplateVersion));
       setLoading(configurationInstances.isLoading());
       setError(configurationInstances.hasError());
       setClusterSelected(configurationInstances.isClusterSelected());
@@ -145,7 +147,7 @@ export function ConfigurationProperty(props) {
 
   const value = getValue();
   const selected = instances.find(({ name }) => toReference(name) === value);
-  const boundInstance = value ? configurationInstances.getByName(fromReference(value)) : null;
+  const boundInstance = value ? configurationInstances.getReferencedInstanceByName(fromReference(value)) : null;
   const boundMetadata = boundInstance?.metadata || {};
   const typeIncompatible = !!boundInstance
     && boundMetadata.configurationTemplate !== configurationTemplate;
@@ -210,7 +212,7 @@ export function ConfigurationProperty(props) {
 
   useEffect(() => {
     const onCreated = (event) => {
-      if (event.element !== element || event.property !== property) {
+      if (!isSameChooser(event, element, property)) {
         return;
       }
 
@@ -818,5 +820,17 @@ function ConfigurationLogo(props) {
  * @returns {boolean}
  */
 export function isConfigurationChooserEdited(node) {
-  return !!domQuery('.bio-properties-panel-configuration-chooser-selected', node);
+  return !!domQuery(
+    '.bio-properties-panel-configuration-chooser-selected, .bio-properties-panel-configuration-chooser-missing, .bio-properties-panel-configuration-chooser-loading',
+    node
+  );
+}
+
+function isSameChooser(event, element, property) {
+  if (event.element === element && event.property === property) {
+    return true;
+  }
+
+  return event.element?.id === element.id
+    && event.property?.id === property.id;
 }

@@ -13,7 +13,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
     // given
     const configurationInstances = createConfigurationInstances();
 
-    configurationInstances.setInstances([ {
+    configurationInstances.setSelectableInstances([ {
       name: 'compatible',
       metadata: {
         kind: 'CREDENTIAL',
@@ -49,7 +49,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
     } ]);
 
     // when
-    const instances = configurationInstances.getByConfigurationTemplate('io.camunda:slack-connection:1', 2);
+    const instances = configurationInstances.getSelectableByConfigurationTemplate('io.camunda:slack-connection:1', 2);
 
     // then
     expect(instances.map(({ name }) => name)).to.eql([ 'compatible' ]);
@@ -72,7 +72,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
     expect(configurationInstances.isLoading()).to.be.true;
     expect(changedSpy).to.have.been.calledOnce;
     expect(changedSpy).to.have.been.calledWith({
-      instances: [],
+      selectableInstances: [],
       loading: true,
       error: false,
       clusterSelected: false,
@@ -84,7 +84,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
 
     // when
     configurationInstances.setState({
-      instances: [ {
+      selectableInstances: [ {
         name: 'slack-production',
         metadata: {
           kind: 'CREDENTIAL',
@@ -102,7 +102,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
     });
 
     // then
-    expect(configurationInstances.getAll()).to.have.length(1);
+    expect(configurationInstances.getSelectableInstances()).to.have.length(1);
     expect(configurationInstances.isLoading()).to.be.false;
     expect(configurationInstances.hasError()).to.be.false;
     expect(configurationInstances.isClusterSelected()).to.be.true;
@@ -110,7 +110,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
     expect(configurationInstances.canUpdate()).to.be.true;
     expect(changedSpy).to.have.been.calledTwice;
     expect(changedSpy).to.have.been.calledWith({
-      instances: configurationInstances.getAll(),
+      selectableInstances: configurationInstances.getSelectableInstances(),
       loading: false,
       error: false,
       clusterSelected: true,
@@ -136,7 +136,7 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
   });
 
 
-  it('should get an instance by name', function() {
+  it('should get a referenced instance by name', function() {
 
     // given
     const configurationInstances = createConfigurationInstances();
@@ -149,11 +149,39 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
       }
     };
 
-    configurationInstances.setInstances([ instance ]);
+    configurationInstances.setState({
+      referencedInstances: [ instance ],
+      clusterSelected: true
+    });
 
     // then
-    expect(configurationInstances.getByName('slack-production')).to.equal(instance);
-    expect(configurationInstances.getByName('missing')).not.to.exist;
+    expect(configurationInstances.getReferencedInstanceByName('slack-production')).to.equal(instance);
+    expect(configurationInstances.getReferencedInstanceByName('missing')).not.to.exist;
+  });
+
+
+  it('should keep a referenced instance out of selectable instances', function() {
+
+    // given
+    const configurationInstances = createConfigurationInstances();
+    const resolvedInstance = {
+      name: 'slack-production',
+      metadata: {
+        kind: 'CREDENTIAL',
+        configurationTemplate: 'io.camunda:slack-connection:1',
+        configurationTemplateVersion: 1
+      }
+    };
+
+    configurationInstances.setState({
+      selectableInstances: [],
+      referencedInstances: [ resolvedInstance ],
+      clusterSelected: true
+    });
+
+    // then
+    expect(configurationInstances.getReferencedInstanceByName('slack-production')).to.equal(resolvedInstance);
+    expect(configurationInstances.getSelectableInstances()).to.be.empty;
   });
 
 
@@ -174,6 +202,32 @@ describe('provider/cloud-element-templates - ConfigurationInstances', function()
     expect(configurationInstances.isCompatible(instance, 'io.camunda:slack-connection:1', 2)).to.be.true;
     expect(configurationInstances.isCompatible(instance, 'io.camunda:slack-connection:1', 3)).to.be.false;
     expect(configurationInstances.isCompatible(instance, 'io.camunda:aws-connection:1', 2)).to.be.false;
+  });
+
+
+  it('should support any template-derived configuration kind', function() {
+
+    // given
+    const configurationInstances = createConfigurationInstances();
+    const templateDerivedInstance = {
+      name: 'shared-connection',
+      metadata: {
+        kind: 'CONNECTION',
+        configurationTemplate: 'io.camunda:shared-connection:1',
+        configurationTemplateVersion: 1
+      }
+    };
+    const plainVariable = {
+      name: 'plain-variable',
+      metadata: {
+        configurationTemplate: 'io.camunda:shared-connection:1',
+        configurationTemplateVersion: 1
+      }
+    };
+
+    // then
+    expect(configurationInstances.isCompatible(templateDerivedInstance, 'io.camunda:shared-connection:1', 1)).to.be.true;
+    expect(configurationInstances.isCompatible(plainVariable, 'io.camunda:shared-connection:1', 1)).to.be.false;
   });
 
 });

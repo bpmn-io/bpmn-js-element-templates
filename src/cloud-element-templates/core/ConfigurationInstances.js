@@ -19,15 +19,18 @@
  */
 
 /**
- * Registry of available configuration instances (cluster variables with
- * `kind = CREDENTIAL`).
+ * Registry of available template-derived configuration instances (cluster
+ * variables with a metadata `kind`).
  */
 export default class ConfigurationInstances {
   constructor(eventBus) {
     this._eventBus = eventBus;
 
     /** @type {ConfigurationInstance[]} */
-    this._instances = [];
+    this._selectableInstances = [];
+
+    /** @type {Record<string, ConfigurationInstance>} */
+    this._referencedInstancesByName = {};
 
     /** @type {boolean} */
     this._loading = false;
@@ -46,15 +49,28 @@ export default class ConfigurationInstances {
   }
 
   /**
-   * Replace the set of available instances and notify listeners.
+   * Replace the configurations that may appear as chooser options and notify
+   * listeners.
    *
-   * @param {ConfigurationInstance[]} instances
+   * @param {ConfigurationInstance[]} selectableInstances
    */
-  setInstances(instances) {
+  setSelectableInstances(selectableInstances) {
     this.setState({
-      instances,
+      selectableInstances,
       error: false,
       clusterSelected: true
+    });
+  }
+
+  /**
+   * Replace configurations referenced in BPMN and fetched by cluster-variable
+   * name, then notify listeners.
+   *
+   * @param {ConfigurationInstance[]} referencedInstances
+   */
+  setReferencedInstances(referencedInstances) {
+    this.setState({
+      referencedInstances
     });
   }
 
@@ -73,11 +89,25 @@ export default class ConfigurationInstances {
   /**
    * Update host-provided configuration instance state and notify listeners.
    *
-  * @param {{ instances?: ConfigurationInstance[], loading?: boolean, error?: boolean, clusterSelected?: boolean, permissions?: ConfigurationPermissions }} state
+  * @param {{ selectableInstances?: ConfigurationInstance[], referencedInstances?: ConfigurationInstance[], loading?: boolean, error?: boolean, clusterSelected?: boolean, permissions?: ConfigurationPermissions }} state
    */
   setState(state) {
-    if ('instances' in state) {
-      this._instances = state.instances || [];
+    if ('selectableInstances' in state) {
+      this._selectableInstances = state.selectableInstances || [];
+    }
+
+    if ('referencedInstances' in state) {
+      const referencedInstances = state.referencedInstances || [];
+
+      this._referencedInstancesByName = referencedInstances.reduce((byName, instance) => {
+        if (!instance || !instance.name) {
+          return byName;
+        }
+
+        byName[ instance.name ] = instance;
+
+        return byName;
+      }, {});
     }
 
     if ('loading' in state) {
@@ -107,10 +137,11 @@ export default class ConfigurationInstances {
         create: false,
         update: false
       };
+      this._referencedInstancesByName = {};
     }
 
     this._eventBus.fire('configurationInstances.changed', {
-      instances: this._instances,
+      selectableInstances: this._selectableInstances,
       loading: this._loading,
       error: this._error,
       clusterSelected: this._clusterSelected,
@@ -165,22 +196,22 @@ export default class ConfigurationInstances {
   }
 
   /**
-   * Get all available instances.
+   * Get all configurations that may appear as chooser options.
    *
    * @returns {ConfigurationInstance[]}
    */
-  getAll() {
-    return this._instances;
+  getSelectableInstances() {
+    return this._selectableInstances;
   }
 
   /**
-   * Get an instance by its cluster-variable name.
+   * Get a BPMN-referenced configuration by its cluster-variable name.
    *
    * @param {string} name
    * @returns {ConfigurationInstance|undefined}
    */
-  getByName(name) {
-    return this._instances.find(instance => instance.name === name);
+  getReferencedInstanceByName(name) {
+    return this._referencedInstancesByName[ name ];
   }
 
   /**
@@ -198,22 +229,23 @@ export default class ConfigurationInstances {
       configurationTemplateVersion: instanceVersion
     } = instance.metadata || {};
 
-    return kind === 'CREDENTIAL'
+    return !!kind
       && instanceTemplate === configurationTemplate
       && (minVersion == null || (instanceVersion != null && instanceVersion >= minVersion));
   }
 
   /**
-    * Get instances compatible with the given template reference and version.
+    * Get selectable configurations compatible with the given template reference
+    * and version.
    *
    * @param {string} configurationTemplate - configuration template ID
    * @param {number} [minVersion] - minimum version floor (inclusive)
    * @returns {ConfigurationInstance[]}
    */
-  getByConfigurationTemplate(configurationTemplate, minVersion) {
+  getSelectableByConfigurationTemplate(configurationTemplate, minVersion) {
     const compatible = [];
 
-    for (const instance of this._instances) {
+    for (const instance of this._selectableInstances) {
       if (!this.isCompatible(instance, configurationTemplate, minVersion)) {
         continue;
       }
