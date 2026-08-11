@@ -344,6 +344,8 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
 }
 
 .bio-properties-panel-configuration-chooser-popover-row {
