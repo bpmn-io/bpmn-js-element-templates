@@ -19,28 +19,6 @@ export default class ElementTemplatesLoader extends TemplatesLoader {
   _createValidator() {
     return new Validator(this._moddle);
   }
-
-  setTemplates(templates) {
-    const elementTemplates = this._elementTemplates;
-
-    const validator = this._createValidator().addAll(templates);
-
-    elementTemplates.set(validator.getValidTemplates());
-
-    const errors = validator.getErrors().filter(
-      (error) => !this._isIncompatibleTemplateError(error)
-    );
-
-    if (errors.length) {
-      this._templateErrors(errors);
-    }
-
-    const warnings = validator.getWarnings();
-
-    if (warnings.length) {
-      elementTemplates._fire('warnings', { warnings });
-    }
-  }
 }
 
 ElementTemplatesLoader.$inject = [

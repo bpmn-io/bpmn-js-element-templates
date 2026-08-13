@@ -95,6 +95,12 @@ export default class ElementTemplatesLoader {
     if (errors.length) {
       this._templateErrors(errors);
     }
+
+    const warnings = validator.getWarnings();
+
+    if (warnings.length) {
+      this._templateWarnings(warnings);
+    }
   }
 
   /**
@@ -123,6 +129,12 @@ export default class ElementTemplatesLoader {
   _templateErrors(errors) {
     this._elementTemplates._fire('errors', {
       errors: errors
+    });
+  }
+
+  _templateWarnings(warnings) {
+    this._elementTemplates._fire('warnings', {
+      warnings: warnings
     });
   }
 }
