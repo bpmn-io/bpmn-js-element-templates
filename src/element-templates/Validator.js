@@ -29,6 +29,7 @@ export class Validator {
 
     this._validTemplates = [];
     this._errors = [];
+    this._warnings = [];
     this._moddle = moddle;
   }
 
@@ -271,6 +272,15 @@ export class Validator {
 
   getValidTemplates() {
     return this._validTemplates;
+  }
+
+  /**
+   * Get non-blocking validation warnings.
+   *
+   * @return {Error[]}
+   */
+  getWarnings() {
+    return this._warnings;
   }
 }
 
