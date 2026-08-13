@@ -20,15 +20,10 @@ const SUPPORTED_SCHEMA_PACKAGE = getTemplateSchemaPackage();
  * A Camunda Cloud element template validator.
  */
 export class Validator extends BaseValidator {
-  constructor(moddle) {
-    super(moddle);
-
-    this._warnings = [];
-  }
 
   /**
-  * Collect warnings for conflicting configuration template definitions before
-  * validating individual element templates.
+   * Collect warnings for conflicting configuration template definitions before
+   * validating individual element templates.
    *
    * @param {TemplateDescriptor[]} templates
    * @returns {Validator}
@@ -183,15 +178,6 @@ export class Validator extends BaseValidator {
 
   isSchemaValid(schema) {
     return schema && schema.includes(SUPPORTED_SCHEMA_PACKAGE);
-  }
-
-  /**
-   * Get non-blocking validation warnings.
-   *
-   * @returns {Error[]}
-   */
-  getWarnings() {
-    return this._warnings;
   }
 }
 
