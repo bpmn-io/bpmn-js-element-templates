@@ -1660,7 +1660,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       await act(() => {
         configurationInstances.setState({
           selectableInstances: [],
-          available: false
+          available: false,
+          unavailableMessage: 'No cluster selected'
         });
       });
 
@@ -1668,6 +1669,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(domQuery('.bio-properties-panel-configuration-chooser-selected', entry)).to.exist;
         expect(domQuery('.bio-properties-panel-configuration-chooser-selected--offline', entry)).to.exist;
         expect(domQuery('.bio-properties-panel-configuration-chooser-logo', entry).getAttribute('src')).to.equal('data:image/svg+xml;base64,offline-icon');
+        expect(domQuery('.bio-properties-panel-configuration-chooser-subtitle', entry).textContent).to.equal('No cluster selected');
         expect(domQuery('.bio-properties-panel-configuration-chooser-missing', entry)).not.to.exist;
       });
 

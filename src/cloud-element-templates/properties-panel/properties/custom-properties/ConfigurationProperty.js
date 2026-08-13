@@ -383,6 +383,7 @@ export function ConfigurationProperty(props) {
                     <OfflineConfiguration
                       value={ value }
                       cachedName={ cachedName }
+                      unavailableMessage={ unavailableMessage }
                       disabled={ disabled }
                       menuOpen={ menuOpen }
                       icon={ configurationTemplates.get(configurationTemplate, configurationTemplateVersion)?.icon?.contents }
@@ -676,6 +677,7 @@ function OfflineConfiguration(props) {
     menuOpen,
     onMenu,
     translate,
+    unavailableMessage,
     value
   } = props;
 
@@ -698,7 +700,7 @@ function OfflineConfiguration(props) {
           { cachedName || refName }
         </span>
         <span class="bio-properties-panel-configuration-chooser-subtitle">
-          <span class="bio-properties-panel-configuration-chooser-varname">{ refName }</span>
+          { unavailableMessage || translate('Cluster unavailable') }
         </span>
       </span>
       <button
