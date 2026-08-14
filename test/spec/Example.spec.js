@@ -52,6 +52,8 @@ import { connectors } from '@camunda/connectors-element-templates';
 
 import connectionsDesignTemplates from 'test/spec/cloud-element-templates/fixtures/connections-design.json';
 
+import configurationConstraintsTemplates from 'test/spec/cloud-element-templates/fixtures/configuration-constraints.json';
+
 const singleStart = window.__env__ && window.__env__.SINGLE_START;
 
 insertCoreStyles();
@@ -575,7 +577,8 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
 
     const elementTemplates = [
       ...connectors.flatMap(connector => connector.default || connector),
-      ...exampleConfigurationTemplates
+      ...exampleConfigurationTemplates,
+      ...configurationConstraintsTemplates
     ];
 
     const configurationTemplates = new Set(
@@ -637,6 +640,10 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
       .filter((configurationTemplate) => !configurationTemplates.has(configurationTemplate));
 
     expect(missingMockConfigurationTemplates).to.be.empty;
+
+    expect(
+      result.modeler.get('elementTemplates').getLatest('io.camunda.examples.ConfigurationConstraints.v1')
+    ).to.have.length(1);
 
     // and
     createTestUI(result.modeler);
