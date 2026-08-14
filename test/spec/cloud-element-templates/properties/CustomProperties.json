@@ -70,6 +70,18 @@
           "type": "zeebe:property",
           "name": "property-1-name"
         }
+      },
+      {
+        "label": "property-required",
+        "type": "String",
+        "value": "property-required-value",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "property-required-name"
+        },
+        "constraints": {
+          "notEmpty": true
+        }
       }
     ]
   },

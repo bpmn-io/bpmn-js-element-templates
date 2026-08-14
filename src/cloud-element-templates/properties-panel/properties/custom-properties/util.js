@@ -64,7 +64,11 @@ export function propertyGetter(element, property) {
 }
 
 export function propertySetter(bpmnFactory, commandStack, element, property) {
-  return function setValue(value, additionalProperties) {
+
+  // entry components call setValue(value, validationError); the validation error
+  // is never persisted, callers that need to stamp extra moddle properties pass
+  // them explicitly as the third argument instead
+  return function setValue(value, error, additionalProperties) {
     return setPropertyValue(bpmnFactory, commandStack, element, property, value, additionalProperties);
   };
 }

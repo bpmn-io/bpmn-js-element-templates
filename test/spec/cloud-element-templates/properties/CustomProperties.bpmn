@@ -13,6 +13,7 @@
         </zeebe:taskHeaders>
         <zeebe:properties>
           <zeebe:property name="property-1-name" value="property-1-value" />
+          <zeebe:property name="property-required-name" value="property-required-value" />
         </zeebe:properties>
       </bpmn:extensionElements>
     </bpmn:serviceTask>
