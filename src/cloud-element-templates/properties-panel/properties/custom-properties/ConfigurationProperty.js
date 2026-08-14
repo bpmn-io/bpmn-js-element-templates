@@ -347,6 +347,7 @@ export function ConfigurationProperty(props) {
               cachedName={ cachedName }
               disabled={ disabled }
               menuOpen={ menuOpen }
+              showMenu
               onMenu={ toggleMenu }
               translate={ translate } />
           )
@@ -356,6 +357,7 @@ export function ConfigurationProperty(props) {
                 instance={ selected }
                 disabled={ disabled }
                 menuOpen={ menuOpen }
+                showMenu={ canUpdate }
                 onClick={ toggleOpen }
                 onMenu={ toggleMenu }
                 translate={ translate } />
@@ -374,6 +376,7 @@ export function ConfigurationProperty(props) {
                     typeIncompatible={ typeIncompatible }
                     disabled={ disabled }
                     menuOpen={ menuOpen }
+                    showMenu={ versionIncompatible && canUpdate }
                     onClick={ toggleOpen }
                     onMenu={ toggleMenu }
                     translate={ translate } />
@@ -386,6 +389,7 @@ export function ConfigurationProperty(props) {
                       unavailableMessage={ unavailableMessage }
                       disabled={ disabled }
                       menuOpen={ menuOpen }
+                      showMenu
                       icon={ configurationTemplates.get(configurationTemplate, configurationTemplateVersion)?.icon?.contents }
                       onMenu={ toggleMenu }
                       translate={ translate } />
@@ -441,6 +445,7 @@ export function ConfigurationProperty(props) {
             <ConfigurationPopover
               instances={ instances }
               selected={ selected }
+              hasSelection={ !!value }
               canCreate={ canCreate }
               onCreate={ createConfiguration }
               onSelect={ select }
@@ -456,7 +461,7 @@ export function ConfigurationProperty(props) {
             <ConfigurationContextMenu
               onEdit={ selected && canUpdate ? editConfiguration : null }
               onUpgrade={ versionIncompatible && canUpdate ? upgradeConfiguration : null }
-              onRemove={ () => select(null) }
+              onClear={ error || !available ? () => select(null) : null }
               translate={ translate } />
           )
           : null
@@ -472,6 +477,7 @@ function SelectedConfiguration(props) {
     menuOpen,
     onClick,
     onMenu,
+    showMenu,
     translate
   } = props;
 
@@ -491,22 +497,28 @@ function SelectedConfiguration(props) {
           <span class="bio-properties-panel-configuration-chooser-varname">{ instance.name }</span>
         </span>
       </span>
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-menu"
-        title={ translate('More actions') }
-        aria-label={ translate('More actions') }
-        aria-expanded={ menuOpen }
-        disabled={ disabled }
-        onClick={ onMenu }>
-        …
-      </button>
+      {
+        showMenu
+          ? (
+            <button
+              type="button"
+              class="bio-properties-panel-configuration-chooser-menu"
+              title={ translate('More actions') }
+              aria-label={ translate('More actions') }
+              aria-expanded={ menuOpen }
+              disabled={ disabled }
+              onClick={ onMenu }>
+              …
+            </button>
+          )
+          : null
+      }
     </div>
   );
 }
 
 function ConfigurationContextMenu(props) {
-  const { onEdit, onRemove, onUpgrade, translate } = props;
+  const { onClear, onEdit, onUpgrade, translate } = props;
 
   return (
     <div class="bio-properties-panel-configuration-chooser-context-menu">
@@ -534,12 +546,18 @@ function ConfigurationContextMenu(props) {
           )
           : null
       }
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-context-menu-item bio-properties-panel-configuration-chooser-context-menu-item--danger"
-        onClick={ onRemove }>
-        { translate('Remove') }
-      </button>
+      {
+        onClear
+          ? (
+            <button
+              type="button"
+              class="bio-properties-panel-configuration-chooser-context-menu-item"
+              onClick={ onClear }>
+              { translate('Clear selection') }
+            </button>
+          )
+          : null
+      }
     </div>
   );
 }
@@ -577,6 +595,7 @@ function ErrorConfiguration(props) {
     disabled,
     menuOpen,
     onMenu,
+    showMenu,
     translate,
     value
   } = props;
@@ -594,16 +613,22 @@ function ErrorConfiguration(props) {
           { translate('Could not load configurations') }
         </span>
       </span>
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-menu"
-        title={ translate('More actions') }
-        aria-label={ translate('More actions') }
-        aria-expanded={ menuOpen }
-        disabled={ disabled }
-        onClick={ onMenu }>
-        …
-      </button>
+      {
+        showMenu
+          ? (
+            <button
+              type="button"
+              class="bio-properties-panel-configuration-chooser-menu"
+              title={ translate('More actions') }
+              aria-label={ translate('More actions') }
+              aria-expanded={ menuOpen }
+              disabled={ disabled }
+              onClick={ onMenu }>
+              …
+            </button>
+          )
+          : null
+      }
     </div>
   );
 }
@@ -617,6 +642,7 @@ function MissingConfiguration(props) {
     minimumVersion,
     onClick,
     onMenu,
+    showMenu,
     translate,
     typeIncompatible,
     value
@@ -655,16 +681,22 @@ function MissingConfiguration(props) {
           }
         </span>
       </span>
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-menu"
-        title={ translate('More actions') }
-        aria-label={ translate('More actions') }
-        aria-expanded={ menuOpen }
-        disabled={ disabled }
-        onClick={ onMenu }>
-        …
-      </button>
+      {
+        showMenu
+          ? (
+            <button
+              type="button"
+              class="bio-properties-panel-configuration-chooser-menu"
+              title={ translate('More actions') }
+              aria-label={ translate('More actions') }
+              aria-expanded={ menuOpen }
+              disabled={ disabled }
+              onClick={ onMenu }>
+              …
+            </button>
+          )
+          : null
+      }
     </div>
   );
 }
@@ -676,6 +708,7 @@ function OfflineConfiguration(props) {
     icon,
     menuOpen,
     onMenu,
+    showMenu,
     translate,
     unavailableMessage,
     value
@@ -703,16 +736,22 @@ function OfflineConfiguration(props) {
           { unavailableMessage || translate('Cluster unavailable') }
         </span>
       </span>
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-menu"
-        title={ translate('More actions') }
-        aria-label={ translate('More actions') }
-        aria-expanded={ menuOpen }
-        disabled={ disabled }
-        onClick={ onMenu }>
-        …
-      </button>
+      {
+        showMenu
+          ? (
+            <button
+              type="button"
+              class="bio-properties-panel-configuration-chooser-menu"
+              title={ translate('More actions') }
+              aria-label={ translate('More actions') }
+              aria-expanded={ menuOpen }
+              disabled={ disabled }
+              onClick={ onMenu }>
+              …
+            </button>
+          )
+          : null
+      }
     </div>
   );
 }
@@ -720,6 +759,7 @@ function OfflineConfiguration(props) {
 function ConfigurationPopover(props) {
   const {
     canCreate,
+    hasSelection,
     instances,
     loading,
     onCreate,
@@ -743,9 +783,18 @@ function ConfigurationPopover(props) {
       }
 
       {
-        instances.length
+        instances.length || hasSelection
           ? (
             <ul class="bio-properties-panel-configuration-chooser-popover-list">
+              {
+                hasSelection
+                  ? (
+                    <EmptyConfigurationRow
+                      onSelect={ () => onSelect(null) }
+                      translate={ translate } />
+                  )
+                  : null
+              }
               {
                 instances.map((instance) => (
                   <ConfigurationRow
@@ -755,6 +804,19 @@ function ConfigurationPopover(props) {
                     onSelect={ () => onSelect(selected === instance ? null : instance.name) }
                     translate={ translate } />
                 ))
+              }
+              {
+                !instances.length
+                  ? (
+                    <li class="bio-properties-panel-configuration-chooser-empty">
+                      {
+                        loading
+                          ? translate('Loading...')
+                          : translate('No compatible configurations are available in the connected cluster')
+                      }
+                    </li>
+                  )
+                  : null
               }
             </ul>
           )
@@ -785,6 +847,37 @@ function ConfigurationPopover(props) {
           : null
       }
     </div>
+  );
+}
+
+function EmptyConfigurationRow(props) {
+  const { onSelect, translate } = props;
+
+  const onKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onSelect();
+    }
+  };
+
+  return (
+    <li
+      class={ [
+        'bio-properties-panel-configuration-chooser-popover-row',
+        'bio-properties-panel-configuration-chooser-popover-row--empty'
+      ].join(' ') }
+      role="button"
+      tabIndex={ 0 }
+      aria-pressed={ false }
+      onClick={ onSelect }
+      onKeyDown={ onKeyDown }>
+      <span
+        class="bio-properties-panel-configuration-chooser-logo bio-properties-panel-configuration-chooser-logo--empty"
+        aria-hidden="true" />
+      <span class="bio-properties-panel-configuration-chooser-subtitle">
+        { translate('No selection') }
+      </span>
+    </li>
   );
 }
 

@@ -1225,9 +1225,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(typeMismatch.textContent).not.to.contain('AWS Credential');
       expect(typeMismatch.textContent).not.to.contain('io.camunda:other-credential:1');
 
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', fallbackEntry));
-
-      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', fallbackEntry)).not.to.exist;
+      expect(domQuery('.bio-properties-panel-configuration-chooser-menu', fallbackEntry)).not.to.exist;
     }));
 
 
@@ -1315,8 +1313,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', inputEntry));
 
       // when
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', inputEntry));
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item--danger', inputEntry));
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-selected', inputEntry));
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row--empty', inputEntry));
 
       // then
       const ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
@@ -1328,8 +1326,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // when
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', propertyEntry));
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item--danger', propertyEntry));
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-selected', propertyEntry));
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row--empty', propertyEntry));
 
       // then
       const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
@@ -1388,13 +1386,15 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
             inputEntry = findEntry('custom-entry-configuration-metadata-cleanup-1', container);
 
       const select = async (entry, index) => {
+        const hasSelection = !!domQuery('.bio-properties-panel-configuration-chooser-selected', entry);
+
         await act(() => {
           fireEvent.click(domQuery(
             '.bio-properties-panel-configuration-chooser-placeholder, .bio-properties-panel-configuration-chooser-selected',
             entry
           ));
         });
-        fireEvent.click(domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry)[ index ]);
+        fireEvent.click(domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry)[ index + (hasSelection ? 1 : 0) ]);
       };
 
       await select(propertyEntry, 0);
@@ -1575,7 +1575,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
 
 
-    it('should hide creation and show only the remove action for an offline configuration', inject(async function(elementTemplates, configurationInstances) {
+    it('should hide creation and show only the clear selection action for an offline configuration', inject(async function(elementTemplates, configurationInstances) {
 
       // given
       const element = await expectSelected('RestTask_noData');
@@ -1660,7 +1660,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const menuItems = domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry);
 
       expect(menuItems).to.have.length(1);
-      expect(menuItems[0].textContent).to.equal('Remove');
+      expect(menuItems[0].textContent).to.equal('Clear selection');
     }));
 
 
@@ -1917,9 +1917,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(entry.textContent).to.contain('Not found on cluster');
       expect(entry.textContent).not.to.contain('Could not load configurations');
 
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
-
-      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry)).to.exist;
+      expect(domQuery('.bio-properties-panel-configuration-chooser-menu', entry)).not.to.exist;
 
       // when - failed response
       await act(() => {
@@ -1950,7 +1948,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const menuItems = domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry);
 
       expect(menuItems).to.have.length(1);
-      expect(menuItems[0].textContent).to.equal('Remove');
+      expect(menuItems[0].textContent).to.equal('Clear selection');
     }));
 
 
@@ -2181,9 +2179,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
       });
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', entry)).not.to.exist;
+      expect(domQuery('.bio-properties-panel-configuration-chooser-menu', entry)).not.to.exist;
 
       await act(() => {
         configurationInstances.setState({
@@ -2192,6 +2189,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
           }
         });
       });
+
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
 
       const edit = domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', entry);
 
@@ -2307,9 +2306,10 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       const rows = domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry);
 
-      expect(rows).to.have.length(1);
-      expect(rows[0].textContent).to.contain('Slack Development');
-      expect(rows[0].textContent).not.to.contain('Slack Production');
+      expect(rows).to.have.length(2);
+      expect(rows[0].textContent).to.equal('No selection');
+      expect(rows[1].textContent).to.contain('Slack Development');
+      expect(rows[1].textContent).not.to.contain('Slack Production');
 
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
 

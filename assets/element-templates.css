@@ -366,6 +366,15 @@
   background-color: var(--color-blue-205-100-95, #eef4ff);
 }
 
+.bio-properties-panel-configuration-chooser-popover-row--empty {
+  border-bottom: 1px solid var(--color-grey-225-10-90, #e6e8ea);
+}
+
+.bio-properties-panel-configuration-chooser-logo--empty {
+  border: 1px dashed var(--color-grey-225-10-75, #ccced0);
+  border-radius: 6px;
+}
+
 /* create configuration footer */
 .bio-properties-panel-configuration-chooser-create {
   display: flex;
