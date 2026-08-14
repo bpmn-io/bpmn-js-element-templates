@@ -1,7 +1,7 @@
 import { useService } from 'bpmn-js-properties-panel';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from '@bpmn-io/properties-panel/preact/hooks';
-import { CreateIcon } from '@bpmn-io/properties-panel';
+import { CreateIcon, useShowEntryEvent } from '@bpmn-io/properties-panel';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
@@ -180,6 +180,7 @@ export function ConfigurationProperty(props) {
   const [ open, setOpen ] = useState(false);
   const [ menuOpen, setMenuOpen ] = useState(false);
   const ref = useRef(null);
+  const showEntryRef = useShowEntryEvent(id);
   const availabilityRef = useRef({ error, available });
 
   useEffect(() => {
@@ -393,6 +394,7 @@ export function ConfigurationProperty(props) {
                   : (
                     <>
                       <button
+                        ref={ showEntryRef }
                         type="button"
                         class="bio-properties-panel-configuration-chooser-placeholder"
                         disabled={ disabled || error || !available }
