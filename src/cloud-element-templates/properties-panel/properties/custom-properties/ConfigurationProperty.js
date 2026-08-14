@@ -144,7 +144,7 @@ export function ConfigurationProperty(props) {
   const setValue = useCallback((value, instance) => {
     const selectedInstance = instance || instances.find(({ name }) => toReference(name) === value);
 
-    baseSetValue(value, {
+    baseSetValue(value, null, {
       modelerConfigurationTemplate: value && configurationTemplate || undefined,
       modelerConfigurationName: selectedInstance ? getDisplayName(selectedInstance) : undefined
     });
