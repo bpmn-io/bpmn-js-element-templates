@@ -1482,7 +1482,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const select = async (entry, name) => {
         await act(() => {
           fireEvent.click(domQuery(
-            '.bio-properties-panel-configuration-chooser-placeholder, .bio-properties-panel-configuration-chooser-selected',
+            '.bio-properties-panel-configuration-chooser-placeholder, .bio-properties-panel-configuration-chooser-trigger',
             entry
           ));
         });
@@ -1817,13 +1817,798 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // when
-      fireEvent.keyDown(getConfigurationSelected(entry), {
-        key: 'Enter'
-      });
+      // when
+      fireEvent.click(getConfigurationTrigger(entry));
 
       // then
       expect(getConfigurationPopover(entry)).to.exist;
 
+    }));
+
+
+    it('should close the popover when clicking the open trigger', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container);
+
+      await act(() => {
+        fireEvent.click(getConfigurationPlaceholder(entry));
+      });
+      clickConfigurationOption(entry, 'Slack Production');
+
+      const trigger = await waitFor(() => {
+        const node = getConfigurationTrigger(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // when opening the dropdown
+      await act(() => {
+        fireEvent.click(trigger);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationPopover(entry)).to.exist;
+      });
+
+      // then clicking the open trigger closes it (canonical dropdown behavior).
+      // Its mousedown is prevented so the popover does not dismiss-then-reopen
+      // when focus would otherwise shift to the trigger.
+      const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+
+      trigger.dispatchEvent(mousedown);
+
+      expect(mousedown.defaultPrevented).to.be.true;
+
+      await act(() => {
+        fireEvent.click(trigger);
+      });
+
+      expect(getConfigurationPopover(entry)).not.to.exist;
+    }));
+
+
+    it('should move focus to the trigger after selecting', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(container)).to.exist;
+      });
+
+      // spy on focus to observe which trigger receives focus (headless
+      // browsers do not reliably move document.activeElement)
+      const focusSpy = spy(HTMLElement.prototype, 'focus');
+
+      try {
+
+        // when
+        await act(() => {
+          fireEvent.keyDown(getConfigurationRow(container), {
+            key: ' '
+          });
+        });
+
+        // then
+        // focus moves to the freshly rendered trigger, not the removed placeholder
+        await waitFor(() => {
+          const trigger = getConfigurationTrigger(entry);
+
+          expect(trigger).to.exist;
+          expect(focusSpy.getCalls().some((call) => call.thisValue === trigger)).to.be.true;
+        });
+      } finally {
+        focusSpy.restore();
+      }
+    }));
+
+
+    it('should restore focus to the trigger when closing via keyboard', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      const listbox = await waitFor(() => {
+        const node = domQuery('[role="listbox"]', container);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      const focusSpy = spy(placeholder, 'focus');
+
+      // when
+      await act(() => {
+        fireEvent.keyDown(listbox, { key: 'Escape' });
+      });
+
+      // then
+      await waitFor(() => {
+        expect(getConfigurationPopover(entry)).not.to.exist;
+        expect(focusSpy).to.have.been.called;
+      });
+
+      focusSpy.restore();
+    }));
+
+
+    it('should reach the create action via keyboard navigation', inject(async function(elementTemplates, eventBus, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const property = {
+        id: 'configuration',
+        label: 'Configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:slack-connection:1',
+        configurationTemplateVersion: 2,
+        binding: {
+          type: 'zeebe:property',
+          name: 'configuration'
+        }
+      };
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ property ]
+      };
+      const createSpy = spy();
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      configurationInstances.setState({
+        permissions: {
+          create: true
+        }
+      });
+      eventBus.on('configuration.create', createSpy);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      const listbox = await waitFor(() => {
+        const node = domQuery('[role="listbox"]', container);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      const createOption = getConfigurationCreate(entry);
+
+      expect(createOption).to.exist;
+
+      // when
+      // arrow down from the single instance to the create action, then activate
+      await act(() => {
+        fireEvent.keyDown(listbox, { key: 'ArrowDown' });
+      });
+
+      // then
+      await waitFor(() => {
+        expect(listbox.getAttribute('aria-activedescendant')).to.equal(createOption.id);
+      });
+
+      // when
+      await act(() => {
+        fireEvent.keyDown(listbox, { key: 'Enter' });
+      });
+
+      // then
+      expect(createSpy).to.have.been.calledOnce;
+    }));
+
+
+    it('should dismiss the popover when focus leaves it', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      const popover = await waitFor(() => {
+        const node = getConfigurationPopover(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      const focusSpy = spy(placeholder, 'focus');
+
+      const listbox = domQuery('[role="listbox"]', popover);
+
+      // when
+      // focus moves from the inner listbox to an element outside of the popover;
+      // real browsers fire a bubbling `focusout` in this case
+      await act(() => {
+        listbox.dispatchEvent(new FocusEvent('focusout', {
+          bubbles: true,
+          relatedTarget: document.body
+        }));
+      });
+
+      // then
+      await waitFor(() => {
+        expect(getConfigurationPopover(entry)).not.to.exist;
+      });
+
+      // focus is not forced back onto the trigger
+      expect(focusSpy).not.to.have.been.called;
+
+      focusSpy.restore();
+    }));
+
+
+    it('should keep the empty popover keyboard-operable', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      // no compatible instances and no create permission
+      configurationInstances.setState({
+        selectableInstances: [],
+        available: true,
+        loading: false
+      });
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      // when
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      const popover = await waitFor(() => {
+        const node = getConfigurationPopover(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // then
+      // the popover exposes a listbox the trigger points to, even without options
+      const listbox = domQuery('[role="listbox"]', popover);
+
+      expect(listbox).to.exist;
+      expect(listbox.id).to.equal(placeholder.getAttribute('aria-controls'));
+
+      // and the empty message is still announced
+      expect(domQuery('.bio-properties-panel-configuration-chooser-empty', popover).textContent)
+        .to.equal('No compatible configurations are available in the connected cluster');
+
+      // and the popover can be closed via keyboard, returning focus to the trigger
+      const focusSpy = spy(placeholder, 'focus');
+
+      await act(() => {
+        fireEvent.keyDown(listbox, { key: 'Escape' });
+      });
+
+      // then
+      await waitFor(() => {
+        expect(getConfigurationPopover(entry)).not.to.exist;
+        expect(focusSpy).to.have.been.called;
+      });
+
+      focusSpy.restore();
+    }));
+
+
+    it('should open the actions menu (not the chooser) when activating it via keyboard', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      // select an instance so the selected card (with its actions menu) renders
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(container)).to.exist;
+      });
+
+      await act(() => {
+        fireEvent.keyDown(getConfigurationRow(container), {
+          key: ' '
+        });
+      });
+
+      const card = await waitFor(() => {
+        const node = getConfigurationSelected(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      const menuButton = getConfigurationMenuButton(card);
+
+      // when
+      // the actions menu button (nested inside the card) is activated via keyboard
+      await act(() => {
+        fireEvent.keyDown(menuButton, { key: 'Enter' });
+      });
+
+      // then
+      // the chooser popover is not opened by the nested activation
+      expect(getConfigurationPopover(entry)).not.to.exist;
+
+      // and the actions menu opens (native button activation)
+      await act(() => {
+        fireEvent.click(menuButton);
+      });
+
+      expect(getConfigurationContextMenu(entry)).to.exist;
+      expect(getConfigurationPopover(entry)).not.to.exist;
+    }));
+
+
+    it('should expose the actions menu as a keyboard-operable menu', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      // select an instance so the selected card (with its actions menu) renders
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(container)).to.exist;
+      });
+
+      await act(() => {
+        fireEvent.keyDown(getConfigurationRow(container), {
+          key: ' '
+        });
+      });
+
+      const menuButton = await waitFor(() => {
+        const node = getConfigurationMenuButton(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // grant update permission so the menu has more than one item (Edit + Remove)
+      await act(() => {
+        configurationInstances.setState({
+          permissions: {
+            update: true
+          }
+        });
+      });
+
+      // the trigger advertises a menu popup
+      expect(menuButton.getAttribute('aria-haspopup')).to.equal('menu');
+
+      // when
+      // the menu is opened via the arrow keys
+      await act(() => {
+        fireEvent.keyDown(menuButton, { key: 'ArrowDown' });
+      });
+
+      const menu = await waitFor(() => {
+        const node = getConfigurationContextMenu(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // then
+      // it has menu semantics
+      expect(menu.getAttribute('role')).to.equal('menu');
+
+      const menuItems = getConfigurationContextMenuItems(entry);
+
+      menuItems.forEach(item => {
+        expect(item.getAttribute('role')).to.equal('menuitem');
+      });
+
+      // and the first item is the active (tabbable) item
+      expect(menuItems[0].getAttribute('tabindex')).to.equal('0');
+      expect(menuItems[1].getAttribute('tabindex')).to.equal('-1');
+
+      // when
+      // navigating down with the keyboard
+      await act(() => {
+        fireEvent.keyDown(menu, { key: 'ArrowDown' });
+      });
+
+      // then
+      // the active (tabbable) item moves to the next one (roving focus)
+      await waitFor(() => {
+        expect(menuItems[1].getAttribute('tabindex')).to.equal('0');
+      });
+      expect(menuItems[0].getAttribute('tabindex')).to.equal('-1');
+
+      // when
+      // pressing Escape (spy on focus, since headless browsers do not reliably
+      // move document.activeElement)
+      const focusSpy = spy(menuButton, 'focus');
+
+      await act(() => {
+        fireEvent.keyDown(menu, { key: 'Escape' });
+      });
+
+      // then
+      // the menu closes and focus returns to the trigger button
+      await waitFor(() => {
+        expect(getConfigurationContextMenu(entry)).not.to.exist;
+      });
+
+      expect(focusSpy).to.have.been.called;
+
+      focusSpy.restore();
+    }));
+
+
+    it('should open the actions menu with the last item active on ArrowUp', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      // select an instance so the selected card (with its actions menu) renders
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(container)).to.exist;
+      });
+
+      await act(() => {
+        fireEvent.keyDown(getConfigurationRow(container), {
+          key: ' '
+        });
+      });
+
+      const menuButton = await waitFor(() => {
+        const node = getConfigurationMenuButton(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // grant update permission so the menu has more than one item (Edit + Remove)
+      await act(() => {
+        configurationInstances.setState({
+          permissions: {
+            update: true
+          }
+        });
+      });
+
+      // when
+      // the menu is opened via ArrowUp
+      await act(() => {
+        fireEvent.keyDown(menuButton, { key: 'ArrowUp' });
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationContextMenu(entry)).to.exist;
+      });
+
+      // then
+      // the last item is the active (tabbable) one
+      const menuItems = getConfigurationContextMenuItems(entry);
+
+      expect(menuItems.length).to.be.above(1);
+      expect(menuItems[menuItems.length - 1].getAttribute('tabindex')).to.equal('0');
+      expect(menuItems[0].getAttribute('tabindex')).to.equal('-1');
     }));
 
 
@@ -2612,9 +3397,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(missing).to.exist;
       expect(missing.textContent).to.contain('Version 1 · Requires version 2+');
 
-      fireEvent.keyDown(missing, {
-        key: 'Enter'
-      });
+      fireEvent.click(getConfigurationTrigger(missing));
 
       const rows = getConfigurationRows(entry);
 
@@ -5304,8 +6087,8 @@ function clickConfigurationOption(entry, name) {
 
 function getConfigurationOption(entry, name) {
   return within(entry).getAllByText(name).find(option => {
-    return option.closest('li[role="button"]');
-  }).closest('li[role="button"]');
+    return option.closest('li[role="option"]');
+  }).closest('li[role="option"]');
 }
 
 function getConfigurationMenuItem(entry, label) {
@@ -5351,6 +6134,27 @@ function getConfigurationMissing(entry) {
 
 function getConfigurationContextMenu(entry) {
   return domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry);
+}
+
+
+function getConfigurationTrigger(entry) {
+  const trigger = domQuery('.bio-properties-panel-configuration-chooser-trigger', entry);
+
+  expect(trigger, 'configuration chooser trigger').to.exist;
+
+  return trigger;
+}
+
+function getConfigurationMenuButton(entry) {
+  const button = domQuery('.bio-properties-panel-configuration-chooser-menu', entry);
+
+  expect(button, 'configuration chooser actions menu button').to.exist;
+
+  return button;
+}
+
+function getConfigurationContextMenuItems(entry) {
+  return domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry);
 }
 
 function expectSelected(id) {
