@@ -430,11 +430,3 @@
   background-color: var(--color-grey-225-10-97, #f7f8f8);
 }
 
-.bio-properties-panel-configuration-chooser-context-menu-item--danger {
-  color: var(--color-red-360-100-45, #e60000);
-}
-
-.bio-properties-panel-configuration-chooser-context-menu-item--danger:hover,
-.bio-properties-panel-configuration-chooser-context-menu-item--danger:focus-visible {
-  background-color: #fff0f0;
-}
