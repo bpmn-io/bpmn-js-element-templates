@@ -1096,6 +1096,7 @@
       {
         "id": "configuration",
         "label": "Example configuration",
+        "description": "Choose a reusable configuration. When set, the access key and secret key fields below are hidden.",
         "type": "Configuration",
         "configurationTemplate": "io.camunda:example-configuration:1",
         "configurationTemplateVersion": 1,
@@ -1104,6 +1105,44 @@
           "type": "zeebe:input",
           "name": "configuration"
         }
+      },
+      {
+        "id": "accessKey",
+        "label": "Access key",
+        "optional": false,
+        "constraints": {
+          "notEmpty": true
+        },
+        "feel": "optional",
+        "binding": {
+          "name": "accessKey",
+          "type": "zeebe:input"
+        },
+        "condition": {
+          "property": "configuration",
+          "isEmpty": true
+        },
+        "type": "String",
+        "secret": true
+      },
+      {
+        "id": "secretKey",
+        "label": "Secret key",
+        "optional": false,
+        "constraints": {
+          "notEmpty": true
+        },
+        "feel": "optional",
+        "binding": {
+          "name": "secretKey",
+          "type": "zeebe:input"
+        },
+        "condition": {
+          "property": "configuration",
+          "isEmpty": true
+        },
+        "type": "String",
+        "secret": true
       }
     ]
   }
