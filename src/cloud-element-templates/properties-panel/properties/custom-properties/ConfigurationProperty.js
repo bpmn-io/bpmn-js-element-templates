@@ -105,6 +105,39 @@ function getBindingElement(extensionElements, binding) {
 }
 
 /**
+ * Subscribe to the `configurationInstances` service and expose its current
+ * state as a single object, re-reading whenever the service emits `changed`.
+ * The declared `configurationTemplateVersion` acts as the minimum required
+ * version when selecting compatible instances.
+ */
+function useConfigurationInstances(configurationInstances, eventBus, configurationTemplate, minimumVersion) {
+  const read = useCallback(() => ({
+    instances: configurationInstances.getSelectableByConfigurationTemplate(configurationTemplate, minimumVersion),
+    loading: configurationInstances.isLoading(),
+    error: configurationInstances.hasError(),
+    available: configurationInstances.isAvailable(),
+    unavailableMessage: configurationInstances.getUnavailableMessage(),
+    canCreate: configurationInstances.canCreate(),
+    canUpdate: configurationInstances.canUpdate()
+  }), [ configurationInstances, configurationTemplate, minimumVersion ]);
+
+  const [ state, setState ] = useState(read);
+
+  useEffect(() => {
+    const onChanged = () => setState(read());
+
+    eventBus.on('configurationInstances.changed', onChanged);
+    onChanged();
+
+    return () => {
+      eventBus.off('configurationInstances.changed', onChanged);
+    };
+  }, [ eventBus, read ]);
+
+  return state;
+}
+
+/**
  * Configuration chooser.
  *
  * Renders a bespoke picker (NOT a plain select): a dashed placeholder that
@@ -148,36 +181,15 @@ export function ConfigurationProperty(props) {
   const chooserLabel = label ? toSentenceFragment(configurationLabel) : configurationLabel;
 
   // re-render when available instances change
-  const [ result, setResult ] = useState(
-    configurationInstances.getSelectableByConfigurationTemplate(configurationTemplate, minimumConfigurationTemplateVersion)
-  );
-  const [ loading, setLoading ] = useState(configurationInstances.isLoading());
-  const [ error, setError ] = useState(configurationInstances.hasError());
-  const [ available, setAvailable ] = useState(configurationInstances.isAvailable());
-  const [ unavailableMessage, setUnavailableMessage ] = useState(configurationInstances.getUnavailableMessage());
-  const [ canCreate, setCanCreate ] = useState(configurationInstances.canCreate());
-  const [ canUpdate, setCanUpdate ] = useState(configurationInstances.canUpdate());
-
-  useEffect(() => {
-    const onChanged = () => {
-      setResult(configurationInstances.getSelectableByConfigurationTemplate(configurationTemplate, minimumConfigurationTemplateVersion));
-      setLoading(configurationInstances.isLoading());
-      setError(configurationInstances.hasError());
-      setAvailable(configurationInstances.isAvailable());
-      setUnavailableMessage(configurationInstances.getUnavailableMessage());
-      setCanCreate(configurationInstances.canCreate());
-      setCanUpdate(configurationInstances.canUpdate());
-    };
-
-    eventBus.on('configurationInstances.changed', onChanged);
-    onChanged();
-
-    return () => {
-      eventBus.off('configurationInstances.changed', onChanged);
-    };
-  }, [ eventBus, configurationInstances, configurationTemplate, minimumConfigurationTemplateVersion ]);
-
-  const instances = result;
+  const {
+    instances,
+    loading,
+    error,
+    available,
+    unavailableMessage,
+    canCreate,
+    canUpdate
+  } = useConfigurationInstances(configurationInstances, eventBus, configurationTemplate, minimumConfigurationTemplateVersion);
 
   const getValue = useMemo(
     () => propertyGetter(element, property),
