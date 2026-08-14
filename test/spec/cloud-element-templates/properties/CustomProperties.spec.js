@@ -1114,6 +1114,32 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(zeebeProperty).not.to.exist;
     }));
 
+
+    it('should not leak the validation error into the moddle element when clearing a required property', inject(async function() {
+
+      // given
+      const task = await expectSelected('RestTask'),
+            businessObject = getBusinessObject(task);
+
+      const entry = findEntry('custom-entry-com.example.rest-8', container),
+            input = findInput('text', entry);
+
+      // when
+      changeInput(input, '');
+
+      // then
+      const zeebeProperties = findExtension(businessObject, 'zeebe:Properties'),
+            zeebeProperty = findZeebeProperty(zeebeProperties, { name: 'property-required-name' });
+
+      expect(zeebeProperty).to.exist;
+      expect(zeebeProperty).to.jsonEqual({
+        $type: 'zeebe:Property',
+        name: 'property-required-name',
+        value: ''
+      });
+      expect(zeebeProperty.$attrs).to.eql({});
+    }));
+
   });
 
 
