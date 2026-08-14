@@ -1450,6 +1450,138 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('configuration showEntry', function() {
+
+    const template = {
+      id: 'configuration-show-entry',
+      appliesTo: [ 'bpmn:ServiceTask' ],
+      elementType: {
+        value: 'bpmn:ServiceTask'
+      },
+      groups: [ {
+        id: 'credentials',
+        label: 'Credentials'
+      } ],
+      properties: [ {
+        id: 'stringProperty',
+        label: 'String property',
+        type: 'String',
+        group: 'credentials',
+        binding: {
+          type: 'zeebe:property',
+          name: 'stringProperty'
+        }
+      }, {
+        id: 'configurationProperty',
+        label: 'Configuration property',
+        type: 'Configuration',
+        group: 'credentials',
+        configurationTemplate: 'io.camunda:slack-connection:1',
+        binding: {
+          type: 'zeebe:property',
+          name: 'configurationProperty'
+        }
+      } ],
+      configurationTemplates: [ {
+        id: 'io.camunda:slack-connection:1',
+        kind: 'CREDENTIAL',
+        name: 'Slack Connection',
+        version: 1,
+        properties: []
+      } ]
+    };
+
+    const STRING_ENTRY_ID = 'custom-entry-configuration-show-entry-credentials-0',
+          CONFIGURATION_ENTRY_ID = 'custom-entry-configuration-show-entry-credentials-1',
+          GROUP_ID = 'ElementTemplates__CustomProperties-credentials';
+
+    beforeEach(inject(async function(elementTemplates, configurationInstances) {
+      const element = await expectSelected('RestTask_noData');
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 1
+        }
+      } ]);
+
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+    }));
+
+
+    it('should reveal the collapsed group of a String property', inject(async function(eventBus) {
+
+      // given
+      expectGroupOpen(getGroupById(GROUP_ID, container), false);
+
+      // when
+      await act(() => {
+        eventBus.fire('propertiesPanel.showEntry', { id: STRING_ENTRY_ID });
+      });
+
+      // then
+      expectGroupOpen(getGroupById(GROUP_ID, container), true);
+    }));
+
+
+    it('should reveal the collapsed group of a Configuration property', inject(async function(eventBus) {
+
+      // given
+      expectGroupOpen(getGroupById(GROUP_ID, container), false);
+
+      // when
+      await act(() => {
+        eventBus.fire('propertiesPanel.showEntry', { id: CONFIGURATION_ENTRY_ID });
+      });
+
+      // then
+      expectGroupOpen(getGroupById(GROUP_ID, container), true);
+    }));
+
+
+    it('should focus a String property entry', inject(async function(eventBus) {
+
+      // given
+      await act(() => {
+        eventBus.fire('propertiesPanel.showEntry', { id: STRING_ENTRY_ID });
+      });
+
+      const entry = findEntry(STRING_ENTRY_ID, container);
+
+      // when
+      const focussed = document.activeElement;
+
+      // then
+      expect(entry.contains(focussed)).to.be.true;
+    }));
+
+
+    it('should focus a Configuration property entry', inject(async function(eventBus) {
+
+      // given
+      await act(() => {
+        eventBus.fire('propertiesPanel.showEntry', { id: CONFIGURATION_ENTRY_ID });
+      });
+
+      const entry = findEntry(CONFIGURATION_ENTRY_ID, container);
+
+      // when
+      const focussed = document.activeElement;
+
+      // then
+      expect(entry.contains(focussed)).to.be.true;
+    }));
+
+  });
+
+
   describe('configuration', function() {
 
     it('should store metadata on zeebe:Property', inject(async function(elementTemplates, configurationInstances) {
