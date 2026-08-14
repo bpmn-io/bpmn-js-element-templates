@@ -12,8 +12,57 @@ import classnames from 'classnames';
 import { PropertyDescription } from '../../../../components/PropertyDescription';
 import { PropertyTooltip } from '../../components/PropertyTooltip';
 import { propertyGetter, propertySetter, propertyValidator } from './util';
+import { useActiveIndex, useFocusOut, usePopup } from './hooks';
 
 import { findExtension, findInputParameter, findZeebeProperty } from '../../../Helper';
+
+// which end of the actions menu to focus when it opens; ArrowUp on the trigger
+// opens onto the last item, matching the WAI-ARIA menu button pattern
+const FOCUS_FIRST = 'first';
+const FOCUS_LAST = 'last';
+
+// the mutually exclusive states the chooser can render
+const VARIANT = {
+  ERROR: 'error',
+  SELECTED: 'selected',
+  LOADING: 'loading',
+  MISSING: 'missing',
+  OFFLINE: 'offline',
+  PLACEHOLDER: 'placeholder'
+};
+
+/**
+ * Pick which chooser variant to render from the current instance state. Kept
+ * pure (and order-sensitive) so the state machine is explicit and testable.
+ *
+ * @param {Object} state
+ * @returns {string} one of VARIANT
+ */
+function getConfigurationVariant(state) {
+  const { value, error, selected, loading, available } = state;
+
+  if (value && error) {
+    return VARIANT.ERROR;
+  }
+
+  if (selected) {
+    return VARIANT.SELECTED;
+  }
+
+  if (!value) {
+    return VARIANT.PLACEHOLDER;
+  }
+
+  if (loading) {
+    return VARIANT.LOADING;
+  }
+
+  if (available) {
+    return VARIANT.MISSING;
+  }
+
+  return VARIANT.OFFLINE;
+}
 
 /**
  * FEEL expression referencing a configuration instance as a cluster variable.
@@ -156,6 +205,7 @@ export function ConfigurationProperty(props) {
   const boundMetadata = boundInstance?.metadata || {};
   const typeIncompatible = !!boundInstance
     && boundMetadata.configurationTemplate !== configurationTemplate;
+
   const versionIncompatible = !!boundInstance
     && boundMetadata.configurationTemplate === configurationTemplate
     && minimumConfigurationTemplateVersion != null
@@ -194,11 +244,50 @@ export function ConfigurationProperty(props) {
 
   const validationError = globalValidationError || localValidationError;
 
-  const [ open, setOpen ] = useState(false);
-  const [ menuOpen, setMenuOpen ] = useState(false);
   const ref = useRef(null);
   const showEntryRef = useShowEntryEvent(id);
+  const listboxId = `${ id }-listbox`;
+  const menuId = `${ id }-menu`;
   const availabilityRef = useRef({ error, available });
+
+  // Resolve the current trigger. It changes with the selection (placeholder
+  // button vs. selected/missing card), so we resolve it from the DOM rather
+  // than holding a ref to a specific node.
+  const resolveTrigger = useCallback(() => {
+    const node = ref.current;
+
+    return node && domQuery(
+      '.bio-properties-panel-configuration-chooser-placeholder,'
+      + '.bio-properties-panel-configuration-chooser-trigger',
+      node
+    );
+  }, []);
+
+  // Resolve the actions ("…") menu button. Like the trigger, it lives inside
+  // whichever card variant is rendered, so we resolve it from the DOM.
+  const resolveMenuButton = useCallback(() => {
+    const node = ref.current;
+
+    return node && domQuery('.bio-properties-panel-configuration-chooser-menu', node);
+  }, []);
+
+  const popover = usePopup({ resolveReturnFocus: resolveTrigger });
+  const menu = usePopup({ resolveReturnFocus: resolveMenuButton });
+
+  const {
+    open: popoverOpen,
+    show: showPopover,
+    close: closePopover,
+    dismiss: dismissPopover
+  } = popover;
+
+  const {
+    open: menuOpen,
+    payload: menuInitialFocus,
+    toggle: toggleMenuState,
+    close: closeMenu,
+    dismiss: dismissMenu
+  } = menu;
 
   useEffect(() => {
     const previousAvailability = availabilityRef.current;
@@ -209,21 +298,21 @@ export function ConfigurationProperty(props) {
       (!previousAvailability.error && error)
       || (previousAvailability.available && !available)
     ) {
-      setOpen(false);
-      setMenuOpen(false);
+      dismissPopover();
+      dismissMenu();
     }
-  }, [ error, available ]);
+  }, [ error, available, dismissPopover, dismissMenu ]);
 
   // close popover/menu on outside click
   useEffect(() => {
-    if (!open && !menuOpen) {
+    if (!popoverOpen && !menuOpen) {
       return;
     }
 
     const onDocPointer = (event) => {
       if (ref.current && !ref.current.contains(event.target)) {
-        setOpen(false);
-        setMenuOpen(false);
+        dismissPopover();
+        dismissMenu();
       }
     };
 
@@ -232,7 +321,7 @@ export function ConfigurationProperty(props) {
     return () => {
       document.removeEventListener('mousedown', onDocPointer, true);
     };
-  }, [ open, menuOpen ]);
+  }, [ popoverOpen, menuOpen, dismissPopover, dismissMenu ]);
 
   const select = useCallback((name) => {
     if (disabled) {
@@ -242,9 +331,11 @@ export function ConfigurationProperty(props) {
     const instance = instances.find(instance => instance.name === name);
 
     setValue(name ? toReference(name) : '', instance);
-    setOpen(false);
-    setMenuOpen(false);
-  }, [ disabled, instances, setValue ]);
+
+    // return focus to the trigger once the (possibly freshly rendered) card mounts
+    closePopover();
+    dismissMenu();
+  }, [ disabled, instances, setValue, closePopover, dismissMenu ]);
 
   useEffect(() => {
     const onCreated = (event) => {
@@ -263,8 +354,8 @@ export function ConfigurationProperty(props) {
       }
 
       setValue(toReference(instance.name), instance);
-      setOpen(false);
-      setMenuOpen(false);
+      dismissPopover();
+      dismissMenu();
     };
 
     eventBus.on('configuration.created', onCreated);
@@ -279,11 +370,13 @@ export function ConfigurationProperty(props) {
     configurationInstances,
     configurationTemplate,
     minimumConfigurationTemplateVersion,
-    setValue
+    setValue,
+    dismissPopover,
+    dismissMenu
   ]);
 
   const createConfiguration = useCallback(() => {
-    setOpen(false);
+    dismissPopover();
 
     eventBus.fire('configuration.create', {
       element,
@@ -291,10 +384,10 @@ export function ConfigurationProperty(props) {
       configurationTemplate,
       configurationTemplateVersion
     });
-  }, [ eventBus, element, property, configurationTemplate, configurationTemplateVersion ]);
+  }, [ eventBus, element, property, configurationTemplate, configurationTemplateVersion, dismissPopover ]);
 
   const editConfiguration = useCallback(() => {
-    setMenuOpen(false);
+    dismissMenu();
 
     eventBus.fire('configuration.edit', {
       element,
@@ -303,10 +396,10 @@ export function ConfigurationProperty(props) {
       configurationTemplate,
       configurationTemplateVersion
     });
-  }, [ eventBus, element, property, selected, configurationTemplate, configurationTemplateVersion ]);
+  }, [ eventBus, element, property, selected, configurationTemplate, configurationTemplateVersion, dismissMenu ]);
 
   const upgradeConfiguration = useCallback(() => {
-    setMenuOpen(false);
+    dismissMenu();
 
     eventBus.fire('configuration.upgrade', {
       element,
@@ -315,26 +408,113 @@ export function ConfigurationProperty(props) {
       configurationTemplate,
       configurationTemplateVersion
     });
-  }, [ eventBus, element, property, boundInstance, configurationTemplate, configurationTemplateVersion ]);
+  }, [ eventBus, element, property, boundInstance, configurationTemplate, configurationTemplateVersion, dismissMenu ]);
 
   const toggleOpen = useCallback(() => {
     if (disabled || error || !available) {
       return;
     }
 
-    setMenuOpen(false);
-    setOpen(value => !value);
-  }, [ disabled, error, available ]);
+    dismissMenu();
 
-  const toggleMenu = useCallback((event) => {
+    // clicking the trigger while the dropdown is open closes it (canonical
+    // dropdown behavior), returning focus to the trigger
+    if (popoverOpen) {
+      closePopover();
+    } else {
+      showPopover();
+    }
+  }, [ disabled, error, available, popoverOpen, dismissMenu, closePopover, showPopover ]);
+
+  const toggleMenu = useCallback((event, initialFocus = FOCUS_FIRST) => {
     if (disabled) {
       return;
     }
 
     event.stopPropagation();
-    setOpen(false);
-    setMenuOpen(value => !value);
-  }, [ disabled ]);
+    dismissPopover();
+    toggleMenuState(initialFocus);
+  }, [ disabled, dismissPopover, toggleMenuState ]);
+
+  const variant = getConfigurationVariant({ value, error, selected, loading, available });
+
+  const renderConfiguration = () => {
+    switch (variant) {
+    case VARIANT.ERROR:
+      return (
+        <ErrorConfiguration
+          value={ value }
+          cachedName={ cachedName }
+          disabled={ disabled }
+          menuId={ menuId }
+          menuOpen={ menuOpen }
+          onMenu={ toggleMenu }
+          translate={ translate } />
+      );
+    case VARIANT.SELECTED:
+      return (
+        <SelectedConfiguration
+          instance={ selected }
+          disabled={ disabled }
+          menuId={ menuId }
+          menuOpen={ menuOpen }
+          open={ popoverOpen }
+          listboxId={ listboxId }
+          onClick={ toggleOpen }
+          onMenu={ toggleMenu }
+          translate={ translate } />
+      );
+    case VARIANT.LOADING:
+      return (
+        <LoadingConfiguration cachedName={ cachedName } translate={ translate } />
+      );
+    case VARIANT.MISSING:
+      return (
+        <MissingConfiguration
+          value={ value }
+          cachedName={ cachedName }
+          instance={ incompatible ? boundInstance : null }
+          minimumVersion={ minimumConfigurationTemplateVersion }
+          typeIncompatible={ typeIncompatible }
+          disabled={ disabled }
+          menuId={ menuId }
+          menuOpen={ menuOpen }
+          open={ popoverOpen }
+          listboxId={ listboxId }
+          onClick={ toggleOpen }
+          onMenu={ toggleMenu }
+          translate={ translate } />
+      );
+    case VARIANT.OFFLINE:
+      return (
+        <OfflineConfiguration
+          value={ value }
+          cachedName={ cachedName }
+          unavailableMessage={ unavailableMessage }
+          disabled={ disabled }
+          menuId={ menuId }
+          menuOpen={ menuOpen }
+          icon={ configurationTemplates.get(configurationTemplate, configurationTemplateVersion)?.icon?.contents }
+          onMenu={ toggleMenu }
+          translate={ translate } />
+      );
+    default:
+      return (
+        <PlaceholderConfiguration
+          id={ id }
+          disabled={ disabled }
+          error={ error }
+          available={ available }
+          unavailableMessage={ unavailableMessage }
+          open={ popoverOpen }
+          listboxId={ listboxId }
+          chooserLabel={ chooserLabel }
+          onClick={ toggleOpen }
+          showEntryRef={ showEntryRef }
+          translate={ translate } />
+      );
+    }
+  };
 
   return (
     <div
@@ -361,102 +541,7 @@ export function ConfigurationProperty(props) {
           : null
       }
 
-      {
-        value && error
-          ? (
-            <ErrorConfiguration
-              value={ value }
-              cachedName={ cachedName }
-              disabled={ disabled }
-              menuOpen={ menuOpen }
-              onMenu={ toggleMenu }
-              translate={ translate } />
-          )
-          : selected
-            ? (
-              <SelectedConfiguration
-                instance={ selected }
-                disabled={ disabled }
-                menuOpen={ menuOpen }
-                onClick={ toggleOpen }
-                onMenu={ toggleMenu }
-                translate={ translate } />
-            )
-            : value && !selected && loading
-              ? (
-                <LoadingConfiguration cachedName={ cachedName } translate={ translate } />
-              )
-              : value && !selected && available
-                ? (
-                  <MissingConfiguration
-                    value={ value }
-                    cachedName={ cachedName }
-                    instance={ incompatible ? boundInstance : null }
-                    minimumVersion={ minimumConfigurationTemplateVersion }
-                    typeIncompatible={ typeIncompatible }
-                    disabled={ disabled }
-                    menuOpen={ menuOpen }
-                    onClick={ toggleOpen }
-                    onMenu={ toggleMenu }
-                    translate={ translate } />
-                )
-                : value && !selected
-                  ? (
-                    <OfflineConfiguration
-                      value={ value }
-                      cachedName={ cachedName }
-                      unavailableMessage={ unavailableMessage }
-                      disabled={ disabled }
-                      menuOpen={ menuOpen }
-                      icon={ configurationTemplates.get(configurationTemplate, configurationTemplateVersion)?.icon?.contents }
-                      onMenu={ toggleMenu }
-                      translate={ translate } />
-                  )
-                  : (
-                    <>
-                      <button
-                        ref={ showEntryRef }
-                        type="button"
-                        class="bio-properties-panel-configuration-chooser-placeholder"
-                        disabled={ disabled || error || !available }
-                        aria-describedby={
-                          error
-                            ? `${ id }-error`
-                            : !available && unavailableMessage
-                              ? `${ id }-unavailable`
-                              : undefined
-                        }
-                        aria-expanded={ open }
-                        onClick={ toggleOpen }>
-                        <CreateIcon
-                          class="bio-properties-panel-configuration-chooser-create-icon"
-                          aria-hidden="true" />
-                        { translate('Choose {configuration}', { configuration: chooserLabel }) }
-                      </button>
-                      {
-                        error
-                          ? (
-                            <div
-                              id={ `${ id }-error` }
-                              class="bio-properties-panel-configuration-chooser-unavailable bio-properties-panel-configuration-chooser-unavailable--error"
-                              role="status">
-                              { translate('Could not load configurations') }
-                            </div>
-                          )
-                          : !available && unavailableMessage
-                            ? (
-                              <div
-                                id={ `${ id }-unavailable` }
-                                class="bio-properties-panel-configuration-chooser-unavailable"
-                                role="status">
-                                { unavailableMessage }
-                              </div>
-                            )
-                            : null
-                      }
-                    </>
-                  )
-      }
+      { renderConfiguration() }
 
       {
         validationError
@@ -469,14 +554,17 @@ export function ConfigurationProperty(props) {
       }
 
       {
-        open
+        popoverOpen
           ? (
             <ConfigurationPopover
+              listboxId={ listboxId }
               instances={ instances }
               selected={ selected }
               canCreate={ canCreate }
               onCreate={ createConfiguration }
               onSelect={ select }
+              onClose={ closePopover }
+              onDismiss={ dismissPopover }
               loading={ loading }
               translate={ translate } />
           )
@@ -487,9 +575,13 @@ export function ConfigurationProperty(props) {
         menuOpen
           ? (
             <ConfigurationContextMenu
+              menuId={ menuId }
+              initialFocus={ menuInitialFocus }
               onEdit={ selected && canUpdate ? editConfiguration : null }
               onUpgrade={ versionIncompatible && canUpdate ? upgradeConfiguration : null }
               onRemove={ () => select(null) }
+              onClose={ closeMenu }
+              onDismiss={ dismissMenu }
               translate={ translate } />
           )
           : null
@@ -502,78 +594,240 @@ function SelectedConfiguration(props) {
   const {
     disabled,
     instance,
+    listboxId,
+    menuId,
     menuOpen,
+    open,
     onClick,
     onMenu,
     translate
   } = props;
 
   return (
-    <div
-      class="bio-properties-panel-configuration-chooser-selected"
-      role="button"
-      tabIndex={ disabled ? -1 : 0 }
-      onClick={ disabled ? null : onClick }
-      onKeyDown={ disabled ? null : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } }>
-      <ConfigurationLogo instance={ instance } />
-      <span class="bio-properties-panel-configuration-chooser-text">
-        <span class="bio-properties-panel-configuration-chooser-title">
-          { getDisplayName(instance) }
-        </span>
-        <span class="bio-properties-panel-configuration-chooser-subtitle">
-          <span class="bio-properties-panel-configuration-chooser-varname">{ instance.name }</span>
-        </span>
-      </span>
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-menu"
-        title={ translate('More actions') }
-        aria-label={ translate('More actions') }
-        aria-expanded={ menuOpen }
+    <div class="bio-properties-panel-configuration-chooser-selected">
+      <ConfigurationTrigger
         disabled={ disabled }
-        onClick={ onMenu }>
-        …
-      </button>
+        listboxId={ listboxId }
+        open={ open }
+        onClick={ onClick }>
+        <ConfigurationLogo instance={ instance } />
+        <span class="bio-properties-panel-configuration-chooser-text">
+          <span class="bio-properties-panel-configuration-chooser-title">
+            { getDisplayName(instance) }
+          </span>
+          <span class="bio-properties-panel-configuration-chooser-subtitle">
+            <span class="bio-properties-panel-configuration-chooser-varname">{ instance.name }</span>
+          </span>
+        </span>
+      </ConfigurationTrigger>
+      <ConfigurationMenuButton
+        menuId={ menuId }
+        menuOpen={ menuOpen }
+        disabled={ disabled }
+        onMenu={ onMenu }
+        translate={ translate } />
     </div>
   );
 }
 
-function ConfigurationContextMenu(props) {
-  const { onEdit, onRemove, onUpgrade, translate } = props;
+function ConfigurationTrigger(props) {
+  const {
+    children,
+    disabled,
+    listboxId,
+    open,
+    onClick
+  } = props;
 
   return (
-    <div class="bio-properties-panel-configuration-chooser-context-menu">
+    <button
+      type="button"
+      class="bio-properties-panel-configuration-chooser-trigger"
+      disabled={ disabled }
+      aria-haspopup="listbox"
+      aria-expanded={ open }
+      aria-controls={ open ? listboxId : undefined }
+      onMouseDown={ open ? (event) => event.preventDefault() : undefined }
+      onClick={ disabled ? null : onClick }>
+      { children }
+    </button>
+  );
+}
+
+function ConfigurationMenuButton(props) {
+  const { disabled, menuId, menuOpen, onMenu, translate } = props;
+
+  const onKeyDown = (event) => {
+
+    if (menuOpen) {
+      return;
+    }
+
+    // open the menu with the arrow keys, matching native menu-button behaviour:
+    // ArrowDown focuses the first item, ArrowUp the last
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      onMenu(event, FOCUS_FIRST);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      onMenu(event, FOCUS_LAST);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      class="bio-properties-panel-configuration-chooser-menu"
+      title={ translate('More actions') }
+      aria-label={ translate('More actions') }
+      aria-haspopup="menu"
+      aria-expanded={ menuOpen }
+      aria-controls={ menuOpen ? menuId : undefined }
+      disabled={ disabled }
+      onClick={ onMenu }
+      onKeyDown={ onKeyDown }>
+      …
+    </button>
+  );
+}
+
+function ConfigurationContextMenu(props) {
+  const { initialFocus, menuId, onClose, onDismiss, onEdit, onRemove, onUpgrade, translate } = props;
+
+  const menuRef = useRef(null);
+  const itemRefs = useRef([]);
+
+  const items = [];
+
+  if (onEdit) {
+    items.push({ key: 'edit', label: translate('Edit'), onClick: onEdit });
+  }
+
+  if (onUpgrade) {
+    items.push({ key: 'upgrade', label: translate('Upgrade'), onClick: onUpgrade });
+  }
+
+  items.push({ key: 'remove', label: translate('Unset'), onClick: onRemove });
+
+  const itemCount = items.length;
+
+  // the menu is re-mounted on each open, so useActiveIndex re-seeds from the
+  // current initialFocus intent ('first' vs 'last') each time
+  const [ activeIndex, setActiveIndex, onNavigationKeyDown ] = useActiveIndex(itemCount, {
+    initialIndex: initialFocus === FOCUS_LAST ? itemCount - 1 : 0,
+    wrap: true
+  });
+
+  // move real focus to the active item (menus use roving focus rather than
+  // aria-activedescendant); this also moves focus into the menu on open
+  useEffect(() => {
+    const node = itemRefs.current[ activeIndex ];
+
+    if (node) {
+      node.focus();
+    }
+  }, [ activeIndex ]);
+
+  const onKeyDown = (event) => {
+    onNavigationKeyDown(event);
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      onClose();
+    }
+  };
+
+  // close the menu once focus leaves it entirely (e.g. tabbing away), letting
+  // focus continue to its natural destination
+  useFocusOut(menuRef, onDismiss);
+
+  return (
+    <div
+      ref={ menuRef }
+      id={ menuId }
+      role="menu"
+      aria-label={ translate('More actions') }
+      class="bio-properties-panel-configuration-chooser-context-menu"
+      onKeyDown={ onKeyDown }>
       {
-        onEdit
-          ? (
-            <button
-              type="button"
-              class="bio-properties-panel-configuration-chooser-context-menu-item"
-              onClick={ onEdit }>
-              { translate('Edit') }
-            </button>
-          )
-          : null
+        items.map((item, index) => (
+          <button
+            key={ item.key }
+            ref={ node => itemRefs.current[ index ] = node }
+            type="button"
+            role="menuitem"
+            tabIndex={ index === activeIndex ? 0 : -1 }
+            class="bio-properties-panel-configuration-chooser-context-menu-item"
+            onClick={ item.onClick }
+            onMouseEnter={ () => setActiveIndex(index) }>
+            { item.label }
+          </button>
+        ))
       }
-      {
-        onUpgrade
-          ? (
-            <button
-              type="button"
-              class="bio-properties-panel-configuration-chooser-context-menu-item"
-              onClick={ onUpgrade }>
-              { translate('Upgrade') }
-            </button>
-          )
-          : null
-      }
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-context-menu-item"
-        onClick={ onRemove }>
-        { translate('Unset') }
-      </button>
     </div>
+  );
+}
+
+function PlaceholderConfiguration(props) {
+  const {
+    available,
+    chooserLabel,
+    disabled,
+    error,
+    id,
+    listboxId,
+    onClick,
+    open,
+    showEntryRef,
+    translate,
+    unavailableMessage
+  } = props;
+
+  const describedBy = error
+    ? `${ id }-error`
+    : !available && unavailableMessage
+      ? `${ id }-unavailable`
+      : undefined;
+
+  return (
+    <>
+      <button
+        ref={ showEntryRef }
+        type="button"
+        class="bio-properties-panel-configuration-chooser-placeholder"
+        disabled={ disabled || error || !available }
+        aria-haspopup="listbox"
+        aria-controls={ open ? listboxId : undefined }
+        aria-describedby={ describedBy }
+        aria-expanded={ open }
+        onClick={ onClick }>
+        <CreateIcon
+          class="bio-properties-panel-configuration-chooser-create-icon"
+          aria-hidden="true" />
+        { translate('Choose {configuration}', { configuration: chooserLabel }) }
+      </button>
+      {
+        error
+          ? (
+            <div
+              id={ `${ id }-error` }
+              class="bio-properties-panel-configuration-chooser-unavailable bio-properties-panel-configuration-chooser-unavailable--error"
+              role="status">
+              { translate('Could not load configurations') }
+            </div>
+          )
+          : !available && unavailableMessage
+            ? (
+              <div
+                id={ `${ id }-unavailable` }
+                class="bio-properties-panel-configuration-chooser-unavailable"
+                role="status">
+                { unavailableMessage }
+              </div>
+            )
+            : null
+      }
+    </>
   );
 }
 
@@ -608,6 +862,7 @@ function ErrorConfiguration(props) {
   const {
     cachedName,
     disabled,
+    menuId,
     menuOpen,
     onMenu,
     translate,
@@ -627,16 +882,12 @@ function ErrorConfiguration(props) {
           { translate('Could not load configurations') }
         </span>
       </span>
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-menu"
-        title={ translate('More actions') }
-        aria-label={ translate('More actions') }
-        aria-expanded={ menuOpen }
+      <ConfigurationMenuButton
+        menuId={ menuId }
+        menuOpen={ menuOpen }
         disabled={ disabled }
-        onClick={ onMenu }>
-        …
-      </button>
+        onMenu={ onMenu }
+        translate={ translate } />
     </div>
   );
 }
@@ -646,8 +897,11 @@ function MissingConfiguration(props) {
     cachedName,
     disabled,
     instance,
+    listboxId,
+    menuId,
     menuOpen,
     minimumVersion,
+    open,
     onClick,
     onMenu,
     translate,
@@ -659,45 +913,42 @@ function MissingConfiguration(props) {
   const refName = fromReference(value);
   const instanceVersion = instance?.metadata?.configurationTemplateVersion;
 
+  const title = instance
+    ? getDisplayName(instance)
+    : cachedName || translate('Configuration not found');
+
+  const subtitle = instance
+    ? typeIncompatible
+      ? translate('Incompatible configuration type')
+      : translate('Version {version} · Requires version {minimumVersion}+', {
+        version: instanceVersion == null ? '?' : instanceVersion,
+        minimumVersion
+      })
+    : cachedName ? translate('Not found on cluster') : refName;
+
   return (
-    <div
-      class="bio-properties-panel-configuration-chooser-missing"
-      role="button"
-      tabIndex={ disabled ? -1 : 0 }
-      onClick={ disabled ? null : onClick }
-      onKeyDown={ disabled ? null : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } }>
-      <ConfigurationLogo warning />
-      <span class="bio-properties-panel-configuration-chooser-text">
-        <span class="bio-properties-panel-configuration-chooser-title">
-          {
-            instance
-              ? getDisplayName(instance)
-              : cachedName || translate('Configuration not found')
-          }
-        </span>
-        <span class="bio-properties-panel-configuration-chooser-subtitle">
-          {
-            instance
-              ? typeIncompatible
-                ? translate('Incompatible configuration type')
-                : translate('Version {version} · Requires version {minimumVersion}+', {
-                  version: instanceVersion == null ? '?' : instanceVersion,
-                  minimumVersion
-                })
-              : cachedName ? translate('Not found on cluster') : refName
-          }
-        </span>
-      </span>
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-menu"
-        title={ translate('More actions') }
-        aria-label={ translate('More actions') }
-        aria-expanded={ menuOpen }
+    <div class="bio-properties-panel-configuration-chooser-missing">
+      <ConfigurationTrigger
         disabled={ disabled }
-        onClick={ onMenu }>
-        …
-      </button>
+        listboxId={ listboxId }
+        open={ open }
+        onClick={ onClick }>
+        <ConfigurationLogo warning />
+        <span class="bio-properties-panel-configuration-chooser-text">
+          <span class="bio-properties-panel-configuration-chooser-title">
+            { title }
+          </span>
+          <span class="bio-properties-panel-configuration-chooser-subtitle">
+            { subtitle }
+          </span>
+        </span>
+      </ConfigurationTrigger>
+      <ConfigurationMenuButton
+        menuId={ menuId }
+        menuOpen={ menuOpen }
+        disabled={ disabled }
+        onMenu={ onMenu }
+        translate={ translate } />
     </div>
   );
 }
@@ -707,6 +958,7 @@ function OfflineConfiguration(props) {
     cachedName,
     disabled,
     icon,
+    menuId,
     menuOpen,
     onMenu,
     translate,
@@ -736,16 +988,12 @@ function OfflineConfiguration(props) {
           { unavailableMessage || translate('Cluster unavailable') }
         </span>
       </span>
-      <button
-        type="button"
-        class="bio-properties-panel-configuration-chooser-menu"
-        title={ translate('More actions') }
-        aria-label={ translate('More actions') }
-        aria-expanded={ menuOpen }
+      <ConfigurationMenuButton
+        menuId={ menuId }
+        menuOpen={ menuOpen }
         disabled={ disabled }
-        onClick={ onMenu }>
-        …
-      </button>
+        onMenu={ onMenu }
+        translate={ translate } />
     </div>
   );
 }
@@ -754,15 +1002,84 @@ function ConfigurationPopover(props) {
   const {
     canCreate,
     instances,
+    listboxId,
     loading,
+    onClose,
     onCreate,
+    onDismiss,
     onSelect,
     selected,
     translate
   } = props;
 
+  const listRef = useRef(null);
+  const createRef = useRef(null);
+  const popoverRef = useRef(null);
+
+  const createId = `${ listboxId }-create`;
+
+  // the create action participates in keyboard navigation as a trailing option
+  const createIndex = canCreate ? instances.length : -1;
+  const optionCount = instances.length + (canCreate ? 1 : 0);
+
+  const selectedIndex = instances.findIndex(instance => instance === selected);
+
+  const [ activeIndex, setActiveIndex, onNavigationKeyDown ] = useActiveIndex(optionCount, {
+    initialIndex: selectedIndex >= 0 ? selectedIndex : 0
+  });
+
+  // move focus into the popover so it can be operated by keyboard; the parent
+  // restores focus to the trigger when the popover is closed via keyboard
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.focus();
+    } else if (createRef.current) {
+      createRef.current.focus();
+    }
+  }, []);
+
+  const isCreateActive = canCreate && activeIndex === createIndex;
+  const activeInstance = isCreateActive ? null : instances[ activeIndex ];
+
+  const optionId = (instance) => `${ listboxId }-option-${ instance.name }`;
+
+  const activeDescendant = isCreateActive
+    ? createId
+    : activeInstance
+      ? optionId(activeInstance)
+      : undefined;
+
+  const activateSelection = () => {
+    if (isCreateActive) {
+      onCreate();
+    } else if (activeInstance) {
+      onSelect(selected === activeInstance ? null : activeInstance.name);
+    }
+  };
+
+  const onKeyDown = (event) => {
+    onNavigationKeyDown(event);
+
+    const { key } = event;
+
+    if (key === 'Enter' || key === ' ') {
+      event.preventDefault();
+      activateSelection();
+    } else if (key === 'Escape') {
+      event.preventDefault();
+      onClose();
+    }
+  };
+
+  // close the popover once focus leaves it entirely (e.g. tabbing to the next
+  // field), letting focus continue to its natural destination
+  useFocusOut(popoverRef, onDismiss);
+
   return (
-    <div class="bio-properties-panel-configuration-chooser-popover">
+    <div
+      ref={ popoverRef }
+      class="bio-properties-panel-configuration-chooser-popover"
+      onKeyDown={ onKeyDown }>
       {
         loading
           ? (
@@ -775,40 +1092,61 @@ function ConfigurationPopover(props) {
           : null
       }
 
-      {
-        instances.length
-          ? (
-            <ul class="bio-properties-panel-configuration-chooser-popover-list">
-              {
-                instances.map((instance) => (
-                  <ConfigurationRow
-                    key={ instance.name }
-                    instance={ instance }
-                    selected={ selected === instance }
-                    onSelect={ () => onSelect(selected === instance ? null : instance.name) }
-                    translate={ translate } />
-                ))
-              }
-            </ul>
-          )
-          : (
-            <div class="bio-properties-panel-configuration-chooser-empty">
-              {
-                loading
-                  ? translate('Loading...')
-                  : translate('No compatible configurations are available in the connected cluster')
-              }
-            </div>
-          )
-      }
+      <ul
+        ref={ listRef }
+        id={ listboxId }
+        role="listbox"
+        tabIndex={ -1 }
+        aria-label={ translate('Configurations') }
+        aria-activedescendant={ activeDescendant }
+        aria-owns={ canCreate ? createId : undefined }
+        class="bio-properties-panel-configuration-chooser-popover-list">
+        {
+          instances.length
+            ? instances.map((instance, index) => (
+              <ConfigurationRow
+                key={ instance.name }
+                id={ optionId(instance) }
+                instance={ instance }
+                active={ index === activeIndex }
+                selected={ selected === instance }
+                onSelect={ () => onSelect(selected === instance ? null : instance.name) }
+                onHover={ () => setActiveIndex(index) }
+                translate={ translate } />
+            ))
+            : (
+              <li
+                class="bio-properties-panel-configuration-chooser-empty"
+                role="presentation">
+                <span role="status">
+                  {
+                    loading
+                      ? translate('Loading...')
+                      : translate('No compatible configurations are available in the connected cluster')
+                  }
+                </span>
+              </li>
+            )
+        }
+      </ul>
 
       {
         canCreate
           ? (
             <button
+              ref={ createRef }
               type="button"
-              class="bio-properties-panel-configuration-chooser-create"
-              onClick={ onCreate }>
+              id={ createId }
+              role="option"
+              tabIndex={ -1 }
+              aria-selected={ false }
+              class={
+                isCreateActive
+                  ? 'bio-properties-panel-configuration-chooser-create bio-properties-panel-configuration-chooser-create--active'
+                  : 'bio-properties-panel-configuration-chooser-create'
+              }
+              onClick={ onCreate }
+              onMouseEnter={ () => setActiveIndex(createIndex) }>
               <CreateIcon
                 class="bio-properties-panel-configuration-chooser-create-icon"
                 aria-hidden="true" />
@@ -823,17 +1161,13 @@ function ConfigurationPopover(props) {
 
 function ConfigurationRow(props) {
   const {
+    active,
+    id,
     instance,
+    onHover,
     onSelect,
     selected
   } = props;
-
-  const onKeyDown = (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      onSelect();
-    }
-  };
 
   const classes = [ 'bio-properties-panel-configuration-chooser-popover-row' ];
 
@@ -841,14 +1175,18 @@ function ConfigurationRow(props) {
     classes.push('bio-properties-panel-configuration-chooser-popover-row--selected');
   }
 
+  if (active) {
+    classes.push('bio-properties-panel-configuration-chooser-popover-row--active');
+  }
+
   return (
     <li
+      id={ id }
       class={ classes.join(' ') }
-      role="button"
-      tabIndex={ 0 }
-      aria-pressed={ selected }
+      role="option"
+      aria-selected={ selected }
       onClick={ onSelect }
-      onKeyDown={ onKeyDown }>
+      onMouseEnter={ onHover }>
       <ConfigurationLogo instance={ instance } />
       <span class="bio-properties-panel-configuration-chooser-text">
         <span class="bio-properties-panel-configuration-chooser-title">
