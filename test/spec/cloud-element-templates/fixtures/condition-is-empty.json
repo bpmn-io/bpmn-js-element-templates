@@ -4,6 +4,15 @@
   "id": "example.com.condition.isEmpty",
   "description": "A conditional template for isEmpty.",
   "appliesTo": ["bpmn:Task"],
+  "configurationTemplates": [
+    {
+      "id": "example.com.condition.isEmpty.configuration:1",
+      "name": "IsEmpty Configuration",
+      "version": 1,
+      "kind": "CREDENTIAL",
+      "properties": []
+    }
+  ],
   "properties": [
     {
       "id": "stringProp",
@@ -192,6 +201,44 @@
       },
       "condition": {
         "property": "optionalInputProp",
+        "isEmpty": false
+      }
+    },
+    {
+      "id": "configurationProp",
+      "type": "Configuration",
+      "label": "Configuration property",
+      "configurationTemplate": "example.com.condition.isEmpty.configuration:1",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "configurationProp"
+      }
+    },
+    {
+      "id": "showIfConfigurationEmpty",
+      "type": "String",
+      "label": "Show if configurationProp is empty",
+      "value": "visible when configuration empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfConfigurationEmpty"
+      },
+      "condition": {
+        "property": "configurationProp",
+        "isEmpty": true
+      }
+    },
+    {
+      "id": "showIfConfigurationNotEmpty",
+      "type": "String",
+      "label": "Show if configurationProp is not empty",
+      "value": "visible when configuration not empty",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "showIfConfigurationNotEmpty"
+      },
+      "condition": {
+        "property": "configurationProp",
         "isEmpty": false
       }
     },

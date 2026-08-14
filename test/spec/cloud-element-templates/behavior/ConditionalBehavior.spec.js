@@ -2210,6 +2210,34 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       }));
 
 
+      it('should match for Configuration when source is empty', inject(function() {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+
+        // then
+        expect(findZeebeProperty(element, 'showIfConfigurationEmpty')).to.exist;
+        expect(findZeebeProperty(element, 'showIfConfigurationNotEmpty')).to.not.exist;
+      }));
+
+
+      it('should not match for Configuration when source has a value', inject(function(modeling) {
+
+        // given
+        const element = changeTemplate('Task_1', isEmptyTemplate);
+        const businessObject = getBusinessObject(element);
+
+        // when
+        const ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
+        const inputParam = ioMapping.get('inputParameters').find(p => p.target === 'configurationProp');
+        modeling.updateModdleProperties(element, inputParam, { source: '=camunda.vars.env.slackProduction' });
+
+        // then
+        expect(findZeebeProperty(element, 'showIfConfigurationEmpty')).to.not.exist;
+        expectZeebeProperty(businessObject, 'showIfConfigurationNotEmpty');
+      }));
+
+
       it('should match for optional zeebe:input when binding is absent from XML', inject(function() {
 
         // given

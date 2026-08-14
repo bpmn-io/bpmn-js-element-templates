@@ -50,6 +50,8 @@ import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/linting
 
 import { connectors } from '@camunda/connectors-element-templates';
 
+import connectionsDesignTemplates from 'test/spec/cloud-element-templates/fixtures/connections-design.json';
+
 const singleStart = window.__env__ && window.__env__.SINGLE_START;
 
 insertCoreStyles();
@@ -567,14 +569,22 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
     // given
     const diagramXml = require('test/spec/cloud-element-templates/fixtures/complex.bpmn').default;
 
-    const elementTemplates = connectors.flatMap(connector => connector.default || connector),
-          configurationTemplates = new Set(
-            elementTemplates.flatMap((template) => {
-              return (template.configurationTemplates || []).map(({ id, version = 1 }) => {
-                return `${ id }@${ version }`;
-              });
-            })
-          );
+    const exampleConfigurationTemplates = connectionsDesignTemplates.filter(
+      ({ id }) => id === 'io.camunda.examples.Configuration.v1'
+    );
+
+    const elementTemplates = [
+      ...connectors.flatMap(connector => connector.default || connector),
+      ...exampleConfigurationTemplates
+    ];
+
+    const configurationTemplates = new Set(
+      elementTemplates.flatMap((template) => {
+        return (template.configurationTemplates || []).map(({ id, version = 1 }) => {
+          return `${ id }@${ version }`;
+        });
+      })
+    );
 
     // when
     const result = await createModeler(
