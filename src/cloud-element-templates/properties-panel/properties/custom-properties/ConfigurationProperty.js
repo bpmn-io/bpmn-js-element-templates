@@ -536,7 +536,8 @@ export function ConfigurationProperty(props) {
         'bio-properties-panel-configuration-chooser',
         validationError ? 'has-error' : ''
       ) }
-      data-entry-id={ id }>
+      data-entry-id={ id }
+      data-configuration-state={ variant }>
       <label class="bio-properties-panel-label">
         { configurationLabel }
       </label>
@@ -1286,14 +1287,19 @@ function ConfigurationLogo(props) {
 /**
  * Whether the configuration chooser has a non-empty selection.
  *
+ * Reads the chooser's rendered `data-configuration-state`, which reflects the
+ * current variant. Every variant except the placeholder represents a binding.
+ *
  * @param {HTMLElement} node
  * @returns {boolean}
  */
 export function isConfigurationChooserEdited(node) {
-  return !!domQuery(
-    '.bio-properties-panel-configuration-chooser-selected, .bio-properties-panel-configuration-chooser-missing, .bio-properties-panel-configuration-chooser-loading',
-    node
-  );
+  const stateNode = node && node.matches?.('[data-configuration-state]')
+    ? node
+    : domQuery('[data-configuration-state]', node);
+
+  return !!stateNode
+    && stateNode.getAttribute('data-configuration-state') !== VARIANT.PLACEHOLDER;
 }
 
 function isSameChooser(event, element, property) {

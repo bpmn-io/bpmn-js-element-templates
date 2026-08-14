@@ -103,26 +103,6 @@ import timerElementTemplates from './CustomProperties.timer.json';
 
 describe('provider/cloud-element-templates - CustomProperties', function() {
 
-  describe('configuration edited state', function() {
-
-    it('should treat every bound configuration state as edited', function() {
-
-      const selected = document.createElement('div');
-      selected.innerHTML = '<div class="bio-properties-panel-configuration-chooser-selected"></div>';
-      const missing = document.createElement('div');
-      missing.innerHTML = '<div class="bio-properties-panel-configuration-chooser-missing"></div>';
-      const loading = document.createElement('div');
-      loading.innerHTML = '<div class="bio-properties-panel-configuration-chooser-loading"></div>';
-      const empty = document.createElement('div');
-
-      expect(isConfigurationChooserEdited(selected)).to.be.true;
-      expect(isConfigurationChooserEdited(missing)).to.be.true;
-      expect(isConfigurationChooserEdited(loading)).to.be.true;
-      expect(isConfigurationChooserEdited(empty)).to.be.false;
-    });
-
-  });
-
   let container;
 
   beforeEach(function() {
@@ -1139,6 +1119,30 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
       expect(zeebeProperty.$attrs).to.eql({});
     }));
+
+  });
+
+
+  describe('configuration edited state', function() {
+
+    it('should treat every bound configuration state as edited', function() {
+
+      const selected = document.createElement('div');
+      selected.innerHTML = '<div data-configuration-state="selected"></div>';
+      const missing = document.createElement('div');
+      missing.innerHTML = '<div data-configuration-state="missing"></div>';
+      const loading = document.createElement('div');
+      loading.innerHTML = '<div data-configuration-state="loading"></div>';
+      const placeholder = document.createElement('div');
+      placeholder.innerHTML = '<div data-configuration-state="placeholder"></div>';
+      const empty = document.createElement('div');
+
+      expect(isConfigurationChooserEdited(selected)).to.be.true;
+      expect(isConfigurationChooserEdited(missing)).to.be.true;
+      expect(isConfigurationChooserEdited(loading)).to.be.true;
+      expect(isConfigurationChooserEdited(placeholder)).to.be.false;
+      expect(isConfigurationChooserEdited(empty)).to.be.false;
+    });
 
   });
 
