@@ -1182,7 +1182,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         } ]);
       });
 
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', fallbackEntry));
+      clickConfigurationOption(fallbackEntry, 'AWS Production');
 
       await act(() => {
         configurationInstances.setSelectableInstances([ {
@@ -1308,12 +1308,12 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       await act(() => {
         fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', propertyEntry));
       });
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', propertyEntry));
+      clickConfigurationOption(propertyEntry, 'Slack Production');
 
       await act(() => {
         fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', inputEntry));
       });
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', inputEntry));
+      clickConfigurationOption(inputEntry, 'Slack Production');
 
       // when
       clickConfigurationMenuItem(inputEntry, 'Unset');
@@ -1386,20 +1386,20 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const propertyEntry = findEntry('custom-entry-configuration-metadata-cleanup-0', container),
             inputEntry = findEntry('custom-entry-configuration-metadata-cleanup-1', container);
 
-      const select = async (entry, index) => {
+      const select = async (entry, name) => {
         await act(() => {
           fireEvent.click(domQuery(
             '.bio-properties-panel-configuration-chooser-placeholder, .bio-properties-panel-configuration-chooser-selected',
             entry
           ));
         });
-        fireEvent.click(domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry)[ index ]);
+        clickConfigurationOption(entry, name);
       };
 
-      await select(propertyEntry, 0);
-      await select(inputEntry, 0);
-      await select(propertyEntry, 1);
-      await select(inputEntry, 1);
+      await select(propertyEntry, 'Slack Production');
+      await select(inputEntry, 'Slack Production');
+      await select(propertyEntry, 'Slack Development');
+      await select(inputEntry, 'Slack Development');
 
       // then
       const zeebeProperties = findExtension(businessObject, 'zeebe:Properties'),
@@ -1480,7 +1480,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container)).to.exist;
       });
 
-      fireEvent.keyDown(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container), {
+      fireEvent.keyDown(getConfigurationOption(container, 'Slack Production'), {
         key: ' '
       });
 
@@ -1557,7 +1557,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container)).to.exist;
       });
 
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container));
+      clickConfigurationOption(container, 'Slack Production');
 
       // then
       const ioMapping = findExtension(businessObject, 'zeebe:IoMapping'),
@@ -1629,7 +1629,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       await act(() => {
         fireEvent.click(placeholder);
       });
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+      clickConfigurationOption(entry, 'Slack Production');
 
       await act(() => {
         configurationInstances.setState({
@@ -1706,7 +1706,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       await act(() => {
         fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
       });
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+      clickConfigurationOption(entry, 'Slack Production');
 
       // when
       await act(() => {
@@ -1899,7 +1899,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       await act(() => {
         fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
       });
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+      clickConfigurationOption(entry, 'Slack Production');
 
       // when - successful empty response
       await act(() => {
@@ -2173,7 +2173,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       await act(() => {
         fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
       });
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+      clickConfigurationOption(entry, 'Slack Production');
       openConfigurationMenu(entry);
 
       expect(getConfigurationMenuItem(entry, 'Unset')).to.exist;
@@ -2274,7 +2274,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       await act(() => {
         fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
       });
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+      clickConfigurationOption(entry, 'Slack Production');
 
       await act(() => {
 
@@ -4976,6 +4976,16 @@ function clickConfigurationMenuItem(entry, label) {
   openConfigurationMenu(entry);
 
   fireEvent.click(getConfigurationMenuItem(entry, label));
+}
+
+function clickConfigurationOption(entry, name) {
+  fireEvent.click(getConfigurationOption(entry, name));
+}
+
+function getConfigurationOption(entry, name) {
+  return within(entry).getAllByText(name).find(option => {
+    return option.closest('li[role="button"]');
+  }).closest('li[role="button"]');
 }
 
 function getConfigurationMenuItem(entry, label) {
