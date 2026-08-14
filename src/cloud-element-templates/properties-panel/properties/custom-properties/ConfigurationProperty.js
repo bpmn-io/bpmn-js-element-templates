@@ -604,29 +604,22 @@ function SelectedConfiguration(props) {
   } = props;
 
   return (
-    <div class="bio-properties-panel-configuration-chooser-selected">
-      <ConfigurationTrigger
-        disabled={ disabled }
-        listboxId={ listboxId }
-        open={ open }
-        onClick={ onClick }>
-        <ConfigurationLogo instance={ instance } />
-        <span class="bio-properties-panel-configuration-chooser-text">
-          <span class="bio-properties-panel-configuration-chooser-title">
-            { getDisplayName(instance) }
-          </span>
-          <span class="bio-properties-panel-configuration-chooser-subtitle">
-            <span class="bio-properties-panel-configuration-chooser-varname">{ instance.name }</span>
-          </span>
-        </span>
-      </ConfigurationTrigger>
-      <ConfigurationMenuButton
-        menuId={ menuId }
-        menuOpen={ menuOpen }
-        disabled={ disabled }
-        onMenu={ onMenu }
-        translate={ translate } />
-    </div>
+    <ConfigurationCard
+      class="bio-properties-panel-configuration-chooser-selected"
+      interactive
+      disabled={ disabled }
+      open={ open }
+      listboxId={ listboxId }
+      onClick={ onClick }
+      menuId={ menuId }
+      menuOpen={ menuOpen }
+      onMenu={ onMenu }
+      translate={ translate }
+      logo={ <ConfigurationLogo instance={ instance } /> }
+      title={ getDisplayName(instance) }
+      subtitle={
+        <span class="bio-properties-panel-configuration-chooser-varname">{ instance.name }</span>
+      } />
   );
 }
 
@@ -651,6 +644,89 @@ function ConfigurationTrigger(props) {
       onClick={ disabled ? null : onClick }>
       { children }
     </button>
+  );
+}
+
+/**
+ * The shared identity of a configuration: its logo and the title/subtitle text.
+ * Presentational; used both by the cards and by the popover rows.
+ */
+function ConfigurationCardContent(props) {
+  const { logo, title, subtitle } = props;
+
+  return (
+    <>
+      { logo }
+      <span class="bio-properties-panel-configuration-chooser-text">
+        <span class="bio-properties-panel-configuration-chooser-title">
+          { title }
+        </span>
+        <span class="bio-properties-panel-configuration-chooser-subtitle">
+          { subtitle }
+        </span>
+      </span>
+    </>
+  );
+}
+
+/**
+ * The shell shared by every configuration card variant (selected, missing,
+ * offline, error, loading): a container holding the identity content and,
+ * optionally, an interactive trigger and/or the actions ("…") menu button.
+ *
+ * - `interactive` wraps the content in the listbox trigger button.
+ * - passing `onMenu` renders the actions menu button.
+ */
+function ConfigurationCard(props) {
+  const {
+    class: className,
+    role,
+    logo,
+    title,
+    subtitle,
+    interactive = false,
+    disabled,
+    open,
+    listboxId,
+    onClick,
+    menuId,
+    menuOpen,
+    onMenu,
+    translate
+  } = props;
+
+  const content = (
+    <ConfigurationCardContent logo={ logo } title={ title } subtitle={ subtitle } />
+  );
+
+  return (
+    <div class={ className } role={ role }>
+      {
+        interactive
+          ? (
+            <ConfigurationTrigger
+              disabled={ disabled }
+              listboxId={ listboxId }
+              open={ open }
+              onClick={ onClick }>
+              { content }
+            </ConfigurationTrigger>
+          )
+          : content
+      }
+      {
+        onMenu
+          ? (
+            <ConfigurationMenuButton
+              menuId={ menuId }
+              menuOpen={ menuOpen }
+              disabled={ disabled }
+              onMenu={ onMenu }
+              translate={ translate } />
+          )
+          : null
+      }
+    </div>
   );
 }
 
@@ -842,19 +918,12 @@ function LoadingConfiguration(props) {
   };
 
   return (
-    <div
+    <ConfigurationCard
       class="bio-properties-panel-configuration-chooser-loading"
-      role="status">
-      <ConfigurationLogo instance={ instance } />
-      <span class="bio-properties-panel-configuration-chooser-text">
-        <span class="bio-properties-panel-configuration-chooser-title">
-          { name }
-        </span>
-        <span class="bio-properties-panel-configuration-chooser-subtitle">
-          { translate('Loading configuration') }
-        </span>
-      </span>
-    </div>
+      role="status"
+      logo={ <ConfigurationLogo instance={ instance } /> }
+      title={ name }
+      subtitle={ translate('Loading configuration') } />
   );
 }
 
@@ -872,23 +941,16 @@ function ErrorConfiguration(props) {
   const refName = fromReference(value);
 
   return (
-    <div class="bio-properties-panel-configuration-chooser-missing bio-properties-panel-configuration-chooser-error">
-      <ConfigurationLogo warning />
-      <span class="bio-properties-panel-configuration-chooser-text">
-        <span class="bio-properties-panel-configuration-chooser-title">
-          { cachedName || refName }
-        </span>
-        <span class="bio-properties-panel-configuration-chooser-subtitle">
-          { translate('Could not load configurations') }
-        </span>
-      </span>
-      <ConfigurationMenuButton
-        menuId={ menuId }
-        menuOpen={ menuOpen }
-        disabled={ disabled }
-        onMenu={ onMenu }
-        translate={ translate } />
-    </div>
+    <ConfigurationCard
+      class="bio-properties-panel-configuration-chooser-missing bio-properties-panel-configuration-chooser-error"
+      disabled={ disabled }
+      menuId={ menuId }
+      menuOpen={ menuOpen }
+      onMenu={ onMenu }
+      translate={ translate }
+      logo={ <ConfigurationLogo warning /> }
+      title={ cachedName || refName }
+      subtitle={ translate('Could not load configurations') } />
   );
 }
 
@@ -927,29 +989,20 @@ function MissingConfiguration(props) {
     : cachedName ? translate('Not found on cluster') : refName;
 
   return (
-    <div class="bio-properties-panel-configuration-chooser-missing">
-      <ConfigurationTrigger
-        disabled={ disabled }
-        listboxId={ listboxId }
-        open={ open }
-        onClick={ onClick }>
-        <ConfigurationLogo warning />
-        <span class="bio-properties-panel-configuration-chooser-text">
-          <span class="bio-properties-panel-configuration-chooser-title">
-            { title }
-          </span>
-          <span class="bio-properties-panel-configuration-chooser-subtitle">
-            { subtitle }
-          </span>
-        </span>
-      </ConfigurationTrigger>
-      <ConfigurationMenuButton
-        menuId={ menuId }
-        menuOpen={ menuOpen }
-        disabled={ disabled }
-        onMenu={ onMenu }
-        translate={ translate } />
-    </div>
+    <ConfigurationCard
+      class="bio-properties-panel-configuration-chooser-missing"
+      interactive
+      disabled={ disabled }
+      open={ open }
+      listboxId={ listboxId }
+      onClick={ onClick }
+      menuId={ menuId }
+      menuOpen={ menuOpen }
+      onMenu={ onMenu }
+      translate={ translate }
+      logo={ <ConfigurationLogo warning /> }
+      title={ title }
+      subtitle={ subtitle } />
   );
 }
 
@@ -977,24 +1030,16 @@ function OfflineConfiguration(props) {
   };
 
   return (
-    <div
-      class="bio-properties-panel-configuration-chooser-selected bio-properties-panel-configuration-chooser-selected--offline">
-      <ConfigurationLogo instance={ instance } />
-      <span class="bio-properties-panel-configuration-chooser-text">
-        <span class="bio-properties-panel-configuration-chooser-title">
-          { cachedName || refName }
-        </span>
-        <span class="bio-properties-panel-configuration-chooser-subtitle">
-          { unavailableMessage || translate('Cluster unavailable') }
-        </span>
-      </span>
-      <ConfigurationMenuButton
-        menuId={ menuId }
-        menuOpen={ menuOpen }
-        disabled={ disabled }
-        onMenu={ onMenu }
-        translate={ translate } />
-    </div>
+    <ConfigurationCard
+      class="bio-properties-panel-configuration-chooser-selected bio-properties-panel-configuration-chooser-selected--offline"
+      disabled={ disabled }
+      menuId={ menuId }
+      menuOpen={ menuOpen }
+      onMenu={ onMenu }
+      translate={ translate }
+      logo={ <ConfigurationLogo instance={ instance } /> }
+      title={ cachedName || refName }
+      subtitle={ unavailableMessage || translate('Cluster unavailable') } />
   );
 }
 
@@ -1187,15 +1232,12 @@ function ConfigurationRow(props) {
       aria-selected={ selected }
       onClick={ onSelect }
       onMouseEnter={ onHover }>
-      <ConfigurationLogo instance={ instance } />
-      <span class="bio-properties-panel-configuration-chooser-text">
-        <span class="bio-properties-panel-configuration-chooser-title">
-          { getDisplayName(instance) }
-        </span>
-        <span class="bio-properties-panel-configuration-chooser-subtitle">
+      <ConfigurationCardContent
+        logo={ <ConfigurationLogo instance={ instance } /> }
+        title={ getDisplayName(instance) }
+        subtitle={
           <span class="bio-properties-panel-configuration-chooser-varname">{ instance.name }</span>
-        </span>
-      </span>
+        } />
     </li>
   );
 }
