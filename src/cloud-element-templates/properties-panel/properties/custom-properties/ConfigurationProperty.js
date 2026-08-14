@@ -536,9 +536,9 @@ function ConfigurationContextMenu(props) {
       }
       <button
         type="button"
-        class="bio-properties-panel-configuration-chooser-context-menu-item bio-properties-panel-configuration-chooser-context-menu-item--danger"
+        class="bio-properties-panel-configuration-chooser-context-menu-item"
         onClick={ onRemove }>
-        { translate('Remove') }
+        { translate('Unset') }
       </button>
     </div>
   );
