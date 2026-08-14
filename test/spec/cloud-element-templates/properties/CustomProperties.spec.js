@@ -1252,7 +1252,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', fallbackEntry));
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', fallbackEntry)).not.to.exist;
+      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item', fallbackEntry).textContent).to.equal('Unset');
     }));
 
 
@@ -1341,7 +1341,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // when
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', inputEntry));
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item--danger', inputEntry));
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item', inputEntry));
 
       // then
       const ioMapping = findExtension(businessObject, 'zeebe:IoMapping');
@@ -1354,7 +1354,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // when
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', propertyEntry));
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item--danger', propertyEntry));
+      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item', propertyEntry));
 
       // then
       const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
@@ -1685,7 +1685,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const menuItems = domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry);
 
       expect(menuItems).to.have.length(1);
-      expect(menuItems[0].textContent).to.equal('Remove');
+      expect(menuItems[0].textContent).to.equal('Unset');
     }));
 
 
@@ -1975,7 +1975,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const menuItems = domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry);
 
       expect(menuItems).to.have.length(1);
-      expect(menuItems[0].textContent).to.equal('Remove');
+      expect(menuItems[0].textContent).to.equal('Unset');
     }));
 
 
@@ -2208,7 +2208,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', entry)).not.to.exist;
+      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu-item', entry).textContent).to.equal('Unset');
 
       await act(() => {
         configurationInstances.setState({
@@ -2218,7 +2218,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         });
       });
 
-      const edit = domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', entry);
+      const edit = domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry)[ 0 ];
 
       expect(edit.textContent).to.equal('Edit');
 
@@ -2338,7 +2338,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-menu', entry));
 
-      const upgrade = domQuery('.bio-properties-panel-configuration-chooser-context-menu-item:not(.bio-properties-panel-configuration-chooser-context-menu-item--danger)', entry);
+      const upgrade = domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry)[ 0 ];
 
       expect(upgrade.textContent).to.equal('Upgrade');
 
