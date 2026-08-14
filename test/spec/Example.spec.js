@@ -574,16 +574,17 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
     );
 
     const elementTemplates = [
-            ...connectors.flatMap(connector => connector.default || connector),
-            ...exampleConfigurationTemplates
-          ],
-          configurationTemplates = new Set(
-            elementTemplates.flatMap((template) => {
-              return (template.configurationTemplates || []).map(({ id, version = 1 }) => {
-                return `${ id }@${ version }`;
-              });
-            })
-          );
+      ...connectors.flatMap(connector => connector.default || connector),
+      ...exampleConfigurationTemplates
+    ];
+
+    const configurationTemplates = new Set(
+      elementTemplates.flatMap((template) => {
+        return (template.configurationTemplates || []).map(({ id, version = 1 }) => {
+          return `${ id }@${ version }`;
+        });
+      })
+    );
 
     // when
     const result = await createModeler(
