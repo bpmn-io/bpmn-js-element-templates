@@ -95,6 +95,8 @@ import complexPropertyTemplates from './CustomProperties.complex-property.json';
 
 import configurationMetadataCleanupTemplates from './CustomProperties.configuration-metadata-cleanup.json';
 
+import configurationConstraintsTemplates from '../fixtures/configuration-constraints.json';
+
 import timerDiagramXML from './CustomProperties.timer.bpmn';
 import timerElementTemplates from './CustomProperties.timer.json';
 
@@ -1577,6 +1579,101 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // then
       expect(entry.contains(focussed)).to.be.true;
+    }));
+
+  });
+
+
+  describe('configuration constraints', function() {
+
+    const template = configurationConstraintsTemplates[0];
+
+    const TEXT_ENTRY_ID = 'custom-entry-io.camunda.examples.ConfigurationConstraints.v1-0',
+          CONFIGURATION_ENTRY_ID = 'custom-entry-io.camunda.examples.ConfigurationConstraints.v1-1';
+
+    const awsProduction = {
+      name: 'awsProduction',
+      metadata: {
+        kind: 'CREDENTIAL',
+        displayName: 'AWS Production',
+        configurationTemplate: 'io.camunda:aws-credential:1',
+        configurationTemplateVersion: 1
+      }
+    };
+
+    beforeEach(inject(async function(elementTemplates, configurationInstances) {
+      const element = await expectSelected('RestTask_noData');
+
+      configurationInstances.setSelectableInstances([]);
+
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+    }));
+
+
+    it('should reject an empty String property', async function() {
+
+      // when
+      const entry = findEntry(TEXT_ENTRY_ID, container);
+
+      // then
+      expectError(entry, 'Required text must not be empty.');
+    });
+
+
+    it('should reject an empty Configuration property', async function() {
+
+      // when
+      const entry = findEntry(CONFIGURATION_ENTRY_ID, container);
+
+      // then
+      expectError(entry, 'Required configuration must not be empty.');
+      expect(domClasses(entry).contains('has-error')).to.be.true;
+    });
+
+
+    it('should accept a selected Configuration property', inject(async function(configurationInstances) {
+
+      // given
+      await act(() => {
+        configurationInstances.setSelectableInstances([ awsProduction ]);
+      });
+
+      const entry = findEntry(CONFIGURATION_ENTRY_ID, container);
+
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+      });
+
+      // when
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+      });
+
+      // then
+      expectValid(findEntry(CONFIGURATION_ENTRY_ID, container));
+    }));
+
+
+    it('should render an external error on a Configuration property', inject(async function(eventBus) {
+
+      // when
+      await act(() => {
+        eventBus.fire('propertiesPanel.setErrors', {
+          errors: {
+            [ CONFIGURATION_ENTRY_ID ]: 'Configuration is not available on the cluster.'
+          }
+        });
+      });
+
+      // then
+      expectError(
+        findEntry(CONFIGURATION_ENTRY_ID, container),
+        'Configuration is not available on the cluster.'
+      );
     }));
 
   });

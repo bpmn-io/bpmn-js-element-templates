@@ -123,6 +123,15 @@
   padding-bottom: 10px;
 }
 
+/* constraint violation, cf. .bio-properties-panel-entry.has-error */
+.bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-placeholder,
+.bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-selected,
+.bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-loading,
+.bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-missing {
+  border-color: var(--input-error-border-color);
+  background-color: var(--input-error-background-color);
+}
+
 /* placeholder trigger (no selection) */
 .bio-properties-panel-configuration-chooser-placeholder {
   display: flex;
