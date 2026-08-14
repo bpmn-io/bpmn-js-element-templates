@@ -1,0 +1,44 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Configuration Constraints Example",
+    "id": "io.camunda.examples.ConfigurationConstraints.v1",
+    "description": "Declares the same notEmpty constraint on a String and on a Configuration property, so their validation can be compared side by side.",
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "engines": {
+      "camunda": "^8.3"
+    },
+    "properties": [
+      {
+        "id": "requiredText",
+        "label": "Required text",
+        "type": "String",
+        "constraints": {
+          "notEmpty": true
+        },
+        "binding": {
+          "type": "zeebe:property",
+          "name": "requiredText"
+        }
+      },
+      {
+        "id": "requiredConfiguration",
+        "label": "Required configuration",
+        "type": "Configuration",
+        "configurationTemplate": "io.camunda:aws-credential:1",
+        "constraints": {
+          "notEmpty": true
+        },
+        "binding": {
+          "type": "zeebe:property",
+          "name": "requiredConfiguration"
+        }
+      }
+    ]
+  }
+]

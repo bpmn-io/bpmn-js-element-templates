@@ -1,15 +1,17 @@
 import { useService } from 'bpmn-js-properties-panel';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from '@bpmn-io/properties-panel/preact/hooks';
-import { CreateIcon, useShowEntryEvent } from '@bpmn-io/properties-panel';
+import { CreateIcon, useError, useShowEntryEvent } from '@bpmn-io/properties-panel';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import { query as domQuery } from 'min-dom';
 
+import classnames from 'classnames';
+
 import { PropertyDescription } from '../../../../components/PropertyDescription';
 import { PropertyTooltip } from '../../components/PropertyTooltip';
-import { propertyGetter, propertySetter } from './util';
+import { propertyGetter, propertySetter, propertyValidator } from './util';
 
 import { findExtension, findInputParameter, findZeebeProperty } from '../../../Helper';
 
@@ -177,6 +179,21 @@ export function ConfigurationProperty(props) {
     return bindingElement && bindingElement.modelerConfigurationName;
   }, [ element, property, value ]);
 
+  // apply the template's `constraints`, as every other custom property does
+  const validate = useMemo(
+    () => propertyValidator(translate, property),
+    [ translate, property ]
+  );
+
+  const globalValidationError = useError(id);
+  const [ localValidationError, setLocalValidationError ] = useState(null);
+
+  useEffect(() => {
+    setLocalValidationError(validate(value) || null);
+  }, [ validate, value ]);
+
+  const validationError = globalValidationError || localValidationError;
+
   const [ open, setOpen ] = useState(false);
   const [ menuOpen, setMenuOpen ] = useState(false);
   const ref = useRef(null);
@@ -322,7 +339,11 @@ export function ConfigurationProperty(props) {
   return (
     <div
       ref={ ref }
-      class="bio-properties-panel-configuration-chooser"
+      class={ classnames(
+        'bio-properties-panel-entry',
+        'bio-properties-panel-configuration-chooser',
+        validationError ? 'has-error' : ''
+      ) }
       data-entry-id={ id }>
       <label class="bio-properties-panel-label">
         { configurationLabel }
@@ -435,6 +456,16 @@ export function ConfigurationProperty(props) {
                       }
                     </>
                   )
+      }
+
+      {
+        validationError
+          ? (
+            <div class="bio-properties-panel-error">
+              { validationError }
+            </div>
+          )
+          : null
       }
 
       {
