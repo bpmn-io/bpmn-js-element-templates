@@ -163,8 +163,6 @@ export function ConfigurationProperty(props) {
     configurationTemplateVersion
   } = property;
 
-  const minimumConfigurationTemplateVersion = configurationTemplateVersion;
-
   const disabled = editable === false;
 
   const bpmnFactory = useService('bpmnFactory'),
@@ -180,7 +178,6 @@ export function ConfigurationProperty(props) {
   const configurationLabel = translate(label || templateName || 'Configuration');
   const chooserLabel = label ? toSentenceFragment(configurationLabel) : configurationLabel;
 
-  // re-render when available instances change
   const {
     instances,
     loading,
@@ -189,7 +186,7 @@ export function ConfigurationProperty(props) {
     unavailableMessage,
     canCreate,
     canUpdate
-  } = useConfigurationInstances(configurationInstances, eventBus, configurationTemplate, minimumConfigurationTemplateVersion);
+  } = useConfigurationInstances(configurationInstances, eventBus, configurationTemplate, configurationTemplateVersion);
 
   const getValue = useMemo(
     () => propertyGetter(element, property),
@@ -218,11 +215,12 @@ export function ConfigurationProperty(props) {
   const typeIncompatible = !!boundInstance
     && boundMetadata.configurationTemplate !== configurationTemplate;
 
+  // the declared version is treated as the minimum required version
   const versionIncompatible = !!boundInstance
     && boundMetadata.configurationTemplate === configurationTemplate
-    && minimumConfigurationTemplateVersion != null
+    && configurationTemplateVersion != null
     && (boundMetadata.configurationTemplateVersion == null
-      || boundMetadata.configurationTemplateVersion < minimumConfigurationTemplateVersion);
+      || boundMetadata.configurationTemplateVersion < configurationTemplateVersion);
   const incompatible = typeIncompatible || versionIncompatible;
 
   // Read cached configuration metadata from the BPMN binding.
@@ -360,7 +358,7 @@ export function ConfigurationProperty(props) {
       if (!instance || !configurationInstances.isCompatible(
         instance,
         configurationTemplate,
-        minimumConfigurationTemplateVersion
+        configurationTemplateVersion
       )) {
         return;
       }
@@ -381,7 +379,7 @@ export function ConfigurationProperty(props) {
     property,
     configurationInstances,
     configurationTemplate,
-    minimumConfigurationTemplateVersion,
+    configurationTemplateVersion,
     setValue,
     dismissPopover,
     dismissMenu
@@ -486,7 +484,7 @@ export function ConfigurationProperty(props) {
           value={ value }
           cachedName={ cachedName }
           instance={ incompatible ? boundInstance : null }
-          minimumVersion={ minimumConfigurationTemplateVersion }
+          minimumVersion={ configurationTemplateVersion }
           typeIncompatible={ typeIncompatible }
           disabled={ disabled }
           menuId={ menuId }
