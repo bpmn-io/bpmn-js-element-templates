@@ -1830,6 +1830,89 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
 
 
+    it('should NOT unset when re-choosing the current selection', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData'),
+            businessObject = getBusinessObject(element);
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container);
+
+      await act(() => {
+        fireEvent.click(getConfigurationPlaceholder(entry));
+      });
+      clickConfigurationOption(entry, 'Slack Production');
+
+      // re-open the dropdown on the now selected configuration
+      const trigger = await waitFor(() => {
+        const node = getConfigurationTrigger(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      await act(() => {
+        fireEvent.click(trigger);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(entry)).to.exist;
+      });
+
+      // when re-choosing the already selected instance
+      clickConfigurationOption(entry, 'Slack Production');
+
+      // then the selection is preserved (NOOP, not toggled off)
+      const zeebeProperties = findExtension(businessObject, 'zeebe:Properties'),
+            zeebeProperty = findZeebeProperty(zeebeProperties, { name: 'configuration' });
+
+      expect(zeebeProperty).to.jsonEqual({
+        $type: 'zeebe:Property',
+        name: 'configuration',
+        value: '=camunda.vars.env.slackProduction',
+        modelerConfigurationTemplate: 'io.camunda:slack-connection:1',
+        modelerConfigurationName: 'Slack Production'
+      });
+
+      // and the popover is closed
+      expect(getConfigurationPopover(entry)).not.to.exist;
+    }));
+
+
     it('should close the popover when clicking the open trigger', inject(async function(elementTemplates, configurationInstances) {
 
       // given
