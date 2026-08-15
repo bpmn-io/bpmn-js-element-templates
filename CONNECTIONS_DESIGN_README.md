@@ -301,7 +301,7 @@ Engine ignores `modeler*` attributes.
 
 ## Key Implementation Details
 
-**Dispatcher** routes to `ConfigurationProperty` when `type === 'Configuration'` or `configurationTemplate` is present.
+**Dispatcher** routes to `ConfigurationProperty` when `type === 'Configuration'`.
 
 **ConfigurationTemplates service** — automatically extracts `configurationTemplates` from all element templates on `elementTemplates.changed`. Provides `get(id, version?)`, `getAll()`, `getLatest()`. Fires `configurationTemplates.changed`.
 
