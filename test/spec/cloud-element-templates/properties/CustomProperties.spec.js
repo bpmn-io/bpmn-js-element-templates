@@ -1199,13 +1199,13 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // then
       expect(domQuery('.bio-properties-panel-label', labeledEntry).textContent).to.equal('Destination AWS credential');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', labeledEntry).textContent).to.equal('Choose destination AWS credential');
+      expect(getConfigurationPlaceholder(labeledEntry).textContent).to.equal('Choose destination AWS credential');
       expect(domQuery('.bio-properties-panel-label', fallbackEntry).textContent).to.equal('AWS Credential');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', fallbackEntry).textContent).to.equal('Choose AWS Credential');
+      expect(getConfigurationPlaceholder(fallbackEntry).textContent).to.equal('Choose AWS Credential');
 
       // when
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', fallbackEntry));
+        fireEvent.click(getConfigurationPlaceholder(fallbackEntry));
       });
 
       // then
@@ -1250,7 +1250,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // then
-      expect(domQuery('.bio-properties-panel-configuration-chooser-missing', fallbackEntry).textContent).to.contain('AWS Production');
+      expect(getConfigurationMissing(fallbackEntry).textContent).to.contain('AWS Production');
 
       // when
       await act(() => {
@@ -1272,7 +1272,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // then
-      const typeMismatch = domQuery('.bio-properties-panel-configuration-chooser-missing', fallbackEntry);
+      const typeMismatch = getConfigurationMissing(fallbackEntry);
 
       expect(typeMismatch.textContent).to.contain('AWS Production');
       expect(typeMismatch.textContent).to.contain('Incompatible configuration type');
@@ -1328,7 +1328,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // then
       expect(domQuery('.bio-properties-panel-label', entry).textContent).to.equal('AWS Credential');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry).textContent).to.equal('Choose AWS Credential');
+      expect(getConfigurationPlaceholder(entry).textContent).to.equal('Choose AWS Credential');
     }));
 
 
@@ -1359,12 +1359,12 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
             inputEntry = findEntry('custom-entry-configuration-metadata-cleanup-1', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', propertyEntry));
+        fireEvent.click(getConfigurationPlaceholder(propertyEntry));
       });
       clickConfigurationOption(propertyEntry, 'Slack Production');
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', inputEntry));
+        fireEvent.click(getConfigurationPlaceholder(inputEntry));
       });
       clickConfigurationOption(inputEntry, 'Slack Production');
 
@@ -1671,12 +1671,12 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry(CONFIGURATION_ENTRY_ID, container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
 
       // when
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+        fireEvent.click(getConfigurationRow(entry));
       });
 
       // then
@@ -1747,7 +1747,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       expect(placeholder.textContent).to.equal('Choose configuration');
 
@@ -1757,7 +1757,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       await waitFor(() => {
-        expect(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container)).to.exist;
+        expect(getConfigurationRow(container)).to.exist;
       });
 
       fireEvent.keyDown(getConfigurationOption(container, 'Slack Production'), {
@@ -1777,12 +1777,12 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // when
-      fireEvent.keyDown(domQuery('.bio-properties-panel-configuration-chooser-selected', entry), {
+      fireEvent.keyDown(getConfigurationSelected(entry), {
         key: 'Enter'
       });
 
       // then
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).to.exist;
+      expect(getConfigurationPopover(entry)).to.exist;
 
     }));
 
@@ -1827,14 +1827,14 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-input-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       await act(() => {
         fireEvent.click(placeholder);
       });
 
       await waitFor(() => {
-        expect(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container)).to.exist;
+        expect(getConfigurationRow(container)).to.exist;
       });
 
       clickConfigurationOption(container, 'Slack Production');
@@ -1904,7 +1904,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       await act(() => {
         fireEvent.click(placeholder);
@@ -1920,17 +1920,17 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       await waitFor(() => {
-        expect(domQuery('.bio-properties-panel-configuration-chooser-selected', entry)).to.exist;
+        expect(getConfigurationSelected(entry)).to.exist;
         expect(domQuery('.bio-properties-panel-configuration-chooser-selected--offline', entry)).to.exist;
         expect(domQuery('.bio-properties-panel-configuration-chooser-logo', entry).getAttribute('src')).to.equal('data:image/svg+xml;base64,offline-icon');
         expect(domQuery('.bio-properties-panel-configuration-chooser-subtitle', entry).textContent).to.equal('No cluster selected');
-        expect(domQuery('.bio-properties-panel-configuration-chooser-missing', entry)).not.to.exist;
+        expect(getConfigurationMissing(entry)).not.to.exist;
       });
 
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-selected', entry));
+      fireEvent.click(getConfigurationSelected(entry));
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).not.to.exist;
-      expect(domQuery('.bio-properties-panel-configuration-chooser-create', entry)).not.to.exist;
+      expect(getConfigurationPopover(entry)).not.to.exist;
+      expect(getConfigurationCreate(entry)).not.to.exist;
 
       // when
       openConfigurationMenu(entry);
@@ -1984,7 +1984,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
       clickConfigurationOption(entry, 'Slack Production');
 
@@ -2050,13 +2050,13 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       await act(() => {
         fireEvent.click(placeholder);
       });
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).to.exist;
+      expect(getConfigurationPopover(entry)).to.exist;
 
       // when
       await act(() => {
@@ -2073,7 +2073,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-unavailable');
       expect(unavailable.getAttribute('role')).to.equal('status');
       expect(unavailable.textContent).to.equal('No cluster selected');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).not.to.exist;
+      expect(getConfigurationPopover(entry)).not.to.exist;
     }));
 
 
@@ -2111,7 +2111,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry),
+            placeholder = getConfigurationPlaceholder(entry),
             error = domQuery('.bio-properties-panel-configuration-chooser-unavailable--error', entry);
 
       // then
@@ -2177,7 +2177,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
       clickConfigurationOption(entry, 'Slack Production');
 
@@ -2195,7 +2195,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       openConfigurationMenu(entry);
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry)).to.exist;
+      expect(getConfigurationContextMenu(entry)).to.exist;
 
       // when - failed response
       await act(() => {
@@ -2215,11 +2215,11 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(error.textContent).to.contain('Slack Production');
       expect(error.textContent).to.contain('Could not load configurations');
       expect(entry.textContent).not.to.contain('Not found on cluster');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry)).not.to.exist;
+      expect(getConfigurationContextMenu(entry)).not.to.exist;
 
       fireEvent.click(error);
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).not.to.exist;
+      expect(getConfigurationPopover(entry)).not.to.exist;
 
       openConfigurationMenu(entry);
 
@@ -2263,14 +2263,14 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       // when
       await act(() => {
         fireEvent.click(placeholder);
       });
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-create', entry)).not.to.exist;
+      expect(getConfigurationCreate(entry)).not.to.exist;
 
       await act(() => {
         configurationInstances.setState({
@@ -2281,10 +2281,10 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       await waitFor(() => {
-        expect(domQuery('.bio-properties-panel-configuration-chooser-create', entry)).to.exist;
+        expect(getConfigurationCreate(entry)).to.exist;
       });
 
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-create', entry));
+      fireEvent.click(getConfigurationCreate(entry));
 
       // then
       expect(createSpy).to.have.been.calledOnce;
@@ -2294,7 +2294,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(event.property).to.equal(property);
       expect(event.configurationTemplate).to.equal('io.camunda:slack-connection:1');
       expect(event.configurationTemplateVersion).to.equal(2);
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).to.not.exist;
+      expect(getConfigurationPopover(entry)).to.not.exist;
     }));
 
 
@@ -2451,7 +2451,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
       clickConfigurationOption(entry, 'Slack Production');
       openConfigurationMenu(entry);
@@ -2552,7 +2552,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
       clickConfigurationOption(entry, 'Slack Production');
 
@@ -2567,7 +2567,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         });
       });
 
-      const missing = domQuery('.bio-properties-panel-configuration-chooser-missing', entry);
+      const missing = getConfigurationMissing(entry);
 
       expect(missing).to.exist;
       expect(missing.textContent).to.contain('Version 1 · Requires version 2+');
@@ -2576,7 +2576,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         key: 'Enter'
       });
 
-      const rows = domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry);
+      const rows = getConfigurationRows(entry);
 
       expect(rows).to.have.length(1);
       expect(rows[0].textContent).to.contain('Slack Development');
@@ -5274,6 +5274,43 @@ function getConfigurationMenuItem(entry, label) {
 
 function openConfigurationMenu(entry) {
   fireEvent.click(within(entry).getByTitle('More actions'));
+}
+
+
+function getConfigurationPlaceholder(entry) {
+  const placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+
+  expect(placeholder, 'configuration chooser placeholder').to.exist;
+
+  return placeholder;
+}
+
+function getConfigurationPopover(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-popover', entry);
+}
+
+function getConfigurationRow(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry);
+}
+
+function getConfigurationRows(entry) {
+  return domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry);
+}
+
+function getConfigurationCreate(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-create', entry);
+}
+
+function getConfigurationSelected(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-selected', entry);
+}
+
+function getConfigurationMissing(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-missing', entry);
+}
+
+function getConfigurationContextMenu(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry);
 }
 
 function expectSelected(id) {
