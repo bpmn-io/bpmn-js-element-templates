@@ -138,7 +138,7 @@ export function createCustomEntry(id, element, property) {
     type = getDefaultType(property);
   }
 
-  if (type === 'Configuration' || property.configurationTemplate) {
+  if (type === 'Configuration') {
     return {
       id,
       component: ConfigurationProperty,
