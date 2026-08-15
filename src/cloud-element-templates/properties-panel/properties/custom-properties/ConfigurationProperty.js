@@ -338,14 +338,20 @@ export function ConfigurationProperty(props) {
       return;
     }
 
-    const instance = instances.find(instance => instance.name === name);
+    const nextValue = name ? toReference(name) : '';
 
-    setValue(name ? toReference(name) : '', instance);
+    // re-choosing the current selection is a NOOP; the popover simply closes.
+    // Removing a configuration is done explicitly via the actions menu.
+    if (nextValue !== value) {
+      const instance = instances.find(instance => instance.name === name);
+
+      setValue(nextValue, instance);
+    }
 
     // return focus to the trigger once the (possibly freshly rendered) card mounts
     closePopover();
     dismissMenu();
-  }, [ disabled, instances, setValue, closePopover, dismissMenu ]);
+  }, [ disabled, value, instances, setValue, closePopover, dismissMenu ]);
 
   useEffect(() => {
     const onCreated = (event) => {
@@ -1109,7 +1115,7 @@ function ConfigurationPopover(props) {
     if (isCreateActive) {
       onCreate();
     } else if (activeInstance) {
-      onSelect(selected === activeInstance ? null : activeInstance.name);
+      onSelect(activeInstance.name);
     }
   };
 
@@ -1166,7 +1172,7 @@ function ConfigurationPopover(props) {
                 instance={ instance }
                 active={ index === activeIndex }
                 selected={ selected === instance }
-                onSelect={ () => onSelect(selected === instance ? null : instance.name) }
+                onSelect={ () => onSelect(instance.name) }
                 onHover={ () => setActiveIndex(index) }
                 translate={ translate } />
             ))
