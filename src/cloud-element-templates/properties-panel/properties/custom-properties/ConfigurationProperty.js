@@ -622,7 +622,7 @@ function SelectedConfiguration(props) {
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-selected"
+      class="bio-properties-panel-configuration-chooser-selected bio-properties-panel-focus-ring"
       interactive
       disabled={ disabled }
       open={ open }
@@ -887,7 +887,7 @@ function PlaceholderConfiguration(props) {
       <button
         ref={ showEntryRef }
         type="button"
-        class="bio-properties-panel-configuration-chooser-placeholder"
+        class="bio-properties-panel-configuration-chooser-placeholder bio-properties-panel-focus-ring"
         disabled={ disabled || error || !available }
         aria-haspopup="listbox"
         aria-controls={ open ? listboxId : undefined }
@@ -959,7 +959,7 @@ function ErrorConfiguration(props) {
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-missing bio-properties-panel-configuration-chooser-error"
+      class="bio-properties-panel-configuration-chooser-missing bio-properties-panel-configuration-chooser-error bio-properties-panel-focus-ring"
       disabled={ disabled }
       menuId={ menuId }
       menuOpen={ menuOpen }
@@ -1007,7 +1007,7 @@ function MissingConfiguration(props) {
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-missing"
+      class="bio-properties-panel-configuration-chooser-missing bio-properties-panel-focus-ring"
       interactive
       disabled={ disabled }
       open={ open }
@@ -1048,7 +1048,7 @@ function OfflineConfiguration(props) {
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-selected bio-properties-panel-configuration-chooser-selected--offline"
+      class="bio-properties-panel-configuration-chooser-selected bio-properties-panel-configuration-chooser-selected--offline bio-properties-panel-focus-ring"
       disabled={ disabled }
       menuId={ menuId }
       menuOpen={ menuOpen }

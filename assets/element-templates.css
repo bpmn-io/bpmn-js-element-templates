@@ -155,10 +155,6 @@
   background-color: var(--color-grey-225-10-97, #f7f8f8);
 }
 
-.bio-properties-panel-configuration-chooser-placeholder:focus-visible {
-  box-shadow: 0 0 0 2px var(--color-blue-205-100-50, #1a75ff);
-}
-
 .bio-properties-panel-configuration-chooser-placeholder:disabled {
   cursor: default;
   opacity: 0.5;
@@ -264,10 +260,6 @@
   background-color: #fef3e0;
 }
 
-.bio-properties-panel-configuration-chooser-missing:focus-within {
-  box-shadow: 0 0 0 2px #f0ad4e;
-}
-
 .bio-properties-panel-configuration-chooser-error {
   cursor: default;
 }
@@ -277,10 +269,6 @@
   overflow-wrap: anywhere;
   text-overflow: clip;
   white-space: normal;
-}
-
-.bio-properties-panel-configuration-chooser-selected:focus-within {
-  box-shadow: 0 0 0 2px var(--color-blue-205-100-50, #1a75ff);
 }
 
 /* logo */
