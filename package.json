@@ -117,7 +117,7 @@
     "mocha": "^11.8.0",
     "mocha-test-container-support": "^0.2.0",
     "modeler-moddle": "^0.2.0",
-    "npm-run-all2": "^9.0.2",
+    "npm-run-all2": "^9.0.3",
     "raw-loader": "^4.0.2",
     "rollup": "^4.62.2",
     "rollup-plugin-copy": "^3.5.0",
