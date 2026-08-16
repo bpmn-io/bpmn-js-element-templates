@@ -59,7 +59,11 @@ const feelEnabled = (property, value) => {
 
 export function propertyGetter(element, property) {
   return function getValue() {
-    return getPropertyValue(element, property);
+    const value = getPropertyValue(element, property);
+
+    // conform to the properties panel value contract, which represents an
+    // empty value as `undefined`; our domain layer uses '' for empty
+    return value === '' ? undefined : value;
   };
 }
 

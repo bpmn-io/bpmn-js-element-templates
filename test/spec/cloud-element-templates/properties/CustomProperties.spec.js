@@ -9,7 +9,8 @@ import {
   getBpmnJS,
   withPropertiesPanel,
   inject,
-  setEditorValue
+  setEditorValue,
+  blurInput
 } from 'test/TestHelper';
 
 import {
@@ -1016,6 +1017,30 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         value: 'property-1-changed-value'
       });
     });
+
+
+    it('should not commit unchanged property on blur', inject(async function(eventBus) {
+
+      // given
+      await expectSelected('RestTask_empty');
+
+      // open the (collapsed) custom properties group to focus the input
+      await openGroup(getGroupById('ElementTemplates__CustomProperties', container));
+
+      const entry = findEntry('custom-entry-com.example.rest-7', container),
+            input = findInput('text', entry);
+
+      const changedSpy = spy();
+
+      eventBus.on('commandStack.changed', changedSpy);
+
+      // when
+      // re-committing the unchanged (empty) value, as save-on-blur does
+      await blurInput(input);
+
+      // then
+      expect(changedSpy).not.to.have.been.called;
+    }));
 
 
     it('should keep property (non optional)', inject(async function() {
@@ -3767,6 +3792,14 @@ function getGroupById(id, container) {
   );
 
   return group;
+}
+
+function openGroup(group) {
+  const header = domQuery('.bio-properties-panel-group-header', group);
+
+  return act(() => {
+    header.click();
+  });
 }
 
 function withoutPrefix(groupId) {

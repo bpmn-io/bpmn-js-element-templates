@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FIX`: align property getter to panel value contract to not defeat changed detection ([#283](https://github.com/bpmn-io/bpmn-js-element-templates/pull/283))
+
 ## 2.30.0
 
 * `FEAT`: attach `template` to template errors ([#273](https://github.com/bpmn-io/bpmn-js-element-templates/pull/273))

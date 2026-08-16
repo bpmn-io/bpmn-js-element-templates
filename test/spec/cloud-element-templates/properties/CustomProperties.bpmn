@@ -20,6 +20,13 @@
     <bpmn:userTask id="DropdownTask" name="low" zeebe:modelerTemplate="my.example.dropdown" />
     <bpmn:task id="ValidateTask" zeebe:modelerTemplate="com.validated-inputs.Task" />
     <bpmn:serviceTask id="RestTask_noData" name="REST Task no data" zeebe:modelerTemplate="com.example.rest" />
+    <bpmn:serviceTask id="RestTask_empty" name="REST Task empty" zeebe:modelerTemplate="com.example.rest">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="property-1-name" value="" />
+        </zeebe:properties>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
     <bpmn:serviceTask id="RestTask_hidden" name="Hidden Task Type" zeebe:modelerTemplate="com.example.rest-hidden">
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="task-type" />
@@ -173,6 +180,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1hbryo1_di" bpmnElement="RestTask_noData">
         <dc:Bounds x="430" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RestTask_empty_di" bpmnElement="RestTask_empty">
+        <dc:Bounds x="430" y="480" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0sz43pp_di" bpmnElement="RestTask_hidden">
         <dc:Bounds x="600" y="80" width="100" height="80" />
