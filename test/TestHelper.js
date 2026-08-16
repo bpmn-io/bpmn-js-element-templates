@@ -70,6 +70,13 @@ export function clickInput(input) {
   fireEvent.click(input);
 }
 
+export function blurInput(input) {
+  return act(() => {
+    input.focus();
+    input.blur();
+  });
+}
+
 export function insertCoreStyles() {
   insertCSS(
     'properties-panel.css',
