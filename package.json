@@ -79,7 +79,6 @@
     "@bpmn-io/element-template-chooser": "^3.0.0",
     "@bpmn-io/element-template-icon-renderer": "^1.0.0",
     "@bpmn-io/properties-panel": "^3.49.0",
-    "@camunda/connectors-element-templates": "1.0.22",
     "@camunda/linting": "^3.54.0",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-babel": "^7.1.0",
