@@ -187,6 +187,63 @@ describe('provider/cloud-element-templates - Validator', function() {
       );
     });
 
+
+    it('should accept a configuration property with optional binding', function() {
+
+      // given
+      const templates = new Validator(moddle);
+      const template = createTemplate('example.valid', createConfigurationTemplate());
+
+      template.properties = [ {
+        id: 'configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:example-credential:1',
+        optional: true,
+        binding: {
+          type: 'zeebe:property',
+          name: 'configuration'
+        }
+      } ];
+
+      // when
+      templates.addAll([ template ]);
+
+      // then
+      expect(errors(templates)).to.be.empty;
+      expect(valid(templates)).to.have.length(1);
+    });
+
+
+    it('should reject a configuration property with optional=true <-> constraints.notEmpty=true', function() {
+
+      // given
+      const templates = new Validator(moddle);
+      const template = createTemplate('example.invalid', createConfigurationTemplate());
+
+      template.properties = [ {
+        id: 'configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:example-credential:1',
+        optional: true,
+        constraints: {
+          notEmpty: true
+        },
+        binding: {
+          type: 'zeebe:property',
+          name: 'configuration'
+        }
+      } ];
+
+      // when
+      templates.addAll([ template ]);
+
+      // then
+      expect(valid(templates)).to.be.empty;
+      expect(errors(templates)).to.include(
+        'template(id: <example.invalid>, name: <example.invalid>): optional is not allowed for truthy "notEmpty" constraint'
+      );
+    });
+
   });
 
 
