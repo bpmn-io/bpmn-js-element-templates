@@ -256,6 +256,7 @@ export function ConfigurationProperty(props) {
 
   const ref = useRef(null);
   const showEntryRef = useShowEntryEvent(id);
+  const controlId = `${ id }-control`;
   const listboxId = `${ id }-listbox`;
   const menuId = `${ id }-menu`;
   const availabilityRef = useRef({ error, available });
@@ -471,6 +472,7 @@ export function ConfigurationProperty(props) {
       return (
         <SelectedConfiguration
           instance={ selected }
+          controlId={ controlId }
           disabled={ disabled }
           menuId={ menuId }
           menuOpen={ menuOpen }
@@ -490,6 +492,7 @@ export function ConfigurationProperty(props) {
           value={ value }
           cachedName={ cachedName }
           instance={ incompatible ? boundInstance : null }
+          controlId={ controlId }
           minimumVersion={ configurationTemplateVersion }
           typeIncompatible={ typeIncompatible }
           disabled={ disabled }
@@ -518,6 +521,7 @@ export function ConfigurationProperty(props) {
       return (
         <PlaceholderConfiguration
           id={ id }
+          controlId={ controlId }
           disabled={ disabled }
           error={ error }
           available={ available }
@@ -542,7 +546,9 @@ export function ConfigurationProperty(props) {
       ) }
       data-entry-id={ id }
       data-configuration-state={ variant }>
-      <label class="bio-properties-panel-label">
+      <label
+        class="bio-properties-panel-label"
+        htmlFor={ controlId }>
         { configurationLabel }
       </label>
 
@@ -609,6 +615,7 @@ export function ConfigurationProperty(props) {
 
 function SelectedConfiguration(props) {
   const {
+    controlId,
     disabled,
     instance,
     listboxId,
@@ -624,6 +631,7 @@ function SelectedConfiguration(props) {
     <ConfigurationCard
       class="bio-properties-panel-configuration-chooser-selected bio-properties-panel-focus-ring"
       interactive
+      controlId={ controlId }
       disabled={ disabled }
       open={ open }
       listboxId={ listboxId }
@@ -644,6 +652,7 @@ function ConfigurationTrigger(props) {
   const {
     children,
     disabled,
+    id,
     listboxId,
     open,
     onClick
@@ -651,6 +660,7 @@ function ConfigurationTrigger(props) {
 
   return (
     <button
+      id={ id }
       type="button"
       class="bio-properties-panel-configuration-chooser-trigger"
       disabled={ disabled }
@@ -702,6 +712,7 @@ function ConfigurationCard(props) {
     title,
     subtitle,
     interactive = false,
+    controlId,
     disabled,
     open,
     listboxId,
@@ -722,6 +733,7 @@ function ConfigurationCard(props) {
         interactive
           ? (
             <ConfigurationTrigger
+              id={ controlId }
               disabled={ disabled }
               listboxId={ listboxId }
               open={ open }
@@ -865,6 +877,7 @@ function PlaceholderConfiguration(props) {
   const {
     available,
     chooserLabel,
+    controlId,
     disabled,
     error,
     id,
@@ -885,6 +898,7 @@ function PlaceholderConfiguration(props) {
   return (
     <>
       <button
+        id={ controlId }
         ref={ showEntryRef }
         type="button"
         class="bio-properties-panel-configuration-chooser-placeholder bio-properties-panel-focus-ring"
@@ -974,6 +988,7 @@ function ErrorConfiguration(props) {
 function MissingConfiguration(props) {
   const {
     cachedName,
+    controlId,
     disabled,
     instance,
     listboxId,
@@ -1009,6 +1024,7 @@ function MissingConfiguration(props) {
     <ConfigurationCard
       class="bio-properties-panel-configuration-chooser-missing bio-properties-panel-focus-ring"
       interactive
+      controlId={ controlId }
       disabled={ disabled }
       open={ open }
       listboxId={ listboxId }
