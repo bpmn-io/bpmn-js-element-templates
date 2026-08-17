@@ -1404,6 +1404,46 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
 
 
+    it('should not keep property (optional)', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData'),
+            businessObject = getBusinessObject(element);
+      const template = configurationMetadataCleanupTemplates[0];
+      const instance = {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      };
+
+      configurationInstances.setSelectableInstances([ instance ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const optionalPropertyEntry = findEntry('custom-entry-configuration-metadata-cleanup-2', container);
+
+      await act(() => {
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', optionalPropertyEntry));
+      });
+      clickConfigurationOption(optionalPropertyEntry, 'Slack Production');
+
+      // when
+      clickConfigurationMenuItem(optionalPropertyEntry, 'Unset');
+
+      // then
+      const zeebeProperties = findExtension(businessObject, 'zeebe:Properties');
+
+      expect(findZeebeProperty(zeebeProperties, { name: 'optionalPropertyConfiguration' })).not.to.exist;
+    }));
+
+
     it('should update metadata when replacing a configuration', inject(async function(elementTemplates, configurationInstances) {
 
       // given

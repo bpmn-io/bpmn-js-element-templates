@@ -29,6 +29,17 @@
           "type": "zeebe:input",
           "name": "inputConfiguration"
         }
+      },
+      {
+        "id": "optionalPropertyConfiguration",
+        "label": "Optional property configuration",
+        "type": "Configuration",
+        "configurationTemplate": "io.camunda:slack-connection:1",
+        "optional": true,
+        "binding": {
+          "type": "zeebe:property",
+          "name": "optionalPropertyConfiguration"
+        }
       }
     ]
   }
