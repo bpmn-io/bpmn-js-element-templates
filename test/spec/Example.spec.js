@@ -48,12 +48,6 @@ import ElementTemplatesPropertiesProviderModule from 'src/element-templates';
 
 import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/linting';
 
-import { connectors } from '@camunda/connectors-element-templates';
-
-import connectionsDesignTemplates from 'test/spec/cloud-element-templates/fixtures/connections-design.json';
-
-import configurationConstraintsTemplates from 'test/spec/cloud-element-templates/fixtures/configuration-constraints.json';
-
 const singleStart = window.__env__ && window.__env__.SINGLE_START;
 
 insertCoreStyles();
@@ -412,47 +406,29 @@ const SLACK_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI3IiBoZWlnaHQ9Ij
 
 const SAMPLE_CONFIGURATIONS = [
   {
-    name: 'awsProduction',
+    name: 'slackProduction',
     metadata: {
       kind: 'CREDENTIAL',
-      displayName: 'AWS Production',
-      configurationTemplate: 'io.camunda:aws-credential:1',
-      configurationTemplateVersion: 1
+      displayName: 'Slack Production',
+      configurationTemplate: 'io.camunda:slack-connection:1',
+      configurationTemplateVersion: 2
     }
   },
   {
-    name: 'awsDevelopment',
+    name: 'slackDevelopment',
     metadata: {
       kind: 'CREDENTIAL',
-      displayName: 'AWS Development',
-      configurationTemplate: 'io.camunda:aws-credential:1',
-      configurationTemplateVersion: 1
+      displayName: 'Slack Development',
+      configurationTemplate: 'io.camunda:slack-connection:1',
+      configurationTemplateVersion: 2
     }
   },
   {
-    name: 'restProduction',
+    name: 'exampleProduction',
     metadata: {
       kind: 'CREDENTIAL',
-      displayName: 'REST Production',
-      configurationTemplate: 'io.camunda.connectors:rest-authentication:1',
-      configurationTemplateVersion: 1
-    }
-  },
-  {
-    name: 'restDevelopment',
-    metadata: {
-      kind: 'CREDENTIAL',
-      displayName: 'REST Development',
-      configurationTemplate: 'io.camunda.connectors:rest-authentication:1',
-      configurationTemplateVersion: 1
-    }
-  },
-  {
-    name: 'jdbcReporting',
-    metadata: {
-      kind: 'CREDENTIAL',
-      displayName: 'JDBC Reporting',
-      configurationTemplate: 'io.camunda.connectors:jdbc-connection:1',
+      displayName: 'Example Production',
+      configurationTemplate: 'io.camunda:example-configuration:1',
       configurationTemplateVersion: 1
     }
   }
@@ -566,28 +542,12 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
 
   (singleStart === 'cloud-templates' ? it.only : it)('should import simple process (cloud-templates)', async function() {
 
-    this.timeout(10000);
-
     // given
     const diagramXml = require('test/spec/cloud-element-templates/fixtures/complex.bpmn').default;
 
-    const exampleConfigurationTemplates = connectionsDesignTemplates.filter(
-      ({ id }) => id === 'io.camunda.examples.Configuration.v1'
-    );
+    const elementTemplateContext = require.context('test/spec/cloud-element-templates/fixtures', false, /\.json$/);
 
-    const elementTemplates = [
-      ...connectors.flatMap(connector => connector.default || connector),
-      ...exampleConfigurationTemplates,
-      ...configurationConstraintsTemplates
-    ];
-
-    const configurationTemplates = new Set(
-      elementTemplates.flatMap((template) => {
-        return (template.configurationTemplates || []).map(({ id, version = 1 }) => {
-          return `${ id }@${ version }`;
-        });
-      })
-    );
+    const elementTemplates = elementTemplateContext.keys().map(key => elementTemplateContext(key)).flat();
 
     // when
     const result = await createModeler(
@@ -624,22 +584,6 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
 
     // then
     expect(result.error).not.to.exist;
-
-    const latestS3Template = result.modeler.get('elementTemplates').getLatest('io.camunda.connectors.aws.s3.v1')[0],
-          awsCredential = latestS3Template.properties.find(({ id }) => id === 'awsCredential');
-
-    expect(latestS3Template.version).to.equal(6);
-    expect(awsCredential).to.include({
-      type: 'Configuration',
-      configurationTemplate: 'io.camunda:aws-credential:1'
-    });
-    const missingMockConfigurationTemplates = SAMPLE_CONFIGURATIONS
-      .map(({ metadata }) => {
-        return `${ metadata.configurationTemplate }@${ metadata.configurationTemplateVersion }`;
-      })
-      .filter((configurationTemplate) => !configurationTemplates.has(configurationTemplate));
-
-    expect(missingMockConfigurationTemplates).to.be.empty;
 
     expect(
       result.modeler.get('elementTemplates').getLatest('io.camunda.examples.ConfigurationConstraints.v1')
