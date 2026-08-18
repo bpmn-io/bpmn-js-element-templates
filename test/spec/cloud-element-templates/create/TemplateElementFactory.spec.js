@@ -890,6 +890,26 @@ describe('provider/cloud-element-templates - TemplateElementFactory', function()
     }));
 
 
+    it('should handle <zeebe:agentDefinition>', inject(function(templateElementFactory) {
+
+      // given
+      const elementTemplate = findTemplate('agent-definition-template');
+
+      // when
+      const element = templateElementFactory.create(elementTemplate);
+
+      // then
+      const bo = getBusinessObject(element);
+      const agentDefinition = findExtension(bo, 'zeebe:AgentDefinition');
+
+      expect(agentDefinition).to.exist;
+      expect(agentDefinition).to.jsonEqual({
+        $type: 'zeebe:AgentDefinition',
+        agentType: 'external',
+      });
+    }));
+
+
     it('should handle <zeebe:taskSchedule>', inject(function(templateElementFactory) {
 
       // given

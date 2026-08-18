@@ -36,6 +36,7 @@ import {
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_JOB_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
+  ZEEBE_AGENT_DEFINITION,
   ZEEBE_TASK_SCHEDULE,
   ZEEBE_EXECUTION_LISTENER,
   ZEEBE_TASK_LISTENER
@@ -352,6 +353,11 @@ function getRawPropertyValue(element, property) {
   if (type === ZEEBE_AD_HOC) {
     const adHoc = findExtension(businessObject, 'zeebe:AdHoc');
     return adHoc ? adHoc.get(bindingProperty) : defaultValue;
+  }
+
+  if (type === ZEEBE_AGENT_DEFINITION) {
+    const agentDefinition = findExtension(businessObject, 'zeebe:AgentDefinition');
+    return agentDefinition ? agentDefinition.get(bindingProperty) : defaultValue;
   }
 
   // zeebe:executionListener
@@ -1153,6 +1159,38 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
           ...context,
           moddleElement: extensionElements,
           properties: { values: [ ...extensionElements.get('values'), adHoc ] }
+        }
+      });
+    }
+  }
+
+  // zeebe:agentDefinition
+  if (type === ZEEBE_AGENT_DEFINITION) {
+    let agentDefinition = findExtension(element, 'zeebe:AgentDefinition');
+    const propertyName = binding.property;
+
+    const properties = {
+      [ propertyName ]: value || ''
+    };
+
+    if (agentDefinition) {
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          element,
+          properties,
+          moddleElement: agentDefinition
+        }
+      });
+    } else {
+      agentDefinition = createElement('zeebe:AgentDefinition', properties, extensionElements, bpmnFactory);
+
+      commands.push({
+        cmd: 'element.updateModdleProperties',
+        context: {
+          ...context,
+          moddleElement: extensionElements,
+          properties: { values: [ ...extensionElements.get('values'), agentDefinition ] }
         }
       });
     }

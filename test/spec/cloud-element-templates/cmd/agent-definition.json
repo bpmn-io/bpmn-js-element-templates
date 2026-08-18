@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "AgentDefinition",
+  "id": "com.camunda.example.AgentDefinition",
+  "appliesTo": [
+    "bpmn:ServiceTask",
+    "bpmn:AdHocSubProcess"
+  ],
+  "properties": [
+    {
+      "type": "Dropdown",
+      "value": "external",
+      "choices": [
+        { "name": "AI Agent Task", "value": "aiAgentTask" },
+        { "name": "AI Agent Sub Process", "value": "aiAgentSubProcess" },
+        { "name": "External Agent", "value": "external" }
+      ],
+      "binding": {
+        "type": "zeebe:agentDefinition",
+        "property": "agentType"
+      }
+    }
+  ]
+}

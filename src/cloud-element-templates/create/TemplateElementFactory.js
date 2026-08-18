@@ -28,6 +28,7 @@ import ZeebeAssignmentDefinitionBindingProvider from './AssignmentDefinitionBind
 import ZeebePriorityDefinitionBindingProvider from './PriorityDefinitionBindingProvider';
 import ZeebeJobPriorityDefinitionBindingProvider from './JobPriorityDefinitionBindingProvider';
 import AdHocBindingProvider from './AdHocBindingProvider';
+import AgentDefinitionBindingProvider from './AgentDefinitionBindingProvider';
 import TaskScheduleBindingProvider from './TaskScheduleBindingProvider';
 import {
   ExecutionListenerBindingProvider,
@@ -58,6 +59,7 @@ import {
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_JOB_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
+  ZEEBE_AGENT_DEFINITION,
   ZEEBE_TASK_SCHEDULE,
   ZEEBE_EXECUTION_LISTENER,
   ZEEBE_TASK_LISTENER
@@ -101,6 +103,7 @@ export default class TemplateElementFactory {
       [ZEEBE_PRIORITY_DEFINITION]: ZeebePriorityDefinitionBindingProvider,
       [ZEEBE_JOB_PRIORITY_DEFINITION]: ZeebeJobPriorityDefinitionBindingProvider,
       [ZEEBE_AD_HOC]: AdHocBindingProvider,
+      [ZEEBE_AGENT_DEFINITION]: AgentDefinitionBindingProvider,
       [ZEEBE_TASK_SCHEDULE]: TaskScheduleBindingProvider,
       [ZEEBE_EXECUTION_LISTENER]: ExecutionListenerBindingProvider,
       [ZEEBE_TASK_LISTENER]: TaskListenerBindingProvider

@@ -561,6 +561,89 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('zeebe:AgentDefinition', function() {
+
+    it('should display', async function() {
+
+      // when
+      await expectSelected('ServiceTask_agentDefinition');
+
+      // then
+      const entry = findEntry('custom-entry-com.camunda.example.AgentDefinition-0', container),
+            select = findSelect(entry);
+
+      expect(entry).to.exist;
+      expect(select).to.exist;
+      expect(select.value).to.equal('aiAgentTask');
+    });
+
+
+    it('should change, setting `agentType`', async function() {
+
+      // given
+      const element = await expectSelected('ServiceTask_agentDefinition'),
+            businessObject = getBusinessObject(element);
+
+      // when
+      const entry = findEntry('custom-entry-com.camunda.example.AgentDefinition-0', container),
+            select = findSelect(entry);
+
+      changeInput(select, 'external');
+
+      // then
+      const agentDefinition = findExtension(businessObject, 'zeebe:AgentDefinition');
+      expect(agentDefinition).to.exist;
+      expect(agentDefinition).to.have.property('agentType', 'external');
+    });
+
+
+    it('should change, creating zeebe:AgentDefinition if non-existing', inject(async function(elementTemplates, elementRegistry) {
+
+      // given
+      const element = await expectSelected('ServiceTask_agentDefinition_empty'),
+            businessObject = getBusinessObject(element);
+      const template = templates.find(t => t.id === 'com.camunda.example.AgentDefinition');
+      const serviceTask = elementRegistry.get('ServiceTask_agentDefinition_empty');
+
+      // when
+      await act(() => {
+        elementTemplates.applyTemplate(serviceTask, template);
+      });
+
+      const entry = findEntry('custom-entry-com.camunda.example.AgentDefinition-0', container),
+            select = findSelect(entry);
+
+      // then
+      const agentDefinition = findExtension(businessObject, 'zeebe:AgentDefinition');
+
+      expect(entry).to.exist;
+      expect(select).to.exist;
+      expect(select.value).to.equal('aiAgentTask');
+
+      expect(agentDefinition).to.exist;
+      expect(agentDefinition).to.have.property('agentType', 'aiAgentTask');
+    }));
+
+
+    it('should remove on template removal', inject(async function(elementTemplates) {
+
+      // given
+      let element = await expectSelected('ServiceTask_agentDefinition');
+
+      // when
+      await act(() => {
+        elementTemplates.removeTemplate(element);
+      });
+      element = await expectSelected('ServiceTask_agentDefinition');
+
+      // then
+      const agentDefinition = findExtension(getBusinessObject(element), 'zeebe:AgentDefinition');
+      expect(agentDefinition).to.not.exist;
+    }));
+
+  });
+
+
   describe('zeebe:taskDefinition', function() {
 
     it('should display', async function() {

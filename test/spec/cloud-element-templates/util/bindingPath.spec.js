@@ -565,6 +565,30 @@ describe('cloud-element-templates/util - bindingPath', function() {
     });
 
 
+    describe('zeebe:agentDefinition', function() {
+
+      it('should resolve agentType', function() {
+
+        // given
+        const agentDefinition = create('zeebe:AgentDefinition', { agentType: 'aiAgentSubProcess' });
+
+        const adHocSubProcess = create('bpmn:AdHocSubProcess', {
+          id: 'AdHocSubProcess_1',
+          extensionElements: withExtensionElements([ agentDefinition ])
+        });
+
+        const binding = { type: 'zeebe:agentDefinition', property: 'agentType' };
+
+        // when
+        const path = getBindingPath(adHocSubProcess, binding);
+
+        // then
+        expect(path).to.eql([ 'extensionElements', 'values', 0, 'agentType' ]);
+      });
+
+    });
+
+
     describe('zeebe:jobPriorityDefinition', function() {
 
       it('should resolve priority', function() {
