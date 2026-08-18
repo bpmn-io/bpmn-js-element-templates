@@ -103,26 +103,6 @@ import timerElementTemplates from './CustomProperties.timer.json';
 
 describe('provider/cloud-element-templates - CustomProperties', function() {
 
-  describe('configuration edited state', function() {
-
-    it('should treat every bound configuration state as edited', function() {
-
-      const selected = document.createElement('div');
-      selected.innerHTML = '<div class="bio-properties-panel-configuration-chooser-selected"></div>';
-      const missing = document.createElement('div');
-      missing.innerHTML = '<div class="bio-properties-panel-configuration-chooser-missing"></div>';
-      const loading = document.createElement('div');
-      loading.innerHTML = '<div class="bio-properties-panel-configuration-chooser-loading"></div>';
-      const empty = document.createElement('div');
-
-      expect(isConfigurationChooserEdited(selected)).to.be.true;
-      expect(isConfigurationChooserEdited(missing)).to.be.true;
-      expect(isConfigurationChooserEdited(loading)).to.be.true;
-      expect(isConfigurationChooserEdited(empty)).to.be.false;
-    });
-
-  });
-
   let container;
 
   beforeEach(function() {
@@ -1143,6 +1123,30 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
   });
 
 
+  describe('configuration edited state', function() {
+
+    it('should treat every bound configuration state as edited', function() {
+
+      const selected = document.createElement('div');
+      selected.innerHTML = '<div data-configuration-state="selected"></div>';
+      const missing = document.createElement('div');
+      missing.innerHTML = '<div data-configuration-state="missing"></div>';
+      const loading = document.createElement('div');
+      loading.innerHTML = '<div data-configuration-state="loading"></div>';
+      const placeholder = document.createElement('div');
+      placeholder.innerHTML = '<div data-configuration-state="placeholder"></div>';
+      const empty = document.createElement('div');
+
+      expect(isConfigurationChooserEdited(selected)).to.be.true;
+      expect(isConfigurationChooserEdited(missing)).to.be.true;
+      expect(isConfigurationChooserEdited(loading)).to.be.true;
+      expect(isConfigurationChooserEdited(placeholder)).to.be.false;
+      expect(isConfigurationChooserEdited(empty)).to.be.false;
+    });
+
+  });
+
+
   describe('configuration labels', function() {
 
     it('should use the property label or configuration template name', inject(async function(elementTemplates, configurationInstances) {
@@ -1199,13 +1203,13 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // then
       expect(domQuery('.bio-properties-panel-label', labeledEntry).textContent).to.equal('Destination AWS credential');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', labeledEntry).textContent).to.equal('Choose destination AWS credential');
+      expect(getConfigurationPlaceholder(labeledEntry).textContent).to.equal('Choose destination AWS credential');
       expect(domQuery('.bio-properties-panel-label', fallbackEntry).textContent).to.equal('AWS Credential');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', fallbackEntry).textContent).to.equal('Choose AWS Credential');
+      expect(getConfigurationPlaceholder(fallbackEntry).textContent).to.equal('Choose AWS Credential');
 
       // when
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', fallbackEntry));
+        fireEvent.click(getConfigurationPlaceholder(fallbackEntry));
       });
 
       // then
@@ -1250,7 +1254,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // then
-      expect(domQuery('.bio-properties-panel-configuration-chooser-missing', fallbackEntry).textContent).to.contain('AWS Production');
+      expect(getConfigurationMissing(fallbackEntry).textContent).to.contain('AWS Production');
 
       // when
       await act(() => {
@@ -1272,7 +1276,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // then
-      const typeMismatch = domQuery('.bio-properties-panel-configuration-chooser-missing', fallbackEntry);
+      const typeMismatch = getConfigurationMissing(fallbackEntry);
 
       expect(typeMismatch.textContent).to.contain('AWS Production');
       expect(typeMismatch.textContent).to.contain('Incompatible configuration type');
@@ -1328,7 +1332,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // then
       expect(domQuery('.bio-properties-panel-label', entry).textContent).to.equal('AWS Credential');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry).textContent).to.equal('Choose AWS Credential');
+      expect(getConfigurationPlaceholder(entry).textContent).to.equal('Choose AWS Credential');
     }));
 
 
@@ -1359,12 +1363,12 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
             inputEntry = findEntry('custom-entry-configuration-metadata-cleanup-1', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', propertyEntry));
+        fireEvent.click(getConfigurationPlaceholder(propertyEntry));
       });
       clickConfigurationOption(propertyEntry, 'Slack Production');
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', inputEntry));
+        fireEvent.click(getConfigurationPlaceholder(inputEntry));
       });
       clickConfigurationOption(inputEntry, 'Slack Production');
 
@@ -1482,7 +1486,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const select = async (entry, name) => {
         await act(() => {
           fireEvent.click(domQuery(
-            '.bio-properties-panel-configuration-chooser-placeholder, .bio-properties-panel-configuration-chooser-selected',
+            '.bio-properties-panel-configuration-chooser-placeholder, .bio-properties-panel-configuration-chooser-trigger',
             entry
           ));
         });
@@ -1711,12 +1715,12 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry(CONFIGURATION_ENTRY_ID, container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
 
       // when
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry));
+        fireEvent.click(getConfigurationRow(entry));
       });
 
       // then
@@ -1787,7 +1791,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       expect(placeholder.textContent).to.equal('Choose configuration');
 
@@ -1797,7 +1801,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       await waitFor(() => {
-        expect(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container)).to.exist;
+        expect(getConfigurationRow(container)).to.exist;
       });
 
       fireEvent.keyDown(getConfigurationOption(container, 'Slack Production'), {
@@ -1817,13 +1821,881 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // when
-      fireEvent.keyDown(domQuery('.bio-properties-panel-configuration-chooser-selected', entry), {
-        key: 'Enter'
+      // when
+      fireEvent.click(getConfigurationTrigger(entry));
+
+      // then
+      expect(getConfigurationPopover(entry)).to.exist;
+
+    }));
+
+
+    it('should NOT unset when re-choosing the current selection', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData'),
+            businessObject = getBusinessObject(element);
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container);
+
+      await act(() => {
+        fireEvent.click(getConfigurationPlaceholder(entry));
+      });
+      clickConfigurationOption(entry, 'Slack Production');
+
+      // re-open the dropdown on the now selected configuration
+      const trigger = await waitFor(() => {
+        const node = getConfigurationTrigger(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      await act(() => {
+        fireEvent.click(trigger);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(entry)).to.exist;
+      });
+
+      // when re-choosing the already selected instance
+      clickConfigurationOption(entry, 'Slack Production');
+
+      // then the selection is preserved (NOOP, not toggled off)
+      const zeebeProperties = findExtension(businessObject, 'zeebe:Properties'),
+            zeebeProperty = findZeebeProperty(zeebeProperties, { name: 'configuration' });
+
+      expect(zeebeProperty).to.jsonEqual({
+        $type: 'zeebe:Property',
+        name: 'configuration',
+        value: '=camunda.vars.env.slackProduction',
+        modelerConfigurationTemplate: 'io.camunda:slack-connection:1',
+        modelerConfigurationName: 'Slack Production'
+      });
+
+      // and the popover is closed
+      expect(getConfigurationPopover(entry)).not.to.exist;
+    }));
+
+
+    it('should close the popover when clicking the open trigger', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container);
+
+      await act(() => {
+        fireEvent.click(getConfigurationPlaceholder(entry));
+      });
+      clickConfigurationOption(entry, 'Slack Production');
+
+      const trigger = await waitFor(() => {
+        const node = getConfigurationTrigger(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // when opening the dropdown
+      await act(() => {
+        fireEvent.click(trigger);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationPopover(entry)).to.exist;
+      });
+
+      // then clicking the open trigger closes it (canonical dropdown behavior).
+      // Its mousedown is prevented so the popover does not dismiss-then-reopen
+      // when focus would otherwise shift to the trigger.
+      const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+
+      trigger.dispatchEvent(mousedown);
+
+      expect(mousedown.defaultPrevented).to.be.true;
+
+      await act(() => {
+        fireEvent.click(trigger);
+      });
+
+      expect(getConfigurationPopover(entry)).not.to.exist;
+    }));
+
+
+    it('should move focus to the trigger after selecting', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(container)).to.exist;
+      });
+
+      // spy on focus to observe which trigger receives focus (headless
+      // browsers do not reliably move document.activeElement)
+      const focusSpy = spy(HTMLElement.prototype, 'focus');
+
+      try {
+
+        // when
+        await act(() => {
+          fireEvent.keyDown(getConfigurationRow(container), {
+            key: ' '
+          });
+        });
+
+        // then
+        // focus moves to the freshly rendered trigger, not the removed placeholder
+        await waitFor(() => {
+          const trigger = getConfigurationTrigger(entry);
+
+          expect(trigger).to.exist;
+          expect(focusSpy.getCalls().some((call) => call.thisValue === trigger)).to.be.true;
+        });
+      } finally {
+        focusSpy.restore();
+      }
+    }));
+
+
+    it('should restore focus to the trigger when closing via keyboard', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      const listbox = await waitFor(() => {
+        const node = domQuery('[role="listbox"]', container);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      const focusSpy = spy(placeholder, 'focus');
+
+      // when
+      await act(() => {
+        fireEvent.keyDown(listbox, { key: 'Escape' });
       });
 
       // then
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).to.exist;
+      await waitFor(() => {
+        expect(getConfigurationPopover(entry)).not.to.exist;
+        expect(focusSpy).to.have.been.called;
+      });
 
+      focusSpy.restore();
+    }));
+
+
+    it('should reach the create action via keyboard navigation', inject(async function(elementTemplates, eventBus, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const property = {
+        id: 'configuration',
+        label: 'Configuration',
+        type: 'Configuration',
+        configurationTemplate: 'io.camunda:slack-connection:1',
+        configurationTemplateVersion: 2,
+        binding: {
+          type: 'zeebe:property',
+          name: 'configuration'
+        }
+      };
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ property ]
+      };
+      const createSpy = spy();
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      configurationInstances.setState({
+        permissions: {
+          create: true
+        }
+      });
+      eventBus.on('configuration.create', createSpy);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      const listbox = await waitFor(() => {
+        const node = domQuery('[role="listbox"]', container);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      const createOption = getConfigurationCreate(entry);
+
+      expect(createOption).to.exist;
+
+      // when
+      // arrow down from the single instance to the create action, then activate
+      await act(() => {
+        fireEvent.keyDown(listbox, { key: 'ArrowDown' });
+      });
+
+      // then
+      await waitFor(() => {
+        expect(listbox.getAttribute('aria-activedescendant')).to.equal(createOption.id);
+      });
+
+      // when
+      await act(() => {
+        fireEvent.keyDown(listbox, { key: 'Enter' });
+      });
+
+      // then
+      expect(createSpy).to.have.been.calledOnce;
+    }));
+
+
+    it('should dismiss the popover when focus leaves it', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      const popover = await waitFor(() => {
+        const node = getConfigurationPopover(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      const focusSpy = spy(placeholder, 'focus');
+
+      const listbox = domQuery('[role="listbox"]', popover);
+
+      // when
+      // focus moves from the inner listbox to an element outside of the popover;
+      // real browsers fire a bubbling `focusout` in this case
+      await act(() => {
+        listbox.dispatchEvent(new FocusEvent('focusout', {
+          bubbles: true,
+          relatedTarget: document.body
+        }));
+      });
+
+      // then
+      await waitFor(() => {
+        expect(getConfigurationPopover(entry)).not.to.exist;
+      });
+
+      // focus is not forced back onto the trigger
+      expect(focusSpy).not.to.have.been.called;
+
+      focusSpy.restore();
+    }));
+
+
+    it('should keep the empty popover keyboard-operable', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      // no compatible instances and no create permission
+      configurationInstances.setState({
+        selectableInstances: [],
+        available: true,
+        loading: false
+      });
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      // when
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      const popover = await waitFor(() => {
+        const node = getConfigurationPopover(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // then
+      // the popover exposes a listbox the trigger points to, even without options
+      const listbox = domQuery('[role="listbox"]', popover);
+
+      expect(listbox).to.exist;
+      expect(listbox.id).to.equal(placeholder.getAttribute('aria-controls'));
+
+      // and the empty message is still announced
+      expect(domQuery('.bio-properties-panel-configuration-chooser-empty', popover).textContent)
+        .to.equal('No compatible configurations are available in the connected cluster');
+
+      // and the popover can be closed via keyboard, returning focus to the trigger
+      const focusSpy = spy(placeholder, 'focus');
+
+      await act(() => {
+        fireEvent.keyDown(listbox, { key: 'Escape' });
+      });
+
+      // then
+      await waitFor(() => {
+        expect(getConfigurationPopover(entry)).not.to.exist;
+        expect(focusSpy).to.have.been.called;
+      });
+
+      focusSpy.restore();
+    }));
+
+
+    it('should open the actions menu (not the chooser) when activating it via keyboard', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      // select an instance so the selected card (with its actions menu) renders
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(container)).to.exist;
+      });
+
+      await act(() => {
+        fireEvent.keyDown(getConfigurationRow(container), {
+          key: ' '
+        });
+      });
+
+      const card = await waitFor(() => {
+        const node = getConfigurationSelected(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      const menuButton = getConfigurationMenuButton(card);
+
+      // when
+      // the actions menu button (nested inside the card) is activated via keyboard
+      await act(() => {
+        fireEvent.keyDown(menuButton, { key: 'Enter' });
+      });
+
+      // then
+      // the chooser popover is not opened by the nested activation
+      expect(getConfigurationPopover(entry)).not.to.exist;
+
+      // and the actions menu opens (native button activation)
+      await act(() => {
+        fireEvent.click(menuButton);
+      });
+
+      expect(getConfigurationContextMenu(entry)).to.exist;
+      expect(getConfigurationPopover(entry)).not.to.exist;
+    }));
+
+
+    it('should expose the actions menu as a keyboard-operable menu', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      // select an instance so the selected card (with its actions menu) renders
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(container)).to.exist;
+      });
+
+      await act(() => {
+        fireEvent.keyDown(getConfigurationRow(container), {
+          key: ' '
+        });
+      });
+
+      const menuButton = await waitFor(() => {
+        const node = getConfigurationMenuButton(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // grant update permission so the menu has more than one item (Edit + Remove)
+      await act(() => {
+        configurationInstances.setState({
+          permissions: {
+            update: true
+          }
+        });
+      });
+
+      // the trigger advertises a menu popup
+      expect(menuButton.getAttribute('aria-haspopup')).to.equal('menu');
+
+      // when
+      // the menu is opened via the arrow keys
+      await act(() => {
+        fireEvent.keyDown(menuButton, { key: 'ArrowDown' });
+      });
+
+      const menu = await waitFor(() => {
+        const node = getConfigurationContextMenu(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // then
+      // it has menu semantics
+      expect(menu.getAttribute('role')).to.equal('menu');
+
+      const menuItems = getConfigurationContextMenuItems(entry);
+
+      menuItems.forEach(item => {
+        expect(item.getAttribute('role')).to.equal('menuitem');
+      });
+
+      // and the first item is the active (tabbable) item
+      expect(menuItems[0].getAttribute('tabindex')).to.equal('0');
+      expect(menuItems[1].getAttribute('tabindex')).to.equal('-1');
+
+      // when
+      // navigating down with the keyboard
+      await act(() => {
+        fireEvent.keyDown(menu, { key: 'ArrowDown' });
+      });
+
+      // then
+      // the active (tabbable) item moves to the next one (roving focus)
+      await waitFor(() => {
+        expect(menuItems[1].getAttribute('tabindex')).to.equal('0');
+      });
+      expect(menuItems[0].getAttribute('tabindex')).to.equal('-1');
+
+      // when
+      // pressing Escape (spy on focus, since headless browsers do not reliably
+      // move document.activeElement)
+      const focusSpy = spy(menuButton, 'focus');
+
+      await act(() => {
+        fireEvent.keyDown(menu, { key: 'Escape' });
+      });
+
+      // then
+      // the menu closes and focus returns to the trigger button
+      await waitFor(() => {
+        expect(getConfigurationContextMenu(entry)).not.to.exist;
+      });
+
+      expect(focusSpy).to.have.been.called;
+
+      focusSpy.restore();
+    }));
+
+
+    it('should open the actions menu with the last item active on ArrowUp', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      configurationInstances.setSelectableInstances([ {
+        name: 'slackProduction',
+        metadata: {
+          kind: 'CREDENTIAL',
+          displayName: 'Slack Production',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2
+        }
+      } ]);
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      // select an instance so the selected card (with its actions menu) renders
+      await act(() => {
+        fireEvent.click(placeholder);
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationRow(container)).to.exist;
+      });
+
+      await act(() => {
+        fireEvent.keyDown(getConfigurationRow(container), {
+          key: ' '
+        });
+      });
+
+      const menuButton = await waitFor(() => {
+        const node = getConfigurationMenuButton(entry);
+
+        expect(node).to.exist;
+
+        return node;
+      });
+
+      // grant update permission so the menu has more than one item (Edit + Remove)
+      await act(() => {
+        configurationInstances.setState({
+          permissions: {
+            update: true
+          }
+        });
+      });
+
+      // when
+      // the menu is opened via ArrowUp
+      await act(() => {
+        fireEvent.keyDown(menuButton, { key: 'ArrowUp' });
+      });
+
+      await waitFor(() => {
+        expect(getConfigurationContextMenu(entry)).to.exist;
+      });
+
+      // then
+      // the last item is the active (tabbable) one
+      const menuItems = getConfigurationContextMenuItems(entry);
+
+      expect(menuItems.length).to.be.above(1);
+      expect(menuItems[menuItems.length - 1].getAttribute('tabindex')).to.equal('0');
+      expect(menuItems[0].getAttribute('tabindex')).to.equal('-1');
     }));
 
 
@@ -1867,14 +2739,14 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-input-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       await act(() => {
         fireEvent.click(placeholder);
       });
 
       await waitFor(() => {
-        expect(domQuery('.bio-properties-panel-configuration-chooser-popover-row', container)).to.exist;
+        expect(getConfigurationRow(container)).to.exist;
       });
 
       clickConfigurationOption(container, 'Slack Production');
@@ -1944,7 +2816,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       await act(() => {
         fireEvent.click(placeholder);
@@ -1960,17 +2832,17 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       await waitFor(() => {
-        expect(domQuery('.bio-properties-panel-configuration-chooser-selected', entry)).to.exist;
+        expect(getConfigurationSelected(entry)).to.exist;
         expect(domQuery('.bio-properties-panel-configuration-chooser-selected--offline', entry)).to.exist;
         expect(domQuery('.bio-properties-panel-configuration-chooser-logo', entry).getAttribute('src')).to.equal('data:image/svg+xml;base64,offline-icon');
         expect(domQuery('.bio-properties-panel-configuration-chooser-subtitle', entry).textContent).to.equal('No cluster selected');
-        expect(domQuery('.bio-properties-panel-configuration-chooser-missing', entry)).not.to.exist;
+        expect(getConfigurationMissing(entry)).not.to.exist;
       });
 
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-selected', entry));
+      fireEvent.click(getConfigurationSelected(entry));
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).not.to.exist;
-      expect(domQuery('.bio-properties-panel-configuration-chooser-create', entry)).not.to.exist;
+      expect(getConfigurationPopover(entry)).not.to.exist;
+      expect(getConfigurationCreate(entry)).not.to.exist;
 
       // when
       openConfigurationMenu(entry);
@@ -2024,7 +2896,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
       clickConfigurationOption(entry, 'Slack Production');
 
@@ -2090,13 +2962,13 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       await act(() => {
         fireEvent.click(placeholder);
       });
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).to.exist;
+      expect(getConfigurationPopover(entry)).to.exist;
 
       // when
       await act(() => {
@@ -2113,7 +2985,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-unavailable');
       expect(unavailable.getAttribute('role')).to.equal('status');
       expect(unavailable.textContent).to.equal('No cluster selected');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).not.to.exist;
+      expect(getConfigurationPopover(entry)).not.to.exist;
     }));
 
 
@@ -2151,7 +3023,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry),
+            placeholder = getConfigurationPlaceholder(entry),
             error = domQuery('.bio-properties-panel-configuration-chooser-unavailable--error', entry);
 
       // then
@@ -2217,7 +3089,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
       clickConfigurationOption(entry, 'Slack Production');
 
@@ -2235,7 +3107,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       openConfigurationMenu(entry);
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry)).to.exist;
+      expect(getConfigurationContextMenu(entry)).to.exist;
 
       // when - failed response
       await act(() => {
@@ -2255,11 +3127,11 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(error.textContent).to.contain('Slack Production');
       expect(error.textContent).to.contain('Could not load configurations');
       expect(entry.textContent).not.to.contain('Not found on cluster');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry)).not.to.exist;
+      expect(getConfigurationContextMenu(entry)).not.to.exist;
 
       fireEvent.click(error);
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).not.to.exist;
+      expect(getConfigurationPopover(entry)).not.to.exist;
 
       openConfigurationMenu(entry);
 
@@ -2303,14 +3175,14 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
-            placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+            placeholder = getConfigurationPlaceholder(entry);
 
       // when
       await act(() => {
         fireEvent.click(placeholder);
       });
 
-      expect(domQuery('.bio-properties-panel-configuration-chooser-create', entry)).not.to.exist;
+      expect(getConfigurationCreate(entry)).not.to.exist;
 
       await act(() => {
         configurationInstances.setState({
@@ -2321,10 +3193,10 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       await waitFor(() => {
-        expect(domQuery('.bio-properties-panel-configuration-chooser-create', entry)).to.exist;
+        expect(getConfigurationCreate(entry)).to.exist;
       });
 
-      fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-create', entry));
+      fireEvent.click(getConfigurationCreate(entry));
 
       // then
       expect(createSpy).to.have.been.calledOnce;
@@ -2334,7 +3206,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(event.property).to.equal(property);
       expect(event.configurationTemplate).to.equal('io.camunda:slack-connection:1');
       expect(event.configurationTemplateVersion).to.equal(2);
-      expect(domQuery('.bio-properties-panel-configuration-chooser-popover', entry)).to.not.exist;
+      expect(getConfigurationPopover(entry)).to.not.exist;
     }));
 
 
@@ -2491,7 +3363,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
       clickConfigurationOption(entry, 'Slack Production');
       openConfigurationMenu(entry);
@@ -2592,7 +3464,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry));
+        fireEvent.click(getConfigurationPlaceholder(entry));
       });
       clickConfigurationOption(entry, 'Slack Production');
 
@@ -2607,16 +3479,14 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         });
       });
 
-      const missing = domQuery('.bio-properties-panel-configuration-chooser-missing', entry);
+      const missing = getConfigurationMissing(entry);
 
       expect(missing).to.exist;
       expect(missing.textContent).to.contain('Version 1 · Requires version 2+');
 
-      fireEvent.keyDown(missing, {
-        key: 'Enter'
-      });
+      fireEvent.click(getConfigurationTrigger(missing));
 
-      const rows = domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry);
+      const rows = getConfigurationRows(entry);
 
       expect(rows).to.have.length(1);
       expect(rows[0].textContent).to.contain('Slack Development');
@@ -5304,8 +6174,8 @@ function clickConfigurationOption(entry, name) {
 
 function getConfigurationOption(entry, name) {
   return within(entry).getAllByText(name).find(option => {
-    return option.closest('li[role="button"]');
-  }).closest('li[role="button"]');
+    return option.closest('li[role="option"]');
+  }).closest('li[role="option"]');
 }
 
 function getConfigurationMenuItem(entry, label) {
@@ -5314,6 +6184,64 @@ function getConfigurationMenuItem(entry, label) {
 
 function openConfigurationMenu(entry) {
   fireEvent.click(within(entry).getByTitle('More actions'));
+}
+
+
+function getConfigurationPlaceholder(entry) {
+  const placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+
+  expect(placeholder, 'configuration chooser placeholder').to.exist;
+
+  return placeholder;
+}
+
+function getConfigurationPopover(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-popover', entry);
+}
+
+function getConfigurationRow(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-popover-row', entry);
+}
+
+function getConfigurationRows(entry) {
+  return domQueryAll('.bio-properties-panel-configuration-chooser-popover-row', entry);
+}
+
+function getConfigurationCreate(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-create', entry);
+}
+
+function getConfigurationSelected(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-selected', entry);
+}
+
+function getConfigurationMissing(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-missing', entry);
+}
+
+function getConfigurationContextMenu(entry) {
+  return domQuery('.bio-properties-panel-configuration-chooser-context-menu', entry);
+}
+
+
+function getConfigurationTrigger(entry) {
+  const trigger = domQuery('.bio-properties-panel-configuration-chooser-trigger', entry);
+
+  expect(trigger, 'configuration chooser trigger').to.exist;
+
+  return trigger;
+}
+
+function getConfigurationMenuButton(entry) {
+  const button = domQuery('.bio-properties-panel-configuration-chooser-menu', entry);
+
+  expect(button, 'configuration chooser actions menu button').to.exist;
+
+  return button;
+}
+
+function getConfigurationContextMenuItems(entry) {
+  return domQueryAll('.bio-properties-panel-configuration-chooser-context-menu-item', entry);
 }
 
 function expectSelected(id) {
