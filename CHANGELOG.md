@@ -6,6 +6,9 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.31.0
+
+* `FEAT`: support `Configuration` binding and configuration templates ([#263](https://github.com/bpmn-io/bpmn-js-element-templates/pull/263))
 * `FIX`: align property getter to panel value contract to not defeat changed detection ([#283](https://github.com/bpmn-io/bpmn-js-element-templates/pull/283))
 
 ## 2.30.0
