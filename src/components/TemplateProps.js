@@ -44,7 +44,7 @@ export function TemplateProps({
       component: TemplateDescription,
       template
     }
-  ];
+  ].filter(Boolean);
 }
 
 function TemplateName({ id, template }) {
