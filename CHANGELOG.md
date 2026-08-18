@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.31.1
+
+* `FIX`: remove stray template entry text ([285](https://github.com/bpmn-io/bpmn-js-element-templates/pull/285))
+
 ## 2.31.0
 
 * `FEAT`: support `Configuration` binding and configuration templates ([#263](https://github.com/bpmn-io/bpmn-js-element-templates/pull/263))
