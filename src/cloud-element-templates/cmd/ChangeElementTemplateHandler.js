@@ -49,6 +49,7 @@ import {
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_JOB_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
+  ZEEBE_AGENT_DEFINITION,
   ZEEBE_TASK_SCHEDULE,
   ZEEBE_EXECUTION_LISTENER,
   ZEEBE_TASK_LISTENER
@@ -170,6 +171,8 @@ export default class ChangeElementTemplateHandler {
     this._updateZeebeJobPriorityDefinition(element, oldTemplate, newTemplate);
 
     this._updateAdHoc(element, oldTemplate, newTemplate);
+
+    this._updateAgentDefinition(element, oldTemplate, newTemplate);
 
     this._updateZeebeTaskSchedule(element, oldTemplate, newTemplate);
 
@@ -1566,6 +1569,19 @@ export default class ChangeElementTemplateHandler {
     );
   }
 
+  _updateAgentDefinition(element, oldTemplate, newTemplate) {
+    this._updateSingleExtensionElement(
+      element,
+      oldTemplate,
+      newTemplate,
+      {
+        bindingTypes: [ ZEEBE_AGENT_DEFINITION ],
+        extensionType: 'zeebe:AgentDefinition',
+        getPropertyName: (binding) => binding.property
+      }
+    );
+  }
+
 
   _updateZeebeTaskSchedule(element, oldTemplate, newTemplate) {
     this._updateSingleExtensionElement(
@@ -2381,6 +2397,19 @@ export function findOldProperty(oldTemplate, newProperty) {
     });
   }
 
+  if (newBindingType === ZEEBE_AGENT_DEFINITION) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_AGENT_DEFINITION) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
+
   if (newBindingType === ZEEBE_TASK_SCHEDULE) {
     return oldProperties.find(oldProperty => {
       const oldBinding = oldProperty.binding,
@@ -2581,6 +2610,10 @@ function getPropertyValue(element, property) {
   }
 
   if (bindingType === ZEEBE_AD_HOC) {
+    return businessObject.get(bindingProperty);
+  }
+
+  if (bindingType === ZEEBE_AGENT_DEFINITION) {
     return businessObject.get(bindingProperty);
   }
 

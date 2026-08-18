@@ -26,6 +26,7 @@ import {
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_JOB_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
+  ZEEBE_AGENT_DEFINITION,
   ZEEBE_TASK_SCHEDULE,
   ZEEBE_EXECUTION_LISTENER,
   ZEEBE_TASK_LISTENER
@@ -120,6 +121,9 @@ export function getBindingPath(element, binding) {
 
   case ZEEBE_AD_HOC:
     return getExtensionBindingPath(businessObject, 'zeebe:AdHoc', binding.property);
+
+  case ZEEBE_AGENT_DEFINITION:
+    return getExtensionBindingPath(businessObject, 'zeebe:AgentDefinition', binding.property);
 
   case ZEEBE_LINKED_RESOURCE_PROPERTY:
     return getLinkedResourceBindingPath(businessObject, binding);

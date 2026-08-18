@@ -1,0 +1,23 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "AgentDefinition",
+    "id": "com.camunda.example.AgentDefinition",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "aiAgentTask",
+        "binding": {
+          "type": "zeebe:agentDefinition",
+          "property": "agentType"
+        }
+      }
+    ]
+  }
+]

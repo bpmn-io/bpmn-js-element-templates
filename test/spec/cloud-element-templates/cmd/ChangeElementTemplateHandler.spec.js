@@ -6285,6 +6285,203 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('update zeebe:agentDefinition', function() {
+
+      beforeEach(bootstrap(require('./agent-definition.bpmn').default));
+
+      const newTemplate = require('./agent-definition.json');
+
+
+      it('execute', inject(function(elementRegistry) {
+
+        // given
+        let serviceTask = elementRegistry.get('ServiceTask_1');
+
+        // when
+        changeTemplate(serviceTask, newTemplate);
+
+        // then
+        serviceTask = elementRegistry.get('ServiceTask_1');
+        expectElementTemplate(serviceTask, 'com.camunda.example.AgentDefinition');
+
+        const agentDefinition = findExtension(serviceTask, 'zeebe:AgentDefinition');
+
+        expect(agentDefinition).to.exist;
+        expect(agentDefinition).to.have.property('agentType', 'external');
+      }));
+
+
+      it('execute on ad-hoc sub-process', inject(function(elementRegistry) {
+
+        // given
+        let subProcess = elementRegistry.get('AdHocSubProcess_1');
+
+        // when
+        changeTemplate(subProcess, newTemplate);
+
+        // then
+        subProcess = elementRegistry.get('AdHocSubProcess_1');
+        expectElementTemplate(subProcess, 'com.camunda.example.AgentDefinition');
+
+        const agentDefinition = findExtension(subProcess, 'zeebe:AgentDefinition');
+
+        expect(agentDefinition).to.exist;
+        expect(agentDefinition).to.have.property('agentType', 'external');
+      }));
+
+
+      it('undo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let serviceTask = elementRegistry.get('ServiceTask_1');
+
+        changeTemplate(serviceTask, newTemplate);
+
+        // when
+        commandStack.undo();
+
+        // then
+        serviceTask = elementRegistry.get('ServiceTask_1');
+        expectNoElementTemplate(serviceTask);
+
+        const agentDefinition = findExtension(serviceTask, 'zeebe:AgentDefinition');
+
+        expect(agentDefinition).not.to.exist;
+      }));
+
+
+      it('redo', inject(function(commandStack, elementRegistry) {
+
+        // given
+        let serviceTask = elementRegistry.get('ServiceTask_1');
+
+        changeTemplate(serviceTask, newTemplate);
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        serviceTask = elementRegistry.get('ServiceTask_1');
+        expectElementTemplate(serviceTask, 'com.camunda.example.AgentDefinition');
+
+        const agentDefinition = findExtension(serviceTask, 'zeebe:AgentDefinition');
+
+        expect(agentDefinition).to.exist;
+        expect(agentDefinition).to.have.property('agentType', 'external');
+      }));
+
+
+      it('should not override existing', inject(function(elementRegistry) {
+
+        // given
+        const serviceTask = elementRegistry.get('ServiceTask_existing');
+
+        // when
+        changeTemplate(serviceTask, newTemplate);
+
+        // then
+        expectElementTemplate(serviceTask, 'com.camunda.example.AgentDefinition');
+
+        const agentDefinition = findExtension(serviceTask, 'zeebe:AgentDefinition');
+
+        expect(agentDefinition).to.exist;
+
+        // Should keep the old value, not override with newTemplate's value
+        expect(agentDefinition).to.have.property('agentType', 'aiAgentTask');
+      }));
+
+
+      it('should not override existing on ad-hoc sub-process', inject(function(elementRegistry) {
+
+        // given
+        const subProcess = elementRegistry.get('AdHocSubProcess_existing');
+
+        // when
+        changeTemplate(subProcess, newTemplate);
+
+        // then
+        expectElementTemplate(subProcess, 'com.camunda.example.AgentDefinition');
+
+        const agentDefinition = findExtension(subProcess, 'zeebe:AgentDefinition');
+
+        expect(agentDefinition).to.exist;
+
+        // Should keep the old value, not override with newTemplate's value
+        expect(agentDefinition).to.have.property('agentType', 'aiAgentSubProcess');
+      }));
+
+
+      it('discards other bindings', inject(function(elementRegistry) {
+
+        // given
+        let serviceTask = elementRegistry.get('ServiceTask_1');
+
+        const oldTemplate = createTemplate([
+          {
+            value: 'oldCollection',
+            binding: {
+              type: 'zeebe:adHoc',
+              property: 'outputCollection'
+            }
+          }
+        ]);
+
+        serviceTask = changeTemplate(serviceTask, oldTemplate);
+
+        // when
+        changeTemplate(serviceTask, newTemplate, oldTemplate);
+
+        // then
+        expectElementTemplate(serviceTask, 'com.camunda.example.AgentDefinition');
+
+        const agentDefinition = findExtension(serviceTask, 'zeebe:AgentDefinition');
+        expect(agentDefinition).to.exist;
+
+        const adHoc = findExtension(serviceTask, 'zeebe:AdHoc');
+        expect(adHoc).to.not.exist;
+      }));
+
+
+      it('should remove on template removal', inject(function(elementTemplates, elementRegistry) {
+
+        // given
+        let serviceTask = elementRegistry.get('ServiceTask_1');
+
+        changeTemplate(serviceTask, newTemplate);
+
+        // when
+        serviceTask = elementTemplates.removeTemplate(serviceTask);
+
+        // then
+        const agentDefinition = findExtension(serviceTask, 'zeebe:AgentDefinition');
+
+        expect(agentDefinition).to.not.exist;
+      }));
+
+
+      it('should keep extension element on unlink', inject(function(elementTemplates, elementRegistry) {
+
+        // given
+        let serviceTask = elementRegistry.get('ServiceTask_1');
+
+        changeTemplate(serviceTask, newTemplate);
+
+        // when
+        serviceTask = elementTemplates.unlinkTemplate(serviceTask);
+
+        // then
+        expectNoElementTemplate(serviceTask);
+
+        const agentDefinition = findExtension(serviceTask, 'zeebe:AgentDefinition');
+
+        expect(agentDefinition).to.exist;
+        expect(agentDefinition).to.have.property('agentType', 'external');
+      }));
+
+    });
+
+
     describe('update zeebe:LinkedResource', function() {
 
       beforeEach(bootstrap(require('./linked-resource.bpmn').default));

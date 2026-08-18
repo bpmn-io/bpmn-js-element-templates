@@ -6,6 +6,12 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.32.0
+
+* `FEAT`: support `zeebe:agentDefinition` binding for `bpmn:ServiceTask` and `bpmn:AdHocSubProcess` element templates ([#286](https://github.com/bpmn-io/bpmn-js-element-templates/pull/286))
+* `DEPS`: update to `zeebe-bpmn-moddle@1.18.0`
+* `DEPS`: update to `@bpmn-io/element-templates-validator@2.26.0`
+
 ## 2.31.1
 
 * `FIX`: remove stray template entry text ([285](https://github.com/bpmn-io/bpmn-js-element-templates/pull/285))

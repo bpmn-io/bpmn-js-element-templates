@@ -1,0 +1,61 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "AI Agent Task",
+    "id": "io.camunda.example.AgentTask",
+    "description": "Marks a service task as an AI Agent Task.",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "id": "widgetType",
+        "label": "Widget Type",
+        "description": "Demo toggle: switch the Agent Type property below between Hidden and Dropdown.",
+        "type": "Dropdown",
+        "value": "dropdown",
+        "choices": [
+          { "name": "Hidden", "value": "hidden" },
+          { "name": "Dropdown", "value": "dropdown" }
+        ],
+        "binding": {
+          "type": "zeebe:property",
+          "name": "agentTypeWidget"
+        }
+      },
+      {
+        "label": "Agent Type",
+        "type": "Hidden",
+        "value": "aiAgentTask",
+        "binding": {
+          "type": "zeebe:agentDefinition",
+          "property": "agentType"
+        },
+        "condition": {
+          "property": "widgetType",
+          "equals": "hidden"
+        }
+      },
+      {
+        "label": "Agent Type",
+        "type": "Dropdown",
+        "value": "aiAgentTask",
+        "choices": [
+          { "name": "AI Agent Task", "value": "aiAgentTask" },
+          { "name": "External Agent", "value": "external" }
+        ],
+        "binding": {
+          "type": "zeebe:agentDefinition",
+          "property": "agentType"
+        },
+        "condition": {
+          "property": "widgetType",
+          "equals": "dropdown"
+        }
+      }
+    ]
+  }
+]

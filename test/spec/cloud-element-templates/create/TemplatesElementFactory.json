@@ -819,6 +819,26 @@
   },
   {
     "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Agent Definition Template",
+    "id": "agent-definition-template",
+    "appliesTo": [
+      "bpmn:ServiceTask",
+      "bpmn:AdHocSubProcess"
+    ],
+    "version": 1,
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "external",
+        "binding": {
+          "type": "zeebe:agentDefinition",
+          "property": "agentType"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
     "name": "TaskSchedule",
     "id": "com.camunda.example.TaskSchedule",
     "appliesTo": [

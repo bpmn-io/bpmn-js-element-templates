@@ -1194,6 +1194,31 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "AgentDefinition",
+    "id": "com.camunda.example.AgentDefinition",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Dropdown",
+        "value": "aiAgentTask",
+        "choices": [
+          { "name": "AI Agent Task", "value": "aiAgentTask" },
+          { "name": "External Agent", "value": "external" }
+        ],
+        "binding": {
+          "type": "zeebe:agentDefinition",
+          "property": "agentType"
+        }
+      }
+    ]
   }
 
 ]

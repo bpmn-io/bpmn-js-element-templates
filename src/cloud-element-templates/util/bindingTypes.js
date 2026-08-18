@@ -23,6 +23,7 @@ export const ZEEBE_ASSIGNMENT_DEFINITION = 'zeebe:assignmentDefinition';
 export const ZEEBE_PRIORITY_DEFINITION = 'zeebe:priorityDefinition';
 export const ZEEBE_JOB_PRIORITY_DEFINITION = 'zeebe:jobPriorityDefinition';
 export const ZEEBE_AD_HOC = 'zeebe:adHoc';
+export const ZEEBE_AGENT_DEFINITION = 'zeebe:agentDefinition';
 export const ZEEBE_TASK_SCHEDULE = 'zeebe:taskSchedule';
 export const ZEEBE_EXECUTION_LISTENER = 'zeebe:executionListener';
 export const ZEEBE_TASK_LISTENER = 'zeebe:taskListener';
@@ -44,6 +45,7 @@ export const EXTENSION_BINDING_TYPES = [
   ZEEBE_PRIORITY_DEFINITION,
   ZEEBE_JOB_PRIORITY_DEFINITION,
   ZEEBE_AD_HOC,
+  ZEEBE_AGENT_DEFINITION,
   ZEEBE_TASK_SCHEDULE,
   ZEEBE_EXECUTION_LISTENER,
   ZEEBE_TASK_LISTENER
