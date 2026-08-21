@@ -132,17 +132,31 @@
   gap: 10px;
   margin-top: 4px;
   padding: 10px 12px;
-  border: 1px solid var(--color-grey-225-10-75, #ccced0);
+  border: 1px solid var(--input-border-color);
   border-radius: 4px;
-  background-color: var(--color-white, #fff);
+  background-color: var(--group-background-color);
   cursor: default;
   outline: none;
 }
 
-/* constraint violation, cf. .bio-properties-panel-entry.has-error */
+/* severity mirrors the standard entry states; .has-warning first so error wins
+   when both are set (matching @bpmn-io/properties-panel) */
+.bio-properties-panel-configuration-chooser.has-warning .bio-properties-panel-configuration-chooser-card {
+  border-color: var(--input-warning-border-color);
+  background-color: var(--input-warning-background-color);
+}
+
 .bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-card {
   border-color: var(--input-error-border-color);
   background-color: var(--input-error-background-color);
+}
+
+/* focus adds the standard input focus treatment; placed after hover so it wins
+   when a card is both hovered and focused */
+.bio-properties-panel-configuration-chooser-card--selected:focus-within,
+.bio-properties-panel-configuration-chooser-card--missing:focus-within {
+  border-color: var(--input-focus-border-color);
+  background-color: var(--input-focus-background-color);
 }
 
 /* placeholder trigger (no selection): a dashed action button */
@@ -151,7 +165,7 @@
   gap: 6px;
   width: 100%;
   border-style: dashed;
-  color: var(--color-grey-225-10-35, #4d5258);
+  color: var(--description-color);
   font-size: 13px;
   cursor: pointer;
 }
@@ -166,14 +180,9 @@
   opacity: 0.5;
 }
 
-.bio-properties-panel-configuration-chooser-unavailable {
-  margin-top: 4px;
-  color: var(--color-grey-225-10-55, #7d8186);
-  font-size: 12px;
-}
-
-.bio-properties-panel-configuration-chooser-unavailable--error {
-  color: #a66b00;
+/* control wrapper: anchors the popover / actions menu directly below the card */
+.bio-properties-panel-configuration-chooser-control {
+  position: relative;
 }
 
 .bio-properties-panel-configuration-chooser-create-icon {
@@ -227,27 +236,7 @@
   border-bottom: 1px solid var(--color-grey-225-10-85, #e5e6e7);
 }
 
-/* missing configuration state */
-.bio-properties-panel-configuration-chooser-card--missing {
-  border-color: #f0ad4e;
-  background-color: #fff8ed;
-}
-
-.bio-properties-panel-configuration-chooser-card--missing:hover {
-  border-color: #e09730;
-  background-color: #fef3e0;
-}
-
-.bio-properties-panel-configuration-chooser-card--error {
-  cursor: default;
-}
-
-.bio-properties-panel-configuration-chooser-card--missing .bio-properties-panel-configuration-chooser-subtitle {
-  overflow: visible;
-  overflow-wrap: anywhere;
-  text-overflow: clip;
-  white-space: normal;
-}
+/* missing configuration state carries the standard warning severity */
 
 /* logo */
 .bio-properties-panel-configuration-chooser-logo {
@@ -263,13 +252,13 @@
   align-items: center;
   justify-content: center;
   background-color: var(--color-grey-225-10-90, #e6e8ea);
-  color: var(--color-grey-225-10-35, #4d5258);
+  color: var(--description-color);
   font-weight: 600;
 }
 
 .bio-properties-panel-configuration-chooser-logo--warning {
   background-color: #fce4bc;
-  color: #a66b00;
+  color: var(--text-warning-color);
 }
 
 /* text block */
@@ -305,7 +294,7 @@
   padding: 0 6px;
   border: none;
   background: none;
-  color: var(--color-grey-225-10-35, #4d5258);
+  color: var(--description-color);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -325,12 +314,13 @@
 .bio-properties-panel-configuration-chooser-popover {
   position: absolute;
   z-index: 100;
+  top: 100%;
   left: 0;
   right: 0;
   margin-top: 4px;
-  border: 1px solid var(--color-grey-225-10-75, #ccced0);
+  border: 1px solid var(--input-border-color);
   border-radius: 4px;
-  background-color: var(--color-white, #fff);
+  background-color: var(--group-background-color);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
@@ -372,7 +362,7 @@
   border: none;
   border-top: 1px solid var(--color-grey-225-10-90, #e6e8ea);
   background: none;
-  color: var(--color-blue-205-100-50, #1a75ff);
+  color: var(--link-color);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -399,12 +389,13 @@
 .bio-properties-panel-configuration-chooser-context-menu {
   position: absolute;
   z-index: 11;
+  top: 100%;
   right: 0;
   margin-top: 4px;
   min-width: 150px;
-  border: 1px solid var(--color-grey-225-10-75, #ccced0);
+  border: 1px solid var(--input-border-color);
   border-radius: 4px;
-  background-color: var(--color-white, #fff);
+  background-color: var(--group-background-color);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
@@ -415,7 +406,7 @@
   padding: 8px 12px;
   border: none;
   background: none;
-  color: var(--color-grey-225-10-15, #1a1d20);
+  color: var(--text-base-color);
   font-size: 13px;
   text-align: left;
   cursor: pointer;
