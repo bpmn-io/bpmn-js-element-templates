@@ -151,6 +151,13 @@
   background-color: var(--input-error-background-color);
 }
 
+/* interactive cards get the standard panel-button hover; loading opts out */
+.bio-properties-panel-configuration-chooser-card--placeholder:hover:not(:disabled),
+.bio-properties-panel-configuration-chooser-card--selected:hover,
+.bio-properties-panel-configuration-chooser-card--missing:hover {
+  background-color: var(--arrow-hover-background-color);
+}
+
 /* focus adds the standard input focus treatment; placed after hover so it wins
    when a card is both hovered and focused */
 .bio-properties-panel-configuration-chooser-card--selected:focus-within,
@@ -168,11 +175,6 @@
   color: var(--description-color);
   font-size: 13px;
   cursor: pointer;
-}
-
-.bio-properties-panel-configuration-chooser-card--placeholder:hover:not(:disabled) {
-  border-color: var(--color-grey-225-10-55, #7d8186);
-  background-color: var(--color-grey-225-10-97, #f7f8f8);
 }
 
 .bio-properties-panel-configuration-chooser-card--placeholder:disabled {
@@ -209,19 +211,6 @@
 
 .bio-properties-panel-configuration-chooser-trigger:disabled {
   cursor: default;
-}
-
-/* selected configuration card */
-.bio-properties-panel-configuration-chooser-card--selected:hover {
-  border-color: var(--color-blue-205-100-50, #1a75ff);
-  background-color: var(--color-blue-205-100-95, #eef4ff);
-}
-
-.bio-properties-panel-configuration-chooser-card--offline,
-.bio-properties-panel-configuration-chooser-card--offline:hover {
-  cursor: default;
-  border-color: var(--color-grey-225-10-75, #ccced0);
-  background-color: var(--color-white, #fff);
 }
 
 /* loading state */
@@ -345,11 +334,7 @@
 
 .bio-properties-panel-configuration-chooser-popover-row:hover,
 .bio-properties-panel-configuration-chooser-popover-row--active {
-  background-color: var(--color-blue-205-100-95, #eef4ff);
-}
-
-.bio-properties-panel-configuration-chooser-popover-row--selected {
-  background-color: var(--color-blue-205-100-95, #eef4ff);
+  background-color: var(--input-background-color);
 }
 
 /* create configuration footer */
@@ -372,7 +357,7 @@
 .bio-properties-panel-configuration-chooser-create:hover,
 .bio-properties-panel-configuration-chooser-create--active,
 .bio-properties-panel-configuration-chooser-create:focus-visible {
-  background-color: var(--color-blue-205-100-95, #eef4ff);
+  background-color: var(--input-background-color);
 }
 
 .bio-properties-panel-configuration-chooser-empty {
@@ -415,6 +400,6 @@
 
 .bio-properties-panel-configuration-chooser-context-menu-item:hover,
 .bio-properties-panel-configuration-chooser-context-menu-item:focus-visible {
-  background-color: var(--color-grey-225-10-97, #f7f8f8);
+  background-color: var(--input-background-color);
 }
 

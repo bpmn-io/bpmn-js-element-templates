@@ -1323,10 +1323,6 @@ function ConfigurationRow(props) {
 
   const classes = [ 'bio-properties-panel-configuration-chooser-popover-row' ];
 
-  if (selected) {
-    classes.push('bio-properties-panel-configuration-chooser-popover-row--selected');
-  }
-
   if (active) {
     classes.push('bio-properties-panel-configuration-chooser-popover-row--active');
   }
