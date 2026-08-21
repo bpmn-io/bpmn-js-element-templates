@@ -120,19 +120,13 @@ function getConfigurationStatus(options) {
     };
   }
 
-  if (variant === VARIANT.OFFLINE) {
+  // offline (bound but unverifiable) and unavailable placeholder are the same
+  // neutral note: the cluster connection can only be restored outside the panel
+  if (variant === VARIANT.OFFLINE || (variant === VARIANT.PLACEHOLDER && !available)) {
     return {
       id: statusId,
       severity: 'note',
-      message: unavailableMessage || translate('Cluster unavailable')
-    };
-  }
-
-  if (variant === VARIANT.PLACEHOLDER && !available) {
-    return {
-      id: statusId,
-      severity: 'note',
-      message: unavailableMessage || translate('Cluster unavailable')
+      message: unavailableMessage || translate('No cluster connected')
     };
   }
 

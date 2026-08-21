@@ -779,7 +779,7 @@ function createTestUI(modeler) {
           selectableInstances: available ? [ ...demoConfigurations ] : [],
           loading: false,
           available,
-          unavailableMessage: available ? null : 'No cluster selected'
+          unavailableMessage: null
         });
       });
 

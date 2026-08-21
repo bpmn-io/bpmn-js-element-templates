@@ -3082,6 +3082,56 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     }));
 
 
+    it('should fall back to a default unavailable message when the host omits one', inject(async function(elementTemplates, configurationInstances) {
+
+      // given
+      const element = await expectSelected('RestTask_noData');
+      const template = {
+        id: 'configuration-property',
+        appliesTo: [ 'bpmn:ServiceTask' ],
+        elementType: {
+          value: 'bpmn:ServiceTask'
+        },
+        properties: [ {
+          id: 'configuration',
+          label: 'Configuration',
+          type: 'Configuration',
+          configurationTemplate: 'io.camunda:slack-connection:1',
+          configurationTemplateVersion: 2,
+          binding: {
+            type: 'zeebe:property',
+            name: 'configuration'
+          }
+        } ]
+      };
+
+      elementTemplates.set([ ...templates, template ]);
+
+      await act(() => {
+        elementTemplates.applyTemplate(element, template);
+      });
+
+      const entry = findEntry('custom-entry-configuration-property-0', container),
+            placeholder = getConfigurationPlaceholder(entry);
+
+      // when
+      await act(() => {
+        configurationInstances.setState({
+          available: false,
+          unavailableMessage: null
+        });
+      });
+
+      // then
+      const status = getConfigurationStatus(entry);
+
+      expect(placeholder.disabled).to.be.true;
+      expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-status');
+      expect(domClasses(status).contains('bio-properties-panel-description')).to.be.true;
+      expect(status.textContent).to.equal('No cluster connected');
+    }));
+
+
     it('should show an error message for an unselected configuration when loading fails', inject(async function(elementTemplates, configurationInstances) {
 
       // given
