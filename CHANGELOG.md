@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.33.0
+
 * `FEAT`: surface configuration state via standard warnings / descriptions ([#287](https://github.com/bpmn-io/bpmn-js-element-templates/pull/287))
 * `FEAT`: align menu select/hover states to muted gray ([#287](https://github.com/bpmn-io/bpmn-js-element-templates/pull/287))
 * `FEAT`: drop configuration card loading state ([#287](https://github.com/bpmn-io/bpmn-js-element-templates/pull/287))
