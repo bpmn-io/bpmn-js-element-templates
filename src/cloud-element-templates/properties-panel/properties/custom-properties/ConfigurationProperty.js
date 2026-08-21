@@ -1056,6 +1056,13 @@ export function ErrorConfiguration(props) {
 
   const refName = fromReference(value);
 
+  const instance = {
+    name: refName,
+    metadata: {
+      displayName: cachedName
+    }
+  };
+
   return (
     <ConfigurationCard
       class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--missing bio-properties-panel-configuration-chooser-card--error bio-properties-panel-focus-ring"
@@ -1064,7 +1071,7 @@ export function ErrorConfiguration(props) {
       menuOpen={ menuOpen }
       onMenu={ onMenu }
       translate={ translate }
-      logo={ <ConfigurationLogo warning /> }
+      logo={ <ConfigurationLogo instance={ instance } /> }
       title={ cachedName || refName }
       subtitle={
         <span class="bio-properties-panel-configuration-chooser-varname">{ refName }</span>
@@ -1095,6 +1102,13 @@ export function MissingConfiguration(props) {
     ? getDisplayName(instance)
     : cachedName || refName;
 
+  const displayInstance = instance || {
+    name: refName,
+    metadata: {
+      displayName: cachedName
+    }
+  };
+
   return (
     <ConfigurationCard
       class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--missing bio-properties-panel-focus-ring"
@@ -1108,7 +1122,7 @@ export function MissingConfiguration(props) {
       menuOpen={ menuOpen }
       onMenu={ onMenu }
       translate={ translate }
-      logo={ <ConfigurationLogo warning /> }
+      logo={ <ConfigurationLogo instance={ displayInstance } /> }
       title={ title }
       subtitle={
         <span class="bio-properties-panel-configuration-chooser-varname">{ refName }</span>
@@ -1350,15 +1364,7 @@ function ConfigurationRow(props) {
 }
 
 function ConfigurationLogo(props) {
-  const { instance, warning } = props;
-
-  if (warning) {
-    return (
-      <span class="bio-properties-panel-configuration-chooser-logo bio-properties-panel-configuration-chooser-logo--placeholder bio-properties-panel-configuration-chooser-logo--warning">
-        !
-      </span>
-    );
-  }
+  const { instance } = props;
 
   if (instance.icon) {
     return (

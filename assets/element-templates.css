@@ -128,7 +128,6 @@
   --configuration-chooser-option-hover-background-color: var(--input-background-color);
   --configuration-chooser-menu-button-hover-background-color: var(--color-grey-225-10-90);
   --configuration-chooser-logo-background-color: var(--color-grey-225-10-90);
-  --configuration-chooser-logo-warning-background-color: var(--dot-color-warning);
   --configuration-chooser-subtitle-color: var(--color-grey-225-10-55);
   --configuration-chooser-status-color: var(--color-grey-225-10-45);
   --configuration-chooser-separator-color: var(--color-grey-225-10-85);
@@ -247,11 +246,6 @@
   background-color: var(--configuration-chooser-logo-background-color);
   color: var(--description-color);
   font-weight: 600;
-}
-
-.bio-properties-panel-configuration-chooser-logo--warning {
-  background-color: var(--configuration-chooser-logo-warning-background-color);
-  color: var(--text-warning-color);
 }
 
 /* text block */
