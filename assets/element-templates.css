@@ -123,39 +123,45 @@
   padding-bottom: 10px;
 }
 
+/* one card box shared across every state via .…-chooser-card; state modifiers
+   (--placeholder / --selected / --missing / --loading / --offline / --error)
+   carry only their deltas */
+.bio-properties-panel-configuration-chooser-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-grey-225-10-75, #ccced0);
+  border-radius: 4px;
+  background-color: var(--color-white, #fff);
+  cursor: default;
+  outline: none;
+}
+
 /* constraint violation, cf. .bio-properties-panel-entry.has-error */
-.bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-placeholder,
-.bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-selected,
-.bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-loading,
-.bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-missing {
+.bio-properties-panel-configuration-chooser.has-error .bio-properties-panel-configuration-chooser-card {
   border-color: var(--input-error-border-color);
   background-color: var(--input-error-background-color);
 }
 
-/* placeholder trigger (no selection) */
-.bio-properties-panel-configuration-chooser-placeholder {
-  display: flex;
-  align-items: center;
+/* placeholder trigger (no selection): a dashed action button */
+.bio-properties-panel-configuration-chooser-card--placeholder {
   justify-content: center;
   gap: 6px;
   width: 100%;
-  margin-top: 4px;
-  padding: 10px 12px;
-  border: 1px dashed var(--color-grey-225-10-75, #ccced0);
-  border-radius: 4px;
-  background-color: var(--color-white, #fff);
+  border-style: dashed;
   color: var(--color-grey-225-10-35, #4d5258);
   font-size: 13px;
   cursor: pointer;
-  outline: none;
 }
 
-.bio-properties-panel-configuration-chooser-placeholder:hover:not(:disabled) {
+.bio-properties-panel-configuration-chooser-card--placeholder:hover:not(:disabled) {
   border-color: var(--color-grey-225-10-55, #7d8186);
   background-color: var(--color-grey-225-10-97, #f7f8f8);
 }
 
-.bio-properties-panel-configuration-chooser-placeholder:disabled {
+.bio-properties-panel-configuration-chooser-card--placeholder:disabled {
   cursor: default;
   opacity: 0.5;
 }
@@ -174,20 +180,6 @@
   width: 16px;
   height: 16px;
   fill: currentColor;
-}
-
-/* selected configuration card */
-.bio-properties-panel-configuration-chooser-selected {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-  padding: 10px 12px;
-  border: 1px solid var(--color-grey-225-10-75, #ccced0);
-  border-radius: 4px;
-  background-color: var(--color-white, #fff);
-  cursor: default;
-  outline: none;
 }
 
 .bio-properties-panel-configuration-chooser-trigger {
@@ -210,27 +202,21 @@
   cursor: default;
 }
 
-.bio-properties-panel-configuration-chooser-selected:hover {
+/* selected configuration card */
+.bio-properties-panel-configuration-chooser-card--selected:hover {
   border-color: var(--color-blue-205-100-50, #1a75ff);
   background-color: var(--color-blue-205-100-95, #eef4ff);
 }
 
-.bio-properties-panel-configuration-chooser-selected--offline,
-.bio-properties-panel-configuration-chooser-selected--offline:hover {
+.bio-properties-panel-configuration-chooser-card--offline,
+.bio-properties-panel-configuration-chooser-card--offline:hover {
   cursor: default;
   border-color: var(--color-grey-225-10-75, #ccced0);
   background-color: var(--color-white, #fff);
 }
 
 /* loading state */
-.bio-properties-panel-configuration-chooser-loading {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-  padding: 10px 12px;
-  border: 1px solid var(--color-grey-225-10-75, #ccced0);
-  border-radius: 4px;
+.bio-properties-panel-configuration-chooser-card--loading {
   background-color: var(--color-grey-225-10-97, #f7f8f8);
 }
 
@@ -242,29 +228,21 @@
 }
 
 /* missing configuration state */
-.bio-properties-panel-configuration-chooser-missing {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-  padding: 10px 12px;
-  border: 1px solid #f0ad4e;
-  border-radius: 4px;
+.bio-properties-panel-configuration-chooser-card--missing {
+  border-color: #f0ad4e;
   background-color: #fff8ed;
-  cursor: default;
-  outline: none;
 }
 
-.bio-properties-panel-configuration-chooser-missing:hover {
+.bio-properties-panel-configuration-chooser-card--missing:hover {
   border-color: #e09730;
   background-color: #fef3e0;
 }
 
-.bio-properties-panel-configuration-chooser-error {
+.bio-properties-panel-configuration-chooser-card--error {
   cursor: default;
 }
 
-.bio-properties-panel-configuration-chooser-missing .bio-properties-panel-configuration-chooser-subtitle {
+.bio-properties-panel-configuration-chooser-card--missing .bio-properties-panel-configuration-chooser-subtitle {
   overflow: visible;
   overflow-wrap: anywhere;
   text-overflow: clip;
