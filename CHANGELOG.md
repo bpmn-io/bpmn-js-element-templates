@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FIX`: use standard warning color for incompatible template indicator
+
 ## 2.33.0
 
 * `FEAT`: surface configuration state via standard warnings / descriptions ([#287](https://github.com/bpmn-io/bpmn-js-element-templates/pull/287))
