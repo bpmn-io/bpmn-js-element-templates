@@ -21,6 +21,8 @@ import {
 
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';import elementTemplatesModule from 'src/element-templates';
 
+import { TemplateProps } from 'src/components';
+
 import diagramXML from '../fixtures/template-props.bpmn';
 import templates from '../fixtures/template-props.json';
 
@@ -295,5 +297,63 @@ describe('provider/element-templates - TemplateProps', function() {
         expect(entry).not.to.exist;
       })
     );
+  });
+
+
+  describe('entries', function() {
+
+    it('should not contain falsy entries for a known template', function() {
+
+      // given
+      const template = { id: 'foo', name: 'Foo' };
+      const elementTemplates = { get: () => template };
+
+      // when
+      const entries = TemplateProps({
+        element: {},
+        elementTemplates,
+        getTemplateId: () => template.id,
+        getTemplateVersion: () => null
+      });
+
+      // then
+      expect(entries.every(Boolean)).to.be.true;
+    });
+
+
+    it('should not contain falsy entries for an unknown template', function() {
+
+      // given
+      const elementTemplates = { get: () => null };
+
+      // when
+      const entries = TemplateProps({
+        element: {},
+        elementTemplates,
+        getTemplateId: () => 'foo',
+        getTemplateVersion: () => null
+      });
+
+      // then
+      expect(entries.every(Boolean)).to.be.true;
+    });
+
+
+    it('should return no entries if no template is applied', function() {
+
+      // given
+      const elementTemplates = { get: () => null };
+
+      // when
+      const entries = TemplateProps({
+        element: {},
+        elementTemplates,
+        getTemplateId: () => null,
+        getTemplateVersion: () => null
+      });
+
+      // then
+      expect(entries).to.be.empty;
+    });
   });
 });
