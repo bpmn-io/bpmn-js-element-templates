@@ -10,7 +10,7 @@
   --unknown-template-hover-background-color: var(--color-red-360-100-40);
 
   --incompatible-template-background-color: var(--input-warning-border-color);
-  --incompatible-template-hover-background-color: hsl(35, 84%, 57%);
+  --incompatible-template-hover-background-color: color-mix(in srgb, var(--input-warning-border-color) 90%, black);
   --incompatible-template-fill-color: var(--color-grey-225-10-15);
   --incompatible-template-label-color: var(--color-grey-225-10-15);
 
