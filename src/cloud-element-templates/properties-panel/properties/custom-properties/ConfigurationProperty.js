@@ -65,6 +65,86 @@ function getConfigurationVariant(state) {
 }
 
 /**
+ * Build the status note shown below the identity-only card, or `null` when there
+ * is nothing to report. `note` reuses the neutral description styling, `warning`
+ * the standard warning field.
+ *
+ * @param {Object} options
+ * @returns {{ id: string, severity: string, message: string }|null}
+ */
+function getConfigurationStatus(options) {
+  const {
+    variant,
+    error,
+    available,
+    incompatible,
+    typeIncompatible,
+    instanceVersion,
+    minimumVersion,
+    hasCachedName,
+    unavailableMessage,
+    translate,
+    id
+  } = options;
+
+  const statusId = `${ id }-status`;
+
+  if (variant === VARIANT.ERROR || (variant === VARIANT.PLACEHOLDER && error)) {
+    return {
+      id: statusId,
+      severity: 'warning',
+      message: translate('Could not load configurations')
+    };
+  }
+
+  if (variant === VARIANT.MISSING) {
+    if (incompatible) {
+      return {
+        id: statusId,
+        severity: 'warning',
+        message: typeIncompatible
+          ? translate('Incompatible configuration type')
+          : translate('Version {version} · Requires version {minimumVersion}+', {
+            version: instanceVersion == null ? '?' : instanceVersion,
+            minimumVersion
+          })
+      };
+    }
+
+    return {
+      id: statusId,
+      severity: 'warning',
+      message: hasCachedName
+        ? translate('Not found on cluster')
+        : translate('Configuration not found')
+    };
+  }
+
+  if (variant === VARIANT.OFFLINE) {
+    return {
+      id: statusId,
+      severity: 'note',
+      message: unavailableMessage || translate('Cluster unavailable')
+    };
+  }
+
+  if (variant === VARIANT.PLACEHOLDER && !available) {
+    return {
+      id: statusId,
+      severity: 'note',
+      message: unavailableMessage || translate('Cluster unavailable')
+    };
+  }
+
+  return null;
+}
+
+const STATUS_CLASS = {
+  note: 'bio-properties-panel-description',
+  warning: 'bio-properties-panel-warning'
+};
+
+/**
  * FEEL expression referencing a configuration instance as a cluster variable.
  *
  * @param {string} name
@@ -455,6 +535,20 @@ export function ConfigurationProperty(props) {
 
   const variant = getConfigurationVariant({ value, error, selected, loading, available });
 
+  const status = getConfigurationStatus({
+    variant,
+    error,
+    available,
+    incompatible,
+    typeIncompatible,
+    instanceVersion: boundInstance?.metadata?.configurationTemplateVersion,
+    minimumVersion: configurationTemplateVersion,
+    hasCachedName: !!cachedName,
+    unavailableMessage,
+    translate,
+    id
+  });
+
   const renderConfiguration = () => {
     switch (variant) {
     case VARIANT.ERROR:
@@ -493,8 +587,6 @@ export function ConfigurationProperty(props) {
           cachedName={ cachedName }
           instance={ incompatible ? boundInstance : null }
           controlId={ controlId }
-          minimumVersion={ configurationTemplateVersion }
-          typeIncompatible={ typeIncompatible }
           disabled={ disabled }
           menuId={ menuId }
           menuOpen={ menuOpen }
@@ -509,7 +601,6 @@ export function ConfigurationProperty(props) {
         <OfflineConfiguration
           value={ value }
           cachedName={ cachedName }
-          unavailableMessage={ unavailableMessage }
           disabled={ disabled }
           menuId={ menuId }
           menuOpen={ menuOpen }
@@ -525,7 +616,6 @@ export function ConfigurationProperty(props) {
           disabled={ disabled }
           error={ error }
           available={ available }
-          unavailableMessage={ unavailableMessage }
           open={ popoverOpen }
           listboxId={ listboxId }
           chooserLabel={ chooserLabel }
@@ -542,6 +632,7 @@ export function ConfigurationProperty(props) {
       class={ classnames(
         'bio-properties-panel-entry',
         'bio-properties-panel-configuration-chooser',
+        status && status.severity === 'warning' ? 'has-warning' : '',
         validationError ? 'has-error' : ''
       ) }
       data-entry-id={ id }
@@ -553,18 +644,58 @@ export function ConfigurationProperty(props) {
       </label>
 
       {
-        description
-          ? <PropertyDescription description={ description } />
-          : null
-      }
-
-      {
         tooltip
           ? <PropertyTooltip tooltip={ tooltip } />
           : null
       }
 
-      { renderConfiguration() }
+      <div class="bio-properties-panel-configuration-chooser-control">
+        { renderConfiguration() }
+
+        {
+          popoverOpen
+            ? (
+              <ConfigurationPopover
+                listboxId={ listboxId }
+                instances={ instances }
+                selected={ selected }
+                canCreate={ canCreate }
+                onCreate={ createConfiguration }
+                onSelect={ select }
+                onClose={ closePopover }
+                onDismiss={ dismissPopover }
+                loading={ loading }
+                translate={ translate } />
+            )
+            : null
+        }
+
+        {
+          menuOpen
+            ? (
+              <ConfigurationContextMenu
+                menuId={ menuId }
+                initialFocus={ menuInitialFocus }
+                onEdit={ selected && canUpdate ? editConfiguration : null }
+                onUpgrade={ versionIncompatible && canUpdate ? upgradeConfiguration : null }
+                onRemove={ () => select(null) }
+                onClose={ closeMenu }
+                onDismiss={ dismissMenu }
+                translate={ translate } />
+            )
+            : null
+        }
+      </div>
+
+      {
+        status
+          ? (
+            <div id={ status.id } class={ STATUS_CLASS[ status.severity ] }>
+              { status.message }
+            </div>
+          )
+          : null
+      }
 
       {
         validationError
@@ -577,35 +708,11 @@ export function ConfigurationProperty(props) {
       }
 
       {
-        popoverOpen
+        description
           ? (
-            <ConfigurationPopover
-              listboxId={ listboxId }
-              instances={ instances }
-              selected={ selected }
-              canCreate={ canCreate }
-              onCreate={ createConfiguration }
-              onSelect={ select }
-              onClose={ closePopover }
-              onDismiss={ dismissPopover }
-              loading={ loading }
-              translate={ translate } />
-          )
-          : null
-      }
-
-      {
-        menuOpen
-          ? (
-            <ConfigurationContextMenu
-              menuId={ menuId }
-              initialFocus={ menuInitialFocus }
-              onEdit={ selected && canUpdate ? editConfiguration : null }
-              onUpgrade={ versionIncompatible && canUpdate ? upgradeConfiguration : null }
-              onRemove={ () => select(null) }
-              onClose={ closeMenu }
-              onDismiss={ dismissMenu }
-              translate={ translate } />
+            <div class="bio-properties-panel-description">
+              <PropertyDescription description={ description } />
+            </div>
           )
           : null
       }
@@ -885,56 +992,30 @@ function PlaceholderConfiguration(props) {
     onClick,
     open,
     showEntryRef,
-    translate,
-    unavailableMessage
+    translate
   } = props;
 
-  const describedBy = error
-    ? `${ id }-error`
-    : !available && unavailableMessage
-      ? `${ id }-unavailable`
-      : undefined;
+  const describedBy = (error || !available)
+    ? `${ id }-status`
+    : undefined;
 
   return (
-    <>
-      <button
-        id={ controlId }
-        ref={ showEntryRef }
-        type="button"
-        class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--placeholder bio-properties-panel-focus-ring"
-        disabled={ disabled || error || !available }
-        aria-haspopup="listbox"
-        aria-controls={ open ? listboxId : undefined }
-        aria-describedby={ describedBy }
-        aria-expanded={ open }
-        onClick={ onClick }>
-        <CreateIcon
-          class="bio-properties-panel-configuration-chooser-create-icon"
-          aria-hidden="true" />
-        { translate('Choose {configuration}', { configuration: chooserLabel }) }
-      </button>
-      {
-        error
-          ? (
-            <div
-              id={ `${ id }-error` }
-              class="bio-properties-panel-configuration-chooser-unavailable bio-properties-panel-configuration-chooser-unavailable--error"
-              role="status">
-              { translate('Could not load configurations') }
-            </div>
-          )
-          : !available && unavailableMessage
-            ? (
-              <div
-                id={ `${ id }-unavailable` }
-                class="bio-properties-panel-configuration-chooser-unavailable"
-                role="status">
-                { unavailableMessage }
-              </div>
-            )
-            : null
-      }
-    </>
+    <button
+      id={ controlId }
+      ref={ showEntryRef }
+      type="button"
+      class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--placeholder bio-properties-panel-focus-ring"
+      disabled={ disabled || error || !available }
+      aria-haspopup="listbox"
+      aria-controls={ open ? listboxId : undefined }
+      aria-describedby={ describedBy }
+      aria-expanded={ open }
+      onClick={ onClick }>
+      <CreateIcon
+        class="bio-properties-panel-configuration-chooser-create-icon"
+        aria-hidden="true" />
+      { translate('Choose {configuration}', { configuration: chooserLabel }) }
+    </button>
   );
 }
 
@@ -981,7 +1062,9 @@ function ErrorConfiguration(props) {
       translate={ translate }
       logo={ <ConfigurationLogo warning /> }
       title={ cachedName || refName }
-      subtitle={ translate('Could not load configurations') } />
+      subtitle={
+        <span class="bio-properties-panel-configuration-chooser-varname">{ refName }</span>
+      } />
   );
 }
 
@@ -994,31 +1077,19 @@ function MissingConfiguration(props) {
     listboxId,
     menuId,
     menuOpen,
-    minimumVersion,
     open,
     onClick,
     onMenu,
     translate,
-    typeIncompatible,
     value
   } = props;
 
   // extract variable name from FEEL expression
   const refName = fromReference(value);
-  const instanceVersion = instance?.metadata?.configurationTemplateVersion;
 
   const title = instance
     ? getDisplayName(instance)
-    : cachedName || translate('Configuration not found');
-
-  const subtitle = instance
-    ? typeIncompatible
-      ? translate('Incompatible configuration type')
-      : translate('Version {version} · Requires version {minimumVersion}+', {
-        version: instanceVersion == null ? '?' : instanceVersion,
-        minimumVersion
-      })
-    : cachedName ? translate('Not found on cluster') : refName;
+    : cachedName || refName;
 
   return (
     <ConfigurationCard
@@ -1035,7 +1106,9 @@ function MissingConfiguration(props) {
       translate={ translate }
       logo={ <ConfigurationLogo warning /> }
       title={ title }
-      subtitle={ subtitle } />
+      subtitle={
+        <span class="bio-properties-panel-configuration-chooser-varname">{ refName }</span>
+      } />
   );
 }
 
@@ -1048,7 +1121,6 @@ function OfflineConfiguration(props) {
     menuOpen,
     onMenu,
     translate,
-    unavailableMessage,
     value
   } = props;
 
@@ -1072,7 +1144,9 @@ function OfflineConfiguration(props) {
       translate={ translate }
       logo={ <ConfigurationLogo instance={ instance } /> }
       title={ cachedName || refName }
-      subtitle={ unavailableMessage || translate('Cluster unavailable') } />
+      subtitle={
+        <span class="bio-properties-panel-configuration-chooser-varname">{ refName }</span>
+      } />
   );
 }
 

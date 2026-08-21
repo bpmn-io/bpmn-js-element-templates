@@ -1362,7 +1362,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const typeMismatch = getConfigurationMissing(fallbackEntry);
 
       expect(typeMismatch.textContent).to.contain('AWS Production');
-      expect(typeMismatch.textContent).to.contain('Incompatible configuration type');
+      expect(getConfigurationStatus(fallbackEntry).textContent).to.contain('Incompatible configuration type');
       expect(typeMismatch.textContent).not.to.contain('AWS Credential');
       expect(typeMismatch.textContent).not.to.contain('io.camunda:other-credential:1');
 
@@ -2918,7 +2918,17 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         expect(getConfigurationSelected(entry)).to.exist;
         expect(domQuery('.bio-properties-panel-configuration-chooser-card--offline', entry)).to.exist;
         expect(domQuery('.bio-properties-panel-configuration-chooser-logo', entry).getAttribute('src')).to.equal('data:image/svg+xml;base64,offline-icon');
-        expect(domQuery('.bio-properties-panel-configuration-chooser-subtitle', entry).textContent).to.equal('No cluster selected');
+
+        // card keeps the stable identity (variable name), not the transient message
+        expect(domQuery('.bio-properties-panel-configuration-chooser-subtitle', entry).textContent).to.equal('slackProduction');
+
+        // the cluster status is surfaced as a standard note (description) below the card
+        const status = getConfigurationStatus(entry);
+
+        expect(domClasses(entry).contains('has-warning')).to.be.false;
+        expect(domClasses(status).contains('bio-properties-panel-description')).to.be.true;
+        expect(status.textContent).to.equal('No cluster selected');
+
         expect(getConfigurationMissing(entry)).not.to.exist;
       });
 
@@ -3062,12 +3072,12 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // then
-      const unavailable = domQuery('.bio-properties-panel-configuration-chooser-unavailable', entry);
+      const status = getConfigurationStatus(entry);
 
       expect(placeholder.disabled).to.be.true;
-      expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-unavailable');
-      expect(unavailable.getAttribute('role')).to.equal('status');
-      expect(unavailable.textContent).to.equal('No cluster selected');
+      expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-status');
+      expect(domClasses(status).contains('bio-properties-panel-description')).to.be.true;
+      expect(status.textContent).to.equal('No cluster selected');
       expect(getConfigurationPopover(entry)).not.to.exist;
     }));
 
@@ -3107,13 +3117,14 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       const entry = findEntry('custom-entry-configuration-property-0', container),
             placeholder = getConfigurationPlaceholder(entry),
-            error = domQuery('.bio-properties-panel-configuration-chooser-unavailable--error', entry);
+            status = getConfigurationStatus(entry);
 
       // then
       expect(placeholder.disabled).to.be.true;
-      expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-error');
-      expect(error.getAttribute('role')).to.equal('status');
-      expect(error.textContent).to.equal('Could not load configurations');
+      expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-status');
+      expect(domClasses(entry).contains('has-warning')).to.be.true;
+      expect(domClasses(status).contains('bio-properties-panel-warning')).to.be.true;
+      expect(status.textContent).to.equal('Could not load configurations');
 
       // when
       await act(() => {
@@ -3124,7 +3135,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // then
       expect(placeholder.disabled).to.be.false;
-      expect(domQuery('.bio-properties-panel-configuration-chooser-unavailable--error', entry)).not.to.exist;
+      expect(domClasses(entry).contains('has-warning')).to.be.false;
+      expect(getConfigurationStatus(entry)).not.to.exist;
     }));
 
 
@@ -3207,8 +3219,17 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const error = domQuery('.bio-properties-panel-configuration-chooser-card--error', entry);
 
       expect(error).to.exist;
+
+      // the card keeps the configuration identity
       expect(error.textContent).to.contain('Slack Production');
-      expect(error.textContent).to.contain('Could not load configurations');
+
+      // the load error is surfaced as a standard error field below the card
+      const errorStatus = getConfigurationStatus(entry);
+
+      expect(errorStatus).to.exist;
+      expect(domClasses(errorStatus).contains('bio-properties-panel-warning')).to.be.true;
+      expect(errorStatus.textContent).to.contain('Could not load configurations');
+
       expect(entry.textContent).not.to.contain('Not found on cluster');
       expect(getConfigurationContextMenu(entry)).not.to.exist;
 
@@ -3565,7 +3586,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const missing = getConfigurationMissing(entry);
 
       expect(missing).to.exist;
-      expect(missing.textContent).to.contain('Version 1 · Requires version 2+');
+      expect(getConfigurationStatus(entry).textContent).to.contain('Version 1 · Requires version 2+');
 
       fireEvent.click(getConfigurationTrigger(missing));
 
@@ -6300,6 +6321,10 @@ function getConfigurationSelected(entry) {
 
 function getConfigurationMissing(entry) {
   return domQuery('.bio-properties-panel-configuration-chooser-card--missing', entry);
+}
+
+function getConfigurationStatus(entry) {
+  return domQuery('[id$="-status"]', entry);
 }
 
 function getConfigurationContextMenu(entry) {
