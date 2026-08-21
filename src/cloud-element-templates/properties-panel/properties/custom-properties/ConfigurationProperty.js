@@ -714,7 +714,7 @@ export function ConfigurationProperty(props) {
   );
 }
 
-function SelectedConfiguration(props) {
+export function SelectedConfiguration(props) {
   const {
     controlId,
     disabled,
@@ -896,7 +896,7 @@ function ConfigurationMenuButton(props) {
   );
 }
 
-function ConfigurationContextMenu(props) {
+export function ConfigurationContextMenu(props) {
   const { initialFocus, menuId, onClose, onDismiss, onEdit, onRemove, onUpgrade, translate } = props;
 
   const menuRef = useRef(null);
@@ -973,7 +973,7 @@ function ConfigurationContextMenu(props) {
   );
 }
 
-function PlaceholderConfiguration(props) {
+export function PlaceholderConfiguration(props) {
   const {
     available,
     chooserLabel,
@@ -1019,7 +1019,7 @@ function PlaceholderConfiguration(props) {
  * indistinguishable from the resolved card; the branch only defers the
  * "not found" warning until the list resolves.
  */
-function LoadingConfiguration(props) {
+export function LoadingConfiguration(props) {
   const { cachedName, value } = props;
 
   const refName = fromReference(value);
@@ -1043,7 +1043,7 @@ function LoadingConfiguration(props) {
   );
 }
 
-function ErrorConfiguration(props) {
+export function ErrorConfiguration(props) {
   const {
     cachedName,
     disabled,
@@ -1072,7 +1072,7 @@ function ErrorConfiguration(props) {
   );
 }
 
-function MissingConfiguration(props) {
+export function MissingConfiguration(props) {
   const {
     cachedName,
     controlId,
@@ -1116,7 +1116,7 @@ function MissingConfiguration(props) {
   );
 }
 
-function OfflineConfiguration(props) {
+export function OfflineConfiguration(props) {
   const {
     cachedName,
     disabled,
@@ -1154,7 +1154,7 @@ function OfflineConfiguration(props) {
   );
 }
 
-function ConfigurationPopover(props) {
+export function ConfigurationPopover(props) {
   const {
     canCreate,
     instances,
