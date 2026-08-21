@@ -1517,7 +1517,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const optionalPropertyEntry = findEntry('custom-entry-configuration-metadata-cleanup-2', container);
 
       await act(() => {
-        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-placeholder', optionalPropertyEntry));
+        fireEvent.click(domQuery('.bio-properties-panel-configuration-chooser-card--placeholder', optionalPropertyEntry));
       });
       clickConfigurationOption(optionalPropertyEntry, 'Slack Production');
 
@@ -1569,7 +1569,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const select = async (entry, name) => {
         await act(() => {
           fireEvent.click(domQuery(
-            '.bio-properties-panel-configuration-chooser-placeholder, .bio-properties-panel-configuration-chooser-trigger',
+            '.bio-properties-panel-configuration-chooser-card--placeholder, .bio-properties-panel-configuration-chooser-trigger',
             entry
           ));
         });
@@ -2916,7 +2916,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       await waitFor(() => {
         expect(getConfigurationSelected(entry)).to.exist;
-        expect(domQuery('.bio-properties-panel-configuration-chooser-selected--offline', entry)).to.exist;
+        expect(domQuery('.bio-properties-panel-configuration-chooser-card--offline', entry)).to.exist;
         expect(domQuery('.bio-properties-panel-configuration-chooser-logo', entry).getAttribute('src')).to.equal('data:image/svg+xml;base64,offline-icon');
         expect(domQuery('.bio-properties-panel-configuration-chooser-subtitle', entry).textContent).to.equal('No cluster selected');
         expect(getConfigurationMissing(entry)).not.to.exist;
@@ -2992,7 +2992,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // then
-      const loading = domQuery('.bio-properties-panel-configuration-chooser-loading', entry);
+      const loading = domQuery('.bio-properties-panel-configuration-chooser-card--loading', entry);
 
       expect(loading).to.exist;
       expect(loading.getAttribute('role')).to.equal('status');
@@ -3204,7 +3204,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // then
-      const error = domQuery('.bio-properties-panel-configuration-chooser-error', entry);
+      const error = domQuery('.bio-properties-panel-configuration-chooser-card--error', entry);
 
       expect(error).to.exist;
       expect(error.textContent).to.contain('Slack Production');
@@ -6271,7 +6271,7 @@ function openConfigurationMenu(entry) {
 
 
 function getConfigurationPlaceholder(entry) {
-  const placeholder = domQuery('.bio-properties-panel-configuration-chooser-placeholder', entry);
+  const placeholder = domQuery('.bio-properties-panel-configuration-chooser-card--placeholder', entry);
 
   expect(placeholder, 'configuration chooser placeholder').to.exist;
 
@@ -6295,11 +6295,11 @@ function getConfigurationCreate(entry) {
 }
 
 function getConfigurationSelected(entry) {
-  return domQuery('.bio-properties-panel-configuration-chooser-selected', entry);
+  return domQuery('.bio-properties-panel-configuration-chooser-card--selected', entry);
 }
 
 function getConfigurationMissing(entry) {
-  return domQuery('.bio-properties-panel-configuration-chooser-missing', entry);
+  return domQuery('.bio-properties-panel-configuration-chooser-card--missing', entry);
 }
 
 function getConfigurationContextMenu(entry) {

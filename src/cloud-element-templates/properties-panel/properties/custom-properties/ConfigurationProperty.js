@@ -268,7 +268,7 @@ export function ConfigurationProperty(props) {
     const node = ref.current;
 
     return node && domQuery(
-      '.bio-properties-panel-configuration-chooser-placeholder,'
+      '.bio-properties-panel-configuration-chooser-card--placeholder,'
       + '.bio-properties-panel-configuration-chooser-trigger',
       node
     );
@@ -629,7 +629,7 @@ function SelectedConfiguration(props) {
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-selected bio-properties-panel-focus-ring"
+      class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--selected bio-properties-panel-focus-ring"
       interactive
       controlId={ controlId }
       disabled={ disabled }
@@ -901,7 +901,7 @@ function PlaceholderConfiguration(props) {
         id={ controlId }
         ref={ showEntryRef }
         type="button"
-        class="bio-properties-panel-configuration-chooser-placeholder bio-properties-panel-focus-ring"
+        class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--placeholder bio-properties-panel-focus-ring"
         disabled={ disabled || error || !available }
         aria-haspopup="listbox"
         aria-controls={ open ? listboxId : undefined }
@@ -950,7 +950,7 @@ function LoadingConfiguration(props) {
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-loading"
+      class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--loading"
       role="status"
       logo={ <ConfigurationLogo instance={ instance } /> }
       title={ name }
@@ -973,7 +973,7 @@ function ErrorConfiguration(props) {
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-missing bio-properties-panel-configuration-chooser-error bio-properties-panel-focus-ring"
+      class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--missing bio-properties-panel-configuration-chooser-card--error bio-properties-panel-focus-ring"
       disabled={ disabled }
       menuId={ menuId }
       menuOpen={ menuOpen }
@@ -1022,7 +1022,7 @@ function MissingConfiguration(props) {
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-missing bio-properties-panel-focus-ring"
+      class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--missing bio-properties-panel-focus-ring"
       interactive
       controlId={ controlId }
       disabled={ disabled }
@@ -1064,7 +1064,7 @@ function OfflineConfiguration(props) {
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-selected bio-properties-panel-configuration-chooser-selected--offline bio-properties-panel-focus-ring"
+      class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--selected bio-properties-panel-configuration-chooser-card--offline bio-properties-panel-focus-ring"
       disabled={ disabled }
       menuId={ menuId }
       menuOpen={ menuOpen }
