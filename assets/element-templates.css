@@ -135,8 +135,8 @@
 }
 
 /* one card box shared across every state via .…-chooser-card; state modifiers
-   (--placeholder / --selected / --missing / --loading / --offline / --error)
-   carry only their deltas */
+   (--placeholder / --selected / --missing / --offline / --error) carry only
+   their deltas. Mirrors the .bio-properties-panel-entry + .has-error convention. */
 .bio-properties-panel-configuration-chooser-card {
   display: flex;
   align-items: center;
@@ -177,7 +177,7 @@
   background-color: var(--input-focus-background-color);
 }
 
-/* placeholder trigger (no selection): a dashed action button */
+/* placeholder (no selection): a dashed action button */
 .bio-properties-panel-configuration-chooser-card--placeholder {
   justify-content: center;
   gap: 6px;
@@ -224,19 +224,12 @@
   cursor: default;
 }
 
-/* loading state */
-.bio-properties-panel-configuration-chooser-card--loading {
-  background-color: var(--color-grey-225-10-97, #f7f8f8);
-}
-
 .bio-properties-panel-configuration-chooser-refreshing {
   display: flex;
   align-items: center;
   padding: 8px 12px;
   border-bottom: 1px solid var(--configuration-chooser-separator-color);
 }
-
-/* missing configuration state carries the standard warning severity */
 
 /* logo */
 .bio-properties-panel-configuration-chooser-logo {

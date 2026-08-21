@@ -3002,13 +3002,17 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       });
 
       // then
-      const loading = domQuery('.bio-properties-panel-configuration-chooser-card--loading', entry);
+      // loading reuses the plain identity card (no distinct loading skin and no
+      // screen-reader-only busy signal) showing the cached identity — it is
+      // indistinguishable from the resolved card
+      const loading = domQuery('.bio-properties-panel-configuration-chooser-card', entry);
 
       expect(loading).to.exist;
-      expect(loading.getAttribute('role')).to.equal('status');
       expect(loading.textContent).to.contain('Slack Production');
-      expect(loading.textContent).to.contain('Loading configuration');
-      expect(domQuery('.bio-properties-panel-configuration-chooser-loading-shimmer', entry)).not.to.exist;
+      expect(loading.textContent).to.contain('slackProduction');
+      expect(loading.getAttribute('aria-busy')).not.to.exist;
+      expect(loading.getAttribute('role')).not.to.exist;
+      expect(domQuery('.bio-properties-panel-configuration-chooser-card--loading', entry)).not.to.exist;
     }));
 
 

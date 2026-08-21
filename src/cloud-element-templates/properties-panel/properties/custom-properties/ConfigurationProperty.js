@@ -572,7 +572,7 @@ export function ConfigurationProperty(props) {
       );
     case VARIANT.LOADING:
       return (
-        <LoadingConfiguration cachedName={ cachedName } translate={ translate } />
+        <LoadingConfiguration value={ value } cachedName={ cachedName } />
       );
     case VARIANT.MISSING:
       return (
@@ -808,7 +808,6 @@ function ConfigurationCardContent(props) {
 function ConfigurationCard(props) {
   const {
     class: className,
-    role,
     logo,
     title,
     subtitle,
@@ -829,7 +828,7 @@ function ConfigurationCard(props) {
   );
 
   return (
-    <div class={ className } role={ role }>
+    <div class={ className }>
       {
         interactive
           ? (
@@ -1013,23 +1012,34 @@ function PlaceholderConfiguration(props) {
   );
 }
 
+/**
+ * A configuration card shown while the instance list is still being fetched.
+ * The list loads once for the whole panel, so this reuses the resolved identity
+ * card (from the cached name) rather than a distinct loading skin — it is
+ * indistinguishable from the resolved card; the branch only defers the
+ * "not found" warning until the list resolves.
+ */
 function LoadingConfiguration(props) {
-  const { cachedName, translate } = props;
-  const name = cachedName || translate('Configuration');
+  const { cachedName, value } = props;
+
+  const refName = fromReference(value);
+  const title = cachedName || refName;
+
   const instance = {
-    name,
+    name: refName || title,
     metadata: {
-      displayName: name
+      displayName: title
     }
   };
 
   return (
     <ConfigurationCard
-      class="bio-properties-panel-configuration-chooser-card bio-properties-panel-configuration-chooser-card--loading"
-      role="status"
+      class="bio-properties-panel-configuration-chooser-card"
       logo={ <ConfigurationLogo instance={ instance } /> }
-      title={ name }
-      subtitle={ translate('Loading configuration') } />
+      title={ title }
+      subtitle={
+        <span class="bio-properties-panel-configuration-chooser-varname">{ refName }</span>
+      } />
   );
 }
 
