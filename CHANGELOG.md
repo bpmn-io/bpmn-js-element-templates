@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FEAT`: surface configuration state via standard warnings / descriptions ([#287](https://github.com/bpmn-io/bpmn-js-element-templates/pull/287))
+* `FEAT`: align menu select/hover states to muted gray ([#287](https://github.com/bpmn-io/bpmn-js-element-templates/pull/287))
+* `FEAT`: drop configuration card loading state ([#287](https://github.com/bpmn-io/bpmn-js-element-templates/pull/287))
+* `FEAT`: unify configuration cluster unavailable messages ([#287](https://github.com/bpmn-io/bpmn-js-element-templates/pull/287))
+* `FEAT`: show the identity logo instead of a warning glyph on configuration cards ([#287](https://github.com/bpmn-io/bpmn-js-element-templates/pull/287))
 * `DEPS`: update to `@bpmn-io/properties-panel@3.51.1`
 
 ## 2.32.0
