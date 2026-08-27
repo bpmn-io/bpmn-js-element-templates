@@ -80,7 +80,7 @@
     "@bpmn-io/element-template-chooser": "^3.0.0",
     "@bpmn-io/element-template-icon-renderer": "^1.0.0",
     "@bpmn-io/properties-panel": "^3.52.0",
-    "@camunda/linting": "^3.54.0",
+    "@camunda/linting": "^3.55.0",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-commonjs": "^29.0.3",
@@ -125,7 +125,7 @@
     "sinon": "^22.1.0",
     "sinon-chai": "^4.0.0",
     "webpack": "^5.109.2",
-    "zeebe-bpmn-moddle": "^1.18.0"
+    "zeebe-bpmn-moddle": "^2.0.0"
   },
   "peerDependencies": {
     "@bpmn-io/properties-panel": ">= 3.52.0",
