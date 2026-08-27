@@ -12,7 +12,7 @@ import coreModule from 'bpmn-js/lib/core';
 import elementTemplatesModule from 'src/element-templates';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 
-import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
+import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda.json';
 
 import diagramXML from './template-util.bpmn';
 

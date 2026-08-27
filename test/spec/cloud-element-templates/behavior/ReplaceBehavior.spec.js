@@ -11,7 +11,7 @@ import CoreModule from 'bpmn-js/lib/core';
 import ModelingModule from 'bpmn-js/lib/features/modeling';
 import ReplaceModule from 'bpmn-js/lib/features/replace';
 
-import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 

@@ -17,7 +17,7 @@ import update from './rules/element-templates-update';
 
 import { BpmnModdle } from 'bpmn-moddle';
 
-import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import { Validator } from '../Validator';
 

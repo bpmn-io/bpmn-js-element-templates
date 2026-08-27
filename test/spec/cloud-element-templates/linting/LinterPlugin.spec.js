@@ -9,7 +9,7 @@ import updateRule from 'src/cloud-element-templates/linting/rules/element-templa
 import templates from './LinterPlugin.json';
 
 import { BpmnModdle } from 'bpmn-moddle';
-import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 
 import { expect } from 'chai';

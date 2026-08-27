@@ -18,7 +18,7 @@ import coreModule from 'bpmn-js/lib/core';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
 
-import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import {
   bootstrapPropertiesPanel,

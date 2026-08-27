@@ -12,7 +12,7 @@ import ElementTemplatesModule from 'src/element-templates';
 import ModelingModule from 'bpmn-js/lib/features/modeling';
 import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
 
-import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
+import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda.json';
 
 import { getBusinessObject, is } from 'bpmn-js/lib/util/ModelUtil';
 

@@ -11,7 +11,7 @@ import CoreModule from 'bpmn-js/lib/core';
 import ModelingModule from 'bpmn-js/lib/features/modeling';
 import ReplaceModule from 'bpmn-js/lib/features/replace';
 
-import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
+import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda.json';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 

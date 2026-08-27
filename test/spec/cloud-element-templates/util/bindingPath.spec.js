@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { BpmnModdle } from 'bpmn-moddle';
-import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import { getBindingPath } from 'src/cloud-element-templates/util/bindingPath';
 
