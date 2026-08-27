@@ -6,8 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.34.0
+
 * `FIX`: use standard warning color for incompatible template indicator
 * `DEPS`: update to `@bpmn-io/properties-panel@3.52.0` for warning / error badge theming tokens
+* `DEPS`: update to `bpmnlint@11.13.0`
 
 ## 2.33.0
 
