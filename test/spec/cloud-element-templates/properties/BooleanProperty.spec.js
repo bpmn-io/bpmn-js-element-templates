@@ -27,7 +27,7 @@ import {
 
 import coreModule from 'bpmn-js/lib/core';
 import modelingModule from 'bpmn-js/lib/features/modeling';
-import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 

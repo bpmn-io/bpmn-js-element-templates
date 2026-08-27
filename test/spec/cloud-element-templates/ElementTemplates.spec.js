@@ -22,7 +22,7 @@ import coreModule from 'bpmn-js/lib/core';
 import elementTemplatesCoreModule from 'src/cloud-element-templates/core';
 import modelingModule from 'bpmn-js/lib/features/modeling';
 
-import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import diagramXML from './ElementTemplates.bpmn';
 import integrationXML from './fixtures/integration.bpmn';

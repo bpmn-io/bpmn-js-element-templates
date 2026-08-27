@@ -13,7 +13,7 @@ import ModelingModule from 'bpmn-js/lib/features/modeling';
 import { BpmnPropertiesPanelModule } from 'bpmn-js-properties-panel';
 
 
-import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import { getBusinessObject, is } from 'bpmn-js/lib/util/ModelUtil';
 

@@ -17,7 +17,7 @@ import modelingModule from 'bpmn-js/lib/features/modeling';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { getLabel } from 'bpmn-js/lib/features/label-editing/LabelUtil';
 
-import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
+import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda.json';
 
 import diagramXML from './ElementTemplates.bpmn';
 

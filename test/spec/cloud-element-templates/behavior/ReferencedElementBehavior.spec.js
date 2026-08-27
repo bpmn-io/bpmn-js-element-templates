@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import ModelingModule from 'bpmn-js/lib/features/modeling';
 import ReplaceModule from 'bpmn-js/lib/features/replace';
 import { getBusinessObject, is } from 'bpmn-js/lib/util/ModelUtil';
-import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import {
   bootstrapModeler,

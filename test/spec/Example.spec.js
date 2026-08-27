@@ -39,9 +39,9 @@ import {
 import CamundaBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-platform';
 import ZeebeBehaviorsModule from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 
-import CamundaModdle from 'camunda-bpmn-moddle/resources/camunda';
-import ModelerModdle from 'modeler-moddle/resources/modeler';
-import ZeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe';
+import CamundaModdle from 'camunda-bpmn-moddle/resources/camunda.json';
+import ModelerModdle from 'modeler-moddle/resources/modeler.json';
+import ZeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import CloudElementTemplatesPropertiesProviderModule from 'src/cloud-element-templates';
 import ElementTemplatesPropertiesProviderModule from 'src/element-templates';

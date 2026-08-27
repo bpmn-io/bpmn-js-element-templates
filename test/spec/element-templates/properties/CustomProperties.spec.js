@@ -36,7 +36,7 @@ import {
 
 import coreModule from 'bpmn-js/lib/core';
 import modelingModule from 'bpmn-js/lib/features/modeling';
-import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda';
+import camundaModdlePackage from 'camunda-bpmn-moddle/resources/camunda.json';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 

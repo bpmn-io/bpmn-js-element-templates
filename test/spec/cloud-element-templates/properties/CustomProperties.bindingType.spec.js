@@ -7,7 +7,7 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
 import { query as domQuery } from 'min-dom';
 import TestContainer from 'mocha-test-container-support';
-import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe';
+import zeebeModdlePackage from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import {
   bootstrapPropertiesPanel,
