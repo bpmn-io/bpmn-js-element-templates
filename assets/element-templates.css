@@ -1,10 +1,10 @@
 .bio-properties-panel {
   --color-grey-225-10-50: hsl(225, 10%, 50%);
 
-  --select-template-background-color: var(--color-blue-205-100-50);
-  --select-template-hover-background-color: var(--color-blue-205-100-45);
-  --select-template-fill-color: var(--color-white);
-  --select-template-label-color: var(--color-white);
+  --select-template-background-color: var(--accent-badge-background-color);
+  --select-template-hover-background-color: var(--accent-badge-hover-background-color);
+  --select-template-fill-color: var(--accent-badge-fill-color);
+  --select-template-label-color: var(--accent-badge-color);
 
   --unknown-template-background-color: var(--error-badge-background-color);
   --unknown-template-hover-background-color: var(--error-badge-hover-background-color);

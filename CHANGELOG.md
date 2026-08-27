@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FIX`: use WCAG AA compliant accent color for applied template badge ([#290](https://github.com/bpmn-io/bpmn-js-element-templates/pull/290))
+
 ## 2.34.0
 
 * `FIX`: use standard warning color for incompatible template indicator
