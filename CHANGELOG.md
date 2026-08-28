@@ -7,6 +7,7 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 ___Note:__ Yet to be released changes appear here._
 
 * `FIX`: use WCAG AA compliant accent color for applied template badge ([#290](https://github.com/bpmn-io/bpmn-js-element-templates/pull/290))
+* `DEPS`: update to `@bpmn-io/properties-panel@3.53.0` for accent theming tokens
 
 ## 2.34.0
 
