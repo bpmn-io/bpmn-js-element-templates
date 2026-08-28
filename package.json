@@ -91,7 +91,7 @@
     "assert": "^2.1.0",
     "babel-loader": "^10.1.1",
     "babel-plugin-istanbul": "^8.0.0",
-    "bpmn-js": "^18.25.1",
+    "bpmn-js": "^18.26.0",
     "bpmn-js-create-append-anything": "^2.0.0",
     "bpmn-js-properties-panel": "^5.65.0",
     "bpmn-moddle": "^10.1.0",
