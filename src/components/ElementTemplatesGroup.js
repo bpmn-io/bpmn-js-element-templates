@@ -180,9 +180,25 @@ function SelectEntryTemplate({ element }) {
 
 function AppliedTemplate({ element }) {
   const translate = useService('translate'),
-        elementTemplates = useService('elementTemplates');
+        elementTemplates = useService('elementTemplates'),
+        canvas = useService('canvas'),
+        popupMenu = useService('popupMenu');
+
+  const openReplaceMenu = () => {
+    const bounds = canvas.getGraphics(element).getBoundingClientRect();
+
+    popupMenu.open(element, 'bpmn-replace', {
+      x: bounds.right,
+      y: bounds.bottom + 5
+    }, {
+      title: translate('Change element'),
+      width: 'var(--bpmn-replace-popup-width, 300px)',
+      search: true
+    });
+  };
 
   const menuItems = [
+    { entry: translate('Replace'), action: openReplaceMenu },
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];

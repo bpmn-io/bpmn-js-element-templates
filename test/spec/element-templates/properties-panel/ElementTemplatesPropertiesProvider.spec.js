@@ -35,6 +35,15 @@ import templates from '../fixtures/simple.json';
 import entriesVisibleDiagramXML from '../fixtures/entries-visible.bpmn';
 import entriesVisibleTemplates from '../fixtures/entries-visible.json';
 
+const knownTemplates = [
+  {
+    id: 'foo',
+    name: 'Foo',
+    appliesTo: [ 'bpmn:Task' ],
+    properties: []
+  }
+];
+
 
 describe('provider/element-templates - ElementTemplates', function() {
 
@@ -491,6 +500,52 @@ describe('provider/element-templates - ElementTemplates', function() {
   });
 
 
+  describe('template#replace', function() {
+
+    beforeEach(bootstrapPropertiesPanel(diagramXML, {
+      container,
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        BpmnPropertiesProvider,
+        elementTemplatesModule,
+        modelingModule
+      ],
+      moddleExtensions: {
+        camunda: camundaModdlePackage
+      },
+      debounceInput: false,
+      elementTemplates: knownTemplates
+    }));
+
+    it('should open BPMN replace menu', inject(
+      async function(elementRegistry, selection, popupMenu) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+        const openSpy = spy(popupMenu, 'open');
+
+        await act(() => selection.select(task));
+
+        const menuItems = map(
+          domQueryAll('.bio-properties-panel-dropdown-button__menu-item', container),
+          item => item.textContent
+        );
+
+        expect(menuItems).to.deep.equal([ 'Replace', 'Unlink', 'Remove' ]);
+
+        // when
+        await replaceElement(container);
+
+        // then
+        expect(openSpy).to.have.been.calledOnce;
+        expect(openSpy).to.have.been.calledWith(task, 'bpmn-replace');
+        expect(popupMenu.isOpen()).to.be.true;
+      })
+    );
+  });
+
+
   describe('template#update', function() {
 
     it('should update template', inject(
@@ -582,6 +637,15 @@ function removeTemplate(container) {
  */
 function unlinkTemplate(container) {
   return clickDropdownItemWhere(container, element => element.textContent === 'Unlink');
+}
+
+/**
+ * Replace element via dropdown menu.
+ *
+ * @param {Element} container
+ */
+function replaceElement(container) {
+  return clickDropdownItemWhere(container, element => element.textContent === 'Replace');
 }
 
 /**
