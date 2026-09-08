@@ -5302,6 +5302,27 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
     });
 
 
+    it('should display tooltip for configuration property', async function() {
+
+      // given
+      await expectSelected('Task');
+
+      const entry = findEntry('custom-entry-com.zeebe.example.tooltip-group-6', container);
+      const tooltipWrapper = domQuery('.bio-properties-panel-tooltip-wrapper', entry);
+
+      // assume not rendered inline
+      expect(entry.textContent).to.not.contain('CONFIGURATION_TOOLTIP');
+
+      // when
+      await openTooltip(tooltipWrapper);
+      const tooltip = domQuery('.bio-properties-panel-tooltip', entry);
+
+      // then
+      expect(tooltip).to.exist;
+      expect(tooltip.textContent).to.contain('CONFIGURATION_TOOLTIP');
+    });
+
+
     it('should display tooltip for groups', async function() {
 
       // given
