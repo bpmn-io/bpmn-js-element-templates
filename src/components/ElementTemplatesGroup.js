@@ -181,20 +181,12 @@ function SelectEntryTemplate({ element }) {
 function AppliedTemplate({ element }) {
   const translate = useService('translate'),
         elementTemplates = useService('elementTemplates'),
-        canvas = useService('canvas'),
-        popupMenu = useService('popupMenu');
+        contextPad = useService('contextPad');
 
   const openReplaceMenu = () => {
-    const bounds = canvas.getGraphics(element).getBoundingClientRect();
+    contextPad.open(element);
 
-    popupMenu.open(element, 'bpmn-replace', {
-      x: bounds.right,
-      y: bounds.bottom + 5
-    }, {
-      title: translate('Change element'),
-      width: 'var(--bpmn-replace-popup-width, 300px)',
-      search: true
-    });
+    contextPad.triggerEntry('replace', 'click', new MouseEvent('click'));
   };
 
   const menuItems = [

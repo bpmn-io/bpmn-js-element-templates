@@ -1,7 +1,7 @@
 import TestContainer from 'mocha-test-container-support';
 
 import { expect } from 'chai';
-import { spy } from 'sinon';
+import { match, spy } from 'sinon';
 
 import {
   act
@@ -519,10 +519,11 @@ describe('provider/element-templates - ElementTemplates', function() {
     }));
 
     it('should open BPMN replace menu', inject(
-      async function(elementRegistry, selection, popupMenu) {
+      async function(elementRegistry, selection, contextPad, popupMenu) {
 
         // given
         const task = elementRegistry.get('Task_1');
+        const triggerSpy = spy(contextPad, 'triggerEntry');
         const openSpy = spy(popupMenu, 'open');
 
         await act(() => selection.select(task));
@@ -538,6 +539,11 @@ describe('provider/element-templates - ElementTemplates', function() {
         await replaceElement(container);
 
         // then
+        expect(triggerSpy).to.have.been.calledWithMatch(
+          'replace',
+          'click',
+          match.any
+        );
         expect(openSpy).to.have.been.calledOnce;
         expect(openSpy).to.have.been.calledWith(task, 'bpmn-replace');
         expect(popupMenu.isOpen()).to.be.true;

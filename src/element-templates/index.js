@@ -1,11 +1,11 @@
 import coreModule from './core';
 import propertiesProviderModule from './properties-panel';
-import popupMenuModule from 'bpmn-js/lib/features/popup-menu';
+import contextPadModule from 'bpmn-js/lib/features/context-pad';
 
 export default {
   __depends__: [
     coreModule,
     propertiesProviderModule,
-    popupMenuModule
+    contextPadModule
   ]
 };
