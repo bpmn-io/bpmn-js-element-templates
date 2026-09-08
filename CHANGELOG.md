@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.35.1
+
+* `FIX`: correct tooltip display for `type=Configuration` entry ([#291](https://github.com/bpmn-io/bpmn-js-element-templates/pull/291))
+
 ## 2.35.0
 
 * `FIX`: use WCAG AA compliant accent color for applied template badge ([#290](https://github.com/bpmn-io/bpmn-js-element-templates/pull/290))
