@@ -1,7 +1,7 @@
 import { useService } from 'bpmn-js-properties-panel';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from '@bpmn-io/properties-panel/preact/hooks';
-import { CreateIcon, useError, useShowEntryEvent } from '@bpmn-io/properties-panel';
+import { CreateIcon, TooltipEntry, useError, useShowEntryEvent } from '@bpmn-io/properties-panel';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
@@ -634,14 +634,13 @@ export function ConfigurationProperty(props) {
       <label
         class="bio-properties-panel-label"
         htmlFor={ controlId }>
-        { configurationLabel }
+        <TooltipEntry
+          value={ tooltip ? PropertyTooltip({ tooltip }) : null }
+          forId={ controlId }
+          element={ element }>
+          { configurationLabel }
+        </TooltipEntry>
       </label>
-
-      {
-        tooltip
-          ? <PropertyTooltip tooltip={ tooltip } />
-          : null
-      }
 
       <div class="bio-properties-panel-configuration-chooser-control">
         { renderConfiguration() }

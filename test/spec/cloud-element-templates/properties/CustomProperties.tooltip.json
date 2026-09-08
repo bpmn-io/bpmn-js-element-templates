@@ -94,6 +94,26 @@
           "name": "string"
         },
         "group": "group"
+      },
+      {
+        "label": "configuration",
+        "tooltip": "CONFIGURATION_TOOLTIP",
+        "type": "Configuration",
+        "configurationTemplate": "io.camunda:example-configuration:1",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "configuration"
+        },
+        "group": "group"
+      }
+    ],
+    "configurationTemplates": [
+      {
+        "id": "io.camunda:example-configuration:1",
+        "kind": "CREDENTIAL",
+        "name": "Example configuration",
+        "version": 1,
+        "properties": []
       }
     ]
   }
