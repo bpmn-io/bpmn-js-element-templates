@@ -989,6 +989,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         key: 'header-1-key',
         value: 'foo@bar'
       });
+      expect(header.$parent).to.equal(taskHeaders);
     }));
 
 
@@ -1015,6 +1016,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         key: 'header-1-key',
         value: 'foo@bar'
       });
+      expect(header.$parent).to.equal(taskHeaders);
     });
 
 
@@ -1079,6 +1081,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         name: 'property-1-name',
         value: 'property-1-changed-value'
       });
+      expect(zeebeProperty.$parent).to.equal(zeebeProperties);
     }));
 
 
@@ -1105,6 +1108,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         name: 'property-1-name',
         value: 'property-1-changed-value'
       });
+      expect(zeebeProperty.$parent).to.equal(zeebeProperties);
     });
 
 
