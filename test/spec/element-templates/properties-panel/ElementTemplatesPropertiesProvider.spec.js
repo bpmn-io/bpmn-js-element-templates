@@ -491,6 +491,35 @@ describe('provider/element-templates - ElementTemplates', function() {
   });
 
 
+  describe('template#change', function() {
+
+    it('should emit `elementTemplates.select` when change is requested', inject(
+      async function(elementRegistry, selection, elementTemplates, eventBus) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+        const selectSpy = spy();
+
+        eventBus.on('elementTemplates.select', selectSpy);
+
+        const template = elementTemplates.getLatest('foo')[0];
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, template);
+          selection.select(task);
+        });
+
+        // when
+        await changeTemplate(container);
+
+        // then
+        expect(selectSpy).to.have.been.calledOnce;
+        expect(selectSpy).to.have.been.calledWithMatch({ element: task });
+      })
+    );
+  });
+
+
   describe('template#update', function() {
 
     it('should update template', inject(
@@ -582,6 +611,15 @@ function removeTemplate(container) {
  */
 function unlinkTemplate(container) {
   return clickDropdownItemWhere(container, element => element.textContent === 'Unlink');
+}
+
+/**
+ * Change template via dropdown menu.
+ *
+ * @param {Element} container
+ */
+function changeTemplate(container) {
+  return clickDropdownItemWhere(container, element => element.textContent === 'Change');
 }
 
 /**

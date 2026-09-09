@@ -180,9 +180,13 @@ function SelectEntryTemplate({ element }) {
 
 function AppliedTemplate({ element }) {
   const translate = useService('translate'),
-        elementTemplates = useService('elementTemplates');
+        elementTemplates = useService('elementTemplates'),
+        eventBus = useService('eventBus');
+
+  const changeTemplate = () => eventBus.fire('elementTemplates.select', { element });
 
   const menuItems = [
+    { entry: translate('Change'), action: changeTemplate },
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
