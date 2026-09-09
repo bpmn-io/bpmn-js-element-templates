@@ -206,9 +206,12 @@ describe('provider/cloud-element-templates - CustomProperties - binding type pro
 
       expect(entry).to.exist;
       expect(select).to.exist;
+
+      // bindingType is absent from the XML; the template default (deployment)
+      // applies instead of the moddle schema default (latest)
       expect(options).to.eql([
-        { value: 'latest', selected: true },
-        { value: 'deployment', selected: false },
+        { value: 'latest', selected: false },
+        { value: 'deployment', selected: true },
         { value: 'versionTag', selected: false }
       ]);
     }));

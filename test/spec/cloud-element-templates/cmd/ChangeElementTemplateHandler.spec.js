@@ -2644,26 +2644,112 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     describe('apply zeebe:calledElement Boolean binding', function() {
 
-      beforeEach(bootstrap(require('./called-element-propagate.bpmn').default));
-
       const newTemplate = require('./called-element-propagate.json');
 
 
-      it('should override moddle default <propagateAllParentVariables=true> with template <false>',
+      describe('attribute absent', function() {
+
+        beforeEach(bootstrap(require('./called-element-propagate-absent.bpmn').default));
+
+        it('should override moddle default <propagateAllParentVariables=true> with template <false>',
+          inject(function(elementRegistry) {
+
+            // given
+            let callActivity = elementRegistry.get('CallActivity_1');
+
+            // when
+            changeTemplate(callActivity, newTemplate);
+
+            // then
+            callActivity = elementRegistry.get('CallActivity_1');
+            const calledElement = findExtension(callActivity, 'zeebe:CalledElement');
+
+            expect(calledElement).to.have.property('propagateAllParentVariables', false);
+          }));
+
+      });
+
+
+      describe('attribute explicitly set', function() {
+
+        beforeEach(bootstrap(require('./called-element-propagate.bpmn').default));
+
+        it('should keep explicitly set <propagateAllParentVariables=true>',
+          inject(function(elementRegistry) {
+
+            // given
+            let callActivity = elementRegistry.get('CallActivity_1');
+
+            // when
+            changeTemplate(callActivity, newTemplate);
+
+            // then
+            callActivity = elementRegistry.get('CallActivity_1');
+            const calledElement = findExtension(callActivity, 'zeebe:CalledElement');
+
+            expect(calledElement).to.have.property('propagateAllParentVariables', true);
+          }));
+
+      });
+
+    });
+
+
+    describe('Boolean binding upgrade (old template known)', function() {
+
+      beforeEach(bootstrap(require('./task.bpmn').default));
+
+      it('should apply new default when old template had no default and attribute is absent',
         inject(function(elementRegistry) {
 
           // given
-          let callActivity = elementRegistry.get('CallActivity_1');
+          const oldTemplate = createTemplate({
+            type: 'Boolean',
+            binding: { type: 'property', name: 'isForCompensation' }
+          });
+
+          const newTemplate = createTemplate({
+            type: 'Boolean',
+            value: true,
+            binding: { type: 'property', name: 'isForCompensation' }
+          });
+
+          let task = elementRegistry.get('Task_1');
+          task = changeTemplate(task, oldTemplate);
 
           // when
-          changeTemplate(callActivity, newTemplate);
+          task = changeTemplate(task, newTemplate, oldTemplate);
 
           // then
-          callActivity = elementRegistry.get('CallActivity_1');
-          const calledElement = findExtension(callActivity, 'zeebe:CalledElement');
-
-          expect(calledElement).to.have.property('propagateAllParentVariables', false);
+          expect(getBusinessObject(task).get('isForCompensation')).to.eql(true);
         }));
+
+
+      it('should replace a value that mirrors the old template default', inject(function(elementRegistry) {
+
+        // given
+        const oldTemplate = createTemplate({
+          type: 'Boolean',
+          value: true,
+          binding: { type: 'property', name: 'isForCompensation' }
+        });
+
+        const newTemplate = createTemplate({
+          type: 'Boolean',
+          value: false,
+          binding: { type: 'property', name: 'isForCompensation' }
+        });
+
+        let task = elementRegistry.get('Task_1');
+        task = changeTemplate(task, oldTemplate);
+
+        // when
+        task = changeTemplate(task, newTemplate, oldTemplate);
+
+        // then
+        expect(getBusinessObject(task).get('isForCompensation')).to.eql(false);
+      }));
+
     });
 
 
@@ -4009,6 +4095,27 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
           expect(getZeebeProperty(task, 'StaticBooleanProperty').value).to.eql('=true');
           expect(getZeebeProperty(task, 'OptionalBooleanProperty').value).to.eql('=true');
         }));
+
+
+        // cf. https://github.com/camunda/camunda-modeler/issues/6174
+        describe('existing user-configured value', function() {
+
+          beforeEach(bootstrap(require('./boolean-zeebe-property-existing.bpmn').default));
+
+          it('should keep existing value', inject(function(elementRegistry) {
+
+            // given
+            let task = elementRegistry.get('Task_1');
+
+            // when
+            task = changeTemplate(task, template);
+
+            // then
+            expect(getZeebeProperty(task, 'StaticBooleanProperty').value).to.eql('=false');
+            expect(getZeebeProperty(task, 'OptionalBooleanProperty').value).to.eql('=false');
+          }));
+
+        });
 
       });
 

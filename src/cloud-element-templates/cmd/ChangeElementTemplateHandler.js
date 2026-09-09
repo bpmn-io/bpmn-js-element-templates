@@ -2465,8 +2465,8 @@ export function findOldProperty(oldTemplate, newProperty) {
 
 /**
  * Check whether the existing property should be kept. This is the case if
- *  - an old template was set and the value differs from the default
- *  - no template was set but the property was set manually
+ *  - an old template was set and the value was explicitly changed from the default
+ *  - no template was set but the property was explicitly set manually
  *
  * @param {djs.model.Base|ModdleElement} element
  * @param {Object} oldProperty
@@ -2492,8 +2492,9 @@ function shouldKeepValue(element, oldProperty, newProperty) {
 
     const currentValue = getPropertyValue(element, newProperty);
 
-    // only keep value if old value is a valid option
-    return newProperty.choices && newProperty.choices.some(
+    // only keep value if explicitly set and a valid option
+    return hasExplicitValue(element, newProperty) &&
+      newProperty.choices && newProperty.choices.some(
       (choice) => choice.value === currentValue
     );
   }
@@ -2504,14 +2505,10 @@ function shouldKeepValue(element, oldProperty, newProperty) {
     return propertyChanged(element, oldProperty);
   }
 
-  // For Boolean type `!!value` check below would keep moddle schema defaults
-  // (e.g. propagateAllParentVariables=true), preventing the template from overriding.
-  if (newProperty.type === 'Boolean') {
-    return false;
-  }
-
-  // keep existing property value
-  return !!(getPropertyValue(element, newProperty));
+  // moddle schema defaults (e.g. propagateAllParentVariables=true,
+  // bindingType="latest") must not be treated as user data
+  // cf. https://github.com/camunda/camunda-modeler/issues/6174
+  return hasExplicitValue(element, newProperty);
 }
 
 /**
@@ -2523,6 +2520,10 @@ function shouldKeepValue(element, oldProperty, newProperty) {
  * @returns {boolean}
  */
 function propertyChanged(element, oldProperty) {
+  if (!hasExplicitValue(element, oldProperty)) {
+    return false;
+  }
+
   const oldPropertyValue = getDefaultFixedValue(oldProperty);
 
   return getPropertyValue(element, oldProperty) !== oldPropertyValue;
@@ -2630,6 +2631,43 @@ function getPropertyHolder(element, property) {
 
     return conditionalFilter && { businessObject: conditionalFilter, name: bindingName };
   }
+}
+
+/**
+ * Check whether a property's current value was explicitly set, as opposed
+ * to a moddle schema default returned by get() for an attribute that was
+ * never written (e.g. absent from the BPMN XML).
+ *
+ * @param {djs.model.Base|ModdleElement} element
+ * @param {Object} property
+ *
+ * @returns {boolean}
+ */
+function hasExplicitValue(element, property) {
+  const holder = getPropertyHolder(element, property);
+
+  if (!holder) {
+    return false;
+  }
+
+  const { businessObject, name } = holder;
+
+  // own properties are keyed by their local name, not the namespaced
+  // binding name (e.g. "value" rather than "zeebe:value")
+  const descriptor = businessObject.$descriptor
+    && businessObject.$descriptor.propertiesByName[name];
+
+  // properties not declared in the moddle schema (e.g. custom `property`
+  // bindings) are stored in `$attrs` rather than as an own property
+  if (!descriptor) {
+    return hasOwnProperty(businessObject.$attrs, name);
+  }
+
+  return hasOwnProperty(businessObject, descriptor.name);
+}
+
+function hasOwnProperty(obj, key) {
+  return obj && Object.prototype.hasOwnProperty.call(obj, key);
 }
 
 function remove(array, item) {
