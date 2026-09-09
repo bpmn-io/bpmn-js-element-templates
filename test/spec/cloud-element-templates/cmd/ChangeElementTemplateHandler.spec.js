@@ -4033,6 +4033,69 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     });
 
+
+    describe('unlink and reapply Boolean property', function() {
+
+      beforeEach(bootstrap(require('./task.bpmn').default));
+
+
+      it('should keep zeebe:property value', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        const template = require('./boolean-property-static-feel.json');
+
+        task = changeTemplate(task, template);
+
+        updateBusinessObject('Task_1', getZeebeProperty(task, 'BooleanProperty'), {
+          value: '=true'
+        });
+
+        // unlink template, keeping properties
+        task = changeTemplate(task, null, template);
+
+        // when
+        task = changeTemplate(task, template);
+
+        // then
+        expect(getZeebeProperty(task, 'BooleanProperty').get('value')).to.equal('=true');
+      }));
+
+
+      it('should keep zeebe:input value', inject(function(elementRegistry) {
+
+        // given
+        let task = elementRegistry.get('Task_1');
+
+        const template = createTemplate({
+          value: false,
+          type: 'Boolean',
+          feel: 'static',
+          binding: {
+            type: 'zeebe:input',
+            name: 'IncludeAgentContext'
+          }
+        });
+
+        task = changeTemplate(task, template);
+
+        updateBusinessObject('Task_1', getInputParameter(task, 'IncludeAgentContext'), {
+          source: '=true'
+        });
+
+        // unlink template, keeping properties
+        task = changeTemplate(task, null, template);
+
+        // when
+        task = changeTemplate(task, template);
+
+        // then
+        expect(getInputParameter(task, 'IncludeAgentContext').get('source')).to.equal('=true');
+      }));
+
+    });
+
   });
 
 

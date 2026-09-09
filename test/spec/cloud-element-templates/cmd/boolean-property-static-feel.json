@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "FEEL static",
+  "id": "booleanField.feel.static",
+  "appliesTo": [
+    "bpmn:ServiceTask"
+  ],
+  "properties": [
+    {
+      "label": "BooleanProperty",
+      "type": "Boolean",
+      "feel": "static",
+      "binding": {
+        "type": "zeebe:property",
+        "name": "BooleanProperty"
+      }
+    }
+  ]
+}

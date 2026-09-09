@@ -2464,6 +2464,25 @@ export function findOldProperty(oldTemplate, newProperty) {
 }
 
 /**
+ * Check whether a binding stores its value in a dedicated container element
+ * (zeebe:Property, zeebe:Header, zeebe:Input, zeebe:Output) rather than as a
+ * plain moddle attribute. Such containers have no schema default, so their
+ * presence always reflects an explicitly configured value.
+ *
+ * @param {Object} binding
+ *
+ * @returns {boolean}
+ */
+function isValueContainerBinding(binding) {
+  return [
+    'zeebe:property',
+    'zeebe:taskHeader',
+    'zeebe:input',
+    'zeebe:output'
+  ].includes(binding.type);
+}
+
+/**
  * Check whether the existing property should be kept. This is the case if
  *  - an old template was set and the value differs from the default
  *  - no template was set but the property was set manually
@@ -2504,9 +2523,12 @@ function shouldKeepValue(element, oldProperty, newProperty) {
     return propertyChanged(element, oldProperty);
   }
 
-  // For Boolean type `!!value` check below would keep moddle schema defaults
-  // (e.g. propagateAllParentVariables=true), preventing the template from overriding.
-  if (newProperty.type === 'Boolean') {
+  // For Boolean properties bound directly to a moddle attribute, `!!value` would
+  // keep moddle schema defaults (e.g. propagateAllParentVariables=true), preventing
+  // the template from overriding. Properties stored in a dedicated container element
+  // (zeebe:Property, zeebe:Header, zeebe:Input, zeebe:Output) have no such schema
+  // default, so an existing container unambiguously reflects a configured value.
+  if (newProperty.type === 'Boolean' && !isValueContainerBinding(newProperty.binding)) {
     return false;
   }
 
