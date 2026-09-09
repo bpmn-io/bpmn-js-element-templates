@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.36.1
+
+* `FIX`: keep explicitly configured properties on template (re-)application ([#297](https://github.com/bpmn-io/bpmn-js-element-templates/pull/297))
+
 ## 2.36.0
 
 * `FEAT`: offer `Change` template action ([#294](https://github.com/bpmn-io/bpmn-js-element-templates/pull/294))
