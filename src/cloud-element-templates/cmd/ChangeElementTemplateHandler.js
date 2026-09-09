@@ -2529,6 +2529,27 @@ function propertyChanged(element, oldProperty) {
 }
 
 function getPropertyValue(element, property) {
+  const holder = getPropertyHolder(element, property);
+
+  if (!holder) {
+    return;
+  }
+
+  const { businessObject, name } = holder;
+
+  return businessObject.get(name);
+}
+
+/**
+ * Resolve the moddle element and attribute name that back a given property
+ * binding, i.e. where its value is actually stored.
+ *
+ * @param {djs.model.Base|ModdleElement} element
+ * @param {Object} property
+ *
+ * @returns {{ businessObject: ModdleElement, name: string }|undefined}
+ */
+function getPropertyHolder(element, property) {
   const businessObject = getBusinessObject(element);
 
   if (!businessObject) {
@@ -2542,98 +2563,72 @@ function getPropertyValue(element, property) {
 
 
   if (bindingType === 'property') {
-    return businessObject.get(bindingName);
+    return { businessObject, name: bindingName };
   }
 
   if (TASK_DEFINITION_TYPES.includes(bindingType)) {
-    return businessObject.get(getTaskDefinitionPropertyName(binding));
+    return { businessObject, name: getTaskDefinitionPropertyName(binding) };
   }
 
   if (bindingType === 'zeebe:input') {
-    return businessObject.get('zeebe:source');
+    return { businessObject, name: 'zeebe:source' };
   }
 
   if (bindingType === 'zeebe:output') {
-    return businessObject.get('zeebe:target');
+    return { businessObject, name: 'zeebe:target' };
   }
 
   if (bindingType === 'zeebe:taskHeader') {
-    return businessObject.get('zeebe:value');
+    return { businessObject, name: 'zeebe:value' };
   }
 
   if (bindingType === 'zeebe:property') {
-    return businessObject.get('zeebe:value');
+    return { businessObject, name: 'zeebe:value' };
   }
 
   if (bindingType === MESSAGE_PROPERTY_TYPE) {
-    return businessObject.get(bindingName);
+    return { businessObject, name: bindingName };
   }
 
   if (bindingType === MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE) {
-    return businessObject.get(bindingName);
+    return { businessObject, name: bindingName };
   }
 
   if (bindingType === SIGNAL_PROPERTY_TYPE) {
-    return businessObject.get(bindingName);
+    return { businessObject, name: bindingName };
   }
 
-  if (bindingType === ZEEBE_LINKED_RESOURCE_PROPERTY) {
-    return businessObject.get(bindingProperty);
+  if ([
+    ZEEBE_LINKED_RESOURCE_PROPERTY,
+    ZEEBE_CALLED_DECISION,
+    ZEEBE_CALLED_ELEMENT,
+    ZEEBE_FORM_DEFINITION,
+    ZEEBE_SCRIPT_TASK,
+    ZEEBE_ASSIGNMENT_DEFINITION,
+    ZEEBE_PRIORITY_DEFINITION,
+    ZEEBE_JOB_PRIORITY_DEFINITION,
+    ZEEBE_AD_HOC,
+    ZEEBE_AGENT_DEFINITION,
+    ZEEBE_TASK_SCHEDULE
+  ].includes(bindingType)) {
+    return { businessObject, name: bindingProperty };
   }
 
-  if (bindingType === ZEEBE_CALLED_DECISION) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === ZEEBE_CALLED_ELEMENT) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === ZEEBE_FORM_DEFINITION) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === ZEEBE_SCRIPT_TASK) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === ZEEBE_ASSIGNMENT_DEFINITION) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === ZEEBE_PRIORITY_DEFINITION) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === ZEEBE_JOB_PRIORITY_DEFINITION) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === ZEEBE_AD_HOC) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === ZEEBE_AGENT_DEFINITION) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === ZEEBE_TASK_SCHEDULE) {
-    return businessObject.get(bindingProperty);
-  }
-
-  if (bindingType === TIMER_EVENT_DEFINITION_PROPERTY_TYPE) {
+  if (
+    bindingType === TIMER_EVENT_DEFINITION_PROPERTY_TYPE ||
+    bindingType === CONDITIONAL_EVENT_DEFINITION_PROPERTY
+  ) {
 
     // the actual value is nested in an Expression
-    return businessObject.get(bindingName)?.get('body');
-  }
+    const expression = businessObject.get(bindingName);
 
-  if (bindingType === CONDITIONAL_EVENT_DEFINITION_PROPERTY) {
-    return businessObject.get(bindingName)?.get('body');
+    return expression && { businessObject: expression, name: 'body' };
   }
 
   if (bindingType === CONDITIONAL_EVENT_DEFINITION_ZEEBE_CONDITIONAL_FILTER_PROPERTY) {
     const conditionalFilter = findExtension(businessObject, 'zeebe:ConditionalFilter');
-    return conditionalFilter?.get(bindingName);
+
+    return conditionalFilter && { businessObject: conditionalFilter, name: bindingName };
   }
 }
 
