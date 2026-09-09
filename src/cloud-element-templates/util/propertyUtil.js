@@ -752,6 +752,8 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
     } else {
       const newTaskHeader = createTaskHeader(binding, value, bpmnFactory);
 
+      newTaskHeader.$parent = taskHeaders;
+
       commands.push({
         cmd: 'element.updateModdleProperties',
         context: {
@@ -788,6 +790,8 @@ export function setPropertyValue(bpmnFactory, commandStack, element, property, v
 
     if (shouldUpdate(value, property)) {
       const newZeebeProperty = createZeebeProperty(binding, value, bpmnFactory, additionalProperties);
+
+      newZeebeProperty.$parent = zeebeProperties;
 
       properties.push(newZeebeProperty);
     }
