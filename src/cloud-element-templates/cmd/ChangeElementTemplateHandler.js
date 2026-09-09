@@ -2306,6 +2306,19 @@ export function findOldProperty(oldTemplate, newProperty) {
     });
   }
 
+  if (newBindingType === ZEEBE_CALLED_ELEMENT) {
+    return oldProperties.find(oldProperty => {
+      const oldBinding = oldProperty.binding,
+            oldBindingType = oldBinding.type;
+
+      if (oldBindingType !== ZEEBE_CALLED_ELEMENT) {
+        return;
+      }
+
+      return oldBindingType === newBindingType && oldBinding.property === newBinding.property;
+    });
+  }
+
   if (newBindingType === ZEEBE_CALLED_DECISION) {
     return oldProperties.find(oldProperty => {
       const oldBinding = oldProperty.binding,

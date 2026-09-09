@@ -2753,6 +2753,148 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
     });
 
 
+    describe('zeebe:calledElement binding upgrade (old template known)', function() {
+
+      describe('String binding', function() {
+
+        beforeEach(bootstrap(require('./task.bpmn').default));
+
+        it('should replace a value that mirrors the old template default', inject(function(elementRegistry) {
+
+          // given
+          const oldTemplate = createTemplate({
+            type: 'String',
+            value: 'oldProcess',
+            binding: { type: 'zeebe:calledElement', property: 'processId' }
+          });
+
+          const newTemplate = createTemplate({
+            type: 'String',
+            value: 'newProcess',
+            binding: { type: 'zeebe:calledElement', property: 'processId' }
+          });
+
+          let task = elementRegistry.get('Task_1');
+          task = changeTemplate(task, oldTemplate);
+
+          // when
+          task = changeTemplate(task, newTemplate, oldTemplate);
+
+          // then
+          const calledElement = findExtension(task, 'zeebe:CalledElement');
+
+          expect(calledElement).to.exist;
+          expect(calledElement).to.have.property('processId', 'newProcess');
+        }));
+
+
+        it('should keep a value that does not mirror the old template default', inject(function(elementRegistry) {
+
+          // given
+          const oldTemplate = createTemplate({
+            type: 'String',
+            value: 'oldProcess',
+            binding: { type: 'zeebe:calledElement', property: 'processId' }
+          });
+
+          const newTemplate = createTemplate({
+            type: 'String',
+            value: 'newProcess',
+            binding: { type: 'zeebe:calledElement', property: 'processId' }
+          });
+
+          let task = elementRegistry.get('Task_1');
+          task = changeTemplate(task, oldTemplate);
+
+          // user changed the value
+          const businessObject = getBusinessObject(task);
+          const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+          calledElement.set('processId', 'userDefinedProcess');
+
+          // when
+          task = changeTemplate(task, newTemplate, oldTemplate);
+
+          // then
+          const newCalledElement = findExtension(task, 'zeebe:CalledElement');
+
+          expect(newCalledElement).to.exist;
+          expect(newCalledElement).to.have.property('processId', 'userDefinedProcess');
+        }));
+
+      });
+
+
+      describe('Boolean binding', function() {
+
+        beforeEach(bootstrap(require('./called-element-propagate.bpmn').default));
+
+        it('should replace a value that mirrors the old template default', inject(function(elementRegistry) {
+
+          // given
+          const oldTemplate = createTemplate({
+            type: 'Boolean',
+            value: true,
+            binding: { type: 'zeebe:calledElement', property: 'propagateAllParentVariables' }
+          });
+
+          const newTemplate = createTemplate({
+            type: 'Boolean',
+            value: false,
+            binding: { type: 'zeebe:calledElement', property: 'propagateAllParentVariables' }
+          });
+
+          let callActivity = elementRegistry.get('CallActivity_1');
+          callActivity = changeTemplate(callActivity, oldTemplate);
+
+          // when
+          callActivity = changeTemplate(callActivity, newTemplate, oldTemplate);
+
+          // then
+          const calledElement = findExtension(callActivity, 'zeebe:CalledElement');
+
+          expect(calledElement).to.exist;
+          expect(calledElement).to.have.property('propagateAllParentVariables', false);
+        }));
+
+
+        it('should keep a value that does not mirror the old template default', inject(function(elementRegistry) {
+
+          // given
+          const oldTemplate = createTemplate({
+            type: 'Boolean',
+            value: true,
+            binding: { type: 'zeebe:calledElement', property: 'propagateAllParentVariables' }
+          });
+
+          const newTemplate = createTemplate({
+            type: 'Boolean',
+            value: true,
+            binding: { type: 'zeebe:calledElement', property: 'propagateAllParentVariables' }
+          });
+
+          let callActivity = elementRegistry.get('CallActivity_1');
+          callActivity = changeTemplate(callActivity, oldTemplate);
+
+          // user changed the value
+          const businessObject = getBusinessObject(callActivity);
+          const calledElement = findExtension(businessObject, 'zeebe:CalledElement');
+          calledElement.set('propagateAllParentVariables', false);
+
+          // when
+          callActivity = changeTemplate(callActivity, newTemplate, oldTemplate);
+
+          // then
+          const newCalledElement = findExtension(callActivity, 'zeebe:CalledElement');
+
+          expect(newCalledElement).to.exist;
+          expect(newCalledElement).to.have.property('propagateAllParentVariables', false);
+        }));
+
+      });
+
+    });
+
+
     describe('create message with zeebe:modelerTemplate', function() {
 
       beforeEach(bootstrap(require('./event.bpmn').default));
