@@ -55,6 +55,23 @@ export default [
     ],
     external: externalDependencies(),
     plugins: corePlugins()
+  },
+  {
+    input: 'src/cloud/util.js',
+    output: [
+      {
+        sourcemap: true,
+        format: 'commonjs',
+        file: 'dist/cloud/util.js'
+      },
+      {
+        sourcemap: true,
+        format: 'esm',
+        file: 'dist/cloud/util.esm.js'
+      }
+    ],
+    external: externalDependencies(),
+    plugins: corePlugins()
   }
 ];
 
