@@ -5,6 +5,7 @@
     <bpmn:task id="Task_2" zeebe:modelerTemplate="foo" zeebe:modelerTemplateVersion="1" />
     <bpmn:task id="Task_3" />
     <bpmn:task id="Task_4" zeebe:modelerTemplate="engines" zeebe:modelerTemplateVersion="2" />
+    <bpmn:callActivity id="CallActivity_1" />
     <bpmn:task id="UnknownTemplateTask" zeebe:modelerTemplate="unknown" />
     <bpmn:serviceTask id="ServiceTask" zeebe:modelerTemplate="default" />
     <bpmn:serviceTask id="Deprecated" name="Deprecated" zeebe:modelerTemplate="deprecated" />
@@ -63,6 +64,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1m5dd19_di" bpmnElement="Task_4">
         <dc:Bounds x="500" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CallActivity_1_di" bpmnElement="CallActivity_1">
+        <dc:Bounds x="620" y="100" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
