@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.36.3
+
+* `FIX`: compare `zeebe:calledElement` against old template value ([#296](https://github.com/bpmn-io/bpmn-js-element-templates/issues/296))
+
 ## 2.36.2
 
 * `FIX`: wire `$parent` on task header and property setters ([#299](https://github.com/bpmn-io/bpmn-js-element-templates/pull/299))
