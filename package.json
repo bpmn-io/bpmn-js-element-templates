@@ -19,12 +19,13 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "all": "run-s lint test distro",
+    "all": "run-s lint lint:theme test distro",
     "distro": "run-s build test:build",
     "build": "run-p bundle",
     "bundle": "rollup -c",
     "bundle:watch": "rollup -c -w",
     "lint": "eslint .",
+    "lint:theme": "bpmn-io-theme-validate assets/element-templates.css",
     "dev": "npm test -- --auto-watch --no-single-run",
     "test": "karma start karma.config.js",
     "test:build": "mocha --reporter=spec --recursive test/distro/*.spec.js",
@@ -80,6 +81,7 @@
     "@bpmn-io/element-template-chooser": "^3.0.0",
     "@bpmn-io/element-template-icon-renderer": "^1.0.0",
     "@bpmn-io/properties-panel": "^3.53.0",
+    "@bpmn-io/theme": "^0.0.0",
     "@camunda/linting": "^3.55.0",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-babel": "^7.1.0",

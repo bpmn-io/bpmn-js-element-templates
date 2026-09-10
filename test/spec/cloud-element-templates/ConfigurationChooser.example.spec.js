@@ -626,7 +626,7 @@ function renderSection(ctx, section) {
   testContainer.classList.add('cb-test-container');
 
   render(
-    <div class="bio-properties-panel">
+    <div class="bio-properties-panel bio-theme-parent">
       <div class="cb-board">
         { section }
       </div>
