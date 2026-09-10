@@ -81,7 +81,7 @@
     "@bpmn-io/element-template-chooser": "^3.0.0",
     "@bpmn-io/element-template-icon-renderer": "^1.0.0",
     "@bpmn-io/properties-panel": "^3.53.0",
-    "@bpmn-io/theme": "^0.0.0",
+    "@bpmn-io/theme": "^0.1.0",
     "@camunda/linting": "^3.55.0",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-babel": "^7.1.0",
