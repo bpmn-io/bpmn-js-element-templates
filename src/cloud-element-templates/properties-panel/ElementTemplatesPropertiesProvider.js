@@ -103,7 +103,7 @@ export default class ElementTemplatesPropertiesProvider {
   }
 
   _shouldShowTemplateProperties(element) {
-    return getTemplateId(element) || this._elementTemplates.getAll(element).length;
+    return getTemplateId(element) || this._elementTemplates.getLatest(element).length;
   }
 
   /**

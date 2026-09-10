@@ -683,6 +683,53 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
       })
     );
 
+
+    it('should display template group if compatible templates are available for element', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const element = elementRegistry.get('CallActivity_1');
+
+        // when
+        elementTemplates.setEngines({
+          camunda: '8.6'
+        });
+
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('[data-group-id="group-ElementTemplates__Template"]', container);
+        expect(group).to.exist;
+
+        const selectButton = domQuery('.bio-properties-panel-select-template-button', group);
+        expect(selectButton).to.exist;
+      })
+    );
+
+
+    it('should NOT display template group if only incompatible templates are available for element', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const element = elementRegistry.get('CallActivity_1');
+
+        // when
+        elementTemplates.setEngines({
+          camunda: '8.0'
+        });
+
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('[data-group-id="group-ElementTemplates__Template"]', container);
+        expect(group).not.to.exist;
+      })
+    );
+
   });
 
 
