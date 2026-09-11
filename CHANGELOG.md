@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FEAT`: source colors and corner radii from `@bpmn-io/theme` ([#301](https://github.com/bpmn-io/bpmn-js-element-templates/pull/301))
+* `DEPS`: update to `@bpmn-io/properties-panel@3.55.0`
+
+
 ## 2.36.4
 
 * `FIX`: do not sentence-case configuration name ([#303](https://github.com/bpmn-io/bpmn-js-element-templates/pull/303))
