@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FEAT`: source color variables from `@bpmn-io/theme` ([#301](https://github.com/bpmn-io/bpmn-js-element-templates/pull/301))
+* `DEPS`: update to `@bpmn-io/properties-panel@3.55.0`
+
+
 ## 2.36.3
 
 * `FIX`: compare `zeebe:calledElement` against old template value ([#296](https://github.com/bpmn-io/bpmn-js-element-templates/issues/296))
