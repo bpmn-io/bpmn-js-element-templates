@@ -1290,7 +1290,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // then
       expect(domQuery('.bio-properties-panel-label', labeledEntry).textContent).to.equal('Destination AWS credential');
-      expect(getConfigurationPlaceholder(labeledEntry).textContent).to.equal('Choose destination AWS credential');
+      expect(getConfigurationPlaceholder(labeledEntry).textContent).to.equal('Choose Destination AWS credential');
       expect(domQuery('.bio-properties-panel-label', fallbackEntry).textContent).to.equal('AWS Credential');
       expect(getConfigurationPlaceholder(fallbackEntry).textContent).to.equal('Choose AWS Credential');
 
@@ -1880,7 +1880,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const entry = findEntry('custom-entry-configuration-property-0', container),
             placeholder = getConfigurationPlaceholder(entry);
 
-      expect(placeholder.textContent).to.equal('Choose configuration');
+      expect(placeholder.textContent).to.equal('Choose Configuration');
 
       // when
       await act(() => {

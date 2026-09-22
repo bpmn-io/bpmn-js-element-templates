@@ -158,12 +158,6 @@ function getDisplayName(instance) {
   return instance.metadata?.displayName || instance.name;
 }
 
-function toSentenceFragment(value) {
-  return /^[A-Z][a-z]/.test(value)
-    ? value.charAt(0).toLowerCase() + value.slice(1)
-    : value;
-}
-
 function getBindingElement(extensionElements, binding) {
   if (binding.type === 'zeebe:input') {
     const ioMapping = findExtension(extensionElements, 'zeebe:IoMapping');
@@ -250,7 +244,7 @@ export function ConfigurationProperty(props) {
     || configurationTemplates.get(configurationTemplate);
   const templateName = configurationTemplateDefinition?.name;
   const configurationLabel = translate(label || templateName || 'Configuration');
-  const chooserLabel = label ? toSentenceFragment(configurationLabel) : configurationLabel;
+  const chooserLabel = configurationLabel;
 
   const {
     instances,
