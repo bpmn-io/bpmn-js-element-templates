@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.37.1
+
+* `FIX`: only show template section if there is a template to apply or change ([#302](https://github.com/bpmn-io/bpmn-js-element-templates/pull/302))
+
 ## 2.37.0
 
 * `FEAT`: source colors and corner radii from `@bpmn-io/theme` tokens ([#301](https://github.com/bpmn-io/bpmn-js-element-templates/pull/301))
