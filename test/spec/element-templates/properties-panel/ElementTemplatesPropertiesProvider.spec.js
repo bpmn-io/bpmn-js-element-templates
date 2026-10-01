@@ -34,6 +34,7 @@ import diagramXML from './ElementTemplatesPropertiesProvider.bpmn';
 import templates from '../fixtures/simple.json';
 import entriesVisibleDiagramXML from '../fixtures/entries-visible.bpmn';
 import entriesVisibleTemplates from '../fixtures/entries-visible.json';
+import enginesTemplates from './ElementTemplatesPropertiesProvider.engines.json';
 
 
 describe('provider/element-templates - ElementTemplates', function() {
@@ -168,6 +169,92 @@ describe('provider/element-templates - ElementTemplates', function() {
         expect(deprecatedButton).to.exist;
         expect(deprecationInfo).to.exist;
         expect(deprecationDocs).to.exist;
+      })
+    );
+
+  });
+
+
+  describe('engines', function() {
+
+    beforeEach(bootstrapPropertiesPanel(diagramXML, {
+      container,
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        BpmnPropertiesProvider,
+        elementTemplatesModule,
+        modelingModule
+      ],
+      moddleExtensions: {
+        camunda: camundaModdlePackage
+      },
+      debounceInput: false,
+      elementTemplates: enginesTemplates
+    }));
+
+
+    it('should display template group if compatible templates are available for element', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const element = elementRegistry.get('CallActivity_1');
+
+        // when
+        elementTemplates.setEngines({
+          camunda: '7.20'
+        });
+
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('[data-group-id="group-ElementTemplates__Template"]', container);
+        expect(group).to.exist;
+
+        const selectButton = domQuery('.bio-properties-panel-select-template-button', group);
+        expect(selectButton).to.exist;
+      })
+    );
+
+
+    it('should NOT display template group if only incompatible templates are available for element', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const element = elementRegistry.get('CallActivity_1');
+
+        // when
+        elementTemplates.setEngines({
+          camunda: '7.15'
+        });
+
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('[data-group-id="group-ElementTemplates__Template"]', container);
+        expect(group).not.to.exist;
+      })
+    );
+
+
+    it('should NOT display template group if only deprecated templates are available for element', inject(
+      async function(elementRegistry, selection) {
+
+        // given
+        const element = elementRegistry.get('SubProcess_1');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('[data-group-id="group-ElementTemplates__Template"]', container);
+        expect(group).not.to.exist;
       })
     );
 

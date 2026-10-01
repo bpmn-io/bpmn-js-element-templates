@@ -1,0 +1,28 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "id": "engines-call-activity",
+    "name": "Engines Call Activity",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:CallActivity"
+    ],
+    "engines": {
+      "camunda": "^7.20"
+    },
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "id": "deprecated-subprocess",
+    "name": "Deprecated Sub Process",
+    "deprecated": {
+      "message": "Removed without replacement",
+      "documentationRef": "https://localhost/gone"
+    },
+    "appliesTo": [
+      "bpmn:SubProcess"
+    ],
+    "properties": []
+  }
+]
