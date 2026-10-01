@@ -158,5 +158,16 @@
       "camunda": "^8.6"
     },
     "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "id": "deprecated-subprocess",
+    "name": "Deprecated Sub Process",
+    "deprecated": {
+      "message": "Removed without replacement",
+      "documentationRef": "https://localhost/gone"
+    },
+    "appliesTo": [ "bpmn:SubProcess" ],
+    "properties": []
   }
 ]

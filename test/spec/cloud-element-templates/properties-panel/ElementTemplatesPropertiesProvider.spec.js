@@ -730,6 +730,25 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
       })
     );
 
+
+
+    it('should NOT display template group if only deprecated templates are available for element', inject(
+      async function(elementRegistry, selection) {
+
+        // given
+        const element = elementRegistry.get('SubProcess_1');
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const group = domQuery('[data-group-id="group-ElementTemplates__Template"]', container);
+        expect(group).not.to.exist;
+      })
+    );
+
   });
 
 
