@@ -34,6 +34,10 @@ const modeler = new BpmnModeler({
 
 To set an element template from the properties panel, plug-in an [element template chooser](https://github.com/bpmn-io/element-template-chooser).
 
+### Programmatic usage
+
+A set of cloud element template utilities is available to bundler-based consumers via `bpmn-js-element-templates/cloud/util`. See the [utility entry point](./src/cloud/util.js) for usage requirements and modeler setup.
+
 ## Additional resources
 
 * [About element templates](https://github.com/bpmn-io/element-templates)
