@@ -268,6 +268,17 @@ ElementTemplates.$inject = [
   'config.elementTemplates',
 ];
 
+/**
+ * Convert a property value to the representation stored in the BPMN model.
+ *
+ * Empty values stay unchanged so the setter can remove optional properties;
+ * all other values are converted to FEEL when required by the property.
+ *
+ * @param {*} value
+ * @param {Object} property
+ *
+ * @return {*}
+ */
 function normalizePropertyValue(value, property) {
   if (value === undefined || value === null || value === '') {
     return value;
