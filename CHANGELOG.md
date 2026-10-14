@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.38.0
+
+* `FEAT`: expose element template service utilities ([#305](https://github.com/bpmn-io/bpmn-js-element-templates/pull/305))
+
 ## 2.37.1
 
 * `FIX`: only show template section if there is a template to apply or change ([#302](https://github.com/bpmn-io/bpmn-js-element-templates/pull/302))
