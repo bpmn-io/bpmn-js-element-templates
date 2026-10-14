@@ -7,6 +7,21 @@ import {
   getTemplateVersion
 } from './Helper';
 
+import {
+  isConditionMet as isConditionMetUtil
+} from './Condition';
+
+import {
+  shouldCastToFeel,
+  toFeelExpression
+} from './util/FeelUtil';
+
+import {
+  getPropertyValue as getPropertyValueUtil,
+  setPropertyValue as setPropertyValueUtil,
+  validateProperty as validatePropertyUtil
+} from './util/propertyUtil';
+
 import { default as DefaultElementTemplates } from '../element-templates/ElementTemplates';
 
 import { isTimerTemplateApplicable } from './util/timerUtil';
@@ -124,6 +139,65 @@ export default class ElementTemplates extends DefaultElementTemplates {
     const element = this._templateElementFactory.create(template, options);
 
     return element;
+  }
+
+  /**
+   * Get a template property value from an element.
+   *
+   * @param {Element} element
+   * @param {Object} property
+   *
+   * @return {*} the property value
+   */
+  getPropertyValue(element, property) {
+    return getPropertyValueUtil(element, property);
+  }
+
+  /**
+   * Set a template property value on an element.
+   *
+   * @param {Element} element
+   * @param {Object} property
+   * @param {*} value
+   */
+  setPropertyValue(element, property, value) {
+    if (shouldCastToFeel(property)) {
+      value = toFeelExpression(value, property.type);
+    }
+
+    return setPropertyValueUtil(
+      this._injector.get('bpmnFactory'),
+      this._commandStack,
+      element,
+      property,
+      value
+    );
+  }
+
+  /**
+   * Validate a template property value.
+   *
+   * @param {*} value
+   * @param {Object} property
+   * @param {Function} [translate]
+   *
+   * @return {string|undefined} the validation error
+   */
+  validateProperty(value, property, translate) {
+    return validatePropertyUtil(value, property, translate);
+  }
+
+  /**
+   * Check whether a template property condition is met.
+   *
+   * @param {Element} element
+   * @param {Array<Object>} properties
+   * @param {Object} property
+   *
+   * @return {boolean}
+   */
+  isConditionMet(element, properties, property) {
+    return isConditionMetUtil(element, properties, property);
   }
 
   /**

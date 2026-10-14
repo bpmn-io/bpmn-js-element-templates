@@ -1190,6 +1190,104 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
   });
 
 
+  describe('property methods', function() {
+
+    it('should get property value', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const task = elementRegistry.get('Task_1');
+      const property = {
+        type: 'String',
+        binding: {
+          type: 'property',
+          name: 'name'
+        }
+      };
+
+      // when
+      const value = elementTemplates.getPropertyValue(task, property);
+
+      // then
+      expect(value).to.equal('foo');
+    }));
+
+
+    it('should set property value', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const task = elementRegistry.get('Task_3');
+      const property = {
+        type: 'String',
+        feel: 'required',
+        binding: {
+          type: 'zeebe:input',
+          name: 'result'
+        }
+      };
+
+      // when
+      elementTemplates.setPropertyValue(task, property, 'response.body');
+
+      // then
+      expect(elementTemplates.getPropertyValue(task, property)).to.equal('=response.body');
+    }));
+
+
+    it('should validate property value', inject(function(elementTemplates) {
+
+      // given
+      const property = {
+        type: 'String',
+        constraints: {
+          notEmpty: true
+        }
+      };
+
+      // when
+      const error = elementTemplates.validateProperty('', property);
+
+      // then
+      expect(error).to.equal('Must not be empty.');
+    }));
+
+
+    it('should check property condition', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const task = elementRegistry.get('Task_1');
+      const properties = [
+        {
+          id: 'name',
+          type: 'String',
+          binding: {
+            type: 'property',
+            name: 'name'
+          }
+        },
+        {
+          id: 'conditional',
+          type: 'String',
+          binding: {
+            type: 'property',
+            name: 'id'
+          },
+          condition: {
+            property: 'name',
+            equals: 'foo'
+          }
+        }
+      ];
+
+      // when
+      const conditionMet = elementTemplates.isConditionMet(task, properties, properties[1]);
+
+      // then
+      expect(conditionMet).to.be.true;
+    }));
+
+  });
+
+
   describe('applyTemplate', function() {
 
     beforeEach(inject(function(elementTemplates) {
