@@ -1233,6 +1233,60 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
     }));
 
 
+    it('should remove empty optional Boolean property', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const task = elementRegistry.get('Task_3');
+      const property = {
+        type: 'Boolean',
+        feel: 'optional',
+        optional: true,
+        binding: {
+          type: 'zeebe:input',
+          name: 'enabled'
+        }
+      };
+
+      elementTemplates.setPropertyValue(task, property, true);
+
+      // assume
+      expect(elementTemplates.getPropertyValue(task, property)).to.equal('=true');
+
+      // when
+      elementTemplates.setPropertyValue(task, property, undefined);
+
+      // then
+      expect(elementTemplates.getPropertyValue(task, property)).to.equal('');
+    }));
+
+
+    it('should remove empty optional Number property', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const task = elementRegistry.get('Task_3');
+      const property = {
+        type: 'Number',
+        feel: 'optional',
+        optional: true,
+        binding: {
+          type: 'zeebe:input',
+          name: 'retries'
+        }
+      };
+
+      elementTemplates.setPropertyValue(task, property, 3);
+
+      // assume
+      expect(elementTemplates.getPropertyValue(task, property)).to.equal('=3');
+
+      // when
+      elementTemplates.setPropertyValue(task, property, '');
+
+      // then
+      expect(elementTemplates.getPropertyValue(task, property)).to.equal('');
+    }));
+
+
     it('should validate property value', inject(function(elementTemplates) {
 
       // given
@@ -1248,6 +1302,29 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
       // then
       expect(error).to.equal('Must not be empty.');
+    }));
+
+
+    it('should validate normalized FEEL value', inject(function(elementTemplates) {
+
+      // given
+      const property = {
+        type: 'String',
+        feel: 'required',
+        binding: {
+          type: 'zeebe:input',
+          name: 'result'
+        },
+        constraints: {
+          minLength: 100
+        }
+      };
+
+      // when
+      const error = elementTemplates.validateProperty('response.body', property);
+
+      // then
+      expect(error).not.to.exist;
     }));
 
 

@@ -161,16 +161,12 @@ export default class ElementTemplates extends DefaultElementTemplates {
    * @param {*} value
    */
   setPropertyValue(element, property, value) {
-    if (shouldCastToFeel(property)) {
-      value = toFeelExpression(value, property.type);
-    }
-
     return setPropertyValueUtil(
       this._injector.get('bpmnFactory'),
       this._commandStack,
       element,
       property,
-      value
+      normalizePropertyValue(value, property)
     );
   }
 
@@ -184,7 +180,11 @@ export default class ElementTemplates extends DefaultElementTemplates {
    * @return {string|undefined} the validation error
    */
   validateProperty(value, property, translate) {
-    return validatePropertyUtil(value, property, translate);
+    return validatePropertyUtil(
+      normalizePropertyValue(value, property),
+      property,
+      translate
+    );
   }
 
   /**
@@ -266,3 +266,13 @@ ElementTemplates.$inject = [
   'injector',
   'config.elementTemplates',
 ];
+
+function normalizePropertyValue(value, property) {
+  if (value === undefined || value === null || value === '') {
+    return value;
+  }
+
+  return shouldCastToFeel(property)
+    ? toFeelExpression(value, property.type)
+    : value;
+}
