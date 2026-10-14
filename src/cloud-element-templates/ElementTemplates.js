@@ -47,10 +47,11 @@ const TEMPLATE_FILTERS = [
  * Registry for element templates.
  */
 export default class ElementTemplates extends DefaultElementTemplates {
-  constructor(templateElementFactory, commandStack, eventBus, modeling, injector, config) {
+  constructor(templateElementFactory, commandStack, eventBus, modeling, injector, translate, config) {
     super(commandStack, eventBus, modeling, injector, config);
 
     this._templateElementFactory = templateElementFactory;
+    this._translate = translate;
   }
 
   _getTemplateId(element) {
@@ -175,15 +176,14 @@ export default class ElementTemplates extends DefaultElementTemplates {
    *
    * @param {*} value
    * @param {Object} property
-   * @param {Function} [translate]
    *
    * @return {string|undefined} the validation error
    */
-  validateProperty(value, property, translate) {
+  validateProperty(value, property) {
     return validatePropertyUtil(
       normalizePropertyValue(value, property),
       property,
-      translate
+      this._translate
     );
   }
 
@@ -264,6 +264,7 @@ ElementTemplates.$inject = [
   'eventBus',
   'modeling',
   'injector',
+  'translate',
   'config.elementTemplates',
 ];
 
