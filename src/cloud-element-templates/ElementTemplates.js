@@ -7,6 +7,21 @@ import {
   getTemplateVersion
 } from './Helper';
 
+import {
+  isConditionMet as isConditionMetUtil
+} from './Condition';
+
+import {
+  shouldCastToFeel,
+  toFeelExpression
+} from './util/FeelUtil';
+
+import {
+  getPropertyValue as getPropertyValueUtil,
+  setPropertyValue as setPropertyValueUtil,
+  validateProperty as validatePropertyUtil
+} from './util/propertyUtil';
+
 import { default as DefaultElementTemplates } from '../element-templates/ElementTemplates';
 
 import { isTimerTemplateApplicable } from './util/timerUtil';
@@ -32,10 +47,11 @@ const TEMPLATE_FILTERS = [
  * Registry for element templates.
  */
 export default class ElementTemplates extends DefaultElementTemplates {
-  constructor(templateElementFactory, commandStack, eventBus, modeling, injector, config) {
+  constructor(templateElementFactory, commandStack, eventBus, modeling, injector, translate, config) {
     super(commandStack, eventBus, modeling, injector, config);
 
     this._templateElementFactory = templateElementFactory;
+    this._translate = translate;
   }
 
   _getTemplateId(element) {
@@ -127,6 +143,64 @@ export default class ElementTemplates extends DefaultElementTemplates {
   }
 
   /**
+   * Get a template property value from an element.
+   *
+   * @param {Element} element
+   * @param {Object} property
+   *
+   * @return {*} the property value
+   */
+  getPropertyValue(element, property) {
+    return getPropertyValueUtil(element, property);
+  }
+
+  /**
+   * Set a template property value on an element.
+   *
+   * @param {Element} element
+   * @param {Object} property
+   * @param {*} value
+   */
+  setPropertyValue(element, property, value) {
+    return setPropertyValueUtil(
+      this._injector.get('bpmnFactory'),
+      this._commandStack,
+      element,
+      property,
+      normalizePropertyValue(value, property)
+    );
+  }
+
+  /**
+   * Validate a template property value.
+   *
+   * @param {*} value
+   * @param {Object} property
+   *
+   * @return {string|undefined} the validation error
+   */
+  validateProperty(value, property) {
+    return validatePropertyUtil(
+      normalizePropertyValue(value, property),
+      property,
+      this._translate
+    );
+  }
+
+  /**
+   * Check whether a template property condition is met.
+   *
+   * @param {Element} element
+   * @param {Array<Object>} properties
+   * @param {Object} property
+   *
+   * @return {boolean}
+   */
+  isConditionMet(element, properties, property) {
+    return isConditionMetUtil(element, properties, property);
+  }
+
+  /**
    * Apply element template to a given element.
    *
    * @param {Element} element
@@ -190,5 +264,27 @@ ElementTemplates.$inject = [
   'eventBus',
   'modeling',
   'injector',
+  'translate',
   'config.elementTemplates',
 ];
+
+/**
+ * Convert a property value to the representation stored in the BPMN model.
+ *
+ * Empty values stay unchanged so the setter can remove optional properties;
+ * all other values are converted to FEEL when required by the property.
+ *
+ * @param {*} value
+ * @param {Object} property
+ *
+ * @return {*}
+ */
+function normalizePropertyValue(value, property) {
+  if (value === undefined || value === null || value === '') {
+    return value;
+  }
+
+  return shouldCastToFeel(property)
+    ? toFeelExpression(value, property.type)
+    : value;
+}
