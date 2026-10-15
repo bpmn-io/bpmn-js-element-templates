@@ -112,6 +112,10 @@ export default class ElementTemplatesPropertiesProvider {
    * `propertiesPanel#getEntryId` to shadow the standard entry with the
    * template's `custom-entry-*` one when a template applies.
    *
+   * Does not resolve properties whose bound moddle node does not exist yet
+   * (e.g. a `zeebe:input` that was never created); use
+   * {@link ElementTemplatesPropertiesProvider#getPropertyEntryId} for those.
+   *
    * @param {djs.model.Base} element
    * @param {(string|number)[]} path
    *
@@ -130,17 +134,51 @@ export default class ElementTemplatesPropertiesProvider {
       const bindingPath = getBindingPath(element, property.binding);
 
       if (bindingPath && pathEquals(bindingPath, path)) {
-        const entryId = getPropertyEntryId(conditioned, property);
+        const entryId = resolveEntryId(conditioned, element, property);
 
-        // only resolve to a property that actually renders an entry (e.g. not
-        // Hidden), so the resolved id is guaranteed to exist in the panel
-        if (createCustomEntry(entryId, element, property)) {
+        if (entryId) {
           return entryId;
         }
       }
     }
 
     return null;
+  }
+
+  /**
+   * Resolve the id of the entry that renders the given template property.
+   *
+   * Unlike {@link ElementTemplatesPropertiesProvider#getEntryId}, this does not
+   * depend on the bound moddle node: it resolves the id of a rendered entry
+   * even if the binding does not exist in the diagram yet (e.g. a blank
+   * `zeebe:input` field).
+   *
+   * @example
+   *
+   * const template = elementTemplates.get(element);
+   * const property = template.properties.find(p => p.id === 'my-input');
+   *
+   * const entryId = elementTemplatesPropertiesProvider.getPropertyEntryId(
+   *   element,
+   *   property
+   * );
+   *
+   * @param {djs.model.Base} element
+   * @param {Object} property a property of the template applied to the
+   *   element, as returned by `elementTemplates.get(element).properties`
+   *
+   * @return {string|null} the entry id, or `null` if no template applies, the
+   *   property is not part of it, its condition is not met, or it renders no
+   *   entry (e.g. `Hidden`)
+   */
+  getPropertyEntryId(element, property) {
+    const template = this._elementTemplates.get(element);
+
+    if (!template) {
+      return null;
+    }
+
+    return resolveEntryId(applyConditions(element, template), element, property);
   }
 }
 
@@ -152,6 +190,21 @@ ElementTemplatesPropertiesProvider.$inject = [
 
 
 // helper /////////////////////
+
+/**
+ * Resolve the entry id of a property of the (condition-filtered) template,
+ * but only if the property actually renders an entry (e.g. not `Hidden`), so
+ * the resolved id is guaranteed to exist in the panel.
+ */
+function resolveEntryId(conditionedTemplate, element, property) {
+  const entryId = getPropertyEntryId(conditionedTemplate, property);
+
+  if (!entryId || !createCustomEntry(entryId, element, property)) {
+    return null;
+  }
+
+  return entryId;
+}
 
 function updateMessageGroup(groups, element) {
   const messageGroup = findGroup(groups, 'message');
