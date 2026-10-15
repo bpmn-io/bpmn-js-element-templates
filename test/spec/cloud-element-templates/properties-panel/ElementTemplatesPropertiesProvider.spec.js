@@ -1491,6 +1491,157 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
 
   });
 
+
+  describe('getPropertyEntryId', function() {
+
+    beforeEach(bootstrapPropertiesPanel(getEntryIdXML, {
+      container,
+      modules: [
+        BpmnPropertiesPanel,
+        coreModule,
+        BpmnPropertiesProvider,
+        ZeebePropertiesProvider,
+        elementTemplatesModule,
+        modelingModule
+      ],
+      moddleExtensions: {
+        zeebe: zeebeModdlePackage
+      },
+      debounceInput: false,
+      elementTemplates: getEntryIdTemplates
+    }));
+
+
+    it('should resolve the entry id of a zeebe:input that does not exist yet', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider, selection) {
+
+        // given
+        const task = elementRegistry.get('Task_3');
+
+        await act(() => selection.select(task));
+
+        const template = elementTemplates.get(task);
+        const property = template.properties.find(p => p.id === 'input-1');
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getPropertyEntryId(task, property);
+
+        // then
+        expect(getBindingPath(task, property.binding)).to.be.null;
+        expect(entryId).to.equal(getPropertyEntryId(template, property));
+        expect(domQuery(`[data-entry-id="${entryId}"]`, container)).to.exist;
+      })
+    );
+
+
+    it('should resolve the entry id of an existing binding', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider, selection) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[0]);
+        });
+        await act(() => selection.select(task));
+
+        const template = elementTemplates.get(task);
+        const property = template.properties.find(p => p.id === 'input-1');
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getPropertyEntryId(task, property);
+
+        // then
+        expect(entryId).to.equal(getPropertyEntryId(template, property));
+        expect(domQuery(`[data-entry-id="${entryId}"]`, container)).to.exist;
+      })
+    );
+
+
+    it('should return null for a Hidden property', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider) {
+
+        // given
+        const task = elementRegistry.get('Task_2');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[3]);
+        });
+
+        const property = elementTemplates.get(task).properties[0];
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getPropertyEntryId(task, property);
+
+        // then
+        expect(entryId).to.be.null;
+      })
+    );
+
+
+    it('should return null for a property whose condition is not met', inject(
+      async function(elementRegistry, elementTemplates, elementTemplatesPropertiesProvider, selection) {
+
+        // given
+        const task = elementRegistry.get('Task_1');
+
+        await act(() => {
+          elementTemplates.applyTemplate(task, getEntryIdTemplates[0]);
+        });
+        await act(() => selection.select(task));
+
+        const template = elementTemplates.get(task);
+        const toggleProperty = template.properties.find(p => p.id === 'toggle');
+        const conditionalProperty = template.properties.find(p => p.id === 'conditional-1');
+
+        const toggleEntry = domQuery(
+          `[data-entry-id="${ getPropertyEntryId(template, toggleProperty) }"]`, container
+        );
+
+        await act(() => domQuery('input[type=\'checkbox\']', toggleEntry).click());
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getPropertyEntryId(task, conditionalProperty);
+
+        // then
+        expect(entryId).to.be.null;
+      })
+    );
+
+
+    it('should return null if no template applies to the element', inject(
+      function(elementRegistry, elementTemplatesPropertiesProvider) {
+
+        // given
+        const task = elementRegistry.get('Task_2');
+        const property = getEntryIdTemplates[0].properties[0];
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getPropertyEntryId(task, property);
+
+        // then
+        expect(entryId).to.be.null;
+      })
+    );
+
+
+    it('should return null for a property that is not part of the applied template', inject(
+      function(elementRegistry, elementTemplatesPropertiesProvider) {
+
+        // given
+        const task = elementRegistry.get('Task_3');
+        const property = getEntryIdTemplates[1].properties[0];
+
+        // when
+        const entryId = elementTemplatesPropertiesProvider.getPropertyEntryId(task, property);
+
+        // then
+        expect(entryId).to.be.null;
+      })
+    );
+
+  });
+
 });
 
 
