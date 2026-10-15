@@ -2144,17 +2144,19 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
       }));
 
 
-      it('should match for Dropdown with empty value', inject(function(modeling) {
+      it('should match for Dropdown with empty value', inject(function(elementTemplates) {
 
         // given
         const element = changeTemplate('Task_1', isEmptyTemplate);
+
+        const dropdownProperty = isEmptyTemplate.properties.find(({ id }) => id === 'dropdownProp');
 
         // assume - no dropdown value set initially
         expect(findZeebeProperty(element, 'showIfDropdownEmpty')).to.exist;
         expect(findZeebeProperty(element, 'showIfDropdownNotEmpty')).to.not.exist;
 
         // when - select a dropdown value
-        modeling.updateModdleProperties(element, findZeebeProperty(element, 'dropdownProp'), { value: 'a' });
+        elementTemplates.setPropertyValue(element, dropdownProperty, 'a');
 
         // then
         const businessObject = getBusinessObject(element);

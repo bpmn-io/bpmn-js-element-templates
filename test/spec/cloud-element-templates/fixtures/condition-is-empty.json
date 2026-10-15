@@ -55,6 +55,7 @@
       "id": "dropdownProp",
       "type": "Dropdown",
       "label": "Dropdown property",
+      "optional": true,
       "choices": [
         { "name": "Option A", "value": "a" },
         { "name": "Option B", "value": "b" }

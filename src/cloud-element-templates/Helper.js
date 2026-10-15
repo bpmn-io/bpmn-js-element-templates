@@ -240,13 +240,31 @@ export function findZeebeSubscription(message) {
  * Get the default value disregarding generated values.
  */
 export function getDefaultFixedValue(property) {
+  const value = getTemplateValue(property);
+
   if (
     shouldCastToFeel(property) || property.feel === 'required'
   ) {
-    return toFeelExpression(property.value, property.type);
+    return toFeelExpression(value, property.type);
   }
 
-  return property.value;
+  return value;
+}
+
+// a non-optional dropdown falls back to its first choice, like <select>
+function getTemplateValue(property) {
+  const {
+    choices,
+    optional,
+    type,
+    value
+  } = property;
+
+  if (value === undefined && type === 'Dropdown' && !optional && choices?.length) {
+    return choices[ 0 ].value;
+  }
+
+  return value;
 }
 
 export function getDefaultValue(property) {

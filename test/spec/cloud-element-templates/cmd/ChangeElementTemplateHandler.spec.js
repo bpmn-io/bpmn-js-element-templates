@@ -4282,6 +4282,86 @@ describe('cloud-element-templates/cmd - ChangeElementTemplateHandler', function(
 
     });
 
+
+    describe('Dropdown default value', function() {
+
+      beforeEach(bootstrap(require('./task.bpmn').default));
+
+      const choices = [
+        { name: 'Low', value: 'low' },
+        { name: 'High', value: 'high' }
+      ];
+
+
+      it('should apply first choice if no value is set', inject(function(elementRegistry) {
+
+        // given
+        const template = createTemplate({
+          type: 'Dropdown',
+          choices,
+          binding: {
+            type: 'zeebe:property',
+            name: 'priority'
+          }
+        });
+
+        let task = elementRegistry.get('Task_1');
+
+        // when
+        task = changeTemplate(task, template);
+
+        // then
+        expect(getZeebeProperty(task, 'priority').get('value')).to.eql('low');
+      }));
+
+
+      it('should apply explicit value', inject(function(elementRegistry) {
+
+        // given
+        const template = createTemplate({
+          type: 'Dropdown',
+          value: 'high',
+          choices,
+          binding: {
+            type: 'zeebe:property',
+            name: 'priority'
+          }
+        });
+
+        let task = elementRegistry.get('Task_1');
+
+        // when
+        task = changeTemplate(task, template);
+
+        // then
+        expect(getZeebeProperty(task, 'priority').get('value')).to.eql('high');
+      }));
+
+
+      it('should NOT apply first choice to optional dropdown', inject(function(elementRegistry) {
+
+        // given
+        const template = createTemplate({
+          type: 'Dropdown',
+          optional: true,
+          choices,
+          binding: {
+            type: 'zeebe:property',
+            name: 'priority'
+          }
+        });
+
+        let task = elementRegistry.get('Task_1');
+
+        // when
+        task = changeTemplate(task, template);
+
+        // then
+        expect(getZeebeProperty(task, 'priority')).not.to.exist;
+      }));
+
+    });
+
   });
 
 
