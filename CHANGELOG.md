@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FEAT`: use first choice as default value of non-optional `Dropdown` without `value` ([#307](https://github.com/bpmn-io/bpmn-js-element-templates/pull/307))
+
 ## 2.38.0
 
 * `FEAT`: expose element template service utilities ([#305](https://github.com/bpmn-io/bpmn-js-element-templates/pull/305))
