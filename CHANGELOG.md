@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.40.0
+
 * `FEAT`: display unavailable cluster note of the configuration chooser as an informational notice
 * `DEPS`: require `@bpmn-io/properties-panel@>= 3.58.0`
 
