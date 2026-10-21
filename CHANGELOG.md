@@ -6,6 +6,9 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FEAT`: display unavailable cluster note of the configuration chooser as an informational notice
+* `DEPS`: require `@bpmn-io/properties-panel@>= 3.56.0`
+
 ## 2.39.0
 
 * `FEAT`: use first choice as default value of non-optional `Dropdown` without `value` ([#307](https://github.com/bpmn-io/bpmn-js-element-templates/pull/307))

@@ -1,5 +1,7 @@
 import TestContainer from 'mocha-test-container-support';
 
+import { InfoIcon } from '@bpmn-io/properties-panel';
+
 import { render } from '@bpmn-io/properties-panel/preact';
 
 import {
@@ -170,7 +172,20 @@ function Cell(props) {
 
         {
           status
-            ? <div class={ 'bio-properties-panel-' + (status.severity === 'warning' ? 'warning' : 'description') }>{ status.message }</div>
+            ? (
+              <div class={ 'bio-properties-panel-' + status.severity }>
+                {
+                  status.severity === 'info'
+                    ? (
+                      <span class="bio-properties-panel-diagnostic-message">
+                        <InfoIcon class="bio-properties-panel-diagnostic-icon" aria-hidden="true" />
+                        { status.message }
+                      </span>
+                    )
+                    : status.message
+                }
+              </div>
+            )
             : null
         }
 
@@ -210,7 +225,7 @@ function StatesSection() {
       </Cell>
 
       <Cell label="Placeholder — unavailable" state="placeholder"
-        status={ { severity: 'note', message: 'No cluster connected' } }>
+        status={ { severity: 'info', message: 'No cluster connected' } }>
         <PlaceholderConfiguration
           id="cb-placeholder-off"
           controlId="cb-placeholder-off-control"

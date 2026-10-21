@@ -2926,11 +2926,11 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         // card keeps the stable identity (variable name), not the transient message
         expect(domQuery('.bio-properties-panel-configuration-chooser-subtitle', entry).textContent).to.equal('slackProduction');
 
-        // the cluster status is surfaced as a standard note (description) below the card
+        // the cluster status is surfaced as an informational notice below the card
         const status = getConfigurationStatus(entry);
 
         expect(domClasses(entry).contains('has-warning')).to.be.false;
-        expect(domClasses(status).contains('bio-properties-panel-description')).to.be.true;
+        expect(domClasses(status).contains('bio-properties-panel-info')).to.be.true;
         expect(status.textContent).to.equal('No cluster selected');
 
         expect(getConfigurationMissing(entry)).not.to.exist;
@@ -3084,7 +3084,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       expect(placeholder.disabled).to.be.true;
       expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-status');
-      expect(domClasses(status).contains('bio-properties-panel-description')).to.be.true;
+      expect(domClasses(status).contains('bio-properties-panel-info')).to.be.true;
       expect(status.textContent).to.equal('No cluster selected');
       expect(getConfigurationPopover(entry)).not.to.exist;
     }));
@@ -3135,7 +3135,8 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       expect(placeholder.disabled).to.be.true;
       expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-status');
-      expect(domClasses(status).contains('bio-properties-panel-description')).to.be.true;
+      expect(domClasses(status).contains('bio-properties-panel-info')).to.be.true;
+      expect(domQuery('.bio-properties-panel-diagnostic-icon', status)).to.exist;
       expect(status.textContent).to.equal('No cluster connected');
     }));
 
