@@ -1,7 +1,7 @@
 import { useService } from 'bpmn-js-properties-panel';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from '@bpmn-io/properties-panel/preact/hooks';
-import { CreateIcon, TooltipEntry, useError, useShowEntryEvent } from '@bpmn-io/properties-panel';
+import { CreateIcon, DiagnosticMessage, TooltipEntry, useError, useShowEntryEvent } from '@bpmn-io/properties-panel';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
@@ -66,7 +66,7 @@ function getConfigurationVariant(state) {
 
 /**
  * Build the status note shown below the identity-only card, or `null` when there
- * is nothing to report. `note` reuses the neutral description styling, `warning`
+ * is nothing to report. `info` renders a neutral informational notice, `warning`
  * the standard warning field.
  *
  * @param {Object} options
@@ -121,22 +121,17 @@ function getConfigurationStatus(options) {
   }
 
   // offline (bound but unverifiable) and unavailable placeholder are the same
-  // neutral note: the cluster connection can only be restored outside the panel
+  // informational notice: the cluster connection can only be restored outside the panel
   if (variant === VARIANT.OFFLINE || (variant === VARIANT.PLACEHOLDER && !available)) {
     return {
       id: statusId,
-      severity: 'note',
+      severity: 'info',
       message: unavailableMessage || translate('No cluster connected')
     };
   }
 
   return null;
 }
-
-const STATUS_CLASS = {
-  note: 'bio-properties-panel-description',
-  warning: 'bio-properties-panel-warning'
-};
 
 /**
  * FEEL expression referencing a configuration instance as a cluster variable.
@@ -677,8 +672,11 @@ export function ConfigurationProperty(props) {
       {
         status
           ? (
-            <div id={ status.id } class={ STATUS_CLASS[ status.severity ] }>
-              { status.message }
+            <div id={ status.id }>
+              <DiagnosticMessage
+                diagnostic={ { severity: status.severity, message: status.message } }
+                forId={ id }
+                element={ element } />
             </div>
           )
           : null
