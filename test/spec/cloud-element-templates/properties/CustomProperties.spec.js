@@ -2930,7 +2930,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
         const status = getConfigurationStatus(entry);
 
         expect(domClasses(entry).contains('has-warning')).to.be.false;
-        expect(domClasses(status).contains('bio-properties-panel-info')).to.be.true;
+        expect(domQuery('.bio-properties-panel-info', status)).to.exist;
         expect(status.textContent).to.equal('No cluster selected');
 
         expect(getConfigurationMissing(entry)).not.to.exist;
@@ -3084,7 +3084,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       expect(placeholder.disabled).to.be.true;
       expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-status');
-      expect(domClasses(status).contains('bio-properties-panel-info')).to.be.true;
+      expect(domQuery('.bio-properties-panel-info', status)).to.exist;
       expect(status.textContent).to.equal('No cluster selected');
       expect(getConfigurationPopover(entry)).not.to.exist;
     }));
@@ -3135,7 +3135,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       expect(placeholder.disabled).to.be.true;
       expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-status');
-      expect(domClasses(status).contains('bio-properties-panel-info')).to.be.true;
+      expect(domQuery('.bio-properties-panel-info', status)).to.exist;
       expect(domQuery('.bio-properties-panel-diagnostic-icon', status)).to.exist;
       expect(status.textContent).to.equal('No cluster connected');
     }));
@@ -3182,7 +3182,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       expect(placeholder.disabled).to.be.true;
       expect(placeholder.getAttribute('aria-describedby')).to.equal('custom-entry-configuration-property-0-status');
       expect(domClasses(entry).contains('has-warning')).to.be.true;
-      expect(domClasses(status).contains('bio-properties-panel-warning')).to.be.true;
+      expect(domQuery('.bio-properties-panel-warning', status)).to.exist;
       expect(status.textContent).to.equal('Could not load configurations');
 
       // when
@@ -3286,7 +3286,7 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
       const errorStatus = getConfigurationStatus(entry);
 
       expect(errorStatus).to.exist;
-      expect(domClasses(errorStatus).contains('bio-properties-panel-warning')).to.be.true;
+      expect(domQuery('.bio-properties-panel-warning', errorStatus)).to.exist;
       expect(errorStatus.textContent).to.contain('Could not load configurations');
 
       expect(entry.textContent).not.to.contain('Not found on cluster');

@@ -1,6 +1,6 @@
 import TestContainer from 'mocha-test-container-support';
 
-import { InfoIcon } from '@bpmn-io/properties-panel';
+import { DiagnosticMessage } from '@bpmn-io/properties-panel';
 
 import { render } from '@bpmn-io/properties-panel/preact';
 
@@ -172,20 +172,7 @@ function Cell(props) {
 
         {
           status
-            ? (
-              <div class={ 'bio-properties-panel-' + status.severity }>
-                {
-                  status.severity === 'info'
-                    ? (
-                      <span class="bio-properties-panel-diagnostic-message">
-                        <InfoIcon class="bio-properties-panel-diagnostic-icon" aria-hidden="true" />
-                        { status.message }
-                      </span>
-                    )
-                    : status.message
-                }
-              </div>
-            )
+            ? <DiagnosticMessage diagnostic={ status } forId="status" />
             : null
         }
 
