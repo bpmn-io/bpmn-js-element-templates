@@ -225,6 +225,24 @@ const invalid = [
       message: 'This is a custom message',
       propertiesPanel: { entryIds: [ 'custom-entry-constraints.pattern-custom-message.noLabel-0' ] }
     }
+  },
+  {
+    name: 'Correlation Key - Not Empty (event sub-process)',
+    moddleElement: createProcess(`
+      <bpmn:subProcess id="SubProcess_1" triggeredByEvent="true">
+        <bpmn:startEvent id="StartEvent_1" zeebe:modelerTemplate="constraints.correlationKey.notEmpty">
+          <bpmn:messageEventDefinition id="MessageEventDefinition_1" messageRef="Message_1" />
+        </bpmn:startEvent>
+      </bpmn:subProcess>
+    `, '<bpmn:message id="Message_1" name="message" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'StartEvent_1',
+      message: 'Correlation Key must not be empty.',
+      propertiesPanel: { entryIds: [ 'custom-entry-constraints.correlationKey.notEmpty-0' ] }
+    }
   }
 ];
 
