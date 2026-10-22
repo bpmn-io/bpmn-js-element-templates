@@ -1014,6 +1014,34 @@ describe('provider/cloud-element-templates - ConditionalBehavior', function() {
           expect(ioMapping).not.to.exist;
         })
       );
+
+
+      it('should keep correlation key when label is moved', inject(function(modeling) {
+
+        // given
+        const element = changeTemplate('MessageStartSubprocess', messageCorrelationTemplate);
+
+        // when
+        modeling.moveElements([ element.label ], { x: 10, y: 10 });
+
+        // then
+        const subscription = findZeebeSubscription(findMessage(getBusinessObject(element)));
+        expect(subscription).to.have.property('correlationKey', 'correlationKey');
+      }));
+
+
+      it('should keep correlation key when event subprocess is moved', inject(function(elementRegistry, modeling) {
+
+        // given
+        const element = changeTemplate('MessageStartSubprocess', messageCorrelationTemplate);
+
+        // when
+        modeling.moveElements([ elementRegistry.get('EventSubProcess') ], { x: 10, y: 10 });
+
+        // then
+        const subscription = findZeebeSubscription(findMessage(getBusinessObject(element)));
+        expect(subscription).to.have.property('correlationKey', 'correlationKey');
+      }));
     });
 
 

@@ -1,6 +1,6 @@
 import { isEventSubProcess } from 'bpmn-js/lib/util/DiUtil';
 import { getPropertyValue } from './util/propertyUtil';
-import { is } from 'bpmn-js/lib/util/ModelUtil';
+import { getBusinessObject, is } from 'bpmn-js/lib/util/ModelUtil';
 import {
   shouldCastToFeel,
   fromFeelExpression,
@@ -95,7 +95,7 @@ function isPropertyAllowed(element, property) {
     type === 'bpmn:Message#zeebe:subscription#property' &&
     binding.name === 'correlationKey' &&
     is(element, 'bpmn:StartEvent') &&
-    !isEventSubProcess(element.parent)
+    !isEventSubProcess(getBusinessObject(element).$parent)
   ) {
     return false;
   }

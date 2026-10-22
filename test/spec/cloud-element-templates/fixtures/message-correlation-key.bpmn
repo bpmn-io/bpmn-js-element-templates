@@ -2,7 +2,7 @@
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_165ah7c" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0-alpha.1" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.2.0">
   <bpmn:process id="Process_0vvlc66" isExecutable="true">
     <bpmn:subProcess id="EventSubProcess" triggeredByEvent="true">
-      <bpmn:startEvent id="MessageStartSubprocess">
+      <bpmn:startEvent id="MessageStartSubprocess" name="Message received">
         <bpmn:messageEventDefinition id="MessageEventDefinition_1n4teqw" />
       </bpmn:startEvent>
     </bpmn:subProcess>
@@ -33,6 +33,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_15z79dd_di" bpmnElement="MessageStartSubprocess">
         <dc:Bounds x="290" y="302" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="266" y="345" width="84" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0lqa760_di" bpmnElement="MessageBoundary">
         <dc:Bounds x="542" y="132" width="36" height="36" />
