@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.40.1
+
 * `FIX`: keep correlation key of message start event in event sub-process when its label moves ([#310](https://github.com/bpmn-io/bpmn-js-element-templates/pull/310))
 * `FIX`: validate correlation key constraints of message start event in event sub-process ([#310](https://github.com/bpmn-io/bpmn-js-element-templates/pull/310))
 
