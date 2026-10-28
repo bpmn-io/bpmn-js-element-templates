@@ -6,6 +6,8 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.40.2
+
 * `FIX`: allow to switch optional FEEL number fields to FEEL via `=` key
 
 ## 2.40.1
