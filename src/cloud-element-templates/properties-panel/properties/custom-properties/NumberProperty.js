@@ -43,6 +43,7 @@ export function NumberProperty(props) {
   return Component({
     debounce,
     element,
+    feel,
     getValue,
     step: 'any',
     id,

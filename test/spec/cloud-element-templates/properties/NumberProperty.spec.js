@@ -337,6 +337,18 @@ describe('provider/cloud-element-templates - NumberProperty', function() {
       });
 
 
+      it('should toggle to FEEL field on `=` key', async function() {
+
+        // when
+        await act(() => {
+          fireEvent.keyDown(input, { key: '=' });
+        });
+
+        // then
+        expect(domQuery('.bio-properties-panel-feel-editor-container', entry)).to.exist;
+      });
+
+
       it('should revert to number field on re-select', async function() {
 
         // given
