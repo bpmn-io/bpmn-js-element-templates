@@ -20,7 +20,7 @@ export default class ConfigurationTemplates {
     this._elementTemplates = elementTemplates;
 
     /** @type {Object<string, Object<number, ConfigurationTemplate>>} */
-    this._byId = {};
+    this._byId = Object.create(null);
 
     eventBus.on('elementTemplates.changed', () => {
       this._extract();
@@ -95,7 +95,7 @@ export default class ConfigurationTemplates {
    * Extract configuration templates from all loaded element templates.
    */
   _extract() {
-    const map = {};
+    const map = Object.create(null);
 
     for (const elementTemplate of this._elementTemplates.getAll()) {
       const configurationTemplates = elementTemplate.configurationTemplates;
@@ -108,7 +108,7 @@ export default class ConfigurationTemplates {
         const { id, version = 1 } = ct;
 
         if (!map[id]) {
-          map[id] = {};
+          map[id] = Object.create(null);
         }
 
         // Keep the first definition for an identical id and version.

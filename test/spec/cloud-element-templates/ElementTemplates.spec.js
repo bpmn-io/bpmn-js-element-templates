@@ -1063,6 +1063,11 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
 
   describe('set', function() {
 
+    afterEach(function() {
+      delete Object.prototype[1];
+      delete Object.prototype.latest;
+    });
+
     it('should set templates', inject(function(elementTemplates) {
 
       // when
@@ -1123,6 +1128,29 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       // then
       // well-formed entries are still indexed
       expect(elementTemplates.get('no-engines')).to.exist;
+    }));
+
+
+    it('should handle <__proto__> id', inject(function(elementTemplates) {
+
+      // given
+      const template = {
+        id: '__proto__',
+        name: 'proto',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [],
+        version: 1
+      };
+
+      // when
+      elementTemplates.set([ template ]);
+
+      // then
+      expect(elementTemplates.get('__proto__', 1)).to.equal(template);
+      expect(elementTemplates.getLatest('__proto__')).to.eql([ template ]);
+
+      expect(({})[ 1 ]).to.be.undefined;
+      expect(Object.prototype).not.to.have.property('latest');
     }));
 
   });
