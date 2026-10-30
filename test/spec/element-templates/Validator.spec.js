@@ -809,6 +809,42 @@ describe('provider/element-templates - Validator', function() {
   });
 
 
+  describe('prototype pollution', function() {
+
+    afterEach(function() {
+      delete Object.prototype[1];
+      delete Object.prototype.latest;
+    });
+
+
+    it('should handle <__proto__> id', function() {
+
+      // given
+      const validator = new Validator(moddle);
+
+      const template = {
+        $schema: 'https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json',
+        id: '__proto__',
+        name: 'proto',
+        appliesTo: [ 'bpmn:Task' ],
+        properties: [],
+        version: 1
+      };
+
+      // when
+      validator.addAll([ template ]);
+
+      // then
+      expect(errors(validator)).to.be.empty;
+      expect(valid(validator)).to.eql([ template ]);
+
+      expect(({})[ 1 ]).to.be.undefined;
+      expect(Object.prototype).not.to.have.property('latest');
+    });
+
+  });
+
+
   describe('error <template> reference', function() {
 
     it('should attach the source template to logged errors', function() {

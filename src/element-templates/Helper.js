@@ -76,7 +76,7 @@ export function isCompatible(template, checkEngines) {
  * @return {Object}
  */
 export function buildTemplatesById(templates, engines) {
-  const templatesById = {};
+  const templatesById = Object.create(null);
 
   templates.forEach((template) => {
 
@@ -90,7 +90,7 @@ export function buildTemplatesById(templates, engines) {
     const version = isUndefined(template.version) ? '_' : template.version;
 
     if (!templatesById[id]) {
-      templatesById[id] = {};
+      templatesById[id] = Object.create(null);
     }
 
     templatesById[id][version] = template;

@@ -34,7 +34,7 @@ export default class ElementTemplates {
     this._injector = injector;
     this._modeling = modeling;
 
-    this._templatesById = {};
+    this._templatesById = Object.create(null);
     this._templates = [];
 
     config = config || {};

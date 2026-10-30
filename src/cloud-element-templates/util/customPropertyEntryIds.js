@@ -25,7 +25,7 @@ export function getPropertyEntryId(elementTemplate, property) {
     groups
   } = elementTemplate;
 
-  const groupedProperties = groupBy(properties, 'group');
+  const groupedProperties = groupBy(properties, 'group', Object.create(null));
 
   const defaultProperties = [];
 

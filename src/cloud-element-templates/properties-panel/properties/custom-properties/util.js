@@ -82,7 +82,7 @@ export function propertyValidator(translate, property) {
 }
 
 export function groupByGroupId(properties) {
-  return groupBy(properties, 'group');
+  return groupBy(properties, 'group', Object.create(null));
 }
 
 export function findCustomGroup(groups, id) {
