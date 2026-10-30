@@ -211,6 +211,29 @@ describe('provider/cloud-element-templates - ConfigurationTemplates', function()
       })
     );
 
+
+    it('should handle <__proto__> id',
+      inject(function(elementTemplates, configurationTemplates) {
+
+        // given
+        const configurationTemplate = {
+          id: '__proto__',
+          name: 'Proto',
+          version: 1
+        };
+
+        // when
+        elementTemplates.set([ {
+          id: 'example.proto',
+          configurationTemplates: [ configurationTemplate ]
+        } ]);
+
+        // then
+        expect(configurationTemplates.get('__proto__', 1)).to.equal(configurationTemplate);
+        expect(({})[ 1 ]).to.be.undefined;
+      })
+    );
+
   });
 
 

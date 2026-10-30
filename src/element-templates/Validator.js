@@ -25,7 +25,7 @@ const MORPHABLE_TYPES = [ 'bpmn:Activity', 'bpmn:Event', 'bpmn:Gateway' ];
  */
 export class Validator {
   constructor(moddle) {
-    this._templatesById = {};
+    this._templatesById = Object.create(null);
 
     this._validTemplates = [];
     this._errors = [];
@@ -76,7 +76,7 @@ export class Validator {
       version = isNil(template.version) ? '_' : template.version;
 
       if (!this._templatesById[ id ]) {
-        this._templatesById[ id ] = {};
+        this._templatesById[ id ] = Object.create(null);
       }
 
       this._templatesById[ id ][ version ] = template;

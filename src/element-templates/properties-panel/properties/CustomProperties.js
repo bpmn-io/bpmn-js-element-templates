@@ -988,7 +988,7 @@ function matchesPattern(string, pattern) {
 }
 
 function groupByGroupId(properties) {
-  return groupBy(properties, 'group');
+  return groupBy(properties, 'group', Object.create(null));
 }
 
 function findCustomGroup(groups, id) {
