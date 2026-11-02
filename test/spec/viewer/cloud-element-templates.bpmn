@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:serviceTask id="AllTypes" name="All types" zeebe:modelerTemplate="viewer.all-types" zeebe:modelerTemplateVersion="2">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="viewer-type" />
+        <zeebe:ioMapping>
+          <zeebe:input source="string value" target="string" />
+          <zeebe:input source="fixed" target="readonly" />
+          <zeebe:input source="=feel + 1" target="feelOptional" />
+          <zeebe:input source="=feelRequired" target="feelRequired" />
+          <zeebe:input source="text value" target="text" />
+          <zeebe:input source="=&#34;feel text&#34;" target="feelText" />
+          <zeebe:input source="=feelTextRequired" target="feelTextRequired" />
+          <zeebe:input source="{&#34;foo&#34;: &#34;bar&#34;}" target="json" />
+          <zeebe:input source="ungrouped value" target="ungrouped" />
+          <zeebe:input source="shown value" target="conditionalShown" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="dropdown" value="a" />
+        </zeebe:taskHeaders>
+        <zeebe:properties>
+          <zeebe:property name="number" value="42" />
+          <zeebe:property name="boolean" value="true" />
+          <zeebe:property name="configuration" value="=camunda.vars.env.myConfiguration" />
+        </zeebe:properties>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="AllTypesEmpty" name="All types, empty" zeebe:modelerTemplate="viewer.all-types" zeebe:modelerTemplateVersion="2" />
+    <bpmn:serviceTask id="Outdated" name="Outdated" zeebe:modelerTemplate="viewer.all-types" zeebe:modelerTemplateVersion="1" />
+    <bpmn:serviceTask id="EntriesVisible" name="Entries visible" zeebe:modelerTemplate="viewer.entries-visible">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=result" target="result" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="EntriesHidden" name="Entries hidden" zeebe:modelerTemplate="viewer.entries-hidden" />
+    <bpmn:serviceTask id="Unknown" name="Unknown template" zeebe:modelerTemplate="viewer.does-not-exist" />
+    <bpmn:task id="Deprecated" name="Deprecated" zeebe:modelerTemplate="viewer.deprecated" />
+    <bpmn:serviceTask id="NoTemplate" name="No template" />
+    <bpmn:intermediateCatchEvent id="Message" name="Message" zeebe:modelerTemplate="viewer.message">
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1" messageRef="Message_1" />
+    </bpmn:intermediateCatchEvent>
+  </bpmn:process>
+  <bpmn:message id="Message_1" name="message-name">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=key" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="AllTypes_di" bpmnElement="AllTypes"><dc:Bounds x="100" y="100" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AllTypesEmpty_di" bpmnElement="AllTypesEmpty"><dc:Bounds x="250" y="100" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Outdated_di" bpmnElement="Outdated"><dc:Bounds x="400" y="100" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EntriesVisible_di" bpmnElement="EntriesVisible"><dc:Bounds x="550" y="100" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EntriesHidden_di" bpmnElement="EntriesHidden"><dc:Bounds x="700" y="100" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Unknown_di" bpmnElement="Unknown"><dc:Bounds x="100" y="250" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Deprecated_di" bpmnElement="Deprecated"><dc:Bounds x="250" y="250" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="NoTemplate_di" bpmnElement="NoTemplate"><dc:Bounds x="400" y="250" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Message_di" bpmnElement="Message"><dc:Bounds x="582" y="272" width="36" height="36" /></bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -6,6 +6,11 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FEAT`: add read-only viewer modules `CloudElementTemplatesPropertiesProviderViewerModule` and `ElementTemplatesPropertiesProviderViewerModule` to inspect templated elements in a `NavigatedViewer`
+* `FEAT`: add `CloudElementTemplatesCoreViewerModule` and `ElementTemplatesCoreViewerModule` that provide the template lookup without editing features
+* `FEAT`: render template configuration chooser and template actions read-only in a read-only properties panel
+* `DEPS`: require `@bpmn-io/properties-panel` and `bpmn-js-properties-panel` releases with read-only support
+
 ## 2.40.2
 
 * `FIX`: allow to switch optional FEEL number fields to FEEL via `=` key
