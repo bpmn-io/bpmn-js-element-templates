@@ -6,6 +6,7 @@
     <bpmn:serviceTask id="ServiceTask_noGroups" name="no groups" camunda:modelerTemplate="example.com.grouping-noGroups" />
     <bpmn:serviceTask id="ServiceTask_nonExisting" name="non existing group" camunda:modelerTemplate="example.com.grouping-nonExisting" />
     <bpmn:serviceTask id="ServiceTask_noEntries" name="no entries" camunda:modelerTemplate="example.com.grouping-noEntries" />
+    <bpmn:serviceTask id="ServiceTask_proto" name="prototype keys" camunda:modelerTemplate="example.com.grouping-proto" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0vvlc66">
@@ -23,6 +24,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_noEntries_di" bpmnElement="ServiceTask_noEntries">
         <dc:Bounds x="270" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_proto_di" bpmnElement="ServiceTask_proto">
+        <dc:Bounds x="270" y="770" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

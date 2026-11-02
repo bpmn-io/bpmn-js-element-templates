@@ -31,6 +31,7 @@
         </zeebe:ioMapping>
       </bpmn:extensionElements>
     </bpmn:serviceTask>
+    <bpmn:serviceTask id="ServiceTask_proto" name="prototype keys" zeebe:modelerTemplate="example.com.grouping-proto" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0vvlc66">
@@ -52,6 +53,9 @@
       <bpmndi:BPMNShape id="BPMNShape_0nnayge" bpmnElement="ServiceTask_groupsCollapsed">
         <dc:Bounds x="270" y="650" width="100" height="80" />
         <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_proto_di" bpmnElement="ServiceTask_proto">
+        <dc:Bounds x="270" y="770" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

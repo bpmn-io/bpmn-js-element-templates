@@ -196,5 +196,38 @@
         "label": "Group two"
       }
     ]
+  },
+  {
+    "name": "Grouping (prototype keys)",
+    "id": "example.com.grouping-proto",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "input 1",
+        "group": "__proto__",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "input1"
+        }
+      },
+      {
+        "label": "input 2",
+        "group": "constructor",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "input2"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "id": "__proto__",
+        "label": "Proto group"
+      }
+    ]
   }
 ]
