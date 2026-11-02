@@ -18,11 +18,16 @@ import {
 } from 'test/TestHelper';
 
 import Modeler from 'bpmn-js/lib/Modeler';
+import NavigatedViewer from 'bpmn-js/lib/NavigatedViewer';
 
 import {
   BpmnPropertiesPanelModule,
+  BpmnPropertiesPanelViewerModule,
   BpmnPropertiesProviderModule,
-  ZeebePropertiesProviderModule
+  BpmnPropertiesProviderViewerModule,
+  CamundaPlatformPropertiesProviderViewerModule,
+  ZeebePropertiesProviderModule,
+  ZeebePropertiesProviderViewerModule
 } from 'bpmn-js-properties-panel';
 
 import LintingModule from '@camunda/linting/modeler';
@@ -45,6 +50,11 @@ import ZeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import CloudElementTemplatesPropertiesProviderModule from 'src/cloud-element-templates';
 import ElementTemplatesPropertiesProviderModule from 'src/element-templates';
+
+import {
+  CloudElementTemplatesPropertiesProviderViewerModule,
+  ElementTemplatesPropertiesProviderViewerModule
+} from 'src';
 
 import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/linting';
 
@@ -540,6 +550,40 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
   }
 
 
+  async function createViewer(xml, { modules, moddleExtensions, elementTemplates }) {
+    const viewer = new NavigatedViewer({
+      container: modelerContainer,
+      additionalModules: [
+        BpmnPropertiesPanelViewerModule,
+        BpmnPropertiesProviderViewerModule,
+        ...modules
+      ],
+      moddleExtensions,
+      propertiesPanel: {
+        parent: null,
+        feelTooltipContainer: container
+      },
+      elementTemplates
+    });
+
+    setBpmnJS(viewer);
+
+    await viewer.importXML(xml);
+
+    return viewer;
+  }
+
+  function modeSwitch(options) {
+    return async function(xml, mode) {
+      if (mode === 'viewer') {
+        return createViewer(xml, options.viewer);
+      }
+
+      return (await createModeler(xml, options.editor)).modeler;
+    };
+  }
+
+
   (singleStart === 'cloud-templates' ? it.only : it)('should import simple process (cloud-templates)', async function() {
 
     // given
@@ -549,38 +593,37 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
 
     const elementTemplates = elementTemplateContext.keys().map(key => elementTemplateContext(key)).flat();
 
-    // when
-    const result = await createModeler(
-      diagramXml,
-      {
-        additionalModules: [
-          ZeebeBehaviorsModule,
-          BpmnPropertiesPanelModule,
-          BpmnPropertiesProviderModule,
-          ZeebePropertiesProviderModule,
-          CloudElementTemplatesPropertiesProviderModule,
-          ElementTemplateChooserModule,
-          ElementTemplatesIconsRenderer,
-          CreateAppendAnythingModule,
-          CreateAppendElementTemplatesModule,
-          ChangeEnginesModule,
-          LogTemplateErrorsModule,
-          MockConfigurationInstancesModule,
-          LintingModule
-        ],
-        moddleExtensions: {
-          zeebe: ZeebeModdle,
-          modeler: ModelerModdle
-        },
-        propertiesPanel: {
-          parent: null
-        },
-        elementTemplates,
-        linting: {
-          active: true
-        }
+    const editorOptions = {
+      additionalModules: [
+        ZeebeBehaviorsModule,
+        BpmnPropertiesPanelModule,
+        BpmnPropertiesProviderModule,
+        ZeebePropertiesProviderModule,
+        CloudElementTemplatesPropertiesProviderModule,
+        ElementTemplateChooserModule,
+        ElementTemplatesIconsRenderer,
+        CreateAppendAnythingModule,
+        CreateAppendElementTemplatesModule,
+        ChangeEnginesModule,
+        LogTemplateErrorsModule,
+        MockConfigurationInstancesModule,
+        LintingModule
+      ],
+      moddleExtensions: {
+        zeebe: ZeebeModdle,
+        modeler: ModelerModdle
+      },
+      propertiesPanel: {
+        parent: null
+      },
+      elementTemplates,
+      linting: {
+        active: true
       }
-    );
+    };
+
+    // when
+    const result = await createModeler(diagramXml, editorOptions);
 
     // then
     expect(result.error).not.to.exist;
@@ -590,7 +633,19 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
     ).to.have.length(1);
 
     // and
-    createTestUI(result.modeler);
+    createTestUI(result.modeler, {
+      switchMode: modeSwitch({
+        editor: editorOptions,
+        viewer: {
+          modules: [
+            ZeebePropertiesProviderViewerModule,
+            CloudElementTemplatesPropertiesProviderViewerModule
+          ],
+          moddleExtensions: editorOptions.moddleExtensions,
+          elementTemplates
+        }
+      })
+    });
   });
 
 
@@ -603,30 +658,41 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
 
     const elementTemplates = elementTemplateContext.keys().map(key => elementTemplateContext(key)).flat();
 
+    const editorOptions = {
+      additionalModules: [
+        CamundaBehaviorsModule,
+        BpmnPropertiesPanelModule,
+        BpmnPropertiesProviderModule,
+        ElementTemplateChooserModule,
+        ElementTemplatesPropertiesProviderModule
+      ],
+      moddleExtensions: {
+        camunda: CamundaModdle,
+        modeler: ModelerModdle
+      },
+      elementTemplates
+    };
+
     // when
-    const result = await createModeler(
-      diagramXml,
-      {
-        additionalModules: [
-          CamundaBehaviorsModule,
-          BpmnPropertiesPanelModule,
-          BpmnPropertiesProviderModule,
-          ElementTemplateChooserModule,
-          ElementTemplatesPropertiesProviderModule
-        ],
-        moddleExtensions: {
-          camunda: CamundaModdle,
-          modeler: ModelerModdle
-        },
-        elementTemplates
-      }
-    );
+    const result = await createModeler(diagramXml, editorOptions);
 
     // then
     expect(result.error).not.to.exist;
 
     // and then
-    createTestUI(result.modeler);
+    createTestUI(result.modeler, {
+      switchMode: modeSwitch({
+        editor: editorOptions,
+        viewer: {
+          modules: [
+            CamundaPlatformPropertiesProviderViewerModule,
+            ElementTemplatesPropertiesProviderViewerModule
+          ],
+          moddleExtensions: editorOptions.moddleExtensions,
+          elementTemplates
+        }
+      })
+    });
   });
 
 });
@@ -636,14 +702,16 @@ function escapeHTML(unsafe) {
   return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
 
-function createTestUI(modeler) {
+function createTestUI(modeler, options = {}) {
+
+  const { switchMode, mode = 'editor' } = options;
 
   const linting = modeler.get('linting', false);
   const elementTemplates = modeler.get('elementTemplates', false);
   const propertiesPanel = modeler.get('propertiesPanel', false);
 
   const canvas = modeler.get('canvas');
-  const modeling = modeler.get('modeling');
+  const modeling = modeler.get('modeling', false);
   const bpmnjs = modeler.get('bpmnjs');
   const eventBus = modeler.get('eventBus');
 
@@ -1038,6 +1106,26 @@ function createTestUI(modeler) {
     };
 
     toggleBtn.addEventListener('click', openModal);
+  }
+
+  // --- Mode switch (editing <-> read-only) ---
+  if (switchMode) {
+    const nextMode = mode === 'editor' ? 'viewer' : 'editor';
+
+    const modeBtn = domify(
+      `<button class="ci-toggle-btn" style="left: 230px;">${ mode === 'editor' ? '✎ Editing' : '👁 Read-only' } (switch)</button>`
+    );
+    container.appendChild(modeBtn);
+
+    modeBtn.addEventListener('click', async () => {
+      const { xml } = await bpmnjs.saveXML({ format: true });
+
+      modeler.destroy();
+
+      const next = await switchMode(xml, nextMode);
+
+      createTestUI(next, { switchMode, mode: nextMode });
+    });
   }
 
   // --- XML viewer button ---
