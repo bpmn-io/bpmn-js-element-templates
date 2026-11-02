@@ -71,7 +71,7 @@ const viewer = new NavigatedViewer({
 });
 ```
 
-Templates are provided via the `elementTemplates` configuration or `elementTemplates#set`, as in the editor. Use `CloudElementTemplatesCoreViewerModule` or `ElementTemplatesCoreViewerModule` for the template lookup only.
+Templates are provided via the `elementTemplates` configuration or `elementTemplates#set`, as in the editor. The viewer does not report template errors or warnings; malformed templates are silently ignored. To render template icons, add the [`@bpmn-io/element-template-icon-renderer`](https://github.com/bpmn-io/element-template-icon-renderer) module to the `additionalModules`. Use `CloudElementTemplatesCoreViewerModule` or `ElementTemplatesCoreViewerModule` for the template lookup only.
 
 ## Additional resources
 
