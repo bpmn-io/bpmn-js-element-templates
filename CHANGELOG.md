@@ -9,6 +9,7 @@ ___Note:__ Yet to be released changes appear here._
 * `FEAT`: add read-only viewer modules `CloudElementTemplatesPropertiesProviderViewerModule` and `ElementTemplatesPropertiesProviderViewerModule` to inspect templated elements in a `NavigatedViewer`
 * `FEAT`: add `CloudElementTemplatesCoreViewerModule` and `ElementTemplatesCoreViewerModule` that provide the template lookup without editing features
 * `FEAT`: render template configuration chooser and template actions read-only in a read-only properties panel
+* `FEAT`: do not report template errors or warnings in viewers
 * `DEPS`: require `@bpmn-io/properties-panel` and `bpmn-js-properties-panel` releases with read-only support
 
 ## 2.40.2

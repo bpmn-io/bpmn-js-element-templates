@@ -43,6 +43,8 @@ import {
   insertCoreStyles
 } from 'test/TestHelper';
 
+import ElementTemplatesIconsRenderer from '@bpmn-io/element-template-icon-renderer';
+
 import cloudDiagram from './cloud-element-templates.bpmn';
 import cloudTemplates from './cloud-element-templates.json';
 
@@ -698,6 +700,112 @@ describe('viewer', function() {
 
       expect(domQueryAll('.bio-properties-panel-collapsible-entry', panelContainer)).not.to.be.empty;
       expect(domQueryAll('.bio-properties-panel-add-entry, .bio-properties-panel-remove-entry', panelContainer)).to.be.empty;
+    });
+
+  });
+
+});
+
+
+describe('viewer (loading)', function() {
+
+  let container, viewer, consoleError;
+
+  beforeEach(function() {
+    container = TestContainer.get(this);
+
+    consoleError = sinon.spy(console, 'error');
+  });
+
+  afterEach(function() {
+    consoleError.restore();
+
+    viewer && viewer.destroy();
+  });
+
+
+  describe('validation', function() {
+
+    FLAVORS.forEach(function({ name, diagram, moddleExtensions, viewerModules, templates }) {
+
+      it(`should not report invalid templates (${ name })`, async function() {
+
+        // given
+        const onErrors = sinon.spy(),
+              onWarnings = sinon.spy();
+
+        const broken = [
+          { id: 'broken' },
+          { $schema: 'foo', name: 'No ID' }
+        ];
+
+        // when
+        viewer = await createViewer(container, diagram, {
+          moddleExtensions,
+          elementTemplates: [ ...templates, ...broken ],
+          modules: [
+            BpmnPropertiesPanelViewerModule,
+            ...viewerModules,
+            {
+              __init__: [ function(eventBus) {
+                eventBus.on('elementTemplates.errors', onErrors);
+                eventBus.on('elementTemplates.warnings', onWarnings);
+              } ]
+            }
+          ]
+        });
+
+        // then
+        expect(onErrors).not.to.have.been.called;
+        expect(onWarnings).not.to.have.been.called;
+        expect(consoleError).not.to.have.been.called;
+
+        // but malformed templates are not made available
+        const elementTemplates = viewer.get('elementTemplates');
+
+        expect(elementTemplates.getLatest('broken') || []).to.be.empty;
+        expect(elementTemplates.getLatest('viewer.all-types')).to.have.length(1);
+      });
+
+    });
+
+  });
+
+
+  describe('icons', function() {
+
+    const ICON = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"><rect width="18" height="18" fill="red"/></svg>'
+    );
+
+    it('should render element template icons', async function() {
+
+      // given
+      const diagram = cloudDiagram.replace(
+        'id="AllTypes"',
+        `id="AllTypes" zeebe:modelerTemplateIcon="${ ICON }"`
+      );
+
+      // when
+      viewer = await createViewer(container, diagram, {
+        moddleExtensions: { zeebe: ZeebeModdle },
+        elementTemplates: cloudTemplates,
+        modules: [
+          ElementTemplatesIconsRenderer,
+          BpmnPropertiesPanelViewerModule,
+          BpmnPropertiesProviderViewerModule,
+          ZeebePropertiesProviderViewerModule,
+          CloudElementTemplatesPropertiesProviderViewerModule
+        ]
+      });
+
+      // then
+      const gfx = viewer.get('elementRegistry').getGraphics('AllTypes');
+
+      const image = domQuery('image', gfx);
+
+      expect(image).to.exist;
+      expect(image.getAttribute('href')).to.eql(ICON);
     });
 
   });

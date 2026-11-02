@@ -1,5 +1,5 @@
 import ElementTemplatesViewer from '../ElementTemplatesViewer';
-import ElementTemplatesLoader from '../ElementTemplatesLoader';
+import ElementTemplatesLoader from '../ElementTemplatesViewerLoader';
 
 export default {
   __init__: [

@@ -638,6 +638,7 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
         editor: editorOptions,
         viewer: {
           modules: [
+            ElementTemplatesIconsRenderer,
             ZeebePropertiesProviderViewerModule,
             CloudElementTemplatesPropertiesProviderViewerModule
           ],
