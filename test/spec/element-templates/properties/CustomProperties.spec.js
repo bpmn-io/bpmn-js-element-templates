@@ -1919,6 +1919,32 @@ describe('provider/element-templates - CustomProperties', function() {
       expect(getGroup(entry)).to.equal('ElementTemplates__CustomProperties');
     });
 
+
+    it('should position into defined group (<__proto__> group id)', async function() {
+
+      // given
+      await expectSelected('ServiceTask_proto');
+
+      // when
+      const entry = findEntry('custom-entry-example.com.grouping-proto-__proto__-0', container);
+
+      // then
+      expect(getGroup(entry)).to.equal('ElementTemplates__CustomProperties-__proto__');
+    });
+
+
+    it('should position into default group (<constructor> group id)', async function() {
+
+      // given
+      await expectSelected('ServiceTask_proto');
+
+      // when
+      const entry = findEntry('custom-entry-example.com.grouping-proto-0', container);
+
+      // then
+      expect(getGroup(entry)).to.equal('ElementTemplates__CustomProperties');
+    });
+
   });
 
 

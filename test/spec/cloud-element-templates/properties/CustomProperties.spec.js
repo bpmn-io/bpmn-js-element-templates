@@ -53,6 +53,7 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import { BpmnPropertiesPanelModule as BpmnPropertiesPanel } from 'bpmn-js-properties-panel';
 import elementTemplatesModule from 'src/cloud-element-templates';
+import { getPropertyEntryId } from 'src/cloud-element-templates/util/customPropertyEntryIds';
 import { isConfigurationChooserEdited } from 'src/cloud-element-templates/properties-panel/properties/custom-properties/ConfigurationProperty';
 
 import diagramXML from './CustomProperties.bpmn';
@@ -6099,6 +6100,48 @@ describe('provider/cloud-element-templates - CustomProperties', function() {
 
       // when
       const entry = findEntry('custom-entry-example.com.grouping-nonExisting-0', container);
+
+      // then
+      expect(getGroup(entry)).to.equal('ElementTemplates__CustomProperties');
+    });
+
+
+    it('should position into defined group (<__proto__> group id)', async function() {
+
+      // given
+      await expectSelected('ServiceTask_proto');
+
+      // when
+      const entry = findEntry('custom-entry-example.com.grouping-proto-__proto__-0', container);
+
+      // then
+      expect(getGroup(entry)).to.equal('ElementTemplates__CustomProperties-__proto__');
+    });
+
+
+    it('should resolve entry id (<__proto__> group id)', inject(async function(elementTemplates) {
+
+      // given
+      await expectSelected('ServiceTask_proto');
+
+      const template = elementTemplates.get('example.com.grouping-proto');
+
+      // when
+      const entryId = getPropertyEntryId(template, template.properties[ 0 ]);
+
+      // then
+      expect(entryId).to.equal('custom-entry-example.com.grouping-proto-__proto__-0');
+      expect(findEntry(entryId, container)).to.exist;
+    }));
+
+
+    it('should position into default group (<constructor> group id)', async function() {
+
+      // given
+      await expectSelected('ServiceTask_proto');
+
+      // when
+      const entry = findEntry('custom-entry-example.com.grouping-proto-0', container);
 
       // then
       expect(getGroup(entry)).to.equal('ElementTemplates__CustomProperties');
