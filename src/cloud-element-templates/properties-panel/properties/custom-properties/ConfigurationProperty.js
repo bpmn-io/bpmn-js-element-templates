@@ -1,7 +1,7 @@
 import { useService } from 'bpmn-js-properties-panel';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from '@bpmn-io/properties-panel/preact/hooks';
-import { CreateIcon, DiagnosticMessage, TooltipEntry, useError, useShowEntryEvent } from '@bpmn-io/properties-panel';
+import { CreateIcon, DiagnosticMessage, TooltipEntry, useError, useReadOnly, useShowEntryEvent } from '@bpmn-io/properties-panel';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
@@ -226,7 +226,9 @@ export function ConfigurationProperty(props) {
     configurationTemplateVersion
   } = property;
 
-  const disabled = editable === false;
+  const readOnly = useReadOnly();
+
+  const disabled = editable === false || readOnly;
 
   const bpmnFactory = useService('bpmnFactory'),
         commandStack = useService('commandStack'),
