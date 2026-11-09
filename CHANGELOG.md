@@ -6,6 +6,10 @@ All notable changes to [bpmn-js-element-templates](https://github.com/bpmn-io/bp
 
 ___Note:__ Yet to be released changes appear here._
 
+## 2.40.3
+
+* `FIX`: handle template ids that collide with Object.prototype keys ([#312](https://github.com/bpmn-io/bpmn-js-element-templates/pull/312))
+
 ## 2.40.2
 
 * `FIX`: allow to switch optional FEEL number fields to FEEL via `=` key
