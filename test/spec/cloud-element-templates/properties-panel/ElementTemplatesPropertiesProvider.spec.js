@@ -596,6 +596,44 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
 
   describe('template#update', function() {
 
+    it('should update to deprecated latest template', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const task = elementRegistry.get('Deprecated_Upgrade');
+
+        await act(() => selection.select(task));
+
+        const updateButton = domQuery('.bio-properties-panel-template-update-available', container);
+
+        expect(updateButton).to.exist;
+
+        // when
+        await act(() => click(domQuery('button', updateButton)));
+        expect(updateButton.classList.contains('open')).to.be.true;
+
+        await updateTemplate(container);
+
+        // then
+        const template = elementTemplates.get(elementRegistry.get('Deprecated_Upgrade'));
+
+        expect(template).to.have.property('id', 'deprecated-upgrade');
+        expect(template).to.have.property('version', 1);
+
+        const deprecatedButton = domQuery('.bio-properties-panel-deprecated-template-button', container);
+
+        expect(deprecatedButton).to.exist;
+        await act(() => click(domQuery('button', deprecatedButton)));
+        expect(deprecatedButton.classList.contains('open')).to.be.true;
+
+        const deprecationInfo = domQuery('.bio-properties-panel-deprecated-template-text', deprecatedButton);
+
+        expect(deprecationInfo.textContent).to.include(template.deprecated.message);
+        expect(domQuery('a', deprecationInfo).getAttribute('href')).to.equal(template.deprecated.documentationRef);
+      })
+    );
+
+
     it('should update template', inject(
       async function(elementRegistry, selection, elementTemplates) {
 
