@@ -1,0 +1,1517 @@
+{
+  "REST 10 to 12": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.rest",
+      "version": 12
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "authentication.type",
+        "value": "bearer",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "authentication.token",
+        "value": "=token",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "method",
+        "value": "POST",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "url",
+        "value": "https://example.test/a?b=1&c=2",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "keepBody",
+        "value": "=true",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "skipEmpty",
+        "value": "=false",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.rest",
+        "version": 10,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.rest",
+        "version": 12,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "usedRecipe": false,
+      "refusal": null,
+      "steps": [],
+      "dropped": [],
+      "added": [
+        {
+          "key": "skipEmpty",
+          "bindingType": "zeebe:input",
+          "label": "Skip empty fields",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "skipEmpty",
+          "value": "=false",
+          "source": "default"
+        }
+      ],
+      "changed": [],
+      "moved": [],
+      "kept": [
+        {
+          "key": "authentication.type",
+          "bindingType": "zeebe:input",
+          "label": "Credentials kind",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.type"
+        },
+        {
+          "key": "authentication.token",
+          "bindingType": "zeebe:input",
+          "label": "Token",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.token"
+        },
+        {
+          "key": "method",
+          "bindingType": "zeebe:input",
+          "label": "Verb",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "method"
+        },
+        {
+          "key": "url",
+          "bindingType": "zeebe:input",
+          "label": "Address",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "url"
+        },
+        {
+          "key": "keepBody",
+          "bindingType": "zeebe:input",
+          "label": "Keep body",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "keepBody"
+        },
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": true
+    }
+  },
+  "REST 12 to 17": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.rest",
+      "version": 17
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "authentication.type",
+        "value": "bearer",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "authentication.token",
+        "value": "=token",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "method",
+        "value": "POST",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "url",
+        "value": "https://example.test/a?b=1&c=2",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "retryOnFailure",
+        "value": "=false",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "skipEmpty",
+        "value": "=false",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.rest",
+        "version": 12,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.rest",
+        "version": 17,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "usedRecipe": false,
+      "refusal": null,
+      "steps": [],
+      "dropped": [
+        {
+          "key": "keepBody",
+          "bindingType": "zeebe:input",
+          "label": "Keep body",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "keepBody",
+          "value": "=true"
+        }
+      ],
+      "added": [
+        {
+          "key": "retryOnFailure",
+          "bindingType": "zeebe:input",
+          "label": "Retry on failure",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "retryOnFailure",
+          "value": "=false",
+          "source": "default"
+        }
+      ],
+      "changed": [],
+      "moved": [],
+      "kept": [
+        {
+          "key": "authentication.type",
+          "bindingType": "zeebe:input",
+          "label": "Credentials kind",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.type"
+        },
+        {
+          "key": "authentication.token",
+          "bindingType": "zeebe:input",
+          "label": "Token",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.token"
+        },
+        {
+          "key": "method",
+          "bindingType": "zeebe:input",
+          "label": "Verb",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "method"
+        },
+        {
+          "key": "url",
+          "bindingType": "zeebe:input",
+          "label": "Address",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "url"
+        },
+        {
+          "key": "skipEmpty",
+          "bindingType": "zeebe:input",
+          "label": "Skip empty fields",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "skipEmpty"
+        },
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": false
+    }
+  },
+  "REST 10 to 17": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.rest",
+      "version": 17
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "authentication.type",
+        "value": "bearer",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "authentication.token",
+        "value": "=token",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "method",
+        "value": "POST",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "url",
+        "value": "https://example.test/a?b=1&c=2",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "retryOnFailure",
+        "value": "=false",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "skipEmpty",
+        "value": "=false",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.rest",
+        "version": 10,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.rest",
+        "version": 17,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "usedRecipe": false,
+      "refusal": null,
+      "steps": [],
+      "dropped": [
+        {
+          "key": "keepBody",
+          "bindingType": "zeebe:input",
+          "label": "Keep body",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "keepBody",
+          "value": "=true"
+        }
+      ],
+      "added": [
+        {
+          "key": "retryOnFailure",
+          "bindingType": "zeebe:input",
+          "label": "Retry on failure",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "retryOnFailure",
+          "value": "=false",
+          "source": "default"
+        },
+        {
+          "key": "skipEmpty",
+          "bindingType": "zeebe:input",
+          "label": "Skip empty fields",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "skipEmpty",
+          "value": "=false",
+          "source": "default"
+        }
+      ],
+      "changed": [],
+      "moved": [],
+      "kept": [
+        {
+          "key": "authentication.type",
+          "bindingType": "zeebe:input",
+          "label": "Credentials kind",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.type"
+        },
+        {
+          "key": "authentication.token",
+          "bindingType": "zeebe:input",
+          "label": "Token",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.token"
+        },
+        {
+          "key": "method",
+          "bindingType": "zeebe:input",
+          "label": "Verb",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "method"
+        },
+        {
+          "key": "url",
+          "bindingType": "zeebe:input",
+          "label": "Address",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "url"
+        },
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": false
+    }
+  },
+  "REST already at 17": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.rest",
+      "version": 17
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "authentication.type",
+        "value": "bearer",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "authentication.token",
+        "value": "=token",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "method",
+        "value": "POST",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "url",
+        "value": "https://example.test/a?b=1&c=2",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "retryOnFailure",
+        "value": "=false",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "skipEmpty",
+        "value": "=false",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.rest",
+        "version": 17,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.rest",
+        "version": 17,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "usedRecipe": false,
+      "refusal": null,
+      "steps": [],
+      "dropped": [],
+      "added": [],
+      "changed": [],
+      "moved": [],
+      "kept": [
+        {
+          "key": "authentication.type",
+          "bindingType": "zeebe:input",
+          "label": "Credentials kind",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.type"
+        },
+        {
+          "key": "authentication.token",
+          "bindingType": "zeebe:input",
+          "label": "Token",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.token"
+        },
+        {
+          "key": "method",
+          "bindingType": "zeebe:input",
+          "label": "Verb",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "method"
+        },
+        {
+          "key": "url",
+          "bindingType": "zeebe:input",
+          "label": "Address",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "url"
+        },
+        {
+          "key": "retryOnFailure",
+          "bindingType": "zeebe:input",
+          "label": "Retry on failure",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "retryOnFailure"
+        },
+        {
+          "key": "skipEmpty",
+          "bindingType": "zeebe:input",
+          "label": "Skip empty fields",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "skipEmpty"
+        },
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": true
+    }
+  },
+  "Agent 10 to 11": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.agent.v1",
+      "version": 11
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.type",
+        "value": "alpha",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.alpha.model",
+        "value": "custom-model",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "limits.maxRounds",
+        "value": "=7",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.agent.v1",
+        "version": 10,
+        "name": "Example agent",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.agent.v1",
+        "version": 11,
+        "name": "Example agent",
+        "deprecated": false
+      },
+      "usedRecipe": false,
+      "refusal": null,
+      "steps": [],
+      "dropped": [],
+      "added": [],
+      "changed": [],
+      "moved": [],
+      "kept": [
+        {
+          "key": "provider.type",
+          "bindingType": "zeebe:input",
+          "label": "Backend",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.type"
+        },
+        {
+          "key": "provider.alpha.model",
+          "bindingType": "zeebe:input",
+          "label": "Alpha model",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.alpha.model"
+        },
+        {
+          "key": "limits.maxRounds",
+          "bindingType": "zeebe:input",
+          "label": "Maximum rounds",
+          "group": "limits",
+          "groupLabel": "Limits",
+          "propertyId": "limits.maxRounds"
+        },
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": true
+    }
+  },
+  "Agent 10 to v2": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.agent.v2",
+      "version": 1
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.type",
+        "value": "alpha",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.alpha.model",
+        "value": "custom-model",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "limits.maxSteps",
+        "value": "=7",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.agent.v1",
+        "version": 10,
+        "name": "Example agent",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.agent.v2",
+        "version": 1,
+        "name": "Example agent v2",
+        "deprecated": false
+      },
+      "usedRecipe": true,
+      "refusal": null,
+      "steps": [
+        {
+          "kind": "hop",
+          "templateId": "io.example.agent.v2",
+          "fromVersion": 10,
+          "toVersion": 1
+        }
+      ],
+      "dropped": [],
+      "added": [],
+      "changed": [],
+      "moved": [
+        {
+          "from": {
+            "key": "limits.maxRounds",
+            "bindingType": "zeebe:input",
+            "label": "Maximum rounds",
+            "group": "limits",
+            "groupLabel": "Limits",
+            "propertyId": "limits.maxRounds"
+          },
+          "to": {
+            "key": "limits.maxSteps",
+            "bindingType": "zeebe:input",
+            "label": "Maximum steps",
+            "group": "limits",
+            "groupLabel": "Limits",
+            "propertyId": "limits.maxSteps"
+          },
+          "value": "=7",
+          "source": "recipe"
+        }
+      ],
+      "kept": [
+        {
+          "key": "provider.type",
+          "bindingType": "zeebe:input",
+          "label": "Backend",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.type"
+        },
+        {
+          "key": "provider.alpha.model",
+          "bindingType": "zeebe:input",
+          "label": "Alpha model",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.alpha.model"
+        },
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": true
+    }
+  },
+  "Agent 11 to v2": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.agent.v2",
+      "version": 1
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.type",
+        "value": "alpha",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.alpha.model",
+        "value": "custom-model",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "limits.maxSteps",
+        "value": "=7",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.agent.v1",
+        "version": 11,
+        "name": "Example agent",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.agent.v2",
+        "version": 1,
+        "name": "Example agent v2",
+        "deprecated": false
+      },
+      "usedRecipe": true,
+      "refusal": null,
+      "steps": [
+        {
+          "kind": "hop",
+          "templateId": "io.example.agent.v2",
+          "fromVersion": 11,
+          "toVersion": 1
+        }
+      ],
+      "dropped": [],
+      "added": [],
+      "changed": [],
+      "moved": [
+        {
+          "from": {
+            "key": "limits.maxRounds",
+            "bindingType": "zeebe:input",
+            "label": "Maximum rounds",
+            "group": "limits",
+            "groupLabel": "Limits",
+            "propertyId": "limits.maxRounds"
+          },
+          "to": {
+            "key": "limits.maxSteps",
+            "bindingType": "zeebe:input",
+            "label": "Maximum steps",
+            "group": "limits",
+            "groupLabel": "Limits",
+            "propertyId": "limits.maxSteps"
+          },
+          "value": "=7",
+          "source": "recipe"
+        }
+      ],
+      "kept": [
+        {
+          "key": "provider.type",
+          "bindingType": "zeebe:input",
+          "label": "Backend",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.type"
+        },
+        {
+          "key": "provider.alpha.model",
+          "bindingType": "zeebe:input",
+          "label": "Alpha model",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.alpha.model"
+        },
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": true
+    }
+  },
+  "recipe refusal": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.agent.v2",
+      "version": 1
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.type",
+        "value": "alpha",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.alpha.model",
+        "value": "alpha-small",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "limits.maxSteps",
+        "value": "=10",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.rest",
+        "version": 17,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.agent.v2",
+        "version": 1,
+        "name": "Example agent v2",
+        "deprecated": false
+      },
+      "usedRecipe": false,
+      "refusal": "wrong source ID: the recipe has no change entry for \"io.example.rest\"",
+      "steps": [],
+      "dropped": [
+        {
+          "key": "authentication.type",
+          "bindingType": "zeebe:input",
+          "label": "Credentials kind",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.type",
+          "value": "bearer",
+          "valueName": "Bearer"
+        },
+        {
+          "key": "authentication.token",
+          "bindingType": "zeebe:input",
+          "label": "Token",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.token",
+          "value": "=token"
+        },
+        {
+          "key": "method",
+          "bindingType": "zeebe:input",
+          "label": "Verb",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "method",
+          "value": "POST",
+          "valueName": "POST"
+        },
+        {
+          "key": "url",
+          "bindingType": "zeebe:input",
+          "label": "Address",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "url",
+          "value": "https://example.test/a?b=1&c=2"
+        },
+        {
+          "key": "retryOnFailure",
+          "bindingType": "zeebe:input",
+          "label": "Retry on failure",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "retryOnFailure",
+          "value": "=false"
+        },
+        {
+          "key": "skipEmpty",
+          "bindingType": "zeebe:input",
+          "label": "Skip empty fields",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "skipEmpty",
+          "value": "=false"
+        }
+      ],
+      "added": [
+        {
+          "key": "provider.type",
+          "bindingType": "zeebe:input",
+          "label": "Backend",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.type",
+          "value": "alpha",
+          "valueName": "Alpha",
+          "source": "default"
+        },
+        {
+          "key": "provider.alpha.model",
+          "bindingType": "zeebe:input",
+          "label": "Alpha model",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.alpha.model",
+          "value": "alpha-small",
+          "source": "default"
+        },
+        {
+          "key": "limits.maxSteps",
+          "bindingType": "zeebe:input",
+          "label": "Maximum steps",
+          "group": "limits",
+          "groupLabel": "Limits",
+          "propertyId": "limits.maxSteps",
+          "value": "=10",
+          "source": "default"
+        }
+      ],
+      "changed": [],
+      "moved": [],
+      "kept": [
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": false
+    }
+  },
+  "upgrade then hop": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.agent.v2",
+      "version": 1
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.type",
+        "value": "alpha",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.alpha.model",
+        "value": "custom-model",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "limits.maxSteps",
+        "value": "=7",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "limits.timeout",
+        "value": "PT30S",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.agent.v1",
+        "version": 10,
+        "name": "Example agent",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.agent.v2",
+        "version": 1,
+        "name": "Example agent v2",
+        "deprecated": false
+      },
+      "usedRecipe": true,
+      "refusal": null,
+      "steps": [
+        {
+          "kind": "version",
+          "templateId": "io.example.agent.v1",
+          "fromVersion": 10,
+          "toVersion": 11
+        },
+        {
+          "kind": "hop",
+          "templateId": "io.example.agent.v2",
+          "fromVersion": 11,
+          "toVersion": 1
+        }
+      ],
+      "dropped": [],
+      "added": [
+        {
+          "key": "limits.timeout",
+          "bindingType": "zeebe:input",
+          "label": "Round timeout",
+          "group": "limits",
+          "groupLabel": "Limits",
+          "propertyId": "limits.timeout",
+          "value": "PT30S",
+          "source": "recipe"
+        }
+      ],
+      "changed": [],
+      "moved": [
+        {
+          "from": {
+            "key": "limits.maxRounds",
+            "bindingType": "zeebe:input",
+            "label": "Maximum rounds",
+            "group": "limits",
+            "groupLabel": "Limits",
+            "propertyId": "limits.maxRounds"
+          },
+          "to": {
+            "key": "limits.maxSteps",
+            "bindingType": "zeebe:input",
+            "label": "Maximum steps",
+            "group": "limits",
+            "groupLabel": "Limits",
+            "propertyId": "limits.maxSteps"
+          },
+          "value": "=7",
+          "source": "recipe"
+        }
+      ],
+      "kept": [
+        {
+          "key": "provider.type",
+          "bindingType": "zeebe:input",
+          "label": "Backend",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.type"
+        },
+        {
+          "key": "provider.alpha.model",
+          "bindingType": "zeebe:input",
+          "label": "Alpha model",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.alpha.model"
+        },
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": true
+    }
+  },
+  "compatible implicit floor": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.agent.v2",
+      "version": 1
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.type",
+        "value": "alpha",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.alpha.model",
+        "value": "custom-model",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "limits.maxSteps",
+        "value": "=7",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.agent.v1",
+        "version": 10,
+        "name": "Example agent",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.agent.v2",
+        "version": 1,
+        "name": "Example agent v2",
+        "deprecated": false
+      },
+      "usedRecipe": true,
+      "refusal": null,
+      "steps": [
+        {
+          "kind": "version",
+          "templateId": "io.example.agent.v1",
+          "fromVersion": 10,
+          "toVersion": 11,
+          "implicit": true
+        },
+        {
+          "kind": "hop",
+          "templateId": "io.example.agent.v2",
+          "fromVersion": 11,
+          "toVersion": 1
+        }
+      ],
+      "dropped": [],
+      "added": [],
+      "changed": [],
+      "moved": [
+        {
+          "from": {
+            "key": "limits.maxRounds",
+            "bindingType": "zeebe:input",
+            "label": "Maximum rounds",
+            "group": "limits",
+            "groupLabel": "Limits",
+            "propertyId": "limits.maxRounds"
+          },
+          "to": {
+            "key": "limits.maxSteps",
+            "bindingType": "zeebe:input",
+            "label": "Maximum steps",
+            "group": "limits",
+            "groupLabel": "Limits",
+            "propertyId": "limits.maxSteps"
+          },
+          "value": "=7",
+          "source": "recipe"
+        }
+      ],
+      "kept": [
+        {
+          "key": "provider.type",
+          "bindingType": "zeebe:input",
+          "label": "Backend",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.type"
+        },
+        {
+          "key": "provider.alpha.model",
+          "bindingType": "zeebe:input",
+          "label": "Alpha model",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.alpha.model"
+        },
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": true
+    }
+  },
+  "explicit map": {
+    "type": "bpmn:ServiceTask",
+    "applied": {
+      "id": "io.example.agent.v2",
+      "version": 1
+    },
+    "values": [
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.type",
+        "value": "alpha",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "provider.alpha.model",
+        "value": "alpha-small",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "limits.maxSteps",
+        "value": "=10",
+        "isFeel": true
+      },
+      {
+        "bindingType": "zeebe:input",
+        "key": "limits.timeout",
+        "value": "https://example.test/a?b=1&c=2",
+        "isFeel": false
+      },
+      {
+        "bindingType": "zeebe:taskDefinition",
+        "key": "retries",
+        "value": "3",
+        "isFeel": false
+      }
+    ],
+    "report": {
+      "from": {
+        "id": "io.example.rest",
+        "version": 10,
+        "name": "Example REST call",
+        "deprecated": false
+      },
+      "to": {
+        "id": "io.example.agent.v2",
+        "version": 1,
+        "name": "Example agent v2",
+        "deprecated": false
+      },
+      "usedRecipe": false,
+      "refusal": "wrong source ID: the recipe has no change entry for \"io.example.rest\"",
+      "steps": [],
+      "dropped": [
+        {
+          "key": "authentication.type",
+          "bindingType": "zeebe:input",
+          "label": "Credentials kind",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.type",
+          "value": "bearer",
+          "valueName": "Bearer"
+        },
+        {
+          "key": "authentication.token",
+          "bindingType": "zeebe:input",
+          "label": "Token",
+          "group": "auth",
+          "groupLabel": "Credentials",
+          "propertyId": "authentication.token",
+          "value": "=token"
+        },
+        {
+          "key": "method",
+          "bindingType": "zeebe:input",
+          "label": "Verb",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "method",
+          "value": "POST",
+          "valueName": "POST"
+        },
+        {
+          "key": "keepBody",
+          "bindingType": "zeebe:input",
+          "label": "Keep body",
+          "group": "request",
+          "groupLabel": "Request",
+          "propertyId": "keepBody",
+          "value": "=true"
+        }
+      ],
+      "added": [
+        {
+          "key": "provider.type",
+          "bindingType": "zeebe:input",
+          "label": "Backend",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.type",
+          "value": "alpha",
+          "valueName": "Alpha",
+          "source": "default"
+        },
+        {
+          "key": "provider.alpha.model",
+          "bindingType": "zeebe:input",
+          "label": "Alpha model",
+          "group": "provider",
+          "groupLabel": "Backend",
+          "propertyId": "provider.alpha.model",
+          "value": "alpha-small",
+          "source": "default"
+        },
+        {
+          "key": "limits.maxSteps",
+          "bindingType": "zeebe:input",
+          "label": "Maximum steps",
+          "group": "limits",
+          "groupLabel": "Limits",
+          "propertyId": "limits.maxSteps",
+          "value": "=10",
+          "source": "default"
+        }
+      ],
+      "changed": [],
+      "moved": [
+        {
+          "from": {
+            "key": "url",
+            "bindingType": "zeebe:input",
+            "label": "Address",
+            "group": "request",
+            "groupLabel": "Request",
+            "propertyId": "url"
+          },
+          "to": {
+            "key": "limits.timeout",
+            "bindingType": "zeebe:input",
+            "label": "Round timeout",
+            "group": "limits",
+            "groupLabel": "Limits",
+            "propertyId": "limits.timeout"
+          },
+          "value": "https://example.test/a?b=1&c=2",
+          "source": "map"
+        }
+      ],
+      "kept": [
+        {
+          "key": "retries",
+          "bindingType": "zeebe:taskDefinition",
+          "label": "Attempts",
+          "group": "retries",
+          "groupLabel": "Retries",
+          "propertyId": "retryCount"
+        }
+      ],
+      "notes": [],
+      "skipped": {
+        "guard": [],
+        "template": [],
+        "noMatch": [],
+        "feel": [],
+        "unchecked": []
+      },
+      "lossless": false
+    }
+  }
+}

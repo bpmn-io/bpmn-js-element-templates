@@ -434,6 +434,23 @@ describe('provider/cloud-element-templates - UpdatePropertiesOrderBehavior', fun
     }));
 
 
+    it('should restore all backing collections with one undo', async function() {
+      const modeler = getBpmnJS();
+      const task = el('TASK');
+      const before = (await modeler.saveXML({ format: true })).xml;
+
+      modeler.get('modeling').updateProperties(task, { name: 'changed' });
+      modeler.get('commandStack').undo();
+
+      expect((await modeler.saveXML({ format: true })).xml).to.equal(before);
+
+      modeler.get('commandStack').redo();
+      expect(task.businessObject.name).to.equal('changed');
+      modeler.get('commandStack').undo();
+      expect((await modeler.saveXML({ format: true })).xml).to.equal(before);
+    });
+
+
     it('zeebe:input', function() {
 
       // given

@@ -14,12 +14,17 @@
       "import": "./dist/core.esm.js",
       "require": "./dist/core.js"
     },
+    "./migration": {
+      "import": "./dist/migration.esm.mjs",
+      "require": "./dist/migration.js"
+    },
+    "./migration/migrates-from.schema.json": "./dist/migrates-from.schema.json",
     "./dist/assets/*.css": "./dist/assets/*.css",
     "./dist/*.js": "./dist/*.js",
     "./package.json": "./package.json"
   },
   "scripts": {
-    "all": "run-s lint lint:theme test distro",
+    "all": "run-s lint lint:theme test test:node distro",
     "distro": "run-s build test:build",
     "build": "run-p bundle",
     "bundle": "rollup -c",
@@ -28,6 +33,7 @@
     "lint:theme": "bpmn-io-theme-validate assets/element-templates.css",
     "dev": "npm test -- --auto-watch --no-single-run",
     "test": "karma start karma.config.js",
+    "test:node": "rollup -c test/migration/rollup.config.mjs && mocha test/migration-test.cjs",
     "test:build": "mocha --reporter=spec --recursive test/distro/*.spec.js",
     "start": "cross-env SINGLE_START=cloud-templates npm run dev",
     "start:templates": "cross-env SINGLE_START=templates npm run dev",
@@ -95,6 +101,7 @@
     "babel-plugin-istanbul": "^8.0.0",
     "bpmn-js": "^18.26.0",
     "bpmn-js-create-append-anything": "^2.0.0",
+    "bpmn-js-headless": "^0.2.0",
     "bpmn-js-properties-panel": "^5.65.0",
     "bpmn-moddle": "^10.1.0",
     "camunda-bpmn-js-behaviors": "^1.18.0",

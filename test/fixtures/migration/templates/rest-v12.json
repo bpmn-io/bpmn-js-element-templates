@@ -1,0 +1,94 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Example REST call",
+  "id": "io.example.rest",
+  "version": 12,
+  "description": "Synthetic test template that calls an HTTP endpoint.",
+  "appliesTo": ["bpmn:Task"],
+  "elementType": { "value": "bpmn:ServiceTask" },
+  "engines": { "camunda": "^8.3" },
+  "groups": [
+    { "id": "auth", "label": "Credentials" },
+    { "id": "request", "label": "Request" },
+    { "id": "retries", "label": "Retries" }
+  ],
+  "properties": [
+    {
+      "type": "Hidden",
+      "value": "io.example:rest:1",
+      "binding": { "type": "zeebe:taskDefinition", "property": "type" }
+    },
+    {
+      "id": "authentication.type",
+      "label": "Credentials kind",
+      "group": "auth",
+      "type": "Dropdown",
+      "value": "noAuth",
+      "choices": [
+        { "name": "None", "value": "noAuth" },
+        { "name": "Bearer", "value": "bearer" }
+      ],
+      "binding": { "type": "zeebe:input", "name": "authentication.type" }
+    },
+    {
+      "id": "authentication.token",
+      "label": "Token",
+      "group": "auth",
+      "type": "String",
+      "optional": false,
+      "binding": { "type": "zeebe:input", "name": "authentication.token" },
+      "condition": { "property": "authentication.type", "equals": "bearer" }
+    },
+    {
+      "id": "method",
+      "label": "Verb",
+      "group": "request",
+      "type": "Dropdown",
+      "value": "GET",
+      "optional": false,
+      "choices": [
+        { "name": "GET", "value": "GET" },
+        { "name": "POST", "value": "POST" },
+        { "name": "PUT", "value": "PUT" },
+        { "name": "PATCH", "value": "PATCH" },
+        { "name": "DELETE", "value": "DELETE" }
+      ],
+      "binding": { "type": "zeebe:input", "name": "method" }
+    },
+    {
+      "id": "url",
+      "label": "Address",
+      "group": "request",
+      "type": "String",
+      "optional": false,
+      "binding": { "type": "zeebe:input", "name": "url" }
+    },
+    {
+      "id": "keepBody",
+      "label": "Keep body",
+      "group": "request",
+      "type": "Boolean",
+      "value": false,
+      "optional": false,
+      "binding": { "type": "zeebe:input", "name": "keepBody" }
+    },
+    {
+      "id": "skipEmpty",
+      "label": "Skip empty fields",
+      "group": "request",
+      "type": "Boolean",
+      "value": false,
+      "optional": false,
+      "binding": { "type": "zeebe:input", "name": "skipEmpty" },
+      "condition": { "property": "method", "oneOf": ["POST", "PUT", "PATCH"] }
+    },
+    {
+      "id": "retryCount",
+      "label": "Attempts",
+      "group": "retries",
+      "type": "String",
+      "value": "3",
+      "binding": { "type": "zeebe:taskDefinition", "property": "retries" }
+    }
+  ]
+}

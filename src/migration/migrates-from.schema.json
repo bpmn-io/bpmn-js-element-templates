@@ -1,0 +1,241 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Element template migration recipe",
+  "description": "Declares how elements bound to older element templates are migrated to the template that carries this recipe. Embedded as `metadata.migratesFrom` in the target template, or passed as a standalone file with `--recipe`. Unofficial dialect, not part of the Camunda element template schema. Schema validation alone is insufficient: keyed source uniqueness and owner-relative ID/version constraints MUST also be validated semantically.",
+  "type": "object",
+  "required": ["schemaVersion", "sources"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional reference to this schema, for editor support in standalone recipe files. Empty and whitespace-only strings are allowed; null and non-string values are not."
+    },
+    "schemaVersion": {
+      "const": 1,
+      "description": "Version of this recipe format. The revised version 1 dialect requires explicit upgrade/change kinds and rejects legacy minVersion entries. Earlier strict version 1 readers reject the revised fields; no compatibility reader is provided. A reader that does not know the version must refuse the recipe."
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Explicit upgrade and change entries. Keyed marker uniqueness and recipe-owner ID/version relations require semantic validation in addition to this schema.",
+      "items": { "$ref": "#/definitions/source" }
+    }
+  },
+  "definitions": {
+    "scalar": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" }
+      ],
+      "description": "A string, finite number or boolean that is stringified when written to a binding. Empty and whitespace-only strings are allowed. Null, objects and arrays are not scalar values."
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S",
+      "description": "A binding key, as used in the template's `binding` (for example `provider.type` or `data.connection.url`). An optional binding-type prefix (`input:`, `output:`, `header:`, `property:`, `taskDefinition:`, `agentDefinition:`, `adHoc:`) disambiguates a key bound by several binding types. MUST contain a non-whitespace character; surrounding whitespace is preserved."
+    },
+    "note": {
+      "description": "Message for the user, shown in the migration report when the entry is active. Use it to explain a lossy or opinionated mapping. A plain string is an info note. Messages MUST contain a non-whitespace character; surrounding whitespace is preserved. An omitted level defaults to info; explicit null is invalid.",
+      "oneOf": [
+        { "type": "string", "minLength": 1, "pattern": "\\S" },
+        {
+          "type": "object",
+          "required": ["message"],
+          "additionalProperties": false,
+          "properties": {
+            "level": { "enum": ["info", "warning"], "default": "info" },
+            "message": { "type": "string", "minLength": 1, "pattern": "\\S" }
+          }
+        }
+      ]
+    },
+    "source": {
+      "type": "object",
+      "required": ["kind", "sourceTemplateId"],
+      "additionalProperties": false,
+      "oneOf": [
+        { "properties": { "kind": { "const": "upgrade" }, "toVersion": {}, "minSourceVersion": false }, "required": ["toVersion"] },
+        { "properties": { "kind": { "const": "change" }, "toVersion": false } }
+      ],
+      "properties": {
+        "kind": { "enum": ["upgrade", "change"] },
+        "sourceTemplateId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S",
+          "description": "Id of the template an element is migrated from. The target's own id denotes a same-id version step."
+        },
+        "toVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "Destination template version for an upgrade. Source ID must equal the recipe owner's ID and the version must not exceed the owner's version."
+        },
+        "minSourceVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "Lowest actually reached source version accepted by a change. Omit to accept any reached version. Source ID must differ from the recipe owner's ID."
+        },
+        "paths": {
+          "type": "array",
+          "default": [],
+          "description": "Mapping entries, applied in order against a snapshot of the source element's values. Missing or empty paths means template application without path rules for either source kind. Values that no entry maps are carried over when the target binds the same key and dropped, with a report line, otherwise.",
+          "items": { "$ref": "#/definitions/node" }
+        }
+      }
+    },
+    "node": {
+      "oneOf": [
+        { "$ref": "#/definitions/rename" },
+        { "$ref": "#/definitions/set" },
+        { "$ref": "#/definitions/template" },
+        { "$ref": "#/definitions/group" }
+      ]
+    },
+    "rename": {
+      "type": "object",
+      "description": "Moves the value at `from` to `to`, optionally translating it.",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "$ref": "#/definitions/path" },
+        "to": { "$ref": "#/definitions/path" },
+        "valueMap": { "$ref": "#/definitions/valueMap" },
+        "when": { "$ref": "#/definitions/when" },
+        "note": { "$ref": "#/definitions/note" }
+      }
+    },
+    "set": {
+      "type": "object",
+      "description": "Writes a static value to `to`, for example a discriminator the source has no counterpart for.",
+      "required": ["to", "set"],
+      "additionalProperties": false,
+      "properties": {
+        "to": { "$ref": "#/definitions/path" },
+        "set": { "$ref": "#/definitions/scalar" },
+        "when": { "$ref": "#/definitions/when" },
+        "note": { "$ref": "#/definitions/note" }
+      }
+    },
+    "template": {
+      "type": "object",
+      "description": "Composes the value at `to` from source values. `${path}` references are replaced with the source value at that path. The entry is skipped when a referenced value is missing. The template MUST contain a non-whitespace character; surrounding whitespace is preserved.",
+      "required": ["to", "template"],
+      "additionalProperties": false,
+      "properties": {
+        "to": { "$ref": "#/definitions/path" },
+        "template": { "type": "string", "minLength": 1, "pattern": "\\S" },
+        "when": { "$ref": "#/definitions/when" },
+        "note": { "$ref": "#/definitions/note" }
+      }
+    },
+    "group": {
+      "type": "object",
+      "description": "Gates a set of entries on a guard over the source values. Nested guards are combined with AND.",
+      "required": ["when", "rules"],
+      "additionalProperties": false,
+      "properties": {
+        "when": { "$ref": "#/definitions/when" },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/node" }
+        }
+      }
+    },
+    "valueMap": {
+      "type": "object",
+      "description": "Translates the source value. The first matching rule wins. Without a matching rule and without a `default`, the target keeps its own default and the report says so.",
+      "required": ["rules"],
+      "additionalProperties": false,
+      "properties": {
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["match", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "match": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S",
+                "description": "Source value to match. `*` matches any run of characters. Empty and whitespace-only patterns are invalid; surrounding whitespace is preserved."
+              },
+              "value": { "$ref": "#/definitions/scalar" }
+            }
+          }
+        },
+        "default": { "$ref": "#/definitions/scalar" }
+      }
+    },
+    "when": {
+      "description": "A guard, or a list of guards that must all hold.",
+      "oneOf": [
+        { "$ref": "#/definitions/guard" },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/guard" }
+        }
+      ]
+    },
+    "guard": {
+      "description": "Tests the source value at `path`. Exactly one operator is allowed. `not` negates `equals`, `matches` and `in`; use `exists: false` to test for absence.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["path", "equals"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "$ref": "#/definitions/path" },
+            "equals": { "$ref": "#/definitions/scalar" },
+            "not": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["path", "matches"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "$ref": "#/definitions/path" },
+            "matches": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S",
+              "description": "Pattern where `*` matches any run of characters. Empty and whitespace-only patterns are invalid; surrounding whitespace is preserved."
+            },
+            "not": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["path", "in"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "$ref": "#/definitions/path" },
+            "in": {
+              "type": "array",
+              "description": "Allowed scalar values. An empty list is valid and matches no value before negation.",
+              "items": { "$ref": "#/definitions/scalar" }
+            },
+            "not": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["path", "exists"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "$ref": "#/definitions/path" },
+            "exists": { "type": "boolean" }
+          }
+        }
+      ]
+    }
+  }
+}

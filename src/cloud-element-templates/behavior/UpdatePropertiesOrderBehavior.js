@@ -97,7 +97,7 @@ export default class UpdateTemplatePropertiesOrder extends CommandInterceptor {
       commands.push({
         cmd: 'element.updateModdleProperties',
         context: {
-          ...context,
+          element: context.element,
           moddleElement: zeebeProperties,
           properties: {
             properties: newPropertiesOrder
@@ -128,7 +128,7 @@ export default class UpdateTemplatePropertiesOrder extends CommandInterceptor {
       commands.push({
         cmd: 'element.updateModdleProperties',
         context: {
-          ...context,
+          element: context.element,
           moddleElement: ioMapping,
           properties: { inputParameters: newInputOrder }
         }
@@ -157,7 +157,7 @@ export default class UpdateTemplatePropertiesOrder extends CommandInterceptor {
       commands.push({
         cmd: 'element.updateModdleProperties',
         context: {
-          ...context,
+          element: context.element,
           moddleElement: ioMapping,
           properties: { outputParameters: newOutputOrder }
         }
@@ -185,7 +185,7 @@ export default class UpdateTemplatePropertiesOrder extends CommandInterceptor {
       commands.push({
         cmd: 'element.updateModdleProperties',
         context: {
-          ...context,
+          element: context.element,
           moddleElement: taskHeaders,
           properties: { values: newHeadersOrder }
         }

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "Example agent",
+  "id": "io.example.agent.v1",
+  "version": 11,
+  "description": "Synthetic test template for a looping agent task.",
+  "appliesTo": ["bpmn:Task"],
+  "elementType": { "value": "bpmn:ServiceTask" },
+  "engines": { "camunda": "^8.10" },
+  "groups": [
+    { "id": "provider", "label": "Backend" },
+    { "id": "limits", "label": "Limits" },
+    { "id": "retries", "label": "Retries" }
+  ],
+  "properties": [
+    {
+      "type": "Hidden",
+      "value": "io.example:agent:1",
+      "binding": { "type": "zeebe:taskDefinition", "property": "type" }
+    },
+    {
+      "id": "provider.type",
+      "label": "Backend",
+      "group": "provider",
+      "type": "Dropdown",
+      "value": "alpha",
+      "choices": [
+        { "name": "Alpha", "value": "alpha" },
+        { "name": "Beta", "value": "beta" }
+      ],
+      "binding": { "type": "zeebe:input", "name": "provider.type" }
+    },
+    {
+      "id": "provider.alpha.model",
+      "label": "Alpha model",
+      "group": "provider",
+      "type": "String",
+      "value": "alpha-small",
+      "binding": { "type": "zeebe:input", "name": "provider.alpha.model" },
+      "condition": { "property": "provider.type", "equals": "alpha" }
+    },
+    {
+      "id": "provider.beta.model",
+      "label": "Beta model",
+      "group": "provider",
+      "type": "String",
+      "value": "beta-small",
+      "binding": { "type": "zeebe:input", "name": "provider.beta.model" },
+      "condition": { "property": "provider.type", "equals": "beta" }
+    },
+    {
+      "id": "limits.maxRounds",
+      "label": "Maximum rounds",
+      "group": "limits",
+      "type": "Number",
+      "value": 10,
+      "feel": "static",
+      "optional": false,
+      "binding": { "type": "zeebe:input", "name": "limits.maxRounds" }
+    },
+    {
+      "id": "limits.timeout",
+      "label": "Round timeout",
+      "group": "limits",
+      "type": "String",
+      "optional": true,
+      "binding": { "type": "zeebe:input", "name": "limits.timeout" }
+    },
+    {
+      "id": "retryCount",
+      "label": "Attempts",
+      "group": "retries",
+      "type": "String",
+      "value": "3",
+      "binding": { "type": "zeebe:taskDefinition", "property": "retries" }
+    }
+  ]
+}

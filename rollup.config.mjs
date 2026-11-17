@@ -17,6 +17,21 @@ const nonExternalDependencies = [ 'preact-markup' ];
 
 export default [
   {
+    input: 'src/migration/index.js',
+    output: [
+      { sourcemap: true, format: 'commonjs', file: 'dist/migration.js' },
+      { sourcemap: true, format: 'esm', file: 'dist/migration.esm.mjs' }
+    ],
+    plugins: corePlugins([
+      copy({
+        targets: [
+          { src: 'src/migration/migrates-from.schema.json', dest: 'dist' },
+          { src: 'src/migration/LICENSE', dest: 'dist', rename: 'migration.LICENSE' }
+        ]
+      })
+    ])
+  },
+  {
     input: 'src/index.js',
     output: [
       {
