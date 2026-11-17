@@ -253,8 +253,8 @@ function parseSource(raw, at) {
  * Parse and validate a recipe. Throws `RecipeError` on the first problem;
  * a recipe is never partially accepted.
  *
- * The version is checked before anything else, so a recipe written for a
- * newer schema always asks for a newer c8ctl, whatever keys it adds.
+ * The version is checked before anything else, so unsupported schema versions
+ * fail before any of their fields are interpreted.
  */
 export function parseRecipe(raw) {
   const obj = requireRecord(raw, 'recipe');
@@ -264,7 +264,7 @@ export function parseRecipe(raw) {
     return parse(obj);
   }
   if (Number.isInteger(version) && Number(version) > SUPPORTED_SCHEMA_VERSION) {
-    throw new RecipeError(`schemaVersion ${version} is newer than this c8ctl supports (${SUPPORTED_SCHEMA_VERSION}). Update c8ctl to use this recipe`);
+    throw new RecipeError(`schemaVersion ${version} is newer than this migration engine supports (${SUPPORTED_SCHEMA_VERSION})`);
   }
   throw new RecipeError(`schemaVersion must be ${SUPPORTED_SCHEMA_VERSION}`);
 }

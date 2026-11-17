@@ -159,15 +159,15 @@ describe('parseRecipe', function() {
     assert.deepStrictEqual(source.entries, []);
   });
 
-  it('refuses a newer schemaVersion with an upgrade hint', function() {
+  it('rejects a schemaVersion the migration engine does not support', function() {
     rejects({
       schemaVersion: 2,
       sources: []
-    }, /Update c8ctl/);
+    }, /newer than this migration engine supports \(1\)/);
   });
 
   it('checks a newer schemaVersion before any other property', function() {
-    const newer = /newer than this c8ctl supports \(1\)\. Update c8ctl/;
+    const newer = /newer than this migration engine supports \(1\)/;
     rejects({
       schemaVersion: 2,
       future: {},
@@ -607,7 +607,7 @@ describe('readEmbeddedRecipe', function() {
     }), RecipeError);
   });
 
-  it('asks to update c8ctl for a newer embedded recipe with new keys', function() {
+  it('rejects an unsupported embedded recipe before reading its fields', function() {
     assert.throws(() => readEmbeddedRecipe({
       metadata: {
         migratesFrom: {
@@ -615,7 +615,7 @@ describe('readEmbeddedRecipe', function() {
           future: {}
         }
       }
-    }), error => error instanceof RecipeError && /Update c8ctl/.test(error.message));
+    }), error => error instanceof RecipeError && /newer than this migration engine supports \(1\)/.test(error.message));
   });
 });
 
@@ -699,10 +699,10 @@ describe('parseRecipe boundary cases', function() {
     });
   }
 
-  it('an integer schemaVersion above 1 asks the user to update c8ctl', function() {
+  it('an integer schemaVersion above 1 is rejected by the migration engine', function() {
     rejects({
       schemaVersion: 2,
       sources: []
-    }, /Update c8ctl/);
+    }, /newer than this migration engine supports \(1\)/);
   });
 });

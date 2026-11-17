@@ -78,6 +78,10 @@ and losslessness decisions; this API does not introduce authorization policy.
 input. `readAppliedTemplate(businessObject)` returns `{ id, version }` or
 `undefined`. The v1 recipe schema is exported as
 `bpmn-js-element-templates/migration/migrates-from.schema.json`.
+The current recipe format is provisional, not a supported external contract.
+Formal schema support belongs to a separate issue in the migration epic.
+Unsupported schema versions raise `RecipeError`; host applications own any
+upgrade guidance or recovery policy.
 The entry point also re-exports `resolveCatalog`, `latestOf`, `findSuccessors`,
 `readEmbeddedRecipe`, `validateRecipeOwner`, `DestinationError`, `emptyFacts`,
 and `buildReport` unchanged from their existing engine modules.
