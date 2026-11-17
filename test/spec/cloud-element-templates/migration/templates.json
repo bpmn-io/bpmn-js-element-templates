@@ -1,0 +1,196 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "REST (legacy)",
+    "id": "example.rest",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.rest",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "URL",
+        "type": "String",
+        "value": "https://example.com",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "url"
+        }
+      },
+      {
+        "label": "Method",
+        "type": "Dropdown",
+        "value": "GET",
+        "choices": [
+          {
+            "name": "GET",
+            "value": "GET"
+          },
+          {
+            "name": "POST",
+            "value": "POST"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        }
+      },
+      {
+        "label": "Timeout",
+        "type": "String",
+        "value": "PT30S",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      }
+    ],
+    "deprecated": {
+      "message": "Use REST instead."
+    }
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "REST",
+    "id": "example.rest.v2",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.rest.v2",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "Endpoint",
+        "type": "String",
+        "value": "https://example.com",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "endpoint"
+        }
+      },
+      {
+        "label": "Method",
+        "type": "Dropdown",
+        "value": "get",
+        "choices": [
+          {
+            "name": "GET",
+            "value": "get"
+          },
+          {
+            "name": "POST",
+            "value": "post"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        },
+        "id": "method"
+      },
+      {
+        "label": "Body",
+        "type": "String",
+        "value": "",
+        "optional": true,
+        "binding": {
+          "type": "zeebe:input",
+          "name": "body"
+        },
+        "condition": {
+          "property": "method",
+          "equals": "post"
+        }
+      },
+      {
+        "label": "Timeout",
+        "type": "String",
+        "value": "PT30S",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      }
+    ],
+    "migratesFrom": [
+      {
+        "id": "example.rest",
+        "description": "Migration to REST connector is available.",
+        "changes": "- URL is now called endpoint.\n- HTTP methods are lower case.\n- Payload is now called body and requires POST.\n\nSee [REST connector](https://docs.camunda.io/docs/components/connectors/protocol/rest/).",
+        "properties": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "url"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "endpoint"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "to": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "values": {
+              "GET": "get",
+              "POST": "post"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "payload"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "body"
+            }
+          }
+        ]
+      },
+      {
+        "id": "example.unknown",
+        "properties": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "url"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "endpoint"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

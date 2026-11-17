@@ -54,22 +54,19 @@ insertCoreStyles();
 insertBpmnStyles();
 
 insertCSS('example.css', `
-  .test-container {
+  .example-container {
     display: flex;
     flex-direction: column;
-  }
-
-  .test-container {
     --example-properties-width: 400px;
     --example-bottom-height: 200px;
   }
 
-  .bjs-container {
+  .example-container .bjs-container {
     padding-right: var(--example-properties-width);
     padding-bottom: var(--example-bottom-height);
   }
 
-  .properties-panel-container {
+  .example-container .properties-panel-container {
     position: absolute;
     top: 0;
     right: 0;
@@ -482,6 +479,7 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
     modelerContainer.classList.add('modeler-container');
 
     container = TestContainer.get(this);
+    container.classList.add('example-container');
     container.appendChild(modelerContainer);
   });
 
