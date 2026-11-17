@@ -227,6 +227,7 @@ function applyApplication(modeler, catalog, element, application, mapWrites = []
       // when a write reached it, so an unknown condition never hides a loss.
       properties: clone.properties.filter(property => active.has(property) || !('condition' in property && property.condition))
     },
+    resolvedValue,
     facts: {
       ...facts,
       after,
@@ -324,12 +325,14 @@ export function migrateElement({
   const implicitTemplates = [];
   let current = element;
   let mapsApplied = false;
+  let finalResolvedValue;
   for (const [ index, application ] of applications.entries()) {
     const isFinal = index === applications.length - 1;
     const result = applyApplication(modeler, catalog, current, application, isFinal ? mapPlan.writes : [], index === 0 && !sourceKnown);
     if (result) {
       current = result.element;
       allFacts.push(result.facts);
+      if (isFinal) finalResolvedValue = result.resolvedValue;
       if (application.step?.implicit) implicitTemplates.push(result.activeTemplate);
       lostInImplicitSteps.push(...advanceLineage(lineage, result.facts.moved, valuesOf(current), application.step?.implicit === true, result.facts.reset));
       mapsApplied ||= isFinal;
@@ -343,14 +346,10 @@ export function migrateElement({
   if (mapsApplied) {
 
     // Maps read the original values, so they bypass step-to-step chaining.
-    facts.moved.push(...mapPlan.moved.map(move => {
-      const property = findPropertiesByTarget(target.properties, move.to.key, move.to.bindingType)[0];
-      const write = mapPlan.writes.find(w => sameTarget(w, move.to));
-      return {
-        ...move,
-        value: property && write ? normalizeDestinationValue(property, write.value) : undefined
-      };
-    }));
+    facts.moved.push(...mapPlan.moved.map(move => ({
+      ...move,
+      value: finalResolvedValue?.(move.to.key, move.to.bindingType)
+    })));
   }
   const report = buildReport({
     fromTemplate: reportSource,

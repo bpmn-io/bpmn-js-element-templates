@@ -1139,6 +1139,17 @@ describe('validateDestinationValues static Number and Boolean values', function(
     assert.throws(() => validateDestinationValues([], [ elementValue('b', '=abc') ], templateOf(numberPattern)), /violates pattern constraint/);
   });
 
+  it('validates string-valued pattern constraints', function() {
+    const target = templateOf({
+      type: 'String',
+      constraints: {
+        pattern: '^allowed$'
+      }
+    });
+    assert.doesNotThrow(() => validateDestinationValues([], [ elementValue('b', 'allowed') ], target));
+    assert.throws(() => validateDestinationValues([], [ elementValue('b', 'INVALID') ], target), /violates pattern constraint/);
+  });
+
   it('keeps skipping the pattern for optional FEEL expressions', function() {
     assert.doesNotThrow(() => validateDestinationValues([], [ elementValue('b', '=someVar') ], templateOf({
       ...numberPattern,

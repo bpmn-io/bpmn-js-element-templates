@@ -22,6 +22,10 @@ describe('splitBindingPrefix', function() {
       bindingType: null,
       key: 'urn:x'
     });
+    assert.deepStrictEqual(splitBindingPrefix('constructor:mode'), {
+      bindingType: null,
+      key: 'constructor:mode'
+    });
     assert.deepStrictEqual(splitBindingPrefix('plain'), {
       bindingType: null,
       key: 'plain'

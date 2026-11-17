@@ -99,6 +99,32 @@ describe('migrateElement maps', function() {
     assert.strictEqual(report.moved.length, 1);
   });
 
+  it('reports a map using the active property when destinations are conditional duplicates', async function() {
+    const target = {
+      ...NEW,
+      properties: [ hidden(NEW.id), input('mode', 'off', {
+        id: 'mode'
+      }), input('limit', '', {
+        feel: 'required',
+        condition: {
+          property: 'mode',
+          equals: 'on'
+        }
+      }), input('limit', '') ]
+    };
+    const {
+      element,
+      report
+    } = await run([ map('maxTokens', 'limit') ], {
+      maxTokens: 'secret'
+    }, undefined, target);
+
+    assert.strictEqual(valueAt(element, 'limit'), 'secret');
+    assert.deepStrictEqual(report.moved.map(move => [ move.from.key, move.to.key, move.value ]), [ [ 'maxTokens', 'limit', 'secret' ] ]);
+    assert.deepStrictEqual(report.dropped, []);
+    assert.strictEqual(report.lossless, true);
+  });
+
   it('without the map the value is dropped', async function() {
     const {
       report

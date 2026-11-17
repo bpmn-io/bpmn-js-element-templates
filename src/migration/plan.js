@@ -173,9 +173,11 @@ export function validateDestinationValues(writes, sourceValues, template) {
       if (isExpression) continue;
       if (property.choices && !property.choices.some(choice => choice.value === literal)) throw fail('violates choice constraint');
       if (constraints?.pattern) {
+        const value = typeof constraints.pattern === 'string' ? constraints.pattern : constraints.pattern.value;
+        if (typeof value !== 'string') throw fail('has invalid pattern constraint');
         let pattern;
         try {
-          pattern = new RegExp(constraints.pattern.value);
+          pattern = new RegExp(value);
         } catch {
           throw fail('has invalid pattern constraint');
         }

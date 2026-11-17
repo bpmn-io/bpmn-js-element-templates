@@ -27,10 +27,10 @@ const BINDING_TYPE_PREFIXES = {
 export function splitBindingPrefix(path) {
   const colon = path.indexOf(':');
   if (colon !== -1) {
-    const bindingType = BINDING_TYPE_PREFIXES[path.slice(0, colon)];
-    if (bindingType) {
+    const prefix = path.slice(0, colon);
+    if (Object.prototype.hasOwnProperty.call(BINDING_TYPE_PREFIXES, prefix)) {
       return {
-        bindingType,
+        bindingType: BINDING_TYPE_PREFIXES[prefix],
         key: path.slice(colon + 1)
       };
     }
