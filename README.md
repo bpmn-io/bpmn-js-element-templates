@@ -34,6 +34,10 @@ const modeler = new BpmnModeler({
 
 To set an element template from the properties panel, plug-in an [element template chooser](https://github.com/bpmn-io/element-template-chooser).
 
+### Template migration (experimental)
+
+See the [preliminary contract](./docs/TEMPLATE_MIGRATION.md).
+
 ## Additional resources
 
 * [About element templates](https://github.com/bpmn-io/element-templates)
