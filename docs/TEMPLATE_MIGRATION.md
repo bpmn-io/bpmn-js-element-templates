@@ -39,7 +39,12 @@ The target template declares its sources:
 * `copyEmpty: true` — on a copy, write an empty value when the source is missing or empty instead of skipping the instruction. Use this to suppress a destination default; optional inputs and outputs are removed by the normal property setter. Use `set: ""` to clear a target default when there is no corresponding source field.
 * `includeHidden: true` — opt in to writing a hidden destination. Inactive destinations are still skipped. Write controlling values before their dependent destinations.
 
-The [AI Agent example](examples/ai-agent-migrates-from.json) is a ready-to-attach `migratesFrom` array authored for [AI Agent v1@13](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-job-worker-13.json) → [AI Agent Sub-process v2@1](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-subprocess-v2-1.json). It explicitly maps changed bindings and defaults; ordinary template application handles unchanged bindings and target-owned wiring. Source matching remains ID-based, so load only the intended source version when trying this example.
+## Connector examples
+
+Attach the example array as the target template's `migratesFrom` and load both templates.
+
+* [REST connector](examples/rest-connector-migrates-from.json): migrates the [legacy Bearer Token template](https://github.com/camunda/connectors/blob/afd91b17524e818219b15581ce3247ca706ad625/connectors/http/rest/element-templates/versioned/http-json-connector-03.json) to [REST v2@18](https://github.com/camunda/connectors/blob/afd91b17524e818219b15581ce3247ca706ad625/connectors/http/rest/element-templates/http-json-connector.json). It selects Bearer token authentication before copying the token, converts the stored HTTP method to uppercase, and leaves an unset result expression unset instead of introducing the target's example expression.
+* [AI Agent](examples/ai-agent-migrates-from.json): migrates [AI Agent v1@13](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-job-worker-13.json) to [AI Agent Sub-process v2@1](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-subprocess-v2-1.json). It explicitly maps changed bindings and defaults; ordinary template application handles unchanged bindings and target-owned wiring. Source matching remains ID-based, so load only the intended source version when trying this example.
 
 ## Rules
 
