@@ -6,6 +6,52 @@
 | Breaking | Never | Possibly; only where `B` declares it |
 | Values | Kept by binding | Kept by binding, moved as hinted |
 
+## Migration primitives
+
+The target template combines four primitives to describe predictable migrations:
+
+| Primitive | Purpose | Example |
+|---|---|---|
+| Select | Use `when` to choose instructions based on source values. | Select an Anthropic backend from the old endpoint. |
+| Transform | Copy or set values with `from`, `to`, `set`, `values`, and `replace`. | Convert a REST method from `post` to `POST`. |
+| Persist | Use `copyEmpty` and `includeHidden` during migration; use `persist` on supported target properties for later updates. | Keep an unset value or a hidden Vertex endpoint. |
+| Require / atomic | Check `require` assertions and `required` writes before applying the migration. | Stop when a required destination is unavailable. |
+
+**Scope boundary:** Prefer these primitives and template validation to connector-specific engine features. Propose additional engine behavior only for a general need that cannot be expressed with them. Every known migration action should be automated or visible as a lint finding. If a known case cannot be migrated safely or surfaced as an actionable finding, treat it as a rollout blocker rather than silently changing or dropping data.
+
+## Template-based validation for edge cases
+
+Where conversion cannot safely determine a value, preserve it where possible and use template validation to give the user a precise action. Property constraints check individual fields but skip FEEL expressions; target-level `validation` rules can check multiple bindings and match stored FEEL text. Documentation can explain an action, but should not be its only notification.
+
+For example, a target declaring `backend` and `endpoint` properties could flag a known-invalid public Anthropic endpoint:
+
+```json
+{
+  "validation": [
+    {
+      "when": [
+        { "binding": { "type": "zeebe:input", "name": "backend" }, "equals": "anthropic-api" },
+        { "binding": { "type": "zeebe:input", "name": "endpoint" }, "matches": "^https://api\\.anthropic\\.com/v1/?$" }
+      ],
+      "property": "endpoint",
+      "message": "Remove the trailing /v1; this backend appends /v1/messages."
+    }
+  ]
+}
+```
+
+`when` is required: one condition or an AND-array, reading current stored values. `message` is reported when all conditions match. Optional `property` is the target property's ID for Problems-panel navigation; omitted, hidden, or inactive properties produce an element-level finding instead. Conditions must reference declared bindings. Malformed declarations are rejected when templates are loaded. Rules cover authored cases only; they do not prove migration completeness.
+
+Examples of actionable findings include:
+
+* **Known-invalid URL:** remove `/v1` from the public Anthropic endpoint; preserve arbitrary proxy paths.
+* **Unresolved configuration:** review a dynamic endpoint or OpenAI-compatible authentication while retaining the original values.
+* **External action:** plan the v2 worker and deployment; marking the plan reviewed does not prove deployment.
+
+For unresolved cases, a migration can set a template property to `pending` and a validation rule can report it until the user marks it reviewed. The [AI Agent checks](examples/ai-agent-migration-checks.json) retain these reviews across save, reopen, and later updates. Retain the properties and choices on later target versions. Routine mappings need no review; a review records a decision, not runtime verification.
+
+The host can apply the upgrade once with `elementTemplates.applyTemplate` and report matching rules as errors with `CloudElementTemplatesLinterPlugin`, using the same target definitions. Re-run lint after migration, edits, import, and undo/redo, and make repair or review fields reachable. Lint checks stored text; it cannot resolve expressions, secrets, or external deployment state. Error-level findings alone do not block deployment or execution: the host must enforce a gate if blocking is required.
+
 ## Declaration
 
 The target template declares its sources:
@@ -100,33 +146,6 @@ Attach the example array as the target template's `migratesFrom` and load both t
 For AI Agent, also append the `groups` and `properties` from [the migration checks](examples/ai-agent-migration-checks.json) to the target, and attach its `validation` array. The migration requires these declared action-item destinations; it fails before editing if they are missing. These are authored template properties, not engine-owned migration state.
 
 The pinned templates do not declare `persist`. Opt the relevant destination properties into persistence: the public Anthropic and Vertex endpoints, the system prompt, the OpenAI model, and the Anthropic/Bedrock prompt-caching settings. Make the public Anthropic endpoint an editable `String` property with `feel: "optional"` so a reported URL error can be repaired. Keep the existing binding and `persist: true`. The recipe preserves endpoint text; the narrowly guarded replacement above is an illustration, not a blanket `/v1` rewrite.
-
-## One-click upgrade and visible action items
-
-The host can call `applyTemplate` once and run `ElementTemplateLinterPlugin` with the same target definitions. Existing field constraints still report errors. Target-level `validation` adds authored cross-field checks using the same binding conditions as migration `when`:
-
-```json
-{
-  "validation": [
-    {
-      "when": [
-        { "binding": { "type": "zeebe:input", "name": "backend" }, "equals": "custom" },
-        { "binding": { "type": "zeebe:input", "name": "endpoint" }, "matches": "^=" }
-      ],
-      "property": "endpoint",
-      "message": "Configure a supported static endpoint; this backend cannot verify an endpoint expression."
-    }
-  ]
-}
-```
-
-`when` is required: one condition or an AND-array, reading current stored values, including FEEL text. `message` is the action to report when all conditions match. Optional `property` is the destination property's ID for Problems-panel navigation; hidden or inactive destinations produce an element-level finding instead. Conditions must reference declared bindings. Malformed declarations are rejected when templates are loaded. This is authored validation, not a completeness checker or an evaluator for expressions/secrets.
-
-The AI example upgrades to the v2 template/job type while preserving inputs. Known-invalid Anthropic suffixes become errors linked to editable endpoint fields; fixing the value clears the error on the next lint run. Nonstandard proxy paths are preserved rather than rewritten. Endpoint expressions/secrets, uncertain proxy paths, and OpenAI-compatible headers/dynamic keys create explicit review action items because their effective behavior cannot be established offline. The action items are stored as ordinary `zeebe:property` Dropdowns, survive save/reopen/update, and are undone/redone with the migration. Retain those fields and their choices on later target versions.
-
-Only unresolved cases require review; routine copied settings do not. Marking an item Reviewed records a human decision, not runtime verification. Deployment always receives a visible action item: plan the v2 worker/optional overrides and a new process deployment while keeping existing v1 instances supported. Reviewing that plan is not evidence that deployment happened.
-
-**Host acceptance contract:** every known migration action is either automated or appears as a lint finding; documentation only elaborates a finding. Re-lint after upgrade, field edits, undo/redo, and import, and make the relevant repair/review field reachable. Static unknowns must remain visible before execution, not only fail at runtime. Error-level findings do not themselves block deployment: the host must enforce a gate if blocking is required. This example is not a guarantee for other source versions, variants, custom runtime implementations, or runtime equivalence.
 
 ## Rules
 
