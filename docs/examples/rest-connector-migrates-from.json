@@ -1,33 +1,77 @@
 [
+  { "toVersion": 2 },
   {
-    "id": "io.camunda.connectors.HttpJson.v1.bearerToken",
-    "description": "Migrate the legacy Bearer Token REST connector to the current REST connector.",
-    "changes": "- Selects Bearer token authentication and keeps the configured token.\n- Converts legacy HTTP method values to uppercase.\n- Keeps the configured result expression, or leaves it unset if no expression was configured.",
+    "toVersion": 3,
+    "changes": "- Converts HTTP method values to uppercase.\n- Keeps the configured OAuth client authentication method, including an unset value.",
     "properties": [
-      {
-        "to": { "type": "zeebe:input", "name": "authentication.type" },
-        "set": "bearer"
-      },
-      {
-        "from": { "type": "zeebe:input", "name": "authentication.token" },
-        "to": { "type": "zeebe:input", "name": "authentication.token" }
-      },
       {
         "from": { "type": "zeebe:input", "name": "method" },
         "to": { "type": "zeebe:input", "name": "method" },
-        "values": {
-          "get": "GET",
-          "post": "POST",
-          "patch": "PATCH",
-          "put": "PUT",
-          "delete": "DELETE"
-        }
+        "values": { "get": "GET", "post": "POST", "patch": "PATCH", "put": "PUT", "delete": "DELETE" }
       },
+      {
+        "when": {
+          "binding": { "type": "zeebe:input", "name": "authentication.type" },
+          "equals": "oauth-client-credentials-flow"
+        },
+        "from": { "type": "zeebe:input", "name": "authentication.clientAuthentication" },
+        "to": { "type": "zeebe:input", "name": "authentication.clientAuthentication" },
+        "copyEmpty": true
+      }
+    ]
+  },
+  { "toVersion": 4 },
+  { "toVersion": 5 },
+  {
+    "toVersion": 6,
+    "changes": "- Initializes the new retry backoff to the v6 default (no delay).",
+    "properties": [
+      {
+        "when": { "binding": { "type": "zeebe:taskHeader", "key": "retryBackoff" }, "isEmpty": true },
+        "to": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
+        "set": "PT0S"
+      }
+    ]
+  },
+  { "toVersion": 7 },
+  { "toVersion": 8 },
+  { "toVersion": 10 },
+  { "toVersion": 11 },
+  { "toVersion": 12 },
+  {
+    "toVersion": 13,
+    "changes": "- Keeps the result expression unset when the source has none, instead of adding the new example expression.",
+    "properties": [
       {
         "from": { "type": "zeebe:taskHeader", "key": "resultExpression" },
         "to": { "type": "zeebe:taskHeader", "key": "resultExpression" },
         "copyEmpty": true
       }
     ]
-  }
+  },
+  { "toVersion": 14 },
+  {
+    "toVersion": 15,
+    "changes": "- Keeps the existing retry backoff instead of replacing it with the v15 default.",
+    "properties": [
+      {
+        "from": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
+        "to": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
+        "copyEmpty": true
+      }
+    ]
+  },
+  { "toVersion": 16 },
+  {
+    "toVersion": 17,
+    "changes": "- Maps the enabled Store response option to Document reference.",
+    "properties": [
+      {
+        "when": { "binding": { "type": "zeebe:input", "name": "storeResponse" }, "matches": "^=?true$" },
+        "to": { "type": "zeebe:input", "name": "documentReturnFormat.choice" },
+        "set": "DOCUMENT"
+      }
+    ]
+  },
+  { "toVersion": 18 }
 ]

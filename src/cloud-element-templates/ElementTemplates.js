@@ -26,7 +26,7 @@ import { default as DefaultElementTemplates } from '../element-templates/Element
 
 import { isTimerTemplateApplicable } from './util/timerUtil';
 
-import { getMigration } from './util/migrationUtil';
+import { getMigrationSteps } from './util/migrationUtil';
 
 /**
  * @typedef {import('bpmn-js/lib/model/Types').Element} Element
@@ -131,11 +131,15 @@ export default class ElementTemplates extends DefaultElementTemplates {
       return [];
     }
 
-    const templateId = sourceTemplate.id;
-
     return this.getLatest(element)
       .filter(template => this.isCompatible(template))
-      .filter(template => getMigration(template, templateId));
+      .filter(template => template.id !== sourceTemplate.id && getMigrationSteps(template, sourceTemplate).length);
+  }
+
+  getMigrationDescription(element, newTemplate) {
+    const source = this.get(element);
+
+    return source && getMigrationSteps(newTemplate, source)[0]?.description;
   }
 
   /**
@@ -148,11 +152,13 @@ export default class ElementTemplates extends DefaultElementTemplates {
    * @return {string|undefined}
    */
   getChanges(element, newTemplate) {
-    const oldTemplate = this.get(element);
+    const source = this.get(element);
 
-    const migration = oldTemplate && getMigration(newTemplate, oldTemplate.id);
+    if (!source) {
+      return;
+    }
 
-    return migration && migration.changes;
+    return getMigrationSteps(newTemplate, source).map(step => step.changes).filter(Boolean).join('\n\n') || undefined;
   }
 
   _filterApplicableTemplates(templates, element) {

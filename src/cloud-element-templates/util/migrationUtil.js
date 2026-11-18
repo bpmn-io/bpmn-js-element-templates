@@ -3,19 +3,51 @@ import { has, isString } from 'min-dash';
 import { getPropertyValue } from './propertyUtil';
 
 /**
- * Get the migration a template declares for a source template.
+ * Get the ordered migration steps from the source to the target.
  *
  * @param {Object} template
- * @param {string} sourceTemplateId
+ * @param {Object} source
  *
- * @return {Object|undefined}
+ * @return {Array<Object>}
  */
-export function getMigration(template, sourceTemplateId) {
-  if (!sourceTemplateId || template.id === sourceTemplateId) {
-    return;
+export function getMigrationSteps(template, source) {
+  const entries = template.migratesFrom || [];
+  const sourceVersion = source.version ?? 0;
+  const targetVersion = template.version ?? 0;
+  const sameId = template.id === source.id;
+  const steps = entries
+    .filter(step => Number.isInteger(step.toVersion) && step.toVersion > 0 && step.toVersion <= targetVersion)
+    .sort((a, b) => a.toVersion - b.toVersion);
+
+  const chain = [];
+  let version = sourceVersion;
+
+  if (!sameId) {
+    const change = steps.find(step => step.sourceTemplateId === source.id && isEligible(step, version));
+
+    if (!change) {
+      const legacy = entries.find(step => !has(step, 'toVersion') && step.id === source.id);
+
+      return legacy ? [ legacy ] : [];
+    }
+
+    chain.push(change);
+    version = change.toVersion;
   }
 
-  return (template.migratesFrom || []).find(migration => migration.id === sourceTemplateId);
+  for (const step of steps) {
+    if ((step.sourceTemplateId ?? template.id) === template.id &&
+        step.toVersion > version && isEligible(step, version)) {
+      chain.push(step);
+      version = step.toVersion;
+    }
+  }
+
+  return chain;
+}
+
+function isEligible(step, version) {
+  return step.minSourceVersion === undefined || version >= step.minSourceVersion;
 }
 
 /**
@@ -37,21 +69,40 @@ function mapValue(value, values) {
 /**
  * Resolve instructions against the source before applying the new template.
  */
-export function resolveMigrationProperties(element, properties) {
+export function resolveMigrationSteps(element, steps) {
+  const staged = new Map();
+  const read = binding => {
+    const key = bindingKey(binding);
+
+    return staged.has(key) ? staged.get(key) : getPropertyValue(element, { type: 'String', binding });
+  };
+
+  return steps.flatMap(step => {
+    const writes = resolveMigrationProperties(read, step.properties || []);
+
+    for (const { to, value } of writes) {
+      staged.set(bindingKey(to), value);
+    }
+
+    return writes;
+  });
+}
+
+function resolveMigrationProperties(read, properties) {
   return properties.flatMap(({ when, properties, from, to, set, values, copyEmpty, includeHidden }) => {
-    if (when && ![].concat(when).every(condition => matchesCondition(element, condition))) {
+    if (when && ![].concat(when).every(condition => matchesCondition(read, condition))) {
       return [];
     }
 
     if (properties) {
-      return resolveMigrationProperties(element, properties);
+      return resolveMigrationProperties(read, properties);
     }
 
     if (!from) {
       return [ { to, value: set, includeHidden } ];
     }
 
-    const value = readValue(element, from);
+    const value = read(from);
 
     if (isEmpty(value)) {
       return copyEmpty ? [ { to, value: '', includeHidden } ] : [];
@@ -76,9 +127,9 @@ export function findMigrationProperty(properties, binding, includeHidden) {
   });
 }
 
-function matchesCondition(element, condition) {
+function matchesCondition(read, condition) {
   const { binding, equals, matches, not } = condition;
-  const value = readValue(element, binding);
+  const value = read(binding);
 
   if (has(condition, 'isEmpty')) {
     return isEmpty(value) === condition.isEmpty;
@@ -97,8 +148,8 @@ function matchesCondition(element, condition) {
   return false;
 }
 
-function readValue(element, binding) {
-  return getPropertyValue(element, { type: 'String', binding });
+function bindingKey(binding) {
+  return JSON.stringify(Object.keys(binding).sort().map(key => [ key, binding[key] ]));
 }
 
 function isEmpty(value) {

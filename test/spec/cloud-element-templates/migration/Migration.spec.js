@@ -37,6 +37,7 @@ import {
 
 import diagramXML from './diagram.bpmn';
 import templates from './templates.json';
+import restSteps from 'docs/examples/rest-connector-migrates-from.json';
 
 const [ legacyTemplate, targetTemplate ] = templates;
 
@@ -136,6 +137,115 @@ describe('provider/cloud-element-templates - migration', function() {
       expect(getInput(element, 'endpoint')).not.to.exist;
       expect(getHeader(element, 'method')).to.eql('POST');
     }));
+
+  });
+
+
+  describe('versioned steps', function() {
+
+    const input = name => ({ type: 'zeebe:input', name });
+    const endpoint = input('endpoint');
+    const intermediate = input('intermediate');
+    const steps = [
+      {
+        toVersion: 4,
+        minSourceVersion: 2,
+        changes: 'Use the staged endpoint.',
+        properties: [ {
+          when: { binding: intermediate, equals: 'https://custom.io' },
+          from: intermediate,
+          to: endpoint
+        } ]
+      },
+      {
+        toVersion: 2,
+        changes: 'Stage the legacy URL.',
+        properties: [ { from: input('url'), to: intermediate } ]
+      },
+      { toVersion: 5, properties: [ { to: endpoint, set: 'not yet' } ] }
+    ];
+
+    it('should run same-ID steps in order without loading intermediate templates and undo once',
+      inject(function(elementRegistry, elementTemplates, commandStack) {
+        const target = { ...targetTemplate, id: legacyTemplate.id, version: 4, migratesFrom: steps };
+        elementTemplates.set([ legacyTemplate, target ]);
+
+        const element = elementRegistry.get('Legacy');
+
+        expect(elementTemplates.getMigrations(element)).to.eql([]);
+        expect(elementTemplates.getChanges(element, target)).to.equal('Stage the legacy URL.\n\nUse the staged endpoint.');
+
+        elementTemplates.applyTemplate(element, target);
+
+        expect(getInput(element, 'endpoint')).to.equal('https://custom.io');
+        expect(getInput(element, 'intermediate')).to.be.undefined;
+        commandStack.undo();
+        expect(elementTemplates.get(element)).to.equal(legacyTemplate);
+        expect(getInput(element, 'url')).to.equal('https://custom.io');
+      }));
+
+    it('should enforce the change minimum and continue above the landing version',
+      inject(function(elementRegistry, elementTemplates) {
+        const change = {
+          sourceTemplateId: legacyTemplate.id,
+          minSourceVersion: 1,
+          toVersion: 2,
+          description: 'Migrate to the new REST template.',
+          properties: [ { from: input('url'), to: intermediate } ]
+        };
+        const target = { ...targetTemplate, version: 4, migratesFrom: [ ...steps, change ] };
+        elementTemplates.set([ legacyTemplate, target ]);
+
+        const element = elementRegistry.get('Legacy');
+
+        expect(elementTemplates.getMigrations(element)).to.eql([ target ]);
+        expect(elementTemplates.getMigrationDescription(element, target)).to.equal(change.description);
+        expect(elementTemplates.getChanges(element, { ...target, migratesFrom: [
+          ...steps, { ...change, minSourceVersion: 2 }
+        ] })).to.be.undefined;
+
+        elementTemplates.applyTemplate(element, target);
+
+        expect(getInput(element, 'endpoint')).to.equal('https://custom.io');
+      }));
+
+    it('should apply the REST example for v1 and skip historical rules for v17',
+      inject(function(elementRegistry, elementTemplates) {
+        const method = input('method');
+        const choices = values => values.map(value => ({ name: value, value }));
+        const header = key => ({ type: 'zeebe:taskHeader', key });
+        const retryBackoff = { label: 'Retry backoff', type: 'String', binding: header('retryBackoff'), value: 'PT30S' };
+        const resultExpression = { label: 'Result', type: 'Text', binding: header('resultExpression'), value: '=response' };
+        const source = {
+          ...legacyTemplate,
+          properties: [ { label: 'Method', type: 'Dropdown', binding: method, choices: choices([ 'post' ]) } ]
+        };
+        const target = {
+          ...source,
+          version: 18,
+          migratesFrom: restSteps,
+          properties: [
+            { label: 'Method', type: 'Dropdown', binding: method, choices: choices([ 'GET', 'POST' ]) },
+            retryBackoff,
+            resultExpression
+          ]
+        };
+        const recent = { ...target, version: 17 };
+        elementTemplates.set([ source, recent, target ]);
+
+        const oldElement = elementTemplates.applyTemplate(elementRegistry.get('Legacy'), source);
+        elementTemplates.applyTemplate(oldElement, target);
+
+        expect(getInput(oldElement, 'method')).to.equal('POST');
+        expect(getHeader(oldElement, 'retryBackoff')).to.equal('PT0S');
+        expect(getHeader(oldElement, 'resultExpression')).to.be.undefined;
+
+        const recentElement = elementTemplates.applyTemplate(elementRegistry.get('Unknown'), recent);
+        elementTemplates.applyTemplate(recentElement, target);
+
+        expect(getHeader(recentElement, 'retryBackoff')).to.equal('PT30S');
+        expect(getHeader(recentElement, 'resultExpression')).to.equal('=response');
+      }));
 
   });
 

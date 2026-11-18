@@ -1,6 +1,8 @@
 [
   {
-    "id": "io.camunda.connectors.agenticai.aiagent.jobworker.v1",
+    "sourceTemplateId": "io.camunda.connectors.agenticai.aiagent.jobworker.v1",
+    "minSourceVersion": 13,
+    "toVersion": 1,
     "description": "Migrate AI Agent to the v2 Sub-process template.",
     "changes": "- Review the selected provider backend and authentication after migration.\n- Explicit public Anthropic endpoints are preserved in BPMN but are not editable in the v2 properties panel. Verify Foundry and custom base URLs: v2 builds the messages path, so a trailing `/v1` or `/anthropic/v1` may need to be removed. Expression-based endpoints are routed to Custom; verify the backend if the expression resolves to a public Anthropic or Foundry URL.\n- A custom Vertex AI endpoint is preserved in BPMN but is not editable in the v2 properties panel.",
     "properties": [

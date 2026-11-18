@@ -461,7 +461,7 @@ function getTemplateState(elementTemplates, element, getTemplateId) {
   const [ targetTemplate ] = elementTemplates.getMigrations ? elementTemplates.getMigrations(element) : [];
 
   if (targetTemplate) {
-    const { description } = (targetTemplate.migratesFrom || []).find(migration => migration.id === template.id);
+    const description = elementTemplates.getMigrationDescription?.(element, targetTemplate);
 
     return { type: 'MIGRATABLE_TEMPLATE', template, targetTemplate, description };
   }

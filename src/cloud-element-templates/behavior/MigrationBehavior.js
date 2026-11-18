@@ -4,8 +4,8 @@ import { applyConditions } from '../Condition';
 
 import {
   findMigrationProperty,
-  getMigration,
-  resolveMigrationProperties
+  getMigrationSteps,
+  resolveMigrationSteps
 } from '../util/migrationUtil';
 
 import { setPropertyValue } from '../util/propertyUtil';
@@ -64,7 +64,9 @@ function getMigratedValues(context) {
     newTemplate
   } = context;
 
-  const migration = oldTemplate && newTemplate && getMigration(newTemplate, oldTemplate.id);
+  if (!oldTemplate || !newTemplate) {
+    return [];
+  }
 
-  return migration ? resolveMigrationProperties(element, migration.properties || []) : [];
+  return resolveMigrationSteps(element, getMigrationSteps(newTemplate, oldTemplate));
 }
