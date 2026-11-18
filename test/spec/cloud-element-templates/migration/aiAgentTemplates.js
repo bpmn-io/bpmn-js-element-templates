@@ -55,7 +55,10 @@ export const target = {
       const condition = all(is(provider, 'anthropic'), is(anthropicBackend, backend === 'anthropic' ? 'anthropic-api' : backend));
 
       if (backend === 'anthropic') {
-        return [ input(`${ prefix }.apiKey`, { condition }) ];
+        return [
+          input(`${ prefix }.apiKey`, { condition }),
+          input(`${ prefix }.endpoint`, { type: 'Hidden', optional: true, condition })
+        ];
       }
 
       const auth = `${ prefix }.authentication.type`;

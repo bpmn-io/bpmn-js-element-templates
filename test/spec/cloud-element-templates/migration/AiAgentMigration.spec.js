@@ -40,9 +40,11 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
 
   const anthropicCases = [
     [ 'the public API without an endpoint', undefined, 'anthropic-api', 'anthropic' ],
+    [ 'the public API with an explicit endpoint', 'https://api.anthropic.com', 'anthropic-api', 'anthropic' ],
     [ 'Microsoft Foundry', 'https://resource.services.ai.azure.com/anthropic', 'foundry', 'foundry' ],
     [ 'a sovereign Foundry host', 'https://resource.services.ai.AZURE.US', 'foundry', 'foundry' ],
     [ 'a custom endpoint with Azure only in the path', 'https://proxy.example/host.azure.com', 'custom', 'custom' ],
+    [ 'a custom endpoint that resembles the public host', 'https://api.anthropic.com.proxy.example', 'custom', 'custom' ],
     [ 'a FEEL endpoint without evaluating it', '=endpoint', 'custom', 'custom' ]
   ];
 
@@ -59,6 +61,10 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
       expect(read(`${ prefix }.${ backend === 'anthropic-api' ? '' : 'authentication.' }apiKey`))
         .to.equal('{{secrets.ANTHROPIC}}');
       expect(read(`${ prefix }.endpoint`)).to.equal(endpoint);
+      if (backend === 'anthropic-api' && endpoint) {
+        expect(read('provider.anthropic.backend.custom.endpoint')).to.be.undefined;
+      }
+
       expect(read('provider.anthropic.model.parameters.promptCaching.enabled')).to.be.undefined;
     });
   }

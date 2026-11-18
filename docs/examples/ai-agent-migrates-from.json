@@ -2,7 +2,7 @@
   {
     "id": "io.camunda.connectors.agenticai.aiagent.jobworker.v1",
     "description": "Migrate AI Agent to the v2 Sub-process template.",
-    "changes": "- Review the selected provider backend and authentication after migration.\n- Anthropic endpoints are copied as entered. Verify Foundry and custom base URLs: v2 builds the messages path, so a trailing `/v1` or `/anthropic/v1` may need to be removed. Expression-based endpoints are routed to Custom; verify the backend if the expression resolves to a Foundry URL.\n- A custom Vertex AI endpoint is preserved in BPMN but is not editable in the v2 properties panel.",
+    "changes": "- Review the selected provider backend and authentication after migration.\n- Explicit public Anthropic endpoints are preserved in BPMN but are not editable in the v2 properties panel. Verify Foundry and custom base URLs: v2 builds the messages path, so a trailing `/v1` or `/anthropic/v1` may need to be removed. Expression-based endpoints are routed to Custom; verify the backend if the expression resolves to a public Anthropic or Foundry URL.\n- A custom Vertex AI endpoint is preserved in BPMN but is not editable in the v2 properties panel.",
     "properties": [
       {
         "from": { "type": "zeebe:input", "name": "provider.type" },
@@ -34,6 +34,24 @@
           {
             "when": {
               "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
+              "matches": "^[Hh][Tt][Tt][Pp][Ss]?://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?::[0-9]+)?(?:[/?#]|$)"
+            },
+            "properties": [
+              { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "anthropic-api" },
+              {
+                "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
+                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.anthropic.apiKey" }
+              },
+              {
+                "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
+                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.anthropic.endpoint" },
+                "includeHidden": true
+              }
+            ]
+          },
+          {
+            "when": {
+              "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
               "matches": "^[Hh][Tt][Tt][Pp][Ss]?://(?:[A-Za-z0-9-]+\\.)+[Aa][Zz][Uu][Rr][Ee]\\.(?:[Cc][Oo][Mm]|[Uu][Ss]|[Cc][Nn])(?::[0-9]+)?(?:[/?#]|$)"
             },
             "properties": [
@@ -52,6 +70,11 @@
           {
             "when": [
               { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "isEmpty": false },
+              {
+                "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
+                "matches": "^[Hh][Tt][Tt][Pp][Ss]?://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?::[0-9]+)?(?:[/?#]|$)",
+                "not": true
+              },
               {
                 "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
                 "matches": "^[Hh][Tt][Tt][Pp][Ss]?://(?:[A-Za-z0-9-]+\\.)+[Aa][Zz][Uu][Rr][Ee]\\.(?:[Cc][Oo][Mm]|[Uu][Ss]|[Cc][Nn])(?::[0-9]+)?(?:[/?#]|$)",
