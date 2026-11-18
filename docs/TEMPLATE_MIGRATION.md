@@ -36,6 +36,7 @@ The target template declares its sources:
 * `toVersion` — required for a versioned step. The version on which the step lands.
 * `sourceTemplateId` — defaults to the declaring template's ID. Use a different ID for a change step.
 * `minSourceVersion` — optional inclusive lower bound checked against the source template version or the landing version of the last applied step (unversioned sources count as `0`).
+* `maxSourceVersion` — optional inclusive upper bound, checked the same way. Set both bounds to the same value to accept exactly one source version.
 * `description` — shown where the migration is offered; falls back to the source's `deprecated.message`.
 * `changes` — human readable changes (text, markdown, HTML); rendered by the application.
 * `properties` — ordered instructions. Either copy `from` to `to` (optionally remapping non-empty strings with `values`), write a literal with `to` and `set`, or group instructions in a nested `properties` array.
@@ -94,7 +95,7 @@ An authored migration group can then select a known static URL, require a suppor
 Attach the example array as the target template's `migratesFrom` and load both templates.
 
 * [REST connector](examples/rest-connector-migrates-from.json): attach to [REST v2@18](https://github.com/camunda/connectors/blob/afd91b17524e818219b15581ce3247ca706ad625/connectors/http/rest/element-templates/http-json-connector.json) and update from any [published REST v2 version 1–17](https://github.com/camunda/connectors/tree/afd91b17524e818219b15581ce3247ca706ad625/connectors/http/rest/element-templates/versioned). List only versions that need migration instructions; omitted versions are no-ops. For example, updating v1 to v18 converts lowercase HTTP methods at v3, leaves an unset result expression unset at v13, and keeps the v6 retry backoff at v15.
-* [AI Agent](examples/ai-agent-migrates-from.json): migrates [AI Agent v1@13](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-job-worker-13.json) to [AI Agent Sub-process v2@1](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-subprocess-v2-1.json). The recipe excludes source versions below 13. It has no upper bound; only v13 is covered by this example.
+* [AI Agent](examples/ai-agent-migrates-from.json): migrates [AI Agent v1@13](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-job-worker-13.json) to [AI Agent Sub-process v2@1](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-subprocess-v2-1.json). The recipe accepts only source version 13 (`minSourceVersion` and `maxSourceVersion` are both `13`); other v1 versions are not offered this migration.
 
 For AI Agent, also append the `groups` and `properties` from [the migration checks](examples/ai-agent-migration-checks.json) to the target, and attach its `validation` array. The migration requires these declared action-item destinations; it fails before editing if they are missing. These are authored template properties, not engine-owned migration state.
 
@@ -125,7 +126,7 @@ The AI example upgrades to the v2 template/job type while preserving inputs. Kno
 
 Only unresolved cases require review; routine copied settings do not. Marking an item Reviewed records a human decision, not runtime verification. Deployment always receives a visible action item: plan the v2 worker/optional overrides and a new process deployment while keeping existing v1 instances supported. Reviewing that plan is not evidence that deployment happened.
 
-**Host acceptance contract:** every known migration action is either automated or appears as a lint finding; documentation only elaborates a finding. Re-lint after upgrade, field edits, undo/redo, and import, and make the relevant repair/review field reachable. Static unknowns must remain visible before execution, not only fail at runtime. Error-level findings do not themselves block deployment: the host must enforce a gate if blocking is required. The source-version limitation above is unchanged; this example is not a guarantee for other source versions, variants, custom runtime implementations, or runtime equivalence.
+**Host acceptance contract:** every known migration action is either automated or appears as a lint finding; documentation only elaborates a finding. Re-lint after upgrade, field edits, undo/redo, and import, and make the relevant repair/review field reachable. Static unknowns must remain visible before execution, not only fail at runtime. Error-level findings do not themselves block deployment: the host must enforce a gate if blocking is required. This example is not a guarantee for other source versions, variants, custom runtime implementations, or runtime equivalence.
 
 ## Rules
 

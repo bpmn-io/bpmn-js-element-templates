@@ -2,6 +2,7 @@
   {
     "sourceTemplateId": "io.camunda.connectors.agenticai.aiagent.jobworker.v1",
     "minSourceVersion": 13,
+    "maxSourceVersion": 13,
     "toVersion": 1,
     "description": "Migrate AI Agent to the v2 Sub-process template.",
     "changes": "Upgrade to the v2 runtime in one step. Fix the reported Problems-panel action items before deploying; routine settings are preserved. See the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/).",

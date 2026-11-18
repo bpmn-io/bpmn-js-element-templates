@@ -429,6 +429,19 @@ describe('provider/cloud-element-templates - migration', function() {
         expect(getInput(element, 'endpoint')).to.equal('https://custom.io');
       }));
 
+    it('should enforce the change maximum',
+      inject(function(elementRegistry, elementTemplates) {
+        const change = { sourceTemplateId: legacyTemplate.id, maxSourceVersion: 1, toVersion: 2, properties: [] };
+        const target = { ...targetTemplate, version: 2, migratesFrom: [ change ] };
+        const element = elementRegistry.get('Legacy');
+
+        elementTemplates.set([ legacyTemplate, target ]);
+        expect(elementTemplates.getMigrations(element)).to.eql([ target ]);
+
+        elementTemplates.set([ legacyTemplate, { ...target, migratesFrom: [ { ...change, maxSourceVersion: 0 } ] } ]);
+        expect(elementTemplates.getMigrations(element)).to.eql([]);
+      }));
+
     it('should apply the REST example for v1 and skip historical rules for v17',
       inject(function(elementRegistry, elementTemplates) {
         const method = input('method');

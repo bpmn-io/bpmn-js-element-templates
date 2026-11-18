@@ -49,7 +49,8 @@ export function getMigrationSteps(template, source) {
 }
 
 function isEligible(step, version) {
-  return step.minSourceVersion === undefined || version >= step.minSourceVersion;
+  return (step.minSourceVersion === undefined || version >= step.minSourceVersion) &&
+    (step.maxSourceVersion === undefined || version <= step.maxSourceVersion);
 }
 
 /**

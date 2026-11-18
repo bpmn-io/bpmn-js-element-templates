@@ -40,6 +40,20 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
   });
 
 
+  for (const version of [ 12, 13, 14 ]) {
+    it(`should ${ version === 13 ? '' : 'not ' }offer the migration from v1@${ version }`, function() {
+      const versioned = { ...source, version };
+      const migrated = { ...target, migratesFrom: declaration };
+
+      elementTemplates.set([ versioned, migrated ]);
+      elementTemplates.applyTemplate(element, versioned);
+      element = modeler.get('elementRegistry').get(element.id);
+
+      expect(elementTemplates.getMigrations(element)).to.eql(version === 13 ? [ migrated ] : []);
+    });
+  }
+
+
   const anthropicCases = [
     [ 'the public API without an endpoint', undefined, 'anthropic-api', 'anthropic' ],
     [ 'the public API with an explicit endpoint', 'https://api.anthropic.com', 'anthropic-api', 'anthropic' ],
