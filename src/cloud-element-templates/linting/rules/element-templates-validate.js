@@ -17,6 +17,7 @@ import { getPropertyValue, validateProperty } from '../../util/propertyUtil';
 import { getPropertyEntryId } from '../../util/customPropertyEntryIds';
 
 import { applyConditions } from '../../Condition';
+import { getValidationErrors } from '../../util/migrationUtil';
 
 export default function({ templates = [] }) {
 
@@ -77,6 +78,19 @@ export default function({ templates = [] }) {
           name: node.name
         }
       );
+    });
+
+    getValidationErrors(node, template).forEach(({ message, property: propertyId }) => {
+      const property = propertyId && template.properties.find(property => property.id === propertyId && property.type !== 'Hidden');
+
+      reporter.report(node.id, message, {
+        ...(property && {
+          propertiesPanel: {
+            entryIds: [ getPropertyEntryId(template, property) ]
+          }
+        }),
+        name: node.name
+      });
     });
   }
 

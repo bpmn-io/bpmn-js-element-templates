@@ -4,13 +4,18 @@
     "minSourceVersion": 13,
     "toVersion": 1,
     "description": "Migrate AI Agent to the v2 Sub-process template.",
-    "changes": "Check authentication and endpoint paths before deployment; dynamic Anthropic endpoints may require backend selection. Public Anthropic and custom Vertex AI endpoints are preserved but hidden in Modeler. See the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/).",
+    "changes": "Upgrade to the v2 runtime in one step. Fix the reported Problems-panel action items before deploying; routine settings are preserved. See the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/).",
     "require": {
       "binding": { "type": "zeebe:input", "name": "provider.type" },
       "matches": "^(anthropic|bedrock|openai|azureOpenAi|openaiCompatible|google-vertex-ai)$"
     },
     "message": "Select a supported AI provider before migrating.",
     "properties": [
+      {
+        "to": { "type": "zeebe:property", "name": "migration.deploymentReview" },
+        "set": "pending",
+        "required": true
+      },
       {
         "from": { "type": "zeebe:input", "name": "provider.type" },
         "to": { "type": "zeebe:input", "name": "provider.type" },
@@ -30,6 +35,16 @@
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "anthropic" },
         "properties": [
+          {
+            "when": [
+              { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "isEmpty": false },
+              { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "matches": "^[Hh][Tt][Tt][Pp][Ss]?://[^/?#]+(?:/v1)?/?$", "not": true },
+              { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "matches": "^[Hh][Tt][Tt][Pp][Ss]?://(?:[A-Za-z0-9-]+\\.)+[Aa][Zz][Uu][Rr][Ee]\\.(?:[Cc][Oo][Mm]|[Uu][Ss]|[Cc][Nn])(?::[0-9]+)?/anthropic(?:/v1)?/?$", "not": true }
+            ],
+            "to": { "type": "zeebe:property", "name": "migration.endpointReview" },
+            "set": "pending",
+            "required": true
+          },
           {
             "when": { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "isEmpty": true },
             "properties": [
@@ -149,6 +164,18 @@
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "openaiCompatible" },
         "properties": [
+          {
+            "when": { "binding": { "type": "zeebe:input", "name": "provider.openaiCompatible.headers" }, "isEmpty": false },
+            "to": { "type": "zeebe:property", "name": "migration.authReview" },
+            "set": "pending",
+            "required": true
+          },
+          {
+            "when": { "binding": { "type": "zeebe:input", "name": "provider.openaiCompatible.authentication.apiKey" }, "matches": "^(?:=|\\{\\{)" },
+            "to": { "type": "zeebe:property", "name": "migration.authReview" },
+            "set": "pending",
+            "required": true
+          },
           { "to": { "type": "zeebe:input", "name": "provider.openai.api.type" }, "set": "completions" },
           { "to": { "type": "zeebe:input", "name": "provider.openai.backend.type" }, "set": "custom" },
           {

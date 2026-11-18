@@ -96,7 +96,36 @@ Attach the example array as the target template's `migratesFrom` and load both t
 * [REST connector](examples/rest-connector-migrates-from.json): attach to [REST v2@18](https://github.com/camunda/connectors/blob/afd91b17524e818219b15581ce3247ca706ad625/connectors/http/rest/element-templates/http-json-connector.json) and update from any [published REST v2 version 1–17](https://github.com/camunda/connectors/tree/afd91b17524e818219b15581ce3247ca706ad625/connectors/http/rest/element-templates/versioned). List only versions that need migration instructions; omitted versions are no-ops. For example, updating v1 to v18 converts lowercase HTTP methods at v3, leaves an unset result expression unset at v13, and keeps the v6 retry backoff at v15.
 * [AI Agent](examples/ai-agent-migrates-from.json): migrates [AI Agent v1@13](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-job-worker-13.json) to [AI Agent Sub-process v2@1](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-subprocess-v2-1.json). The recipe excludes source versions below 13. It has no upper bound; only v13 is covered by this example.
 
-The pinned templates do not declare `persist`. To retain migrated AI Agent settings across later edits, also opt the relevant destination properties into persistence: the public Anthropic and Vertex hidden endpoints, the system prompt, the OpenAI model, and the Anthropic/Bedrock prompt-caching settings. The recipe preserves endpoint text as entered; the narrowly guarded replacement above is an illustration, not a blanket `/v1` rewrite. Backend-specific field validation or documentation is still needed for cases not automatically converted.
+For AI Agent, also append the `groups` and `properties` from [the migration checks](examples/ai-agent-migration-checks.json) to the target, and attach its `validation` array. The migration requires these declared action-item destinations; it fails before editing if they are missing. These are authored template properties, not engine-owned migration state.
+
+The pinned templates do not declare `persist`. Opt the relevant destination properties into persistence: the public Anthropic and Vertex endpoints, the system prompt, the OpenAI model, and the Anthropic/Bedrock prompt-caching settings. Make the public Anthropic endpoint an editable `String` property with `feel: "optional"` so a reported URL error can be repaired. Keep the existing binding and `persist: true`. The recipe preserves endpoint text; the narrowly guarded replacement above is an illustration, not a blanket `/v1` rewrite.
+
+## One-click upgrade and visible action items
+
+The host can call `applyTemplate` once and run `ElementTemplateLinterPlugin` with the same target definitions. Existing field constraints still report errors. Target-level `validation` adds authored cross-field checks using the same binding conditions as migration `when`:
+
+```json
+{
+  "validation": [
+    {
+      "when": [
+        { "binding": { "type": "zeebe:input", "name": "backend" }, "equals": "custom" },
+        { "binding": { "type": "zeebe:input", "name": "endpoint" }, "matches": "^=" }
+      ],
+      "property": "endpoint",
+      "message": "Configure a supported static endpoint; this backend cannot verify an endpoint expression."
+    }
+  ]
+}
+```
+
+`when` is required: one condition or an AND-array, reading current stored values, including FEEL text. `message` is the action to report when all conditions match. Optional `property` is the destination property's ID for Problems-panel navigation; hidden or inactive destinations produce an element-level finding instead. Conditions must reference declared bindings. Malformed declarations are rejected when templates are loaded. This is authored validation, not a completeness checker or an evaluator for expressions/secrets.
+
+The AI example upgrades to the v2 template/job type while preserving inputs. Known-invalid Anthropic suffixes become errors linked to editable endpoint fields; fixing the value clears the error on the next lint run. Nonstandard proxy paths are preserved rather than rewritten. Endpoint expressions/secrets, uncertain proxy paths, and OpenAI-compatible headers/dynamic keys create explicit review action items because their effective behavior cannot be established offline. The action items are stored as ordinary `zeebe:property` Dropdowns, survive save/reopen/update, and are undone/redone with the migration. Retain those fields and their choices on later target versions.
+
+Only unresolved cases require review; routine copied settings do not. Marking an item Reviewed records a human decision, not runtime verification. Deployment always receives a visible action item: plan the v2 worker/optional overrides and a new process deployment while keeping existing v1 instances supported. Reviewing that plan is not evidence that deployment happened.
+
+**Host acceptance contract:** every known migration action is either automated or appears as a lint finding; documentation only elaborates a finding. Re-lint after upgrade, field edits, undo/redo, and import, and make the relevant repair/review field reachable. Static unknowns must remain visible before execution, not only fail at runtime. Error-level findings do not themselves block deployment: the host must enforce a gate if blocking is required. The source-version limitation above is unchanged; this example is not a guarantee for other source versions, variants, custom runtime implementations, or runtime equivalence.
 
 ## Rules
 

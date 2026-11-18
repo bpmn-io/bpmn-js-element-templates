@@ -1,4 +1,6 @@
 // Minimal test templates projected from the pinned definitions linked in TEMPLATE_MIGRATION.md.
+import checks from 'docs/examples/ai-agent-migration-checks.json';
+
 const $schema = 'https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json';
 const appliesTo = [ 'bpmn:SubProcess' ];
 const elementType = { value: 'bpmn:AdHocSubProcess' };
@@ -20,6 +22,7 @@ export const source = {
   id: 'io.camunda.connectors.agenticai.aiagent.jobworker.v1',
   version: 13,
   properties: [
+    { type: 'Hidden', value: 'io.camunda.agenticai:aiagent-job-worker:1', binding: { type: 'zeebe:taskDefinition', property: 'type' } },
     dropdown(provider, [ 'anthropic', 'bedrock', 'openai', 'azureOpenAi', 'openaiCompatible', 'google-vertex-ai' ]),
     input(systemPrompt, { value: '="v1 prompt"' }),
     input('provider.anthropic.endpoint', { optional: true }),
@@ -32,6 +35,7 @@ export const source = {
     input('provider.azureOpenAi.model.deploymentName'),
     input('provider.openaiCompatible.authentication.apiKey', { optional: true }),
     input('provider.openaiCompatible.endpoint'),
+    input('provider.openaiCompatible.headers', { optional: true }),
     input('provider.openaiCompatible.model.parameters.customParameters'),
     dropdown('provider.googleVertexAi.authentication.type', [ 'serviceAccountCredentials', 'applicationDefaultCredentials' ]),
     input('provider.googleVertexAi.endpoint', { optional: true }),
@@ -46,7 +50,11 @@ export const target = {
   name: 'AI Agent Sub-process (v2 test fixture)',
   id: 'io.camunda.connectors.agenticai.ai-agent-subprocess.v2',
   version: 1,
+  groups: checks.groups,
+  validation: checks.validation,
   properties: [
+    { type: 'Hidden', value: 'io.camunda.agenticai:aiagent:subprocess:2', binding: { type: 'zeebe:taskDefinition', property: 'type' } },
+    ...checks.properties,
     dropdown(provider, [ 'anthropic', 'bedrock', 'openai', 'google-gemini' ]),
     input(systemPrompt, { value: '="v2 prompt"' }),
     dropdown(anthropicBackend, [ 'anthropic-api', 'foundry', 'custom' ], is(provider, 'anthropic')),
@@ -57,7 +65,7 @@ export const target = {
       if (backend === 'anthropic') {
         return [
           input(`${ prefix }.apiKey`, { condition }),
-          input(`${ prefix }.endpoint`, { type: 'Hidden', optional: true, condition })
+          input(`${ prefix }.endpoint`, { optional: true, persist: true, condition })
         ];
       }
 
@@ -85,7 +93,7 @@ export const target = {
     input('provider.openai.backend.foundry.authentication.clientId', { condition: all(is(provider, 'openai'), is(openaiBackend, 'foundry'), is(foundryAuth, 'clientCredentials')) }),
     input('provider.openai.backend.foundry.authentication.apiKey', { condition: all(is(provider, 'openai'), is(openaiBackend, 'foundry'), is(foundryAuth, 'apiKey')) }),
     input('provider.openai.backend.custom.authentication.apiKey', { condition: all(is(provider, 'openai'), is(openaiBackend, 'custom'), is(openaiAuth, 'apiKey')) }),
-    ...[ 'endpoint', 'bodyProperties' ].map(name => input(`provider.openai.backend.custom.${ name }`, {
+    ...[ 'endpoint', 'headers', 'bodyProperties' ].map(name => input(`provider.openai.backend.custom.${ name }`, {
       condition: all(is(provider, 'openai'), is(openaiBackend, 'custom'))
     })),
     dropdown(vertexBackend, [ 'google-gemini-api', 'google-vertex-ai' ], is(provider, 'google-gemini')),

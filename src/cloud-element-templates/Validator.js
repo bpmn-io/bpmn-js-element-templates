@@ -12,6 +12,7 @@ import {
   getZeebeSchemaVersion as getTemplateSchemaVersion
 } from '@bpmn-io/element-templates-validator';
 import { isNil } from 'min-dash';
+import { findMigrationProperty } from './util/migrationUtil';
 
 const SUPPORTED_SCHEMA_VERSION = getTemplateSchemaVersion();
 const SUPPORTED_SCHEMA_PACKAGE = getTemplateSchemaPackage();
@@ -111,6 +112,12 @@ export class Validator extends BaseValidator {
       return new Error('invalid template');
     }
 
+    const validationError = this._validateRules(template);
+
+    if (validationError) {
+      return validationError;
+    }
+
     // (7) engines validation
     const enginesError = this._validateEngines(template);
 
@@ -172,6 +179,45 @@ export class Validator extends BaseValidator {
 
       if (!isNonEmptyString(binding.name)) {
         return this._logError('configuration property binding requires a name', template);
+      }
+    }
+  }
+
+  _validateRules(template) {
+    if (template.validation === undefined) {
+      return;
+    }
+
+    if (!Array.isArray(template.validation)) {
+      return this._logError('validation must be an array', template);
+    }
+
+    const properties = Array.isArray(template.properties) ? template.properties : [];
+
+    for (const rule of template.validation) {
+      const conditions = rule && [].concat(rule.when || []);
+
+      if (!rule || !isNonEmptyString(rule.message) || !conditions.length ||
+          rule.property !== undefined && !properties.some(property => property.id === rule.property)) {
+        return this._logError('validation rules require conditions, a message, and a declared property if specified', template);
+      }
+
+      for (const condition of conditions) {
+        if (!condition || !condition.binding || !findMigrationProperty(properties, condition.binding, true) ||
+            [ 'equals', 'isEmpty', 'matches' ].filter(key => Object.prototype.hasOwnProperty.call(condition, key)).length !== 1 ||
+            'isEmpty' in condition && typeof condition.isEmpty !== 'boolean' ||
+            'matches' in condition && typeof condition.matches !== 'string' ||
+            'not' in condition && (typeof condition.not !== 'boolean' || !('matches' in condition))) {
+          return this._logError('invalid validation condition', template);
+        }
+
+        if ('matches' in condition) {
+          try {
+            new RegExp(condition.matches);
+          } catch (error) {
+            return this._logError(`invalid validation pattern: ${ error.message }`, template);
+          }
+        }
       }
     }
   }

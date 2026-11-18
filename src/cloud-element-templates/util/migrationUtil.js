@@ -196,6 +196,14 @@ export function findMigrationProperty(properties, binding, includeHidden) {
   });
 }
 
+export function getValidationErrors(element, template) {
+  const read = binding => getPropertyValue(element, { type: 'String', binding });
+
+  return (template.validation || []).filter(({ when }) =>
+    [].concat(when).every(condition => matchesCondition(read, condition))
+  );
+}
+
 function matchesCondition(read, condition) {
   const { binding, equals, matches, not } = condition;
   const value = read(binding);
