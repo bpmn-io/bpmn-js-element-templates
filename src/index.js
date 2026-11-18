@@ -2,6 +2,7 @@ export { default as CloudElementTemplatesPropertiesProviderModule } from './clou
 export { default as ElementTemplatesPropertiesProviderModule } from './element-templates';
 
 // utils
+export { TemplateMenuActions } from './TemplateMenuActions';
 export { Validator as CloudElementTemplatesValidator } from './cloud-element-templates/Validator';
 export { ElementTemplateLinterPlugin as CloudElementTemplatesLinterPlugin } from './cloud-element-templates/linting';
 
