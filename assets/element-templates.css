@@ -48,6 +48,10 @@
   position: initial;
 }
 
+.bio-properties-panel-templates-group .bio-properties-panel-dropdown-button__menu {
+  width: max-content;
+}
+
 .bio-properties-panel-templates-group .bio-properties-panel-group-header-button:not(.bio-properties-panel-arrow) {
   padding-right: 6px;
   padding-left: 9px;
@@ -124,13 +128,11 @@
 }
 
 .bio-properties-panel-template-not-found-text,
-.bio-properties-panel-template-update-available-text,
 .bio-properties-panel-template-incompatible-text {
   color: var(--select-template-information-text-color);
 }
 
 .bio-properties-panel-template-not-found-text,
-.bio-properties-panel-template-update-available-text,
 .bio-properties-panel-deprecated-template-text,
 .bio-properties-panel-template-incompatible-text {
   width: 216px;

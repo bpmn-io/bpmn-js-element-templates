@@ -34,6 +34,18 @@ const modeler = new BpmnModeler({
 
 To set an element template from the properties panel, plug-in an [element template chooser](https://github.com/bpmn-io/element-template-chooser).
 
+Hosts can reuse action labels and descriptions without copying their wording:
+
+```javascript
+import { TemplateMenuActions } from 'bpmn-js-element-templates/core';
+
+button.textContent = translate(TemplateMenuActions.unlink.label);
+button.title = translate(TemplateMenuActions.unlink.description);
+```
+
+Also exported from the main entry point. The `update` label accepts a `{version}`
+translation replacement. The `migrate` entry describes the action but does not enable migration.
+
 ## Additional resources
 
 * [About element templates](https://github.com/bpmn-io/element-templates)
