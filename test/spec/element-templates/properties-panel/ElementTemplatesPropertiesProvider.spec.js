@@ -745,7 +745,7 @@ function removeTemplate(container) {
  * @param {Element} container
  */
 function unlinkTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent === 'Unlink');
+  return clickDropdownItemWhere(container, element => element.textContent === 'Unlink and keep properties');
 }
 
 /**
@@ -754,7 +754,7 @@ function unlinkTemplate(container) {
  * @param {Element} container
  */
 function changeTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent === 'Change');
+  return clickDropdownItemWhere(container, element => element.textContent === 'Change to a different template');
 }
 
 /**
@@ -763,7 +763,7 @@ function changeTemplate(container) {
  * @param {Element} container
  */
 function updateTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent === 'Update');
+  return clickDropdownItemWhere(container, element => element.textContent.startsWith('Update to version '));
 }
 
 /**
