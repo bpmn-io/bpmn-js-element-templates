@@ -1,6 +1,8 @@
 import { has, isString } from 'min-dash';
 
 import { getPropertyValue } from './propertyUtil';
+import { isFeel } from './FeelUtil';
+import { isConditionMet } from '../Condition';
 
 /**
  * Get the ordered migration steps from the source to the target.
@@ -78,7 +80,7 @@ export function resolveMigrationSteps(element, steps) {
   };
 
   return steps.flatMap(step => {
-    const writes = resolveMigrationProperties(read, step.properties || []);
+    const writes = resolveMigrationProperties(read, [ { ...step, properties: step.properties || [] } ]);
 
     for (const { to, value } of writes) {
       staged.set(bindingKey(to), value);
@@ -89,9 +91,13 @@ export function resolveMigrationSteps(element, steps) {
 }
 
 function resolveMigrationProperties(read, properties) {
-  return properties.flatMap(({ when, properties, from, to, set, values, copyEmpty, includeHidden }) => {
+  return properties.flatMap(({ when, require: requirements, message, properties, from, to, set, values, replace, copyEmpty, includeHidden, required }) => {
     if (when && ![].concat(when).every(condition => matchesCondition(read, condition))) {
       return [];
+    }
+
+    if (requirements && ![].concat(requirements).every(condition => matchesCondition(read, condition))) {
+      throw new Error(message || 'Migration requirement not met');
     }
 
     if (properties) {
@@ -99,17 +105,80 @@ function resolveMigrationProperties(read, properties) {
     }
 
     if (!from) {
-      return [ { to, value: set, includeHidden } ];
+      return [ { to, value: set, includeHidden, required } ];
     }
 
-    const value = read(from);
+    let value = read(from);
 
     if (isEmpty(value)) {
-      return copyEmpty ? [ { to, value: '', includeHidden } ] : [];
+      if (required && !copyEmpty) {
+        throw new Error(`Required migration source is empty: ${ bindingKey(from) }`);
+      }
+
+      return copyEmpty ? [ { to, value: '', includeHidden, required } ] : [];
     }
 
-    return [ { to, value: mapValue(value, values), includeHidden } ];
+    value = mapValue(value, values);
+
+    if (replace) {
+      if (!isString(value) || isFeel(value) || !isString(replace.pattern) || !isString(replace.replacement)) {
+        throw new Error('Migration replacement requires a static string, pattern, and string replacement');
+      }
+
+      value = value.replace(new RegExp(replace.pattern), replace.replacement);
+    }
+
+    return [ { to, value, includeHidden, required } ];
   });
+}
+
+/**
+ * Preflight authored requirements before entering the command stack.
+ * Required conditional writes must follow explicit, stable controller writes.
+ */
+export function prepareMigration(element, source, target) {
+  if (!source || !target) {
+    return [];
+  }
+
+  const writes = resolveMigrationSteps(element, getMigrationSteps(target, source));
+  const applied = new Map();
+  let known;
+  const read = (_, property) => {
+    const key = bindingKey(property.binding);
+
+    if (!applied.has(key) || !isConditionMet(element, target.properties, property, read)) {
+      known = false;
+    }
+
+    const value = applied.get(key);
+
+    return property.type === 'Boolean' && [ 'true', 'false' ].includes(value) ? value === 'true' : value;
+  };
+
+  for (const { to, value, includeHidden, required } of writes) {
+    known = true;
+    const property = findMigrationProperty(target.properties, to, includeHidden);
+    const active = property && isConditionMet(element, target.properties, property, read);
+
+    if (required && (!active || !known)) {
+      throw new Error(`Required migration destination is missing, hidden, inactive, or lacks explicit controller writes: ${ bindingKey(to) }`);
+    }
+
+    if (active && known && (property.type !== 'Hidden' ||
+        property.persist && [ 'zeebe:input', 'zeebe:output' ].includes(property.binding.type))) {
+      applied.set(bindingKey(to), value);
+    }
+
+    for (const property of target.properties.filter(property => applied.has(bindingKey(property.binding)))) {
+      known = true;
+      if (!isConditionMet(element, target.properties, property, read) || !known) {
+        applied.delete(bindingKey(property.binding));
+      }
+    }
+  }
+
+  return writes;
 }
 
 /**

@@ -70,6 +70,49 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
   }
 
 
+  it('should reject an unsupported provider before changing the element', async function() {
+    findInputParameter(findExtension(element, 'zeebe:IoMapping'), { name: 'provider.type' }).set('source', 'unsupported');
+    const before = (await modeler.saveXML()).xml;
+
+    expect(migrate).to.throw('Select a supported AI provider before migrating.');
+
+    expect((await modeler.saveXML()).xml).to.equal(before);
+    expect(elementTemplates.get(element).id).to.equal(source.id);
+  });
+
+
+  for (const [ provider, oldEndpoint, newEndpoint, value ] of [
+    [ 'anthropic', 'provider.anthropic.endpoint', 'provider.anthropic.backend.anthropic.endpoint', 'https://api.anthropic.com' ],
+    [ 'google-vertex-ai', 'provider.googleVertexAi.endpoint', 'provider.googleGemini.backend.googleVertexAi.endpoint', '=vertexEndpoint' ]
+  ]) {
+    it(`should retain ${ provider } hidden settings after reopen and update when persistence is authored`, async function() {
+      const persistent = new Set([ newEndpoint, 'data.systemPrompt.prompt', 'provider.anthropic.model.parameters.promptCaching.enabled' ]);
+      const destination = {
+        ...target,
+        migratesFrom: declaration,
+        properties: target.properties.map(property => persistent.has(property.binding.name) ? { ...property, persist: true } : property)
+      };
+      elementTemplates.set([ source, destination ]);
+      write('provider.type', provider);
+      write(oldEndpoint, value);
+      write('data.systemPrompt.prompt', '', false);
+      migrate();
+
+      await modeler.importXML((await modeler.saveXML()).xml);
+      element = modeler.get('elementRegistry').get(element.id);
+      const updated = { ...destination, version: 2 };
+      elementTemplates.set([ source, destination, updated ]);
+      elementTemplates.applyTemplate(element, updated);
+
+      expect(read(newEndpoint)).to.equal(value);
+      expect(read('data.systemPrompt.prompt')).to.equal('');
+      if (provider === 'anthropic') {
+        expect(read('provider.anthropic.model.parameters.promptCaching.enabled')).to.be.undefined;
+      }
+    });
+  }
+
+
   for (const [ label, key ] of [ [ 'with a key', '=apiKey' ], [ 'without a key', undefined ], [ 'with an empty key', '' ] ]) {
     it(`should select custom OpenAI authentication ${ label }`, function() {
       write('provider.type', 'openaiCompatible');

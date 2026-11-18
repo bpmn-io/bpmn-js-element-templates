@@ -26,7 +26,7 @@ import { default as DefaultElementTemplates } from '../element-templates/Element
 
 import { isTimerTemplateApplicable } from './util/timerUtil';
 
-import { getMigrationSteps } from './util/migrationUtil';
+import { getMigrationSteps, prepareMigration } from './util/migrationUtil';
 
 /**
  * @typedef {import('bpmn-js/lib/model/Types').Element} Element
@@ -262,6 +262,7 @@ export default class ElementTemplates extends DefaultElementTemplates {
       element,
       newTemplate,
       oldTemplate,
+      migratedValues: prepareMigration(element, oldTemplate, newTemplate),
       options
     };
 

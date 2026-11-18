@@ -141,6 +141,226 @@ describe('provider/cloud-element-templates - migration', function() {
   });
 
 
+  describe('composable primitives', function() {
+    const input = name => ({ type: 'zeebe:input', name });
+    const endpoint = input('endpoint');
+    const method = { type: 'zeebe:taskHeader', key: 'method' };
+    const body = input('body');
+    const copy = { from: input('url'), to: endpoint, required: true };
+
+    function targetWith(properties, fields = targetTemplate.properties) {
+      return {
+        ...targetTemplate,
+        properties: fields,
+        migratesFrom: [ { id: legacyTemplate.id, properties } ]
+      };
+    }
+
+    it('should compose selection, requirements, capture replacement, and conditional required writes',
+      inject(function(elementRegistry, elementTemplates, commandStack) {
+        const target = targetWith([
+          {
+            when: { binding: input('url'), equals: 'not selected' },
+            require: { binding: input('missing'), isEmpty: false },
+            properties: [ copy ]
+          },
+          {
+            when: { binding: input('url'), matches: '^https://' },
+            require: { binding: input('url'), matches: '^https://[^/]+$' },
+            properties: [ { ...copy, replace: { pattern: '^https://(.*)$', replacement: 'https://api.$1' } } ]
+          },
+          { to: method, set: 'post', required: true },
+          { from: input('payload'), to: body, required: true }
+        ]);
+        elementTemplates.set([ legacyTemplate, target ]);
+        const element = elementRegistry.get('Legacy');
+
+        elementTemplates.applyTemplate(element, target);
+
+        expect(getInput(element, 'endpoint')).to.equal('https://api.custom.io');
+        expect(getInput(element, 'body')).to.equal('=payload');
+        commandStack.undo();
+        expect(elementTemplates.get(element)).to.equal(legacyTemplate);
+        commandStack.redo();
+        expect(getInput(element, 'endpoint')).to.equal('https://api.custom.io');
+        expect(getInput(element, 'body')).to.equal('=payload');
+      }));
+
+    const failures = [
+      [ 'an unmet requirement', {
+        require: { binding: input('url'), equals: 'https://other.example' },
+        message: 'Configure the endpoint before migrating.',
+        properties: [ copy ]
+      }, /Configure the endpoint before migrating/ ],
+      [ 'an invalid replacement pattern', {
+        ...copy, replace: { pattern: '[', replacement: '' }
+      }, /regular expression/i ],
+      [ 'a replacement without a pattern', {
+        ...copy, replace: { replacement: '' }
+      }, /pattern/ ],
+      [ 'an expression replacement', {
+        from: input('payload'), to: endpoint, replace: { pattern: 'payload', replacement: 'changed' }
+      }, /static string/ ],
+      [ 'a missing required source', {
+        from: input('missing'), to: endpoint, required: true
+      }, /source is empty/ ],
+      [ 'a missing required destination', {
+        ...copy, to: input('missing')
+      }, /destination/ ],
+      [ 'a hidden required destination without opt-in', {
+        to: { type: 'zeebe:taskDefinition', property: 'type' }, set: 'changed', required: true
+      }, /destination/ ],
+      [ 'an inactive required destination', {
+        properties: [ { to: method, set: 'get' }, { to: body, set: 'body', required: true } ]
+      }, /destination/ ],
+      [ 'a required destination without explicit controller writes', {
+        to: body, set: 'body', required: true
+      }, /controller writes/ ]
+    ];
+
+    for (const [ label, instruction, error ] of failures) {
+      it(`should reject ${ label } without changing XML or damaging undo`,
+        inject(async function(bpmnjs, elementRegistry, elementTemplates, commandStack) {
+          const target = targetWith([ { to: endpoint, set: 'must not be applied' }, instruction ]);
+          elementTemplates.set([ legacyTemplate, target ]);
+          const element = elementRegistry.get('Legacy');
+          const before = (await bpmnjs.saveXML()).xml;
+          const canUndo = commandStack.canUndo();
+
+          expect(() => elementTemplates.applyTemplate(element, target)).to.throw(error);
+
+          expect((await bpmnjs.saveXML()).xml).to.equal(before);
+          expect(commandStack.canUndo()).to.equal(canUndo);
+          elementTemplates.applyTemplate(element, targetTemplate);
+          commandStack.undo();
+          expect(elementTemplates.get(element)).to.equal(legacyTemplate);
+          expect(getInput(element, 'url')).to.equal('https://custom.io');
+          expect(getInput(element, 'endpoint')).to.be.undefined;
+          expect(getHeader(element, 'method')).to.equal('POST');
+          expect(commandStack.canUndo()).to.equal(canUndo);
+        }));
+    }
+
+    it('should not reuse a controller value after its field was deactivated and reactivated',
+      inject(async function(bpmnjs, elementRegistry, elementTemplates) {
+        const fields = targetTemplate.properties.map(property => {
+          if (property.binding.name === 'body') {
+            return { ...property, id: 'body' };
+          }
+
+          return property.binding.name === 'endpoint'
+            ? { ...property, condition: { property: 'body', equals: 'first' } } : property;
+        });
+        const target = targetWith([
+          { to: method, set: 'post' },
+          { to: body, set: 'first' },
+          { to: method, set: 'get' },
+          { to: method, set: 'post' },
+          copy
+        ], fields);
+        elementTemplates.set([ legacyTemplate, target ]);
+        const before = (await bpmnjs.saveXML()).xml;
+
+        expect(() => elementTemplates.applyTemplate(elementRegistry.get('Legacy'), target)).to.throw(/controller writes/);
+
+        expect((await bpmnjs.saveXML()).xml).to.equal(before);
+      }));
+
+    for (const optional of [ true, false ]) {
+      it(`should retain hidden and absent mappings through conditional refresh, reopen, and update (optional=${ optional })`,
+        inject(async function(bpmnjs, elementRegistry, elementTemplates) {
+          const fields = targetTemplate.properties.map(property => {
+            if (property.binding.name === 'endpoint') {
+              return { ...property, type: 'Hidden', persist: true };
+            }
+
+            if (property.binding.name === 'timeout') {
+              return { ...property, optional, persist: true };
+            }
+
+            return property;
+          });
+          fields.push({
+            type: 'String', label: 'Result', value: 'newResult', optional: true, persist: true,
+            binding: { type: 'zeebe:output', source: '=result' }
+          });
+          const target = targetWith([
+            { ...copy, includeHidden: true },
+            { to: input('timeout'), set: '' },
+            { to: { type: 'zeebe:output', source: '=result' }, set: '' }
+          ], fields);
+          elementTemplates.set([ legacyTemplate, target ]);
+          let element = elementRegistry.get('Legacy');
+
+          elementTemplates.applyTemplate(element, target);
+          const timeout = { ...fields.find(property => property.binding.name === 'timeout'), optional: true };
+          elementTemplates.setPropertyValue(element, timeout, undefined);
+          elementTemplates.setPropertyValue(element, fields.find(property => property.binding.key === 'method'), 'post');
+          elementTemplates.applyTemplate(element, target);
+
+          expect(getInput(element, 'endpoint')).to.equal('https://custom.io');
+          expect(getInput(element, 'timeout')).to.be.undefined;
+          expect(findExtension(element, 'zeebe:IoMapping').get('outputParameters')).to.be.empty;
+
+          await bpmnjs.importXML((await bpmnjs.saveXML()).xml);
+          element = elementRegistry.get('Legacy');
+          const updated = {
+            ...target, version: 2,
+            properties: fields.map(property => property.type === 'Dropdown' ? property : { ...property, value: 'changed default' })
+          };
+          elementTemplates.set([ legacyTemplate, target, updated ]);
+          elementTemplates.applyTemplate(element, updated);
+
+          expect(getInput(element, 'endpoint')).to.equal('https://custom.io');
+          expect(getInput(element, 'timeout')).to.be.undefined;
+          expect(findExtension(element, 'zeebe:IoMapping').get('outputParameters')).to.be.empty;
+          expect(findExtension(element, 'zeebe:TaskDefinition').get('type')).to.equal('changed default');
+        }));
+    }
+
+    it('should retain a stored value equal to the old default when the next default changes',
+      inject(function(elementRegistry, elementTemplates) {
+        const fields = targetTemplate.properties.map(property =>
+          property.binding.name === 'timeout' ? { ...property, persist: true } : property
+        );
+        const target = targetWith([ { to: input('timeout'), set: 'PT30S' } ], fields);
+        elementTemplates.set([ legacyTemplate, target ]);
+        const element = elementRegistry.get('Legacy');
+        elementTemplates.applyTemplate(element, target);
+        const updated = {
+          ...target, version: 2,
+          properties: fields.map(property =>
+            property.binding.name === 'timeout' ? { ...property, value: 'PT2M' } : property
+          )
+        };
+        elementTemplates.set([ legacyTemplate, target, updated ]);
+
+        elementTemplates.applyTemplate(element, updated);
+
+        expect(getInput(element, 'timeout')).to.equal('PT30S');
+      }));
+
+    it('should let an explicit preset override persistence',
+      inject(function(elementRegistry, elementTemplates) {
+        const fields = targetTemplate.properties.map(property =>
+          property.binding.name === 'timeout' ? { ...property, id: 'timeout', persist: true } : property
+        );
+        const target = {
+          ...targetWith([], fields),
+          presets: [ { id: 'reset', name: 'Reset', properties: { timeout: 'PT5M' } } ]
+        };
+        elementTemplates.set([ legacyTemplate, target ]);
+        const element = elementRegistry.get('Legacy');
+        elementTemplates.applyTemplate(element, target);
+        expect(getInput(element, 'timeout')).to.equal('PT1M');
+
+        elementTemplates.applyTemplate(element, target, { presetId: 'reset' });
+
+        expect(getInput(element, 'timeout')).to.equal('PT5M');
+      }));
+  });
+
+
   describe('versioned steps', function() {
 
     const input = name => ({ type: 'zeebe:input', name });

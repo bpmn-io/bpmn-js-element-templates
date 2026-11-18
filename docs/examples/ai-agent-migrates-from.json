@@ -4,7 +4,12 @@
     "minSourceVersion": 13,
     "toVersion": 1,
     "description": "Migrate AI Agent to the v2 Sub-process template.",
-    "changes": "- Review the selected provider backend and authentication after migration.\n- Explicit public Anthropic endpoints are preserved in BPMN but are not editable in the v2 properties panel. Verify Foundry and custom base URLs: v2 builds the messages path, so a trailing `/v1` or `/anthropic/v1` may need to be removed. Expression-based endpoints are routed to Custom; verify the backend if the expression resolves to a public Anthropic or Foundry URL.\n- A custom Vertex AI endpoint is preserved in BPMN but is not editable in the v2 properties panel.",
+    "changes": "Check authentication and endpoint paths before deployment; dynamic Anthropic endpoints may require backend selection. Public Anthropic and custom Vertex AI endpoints are preserved but hidden in Modeler. See the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/).",
+    "require": {
+      "binding": { "type": "zeebe:input", "name": "provider.type" },
+      "matches": "^(anthropic|bedrock|openai|azureOpenAi|openaiCompatible|google-vertex-ai)$"
+    },
+    "message": "Select a supported AI provider before migrating.",
     "properties": [
       {
         "from": { "type": "zeebe:input", "name": "provider.type" },
@@ -13,12 +18,14 @@
           "azureOpenAi": "openai",
           "openaiCompatible": "openai",
           "google-vertex-ai": "google-gemini"
-        }
+        },
+        "required": true
       },
       {
         "from": { "type": "zeebe:input", "name": "data.systemPrompt.prompt" },
         "to": { "type": "zeebe:input", "name": "data.systemPrompt.prompt" },
-        "copyEmpty": true
+        "copyEmpty": true,
+        "required": true
       },
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "anthropic" },
@@ -47,7 +54,8 @@
               {
                 "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
                 "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.anthropic.endpoint" },
-                "includeHidden": true
+                "includeHidden": true,
+                "required": true
               }
             ]
           },

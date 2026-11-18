@@ -23,7 +23,7 @@ export function applyConditions(element, elementTemplate) {
   };
 }
 
-export function isConditionMet(element, properties, property) {
+export function isConditionMet(element, properties, property, read = getPropertyValue) {
 
   if (!isPropertyAllowed(element, property)) {
     return false;
@@ -41,15 +41,15 @@ export function isConditionMet(element, properties, property) {
     const conditions = condition.allMatch;
 
     return conditions.every(
-      condition => isSimpleConditionMet(element, properties, condition)
+      condition => isSimpleConditionMet(element, properties, condition, read)
     );
   }
 
   // single condition
-  return isSimpleConditionMet(element, properties, condition);
+  return isSimpleConditionMet(element, properties, condition, read);
 }
 
-function isSimpleConditionMet(element, properties, condition) {
+function isSimpleConditionMet(element, properties, condition, read) {
   const { property: propertyId, equals, oneOf, isActive, isEmpty } = condition;
 
   if (typeof isActive !== 'undefined') {
@@ -59,7 +59,7 @@ function isSimpleConditionMet(element, properties, condition) {
       return !isActive;
     }
 
-    const isRelatedActive = isConditionMet(element, properties, relatedProperty);
+    const isRelatedActive = isConditionMet(element, properties, relatedProperty, read);
 
     return isActive ? isRelatedActive : !isRelatedActive;
   }
@@ -71,17 +71,17 @@ function isSimpleConditionMet(element, properties, condition) {
   }
 
   if (hasProperty(condition, 'isEmpty')) {
-    const value = getPropertyValue(element, property);
+    const value = read(element, property);
     const isPropertyEmpty = value === undefined || value === null || value === '';
     return isEmpty ? isPropertyEmpty : !isPropertyEmpty;
   }
 
   if (hasProperty(condition, 'equals')) {
-    return compare(element, property, equals);
+    return compare(element, property, equals, read);
   }
 
   if (oneOf) {
-    return oneOf.some(equals => compare(element, property, equals));
+    return oneOf.some(equals => compare(element, property, equals, read));
   }
 
   return false;
@@ -103,11 +103,11 @@ function isPropertyAllowed(element, property) {
   return true;
 }
 
-function compare(element, property, equals) {
+function compare(element, property, equals, read) {
 
   const value = shouldCastToFeel(property) ?
-    fromFeelExpression(getPropertyValue(element, property), property.type) :
-    getPropertyValue(element, property);
+    fromFeelExpression(read(element, property), property.type) :
+    read(element, property);
 
   if (typeof value === 'undefined' || value === null) {
     return false;

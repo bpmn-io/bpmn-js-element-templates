@@ -21,7 +21,7 @@ export default class MigrationBehavior extends CommandInterceptor {
     super(eventBus);
 
     this.preExecute('propertiesPanel.zeebe.changeTemplate', (context) => {
-      context.migratedValues = getMigratedValues(context);
+      context.migratedValues ??= getMigratedValues(context);
     }, true);
 
     this.postExecute('propertiesPanel.zeebe.changeTemplate', (context) => {
