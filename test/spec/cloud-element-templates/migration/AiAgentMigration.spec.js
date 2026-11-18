@@ -86,14 +86,23 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
   }
 
 
-  it('should reject an unsupported provider before changing the element', async function() {
+  it('should migrate an unsupported provider and report a review action through template validation', async function() {
     findInputParameter(findExtension(element, 'zeebe:IoMapping'), { name: 'provider.type' }).set('source', 'unsupported');
-    const before = (await modeler.saveXML()).xml;
 
-    expect(migrate).to.throw('Select a supported AI provider before migrating.');
+    migrate();
 
-    expect((await modeler.saveXML()).xml).to.equal(before);
-    expect(elementTemplates.get(element).id).to.equal(source.id);
+    expect(elementTemplates.get(element).id).to.equal(target.id);
+    expect((await lint()).some(report => report.message === 'Select and configure the intended v2 provider, then mark V1 provider mapping Reviewed.')).to.be.true;
+  });
+
+
+  it('should preserve a missing provider and report it through template validation', async function() {
+    findInputParameter(findExtension(element, 'zeebe:IoMapping'), { name: 'provider.type' }).set('source', '');
+
+    migrate();
+
+    expect(elementTemplates.get(element).id).to.equal(target.id);
+    expect((await lint()).some(report => report.message === 'Select and configure the intended v2 provider, then mark V1 provider mapping Reviewed.')).to.be.true;
   });
 
 
@@ -101,18 +110,14 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
     [ 'anthropic', 'provider.anthropic.endpoint', 'provider.anthropic.backend.anthropic.endpoint', 'https://api.anthropic.com' ],
     [ 'google-vertex-ai', 'provider.googleVertexAi.endpoint', 'provider.googleGemini.backend.googleVertexAi.endpoint', '=vertexEndpoint' ]
   ]) {
-    it(`should retain ${ provider } hidden settings after reopen and update when persistence is authored`, async function() {
-      const persistent = new Set([ newEndpoint, 'data.systemPrompt.prompt', 'provider.anthropic.model.parameters.promptCaching.enabled' ]);
-      const destination = {
-        ...target,
-        migratesFrom: declaration,
-        properties: target.properties.map(property => persistent.has(property.binding.name) ? { ...property, persist: true } : property)
-      };
+    it(`should apply normal update behavior to ${ provider } settings`, async function() {
+      const destination = { ...target, migratesFrom: declaration };
       elementTemplates.set([ source, destination ]);
       write('provider.type', provider);
       write(oldEndpoint, value);
       write('data.systemPrompt.prompt', '', false);
       migrate();
+      expect(read(newEndpoint)).to.equal(value);
 
       await modeler.importXML((await modeler.saveXML()).xml);
       element = modeler.get('elementRegistry').get(element.id);
@@ -120,11 +125,8 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
       elementTemplates.set([ source, destination, updated ]);
       elementTemplates.applyTemplate(element, updated);
 
-      expect(read(newEndpoint)).to.equal(value);
+      expect(read(newEndpoint)).to.equal(provider === 'google-vertex-ai' ? undefined : value);
       expect(read('data.systemPrompt.prompt')).to.equal('');
-      if (provider === 'anthropic') {
-        expect(read('provider.anthropic.model.parameters.promptCaching.enabled')).to.be.undefined;
-      }
     });
   }
 
@@ -149,7 +151,7 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
   }
 
 
-  it('should persist the hidden Vertex endpoint and undo and redo it with the migration', async function() {
+  it('should copy the hidden Vertex endpoint and undo and redo it with the migration', async function() {
     write('provider.type', 'google-vertex-ai');
     write('provider.googleVertexAi.authentication.type', 'applicationDefaultCredentials');
     write('provider.googleVertexAi.endpoint', '=vertexEndpoint');

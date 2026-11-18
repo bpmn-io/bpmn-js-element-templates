@@ -2,7 +2,6 @@ import { has, isString } from 'min-dash';
 
 import { getPropertyValue } from './propertyUtil';
 import { isFeel } from './FeelUtil';
-import { isConditionMet } from '../Condition';
 
 /**
  * Get the ordered migration steps from the source to the target.
@@ -92,13 +91,9 @@ export function resolveMigrationSteps(element, steps) {
 }
 
 function resolveMigrationProperties(read, properties) {
-  return properties.flatMap(({ when, require: requirements, message, properties, from, to, set, values, replace, copyEmpty, includeHidden, required }) => {
+  return properties.flatMap(({ when, properties, from, to, set, values, replace, copyEmpty, includeHidden }) => {
     if (when && ![].concat(when).every(condition => matchesCondition(read, condition))) {
       return [];
-    }
-
-    if (requirements && ![].concat(requirements).every(condition => matchesCondition(read, condition))) {
-      throw new Error(message || 'Migration requirement not met');
     }
 
     if (properties) {
@@ -106,17 +101,13 @@ function resolveMigrationProperties(read, properties) {
     }
 
     if (!from) {
-      return [ { to, value: set, includeHidden, required } ];
+      return [ { to, value: set, includeHidden } ];
     }
 
     let value = read(from);
 
     if (isEmpty(value)) {
-      if (required && !copyEmpty) {
-        throw new Error(`Required migration source is empty: ${ bindingKey(from) }`);
-      }
-
-      return copyEmpty ? [ { to, value: '', includeHidden, required } ] : [];
+      return copyEmpty ? [ { to, value: '', includeHidden } ] : [];
     }
 
     value = mapValue(value, values);
@@ -129,57 +120,16 @@ function resolveMigrationProperties(read, properties) {
       value = value.replace(new RegExp(replace.pattern), replace.replacement);
     }
 
-    return [ { to, value, includeHidden, required } ];
+    return [ { to, value, includeHidden } ];
   });
 }
 
-/**
- * Preflight authored requirements before entering the command stack.
- * Required conditional writes must follow explicit, stable controller writes.
- */
 export function prepareMigration(element, source, target) {
   if (!source || !target) {
     return [];
   }
 
-  const writes = resolveMigrationSteps(element, getMigrationSteps(target, source));
-  const applied = new Map();
-  let known;
-  const read = (_, property) => {
-    const key = bindingKey(property.binding);
-
-    if (!applied.has(key) || !isConditionMet(element, target.properties, property, read)) {
-      known = false;
-    }
-
-    const value = applied.get(key);
-
-    return property.type === 'Boolean' && [ 'true', 'false' ].includes(value) ? value === 'true' : value;
-  };
-
-  for (const { to, value, includeHidden, required } of writes) {
-    known = true;
-    const property = findMigrationProperty(target.properties, to, includeHidden);
-    const active = property && isConditionMet(element, target.properties, property, read);
-
-    if (required && (!active || !known)) {
-      throw new Error(`Required migration destination is missing, hidden, inactive, or lacks explicit controller writes: ${ bindingKey(to) }`);
-    }
-
-    if (active && known && (property.type !== 'Hidden' ||
-        property.persist && [ 'zeebe:input', 'zeebe:output' ].includes(property.binding.type))) {
-      applied.set(bindingKey(to), value);
-    }
-
-    for (const property of target.properties.filter(property => applied.has(bindingKey(property.binding)))) {
-      known = true;
-      if (!isConditionMet(element, target.properties, property, read) || !known) {
-        applied.delete(bindingKey(property.binding));
-      }
-    }
-  }
-
-  return writes;
+  return resolveMigrationSteps(element, getMigrationSteps(target, source));
 }
 
 /**

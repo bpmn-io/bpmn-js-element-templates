@@ -446,9 +446,7 @@ export default class ChangeElementTemplateHandler {
     newProperties.forEach((newProperty) => {
       const oldProperty = findOldProperty(oldTemplate, newProperty),
             inputOrOutput = findBusinessObject(businessObject, newProperty),
-            newPropertyValue = newProperty.persist && oldProperty && !newProperty._presetValue
-              ? inputOrOutput && getPropertyValue(inputOrOutput, newProperty)
-              : getDefaultValue(newProperty),
+            newPropertyValue = getDefaultValue(newProperty),
             newBinding = newProperty.binding,
             newBindingType = newBinding.type;
 
@@ -494,7 +492,7 @@ export default class ChangeElementTemplateHandler {
       }
 
       // (3) add new inputs and outputs (unless optional)
-      else if (shouldUpdate(newPropertyValue, newProperty) && !(newProperty.persist && oldProperty && !newProperty._presetValue)) {
+      else if (shouldUpdate(newPropertyValue, newProperty)) {
 
         if (newBindingType === 'zeebe:input') {
           propertyName = 'inputParameters';
@@ -2494,10 +2492,6 @@ function shouldKeepValue(element, oldProperty, newProperty) {
   // preset values are authoritative and always (re-)applied
   if (newProperty._presetValue) {
     return false;
-  }
-
-  if (oldProperty && newProperty.persist && [ 'zeebe:input', 'zeebe:output' ].includes(newProperty.binding.type)) {
-    return true;
   }
 
   // "Hidden" values are treated as a constant

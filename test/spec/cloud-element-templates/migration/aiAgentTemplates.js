@@ -65,7 +65,7 @@ export const target = {
       if (backend === 'anthropic') {
         return [
           input(`${ prefix }.apiKey`, { condition }),
-          input(`${ prefix }.endpoint`, { optional: true, persist: true, condition })
+          input(`${ prefix }.endpoint`, { optional: true, condition })
         ];
       }
 

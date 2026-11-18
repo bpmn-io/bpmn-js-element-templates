@@ -3,19 +3,49 @@
 |  | Upgrade | Migration |
 |---|---|---|
 | From → to | `A@n` → `A@m` | `A` → `B` |
-| Breaking | Never | Possibly; only where `B` declares it |
+| Breaking | When user-entered values need migration instructions to be kept | When user-entered values need migration instructions to be kept |
 | Values | Kept by binding | Kept by binding, moved as hinted |
+
+## Breaking changes
+
+A template change is **breaking** if keeping the same bindings would lose or misapply a value the user entered, so the target must declare migration instructions. A change that keeps every user-entered value by binding is not breaking, whether or not the template ID changes.
+
+**Mandatory:** preserve user decisions. Every value the user entered on the source must be carried to the target, either unchanged by binding or converted by a migration instruction.
+
+**Not required:** preserve exact behavior. Values the user did not set may take the target's defaults, even if the behavior changes.
+
+A change is breaking, and needs a migration instruction, when the target:
+
+1. Moves or renames the binding of a user-editable value, for example `url` → `endpoint`.
+2. Changes the accepted format of a value, for example `POST` → `post`.
+3. Splits, merges, or replaces a choice, for example a provider becomes a backend plus an endpoint.
+4. Removes a user-editable value or ignores it at its existing binding.
+
+A change is **not breaking** when it only:
+
+* Changes a default, or a hidden or fixed value the user cannot edit.
+* Adds a property, including a required one; the user completes it in the properties panel.
+* Changes the template ID, name, or description while keeping bindings and formats.
+
+### One-click migration
+
+**Goal:** the user clicks **Update** or **Migrate** and does not have to re-enter or translate anything they configured before.
+
+For every source version it is offered for, a migration must:
+
+* Carry user-entered values to the target where the target accepts them, using the [primitives](#migration-primitives).
+* Leave unclear or incomplete target configuration visible for repair after migration.
+
+If a value cannot be converted automatically, preserve it where possible and report a specific action as a lint finding (see [Template-based validation](#template-based-validation-for-edge-cases)). The migration is one undoable command; users can repair the result or undo it.
 
 ## Migration primitives
 
-The target template combines four primitives to describe predictable migrations:
+The target template combines two primitives to describe predictable migrations:
 
 | Primitive | Purpose | Example |
 |---|---|---|
 | Select | Use `when` to choose instructions based on source values. | Select an Anthropic backend from the old endpoint. |
-| Transform | Copy or set values with `from`, `to`, `set`, `values`, and `replace`. | Convert a REST method from `post` to `POST`. |
-| Persist | Use `copyEmpty` and `includeHidden` during migration; use `persist` on supported target properties for later updates. | Keep an unset value or a hidden Vertex endpoint. |
-| Require / atomic | Check `require` assertions and `required` writes before applying the migration. | Stop when a required destination is unavailable. |
+| Transform | Copy or set values with `from`, `to`, `set`, `values`, and `replace`; use `copyEmpty` or `includeHidden` when needed. | Convert a REST method from `post` to `POST`. |
 
 **Scope boundary:** Prefer these primitives and template validation to connector-specific engine features. Propose additional engine behavior only for a general need that cannot be expressed with them. Every known migration action should be automated or visible as a lint finding. If a known case cannot be migrated safely or surfaced as an actionable finding, treat it as a rollout blocker rather than silently changing or dropping data.
 
@@ -90,51 +120,22 @@ The target template declares its sources:
 * `copyEmpty: true` — on a copy, write an empty value when the source is missing or empty instead of skipping the instruction. Use this to suppress a destination default; optional inputs and outputs are removed by the normal property setter. Use `set: ""` to clear a target default when there is no corresponding source field.
 * `includeHidden: true` — opt in to writing a hidden destination. Inactive destinations are still skipped. Write controlling values before their dependent destinations.
 * `replace: { "pattern": "...", "replacement": "..." }` — transform a non-empty copied string after `values` remapping. Uses JavaScript `String.replace` with a regular expression and capture references such as `$1`. FEEL expressions and non-string values are rejected rather than rewritten.
-* `require` — on a step, group, or instruction, assert one source condition or an AND-array using the same syntax as `when`. Unlike `when`, an unmet requirement aborts migration with the optional authored `message`. Unselected groups are not checked.
-* `required: true` — require a selected write to have a source value (unless `copyEmpty`), a declared destination, hidden-write permission, and an active destination. For a conditional required destination, explicitly write its controllers first; the preflight does not guess values from defaults or existing bindings. Hidden controllers must be persistent inputs/outputs. Intermediate-only bindings cannot be required.
 
-## Composing Select, Transform, Persist, and Require
+## Composing Select and Transform
 
-Select uses `when`; Transform uses copy, `set`, `values`, and `replace`. Persist is a destination **property** option, not a migration instruction: `persist: true` on a `zeebe:input` or `zeebe:output` retains its stored value (including a hidden value, a value equal to the old default, or an absent mapping) on refresh and later updates when the old template has the same binding. Keep the flag on later template versions. New fields still receive their defaults; explicit presets still win. Deactivating a conditional field still removes it normally.
+Select uses `when`; Transform uses copy, `set`, `values`, and `replace`. `copyEmpty` writes an empty value when the source is missing or empty, and `includeHidden` allows a migration write to a hidden target property. Hidden fields remain controlled by the template author: a later template update can replace a migrated value with the template's default. Editable fields follow normal update behavior: an explicitly changed value is retained, while a value equal to the old default or an absent value may take the new default.
 
-For example, the destination can declare:
+For example, a migration can write to a hidden destination for this migration:
 
 ```json
 {
-  "type": "Hidden",
-  "value": "",
-  "optional": true,
-  "persist": true,
-  "binding": { "type": "zeebe:input", "name": "endpoint" }
+  "from": { "type": "zeebe:input", "name": "oldEndpoint" },
+  "to": { "type": "zeebe:input", "name": "endpoint" },
+  "includeHidden": true
 }
 ```
 
-An authored migration group can then select a known static URL, require a supported shape, remove its known legacy suffix, and require the hidden write:
-
-```json
-{
-  "when": {
-    "binding": { "type": "zeebe:input", "name": "provider.type" },
-    "equals": "anthropic"
-  },
-  "require": {
-    "binding": { "type": "zeebe:input", "name": "oldEndpoint" },
-    "matches": "^https://api\\.anthropic\\.com/v1/?$"
-  },
-  "message": "Configure a public Anthropic endpoint before migrating.",
-  "properties": [
-    {
-      "from": { "type": "zeebe:input", "name": "oldEndpoint" },
-      "to": { "type": "zeebe:input", "name": "endpoint" },
-      "replace": { "pattern": "/v1/?$", "replacement": "" },
-      "includeHidden": true,
-      "required": true
-    }
-  ]
-}
-```
-
-`elementTemplates.applyTemplate` resolves transformations, checks requirements, and preflights required destinations **before entering the command stack**. Authored-check failures leave the original element and undo history unchanged; successful changes remain one undoable operation. This is not a general rollback facility for unexpected modeling errors or direct command-stack calls. Optional writes retain best-effort behavior. These primitives apply authored instructions, not a completeness or connector-runtime-equivalence check, and do not implement host deployment blocking.
+`elementTemplates.applyTemplate` resolves transformations and applies them as one undoable command. Missing or inactive destinations are skipped; authored `validation` rules can report user-actionable missing or invalid values after the migration. These primitives apply authored instructions, not a completeness or connector-runtime-equivalence check, and do not implement host deployment blocking.
 
 ## Connector examples
 
@@ -143,9 +144,9 @@ Attach the example array as the target template's `migratesFrom` and load both t
 * [REST connector](examples/rest-connector-migrates-from.json): attach to [REST v2@18](https://github.com/camunda/connectors/blob/afd91b17524e818219b15581ce3247ca706ad625/connectors/http/rest/element-templates/http-json-connector.json) and update from any [published REST v2 version 1–17](https://github.com/camunda/connectors/tree/afd91b17524e818219b15581ce3247ca706ad625/connectors/http/rest/element-templates/versioned). List only versions that need migration instructions; omitted versions are no-ops. For example, updating v1 to v18 converts lowercase HTTP methods at v3, leaves an unset result expression unset at v13, and keeps the v6 retry backoff at v15.
 * [AI Agent](examples/ai-agent-migrates-from.json): migrates [AI Agent v1@13](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-job-worker-13.json) to [AI Agent Sub-process v2@1](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-subprocess-v2-1.json). The recipe accepts only source version 13 (`minSourceVersion` and `maxSourceVersion` are both `13`); other v1 versions are not offered this migration.
 
-For AI Agent, also append the `groups` and `properties` from [the migration checks](examples/ai-agent-migration-checks.json) to the target, and attach its `validation` array. The migration requires these declared action-item destinations; it fails before editing if they are missing. These are authored template properties, not engine-owned migration state.
+For AI Agent, also append the `groups` and `properties` from [the migration checks](examples/ai-agent-migration-checks.json) to the target, and attach its `validation` array. The validation rules report unsupported or missing providers and unresolved action items after migration. Keep their bindings declared in the target; rules can report user configuration problems, not missing template declarations.
 
-The pinned templates do not declare `persist`. Opt the relevant destination properties into persistence: the public Anthropic and Vertex endpoints, the system prompt, the OpenAI model, and the Anthropic/Bedrock prompt-caching settings. Make the public Anthropic endpoint an editable `String` property with `feel: "optional"` so a reported URL error can be repaired. Keep the existing binding and `persist: true`. The recipe preserves endpoint text; the narrowly guarded replacement above is an illustration, not a blanket `/v1` rewrite.
+The recipe preserves endpoint text; the narrowly guarded replacement above is an illustration, not a blanket `/v1` rewrite. Hidden target endpoints use the template's default on later updates; editable values changed from their old defaults follow normal update retention.
 
 ## Rules
 

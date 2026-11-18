@@ -44,9 +44,38 @@
         { "name": "Reviewed", "value": "reviewed" }
       ],
       "binding": { "type": "zeebe:property", "name": "migration.deploymentReview" }
+    },
+    {
+      "id": "migration.providerReview",
+      "label": "V1 provider mapping",
+      "description": "The v1 provider is missing or unsupported by this migration. Select and configure the intended v2 provider.",
+      "group": "migration",
+      "type": "Dropdown",
+      "value": "not-needed",
+      "choices": [
+        { "name": "Not needed", "value": "not-needed" },
+        { "name": "Needs review", "value": "pending" },
+        { "name": "Reviewed", "value": "reviewed" }
+      ],
+      "binding": { "type": "zeebe:property", "name": "migration.providerReview" }
     }
   ],
   "validation": [
+    {
+      "when": { "binding": { "type": "zeebe:property", "name": "migration.providerReview" }, "equals": "pending" },
+      "property": "migration.providerReview",
+      "message": "Select and configure the intended v2 provider, then mark V1 provider mapping Reviewed."
+    },
+    {
+      "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "isEmpty": true },
+      "property": "provider.type",
+      "message": "Select a supported v2 AI provider before deploying."
+    },
+    {
+      "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "matches": "^(anthropic|bedrock|openai|google-gemini)$", "not": true },
+      "property": "provider.type",
+      "message": "Select a supported v2 AI provider before deploying."
+    },
     {
       "when": { "binding": { "type": "zeebe:property", "name": "migration.endpointReview" }, "equals": "pending" },
       "property": "migration.endpointReview",
