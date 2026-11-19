@@ -1,7 +1,6 @@
 import TestContainer from 'mocha-test-container-support';
 
 import { expect } from 'chai';
-import { spy } from 'sinon';
 
 import { act } from '@testing-library/preact';
 
@@ -34,7 +33,6 @@ import {
   findInputParameter,
   findTaskHeader
 } from 'src/cloud-element-templates/Helper';
-import { getValidationErrors } from 'src/cloud-element-templates/util/migrationUtil';
 
 import diagramXML from './diagram.bpmn';
 import templates from './templates.json';
@@ -149,11 +147,11 @@ describe('provider/cloud-element-templates - migration', function() {
     const body = input('body');
     const copy = { from: input('url'), to: endpoint };
 
-    function targetWith(properties, fields = targetTemplate.properties) {
+    function targetWith(instructions, fields = targetTemplate.properties) {
       return {
         ...targetTemplate,
         properties: fields,
-        migratesFrom: [ { id: legacyTemplate.id, properties } ]
+        migratesFrom: [ { id: legacyTemplate.id, instructions } ]
       };
     }
 
@@ -162,11 +160,11 @@ describe('provider/cloud-element-templates - migration', function() {
         const target = targetWith([
           {
             when: { binding: input('url'), equals: 'not selected' },
-            properties: [ copy ]
+            instructions: [ copy ]
           },
           {
             when: { binding: input('url'), matches: '^https://' },
-            properties: [ { ...copy, replace: { pattern: '^https://(.*)$', replacement: 'https://api.$1' } } ]
+            instructions: [ { ...copy, replace: { pattern: '^https://(.*)$', replacement: 'https://api.$1' } } ]
           },
           { to: method, set: 'post' },
           { from: input('payload'), to: body }
@@ -191,11 +189,32 @@ describe('provider/cloud-element-templates - migration', function() {
       }, /regular expression/i ],
       [ 'a replacement without a pattern', {
         ...copy, replace: { replacement: '' }
-      }, /pattern/ ],
-      [ 'an expression replacement', {
-        from: input('payload'), to: endpoint, replace: { pattern: 'payload', replacement: 'changed' }
-      }, /static string/ ]
+      }, /pattern/ ]
     ];
+
+    it('should replace matching text in an expression', inject(function(elementRegistry, elementTemplates) {
+      const target = targetWith([
+        { from: input('payload'), to: endpoint, replace: { pattern: 'payload', replacement: 'changed' } }
+      ]);
+      elementTemplates.set([ legacyTemplate, target ]);
+      const element = elementRegistry.get('Legacy');
+
+      elementTemplates.applyTemplate(element, target);
+
+      expect(getInput(element, 'endpoint')).to.equal('=changed');
+    }));
+
+    it('should not evaluate an expression to match a replacement', inject(function(elementRegistry, elementTemplates) {
+      const target = targetWith([
+        { from: input('payload'), to: endpoint, replace: { pattern: '^https:', replacement: 'http:' } }
+      ]);
+      elementTemplates.set([ legacyTemplate, target ]);
+      const element = elementRegistry.get('Legacy');
+
+      elementTemplates.applyTemplate(element, target);
+
+      expect(getInput(element, 'endpoint')).to.equal('=payload');
+    }));
 
     for (const [ label, instruction, error ] of failures) {
       it(`should reject ${ label } without changing XML or damaging undo`,
@@ -220,28 +239,18 @@ describe('provider/cloud-element-templates - migration', function() {
         }));
     }
 
-    it('should apply missing-value migrations and report the missing target value with validation',
+    it('should skip copying a missing source value',
       inject(function(elementRegistry, elementTemplates) {
         const fields = targetTemplate.properties.map(property =>
           property.binding.name === 'endpoint' ? { ...property, value: '', optional: true } : property
         );
-        const target = {
-          ...targetWith([ { from: input('missing'), to: endpoint } ], fields),
-          validation: [
-            {
-              when: { binding: endpoint, isEmpty: true },
-              message: 'Configure the endpoint before deploying.'
-            }
-          ]
-        };
+        const target = targetWith([ { from: input('missing'), to: endpoint } ], fields);
         elementTemplates.set([ legacyTemplate, target ]);
         const element = elementRegistry.get('Legacy');
 
         elementTemplates.applyTemplate(element, target);
 
         expect(getInput(element, 'endpoint')).to.be.undefined;
-        expect(getValidationErrors(element, target).map(error => error.message))
-          .to.eql([ 'Configure the endpoint before deploying.' ]);
       }));
 
     it('should reset a hidden value to the template default on update',
@@ -324,7 +333,7 @@ describe('provider/cloud-element-templates - migration', function() {
         toVersion: 4,
         minSourceVersion: 2,
         changes: 'Use the staged endpoint.',
-        properties: [ {
+        instructions: [ {
           when: { binding: intermediate, equals: 'https://custom.io' },
           from: intermediate,
           to: endpoint
@@ -333,9 +342,9 @@ describe('provider/cloud-element-templates - migration', function() {
       {
         toVersion: 2,
         changes: 'Stage the legacy URL.',
-        properties: [ { from: input('url'), to: intermediate } ]
+        instructions: [ { from: input('url'), to: intermediate } ]
       },
-      { toVersion: 5, properties: [ { to: endpoint, set: 'not yet' } ] }
+      { toVersion: 5, instructions: [ { to: endpoint, set: 'not yet' } ] }
     ];
 
     it('should run same-ID steps in order without loading intermediate templates and undo once',
@@ -363,8 +372,8 @@ describe('provider/cloud-element-templates - migration', function() {
           sourceTemplateId: legacyTemplate.id,
           minSourceVersion: 1,
           toVersion: 2,
-          description: 'Migrate to the new REST template.',
-          properties: [ { from: input('url'), to: intermediate } ]
+          availabilityMessage: 'Migrate to the new REST template.',
+          instructions: [ { from: input('url'), to: intermediate } ]
         };
         const target = { ...targetTemplate, version: 4, migratesFrom: [ ...steps, change ] };
         elementTemplates.set([ legacyTemplate, target ]);
@@ -372,7 +381,7 @@ describe('provider/cloud-element-templates - migration', function() {
         const element = elementRegistry.get('Legacy');
 
         expect(elementTemplates.getMigrations(element)).to.eql([ target ]);
-        expect(elementTemplates.getMigrationDescription(element, target)).to.equal(change.description);
+        expect(elementTemplates.getMigrationAvailabilityMessage(element, target)).to.equal(change.availabilityMessage);
         expect(elementTemplates.getChanges(element, { ...target, migratesFrom: [
           ...steps, { ...change, minSourceVersion: 2 }
         ] })).to.be.undefined;
@@ -384,7 +393,7 @@ describe('provider/cloud-element-templates - migration', function() {
 
     it('should enforce the change maximum',
       inject(function(elementRegistry, elementTemplates) {
-        const change = { sourceTemplateId: legacyTemplate.id, maxSourceVersion: 1, toVersion: 2, properties: [] };
+        const change = { sourceTemplateId: legacyTemplate.id, maxSourceVersion: 1, toVersion: 2, instructions: [] };
         const target = { ...targetTemplate, version: 2, migratesFrom: [ change ] };
         const element = elementRegistry.get('Legacy');
 
@@ -509,30 +518,6 @@ describe('provider/cloud-element-templates - migration', function() {
       const text = domQuery('.bio-properties-panel-template-migration-available-text', button);
 
       expect(text.textContent).to.eql('Migration to REST connector is available.');
-    }));
-
-
-    it('should request changes review', inject(async function(elementRegistry, selection, eventBus) {
-
-      // given
-      const element = elementRegistry.get('Legacy');
-
-      const reviewSpy = spy();
-
-      eventBus.on('elementTemplates.reviewChanges', reviewSpy);
-
-      await act(() => selection.select(element));
-
-      // when
-      await clickMenuItem(container, 'Review changes');
-
-      // then
-      expect(reviewSpy).to.have.been.calledOnce;
-      expect(reviewSpy.getCall(0).args[0]).to.include({
-        element,
-        newTemplate: targetTemplate,
-        changes: targetTemplate.migratesFrom[0].changes
-      });
     }));
 
 

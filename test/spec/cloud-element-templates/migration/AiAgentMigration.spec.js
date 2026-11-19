@@ -1,12 +1,10 @@
 import { expect } from 'chai';
-import { Linter } from 'bpmnlint';
 
 import Modeler from 'bpmn-js/lib/Modeler';
 import ZeebeBehaviors from 'camunda-bpmn-js-behaviors/lib/camunda-cloud';
 import zeebe from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 import elementTemplatesModule from 'src/cloud-element-templates/core';
-import { ElementTemplateLinterPlugin } from 'src/cloud-element-templates/linting';
 import { findExtension, findInputParameter } from 'src/cloud-element-templates/Helper';
 import { setPropertyValue } from 'src/cloud-element-templates/util/propertyUtil';
 import declaration from 'docs/examples/ai-agent-migrates-from.json';
@@ -84,26 +82,6 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
       expect(read('provider.anthropic.model.parameters.promptCaching.enabled')).to.be.undefined;
     });
   }
-
-
-  it('should migrate an unsupported provider and report a review action through template validation', async function() {
-    findInputParameter(findExtension(element, 'zeebe:IoMapping'), { name: 'provider.type' }).set('source', 'unsupported');
-
-    migrate();
-
-    expect(elementTemplates.get(element).id).to.equal(target.id);
-    expect((await lint()).some(report => report.message === 'Select and configure the intended v2 provider, then mark V1 provider mapping Reviewed.')).to.be.true;
-  });
-
-
-  it('should preserve a missing provider and report it through template validation', async function() {
-    findInputParameter(findExtension(element, 'zeebe:IoMapping'), { name: 'provider.type' }).set('source', '');
-
-    migrate();
-
-    expect(elementTemplates.get(element).id).to.equal(target.id);
-    expect((await lint()).some(report => report.message === 'Select and configure the intended v2 provider, then mark V1 provider mapping Reviewed.')).to.be.true;
-  });
 
 
   for (const [ provider, oldEndpoint, newEndpoint, value ] of [
@@ -241,132 +219,68 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
     expect(read('provider.bedrock.model.parameters.promptCaching.enabled')).to.be.undefined;
   });
 
-  it('should upgrade in one command and surface the deployment action without blanket field checks', async function() {
+  it('should apply the v2 worker type', function() {
     migrate();
 
     expect(elementTemplates.get(element).id).to.equal(target.id);
     expect(findExtension(element, 'zeebe:TaskDefinition').get('type')).to.equal('io.camunda.agenticai:aiagent:subprocess:2');
-    const reports = await lint();
-    expect(reports).to.have.length(1);
-    expect(reports[0]).to.include({ category: 'error' });
-    expect(reports[0].message).to.include('v2 worker');
-    expect(reports[0].propertiesPanel.entryIds).to.deep.equal([ `custom-entry-${ target.id }-migration-2` ]);
-
-    review('migration.deploymentReview');
-    expect(await lint()).to.be.empty;
   });
 
 
-  for (const [ endpoint, message ] of [
-    [ 'https://api.anthropic.com/v1', 'Remove the trailing /v1' ],
-    [ 'https://resource.services.ai.azure.com/anthropic/v1', 'Remove the trailing /anthropic/v1' ],
-    [ 'https://proxy.example/v1', 'Remove the root /v1' ]
+  for (const endpoint of [
+    'https://api.anthropic.com/v1',
+    'https://resource.services.ai.azure.com/anthropic/v1',
+    'https://proxy.example/v1'
   ]) {
-    it(`should preserve and report the actionable suffix in ${ endpoint }`, async function() {
+    it(`should preserve the endpoint text in ${ endpoint }`, function() {
       write('provider.anthropic.endpoint', endpoint);
       migrate();
-      review('migration.deploymentReview');
-
-      const reports = await lint();
-      expect(reports).to.have.length(1);
-      expect(reports[0].message).to.include(message);
-      expect(reports[0].propertiesPanel.entryIds).to.have.length(1);
 
       const destination = elementTemplates.get(element).properties.find(property =>
         property.binding.name?.endsWith('.endpoint') && read(property.binding.name) === endpoint
       );
+      expect(destination).to.exist;
       expect(destination.type).to.equal('String');
-      setPropertyValue(modeler.get('bpmnFactory'), modeler.get('commandStack'), element, destination,
-        endpoint.replace(/\/(?:anthropic\/)?v1$/, ''));
-
-      expect(await lint()).to.be.empty;
     });
   }
 
 
   for (const endpoint of [ '=endpoint', '{{secrets.ENDPOINT}}', 'https://proxy.example/prefix/v1' ]) {
-    it(`should report an unresolved endpoint without rewriting ${ endpoint }`, async function() {
+    it(`should retain an unresolved endpoint without rewriting ${ endpoint }`, async function() {
       write('provider.anthropic.endpoint', endpoint);
       migrate();
-      review('migration.deploymentReview');
 
       expect(read('provider.anthropic.backend.custom.endpoint')).to.equal(endpoint);
-      expect((await lint()).map(report => report.message)).to.have.length(1).and.satisfy(messages =>
-        messages[0].includes('Anthropic endpoint compatibility')
-      );
 
       await modeler.importXML((await modeler.saveXML()).xml);
       element = modeler.get('elementRegistry').get(element.id);
-      expect(await lint()).to.have.length(1);
+      expect(read('provider.anthropic.backend.custom.endpoint')).to.equal(endpoint);
 
       const updated = { ...elementTemplates.get(element), version: 2 };
       elementTemplates.set([ source, elementTemplates.get(element), updated ]);
       elementTemplates.applyTemplate(element, updated);
-      expect(await lint()).to.have.length(1);
-
-      review('migration.endpointReview');
-      expect(await lint()).to.be.empty;
-      modeler.get('commandStack').undo();
-      expect(await lint()).to.have.length(1);
-      modeler.get('commandStack').redo();
-      expect(await lint()).to.be.empty;
+      expect(read('provider.anthropic.backend.custom.endpoint')).to.equal(endpoint);
     });
   }
 
 
-  for (const [ key, headers, reviewNeeded ] of [
-    [ 'static-key', undefined, false ],
-    [ undefined, undefined, false ],
-    [ '=apiKey', undefined, true ],
-    [ '{{secrets.API_KEY}}', undefined, true ],
-    [ 'static-key', '={ Authorization: token }', true ],
-    [ undefined, '=headers', true ]
+  for (const [ key, headers ] of [
+    [ 'static-key', undefined ],
+    [ undefined, undefined ],
+    [ '=apiKey', undefined ],
+    [ '{{secrets.API_KEY}}', undefined ],
+    [ 'static-key', '={ Authorization: token }' ],
+    [ undefined, '=headers' ]
   ]) {
-    it(`should report only unresolved compatible authentication (${ key }, ${ headers })`, async function() {
+    it(`should preserve compatible authentication (${ key }, ${ headers })`, function() {
       write('provider.type', 'openaiCompatible');
       write('provider.openaiCompatible.authentication.apiKey', key);
       write('provider.openaiCompatible.headers', headers);
       migrate();
-      review('migration.deploymentReview');
 
       expect(read('provider.openai.backend.custom.headers')).to.equal(headers);
-      const reports = await lint();
-      expect(reports).to.have.length(reviewNeeded ? 1 : 0);
-
-      if (reviewNeeded) {
-        expect(reports[0].message).to.include('Authorization overrides the old key');
-        review('migration.authReview');
-        expect(await lint()).to.be.empty;
-      }
+      expect(read('provider.openai.backend.custom.authentication.apiKey')).to.equal(key);
     });
-  }
-
-
-  it('should undo and redo the upgrade together with its lint action items', async function() {
-    write('provider.anthropic.endpoint', '=endpoint');
-    migrate();
-    expect(await lint()).to.have.length(2);
-
-    modeler.get('commandStack').undo();
-    expect(elementTemplates.get(element).id).to.equal(source.id);
-    expect(await lint()).to.be.empty;
-
-    modeler.get('commandStack').redo();
-    expect(elementTemplates.get(element).id).to.equal(target.id);
-    expect(await lint()).to.have.length(2);
-  });
-
-
-  async function lint() {
-    const linter = new Linter(ElementTemplateLinterPlugin(elementTemplates.getAll()));
-    const reports = await linter.lint(modeler.getDefinitions());
-
-    return (reports['element-templates/validate'] || []).filter(report => report.id === element.id);
-  }
-
-  function review(id) {
-    const property = elementTemplates.get(element).properties.find(property => property.id === id);
-    setPropertyValue(modeler.get('bpmnFactory'), modeler.get('commandStack'), element, property, 'reviewed');
   }
 
 

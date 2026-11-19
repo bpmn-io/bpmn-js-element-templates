@@ -1,7 +1,6 @@
 import { has, isString } from 'min-dash';
 
 import { getPropertyValue } from './propertyUtil';
-import { isFeel } from './FeelUtil';
 
 /**
  * Get the ordered migration steps from the source to the target.
@@ -80,7 +79,7 @@ export function resolveMigrationSteps(element, steps) {
   };
 
   return steps.flatMap(step => {
-    const writes = resolveMigrationProperties(read, [ { ...step, properties: step.properties || [] } ]);
+    const writes = resolveMigrationInstructions(read, step.instructions || []);
 
     for (const { to, value } of writes) {
       staged.set(bindingKey(to), value);
@@ -90,14 +89,14 @@ export function resolveMigrationSteps(element, steps) {
   });
 }
 
-function resolveMigrationProperties(read, properties) {
-  return properties.flatMap(({ when, properties, from, to, set, values, replace, copyEmpty, includeHidden }) => {
+function resolveMigrationInstructions(read, instructions) {
+  return instructions.flatMap(({ when, instructions, from, to, set, values, replace, copyEmpty, includeHidden }) => {
     if (when && ![].concat(when).every(condition => matchesCondition(read, condition))) {
       return [];
     }
 
-    if (properties) {
-      return resolveMigrationProperties(read, properties);
+    if (instructions) {
+      return resolveMigrationInstructions(read, instructions);
     }
 
     if (!from) {
@@ -113,11 +112,15 @@ function resolveMigrationProperties(read, properties) {
     value = mapValue(value, values);
 
     if (replace) {
-      if (!isString(value) || isFeel(value) || !isString(replace.pattern) || !isString(replace.replacement)) {
-        throw new Error('Migration replacement requires a static string, pattern, and string replacement');
+      if (!isString(replace.pattern) || !isString(replace.replacement)) {
+        throw new Error('Migration replacement requires a string pattern and replacement');
       }
 
-      value = value.replace(new RegExp(replace.pattern), replace.replacement);
+      const pattern = new RegExp(replace.pattern);
+
+      if (isString(value)) {
+        value = value.replace(pattern, replace.replacement);
+      }
     }
 
     return [ { to, value, includeHidden } ];
@@ -145,14 +148,6 @@ export function findMigrationProperty(properties, binding, includeHidden) {
   return properties.find(property => {
     return (includeHidden || property.type !== 'Hidden') && isSameBinding(property.binding, binding);
   });
-}
-
-export function getValidationErrors(element, template) {
-  const read = binding => getPropertyValue(element, { type: 'String', binding });
-
-  return (template.validation || []).filter(({ when }) =>
-    [].concat(when).every(condition => matchesCondition(read, condition))
-  );
 }
 
 function matchesCondition(read, condition) {

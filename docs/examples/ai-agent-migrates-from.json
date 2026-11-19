@@ -4,22 +4,9 @@
     "minSourceVersion": 13,
     "maxSourceVersion": 13,
     "toVersion": 1,
-    "description": "Migrate AI Agent to the v2 Sub-process template.",
-    "changes": "Upgrade to the v2 runtime in one step. Fix the reported Problems-panel action items before deploying; routine settings are preserved. See the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/).",
-    "properties": [
-      {
-        "when": {
-          "binding": { "type": "zeebe:input", "name": "provider.type" },
-          "matches": "^(anthropic|bedrock|openai|azureOpenAi|openaiCompatible|google-vertex-ai)$",
-          "not": true
-        },
-        "to": { "type": "zeebe:property", "name": "migration.providerReview" },
-        "set": "pending"
-      },
-      {
-        "to": { "type": "zeebe:property", "name": "migration.deploymentReview" },
-        "set": "pending"
-      },
+    "availabilityMessage": "Migrate AI Agent to the v2 Sub-process template.",
+    "changes": "Before deploying:\n- Select and configure a supported v2 provider if the source provider is missing or unsupported.\n- Check the static Anthropic endpoint for its selected backend. Remove the trailing /v1 from the public endpoint, /anthropic/v1 or /v1 from Foundry, or the root /v1 from Custom; these backends construct the messages path. Preserve intentional proxy prefixes.\n- Check OpenAI-compatible authentication: an Authorization header overrides the legacy key. Move Bearer credentials to API key without the prefix and remove that header; keep other schemes as headers with None authentication. For dynamic keys, ensure API key mode receives a non-empty key, or use None for no-key calls.\n- Ensure the v2 worker is available, configure custom overrides if used, and deploy a new process version. Existing instances remain on v1; retain their worker and overrides while needed.\nSee the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/) for details.",
+    "instructions": [
       {
         "from": { "type": "zeebe:input", "name": "provider.type" },
         "to": { "type": "zeebe:input", "name": "provider.type" },
@@ -37,19 +24,10 @@
       },
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "anthropic" },
-        "properties": [
-          {
-            "when": [
-              { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "isEmpty": false },
-              { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "matches": "^[Hh][Tt][Tt][Pp][Ss]?://[^/?#]+(?:/v1)?/?$", "not": true },
-              { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "matches": "^[Hh][Tt][Tt][Pp][Ss]?://(?:[A-Za-z0-9-]+\\.)+[Aa][Zz][Uu][Rr][Ee]\\.(?:[Cc][Oo][Mm]|[Uu][Ss]|[Cc][Nn])(?::[0-9]+)?/anthropic(?:/v1)?/?$", "not": true }
-            ],
-            "to": { "type": "zeebe:property", "name": "migration.endpointReview" },
-            "set": "pending"
-          },
+        "instructions": [
           {
             "when": { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "isEmpty": true },
-            "properties": [
+            "instructions": [
               { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "anthropic-api" },
               {
                 "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
@@ -62,7 +40,7 @@
               "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
               "matches": "^[Hh][Tt][Tt][Pp][Ss]?://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?::[0-9]+)?(?:[/?#]|$)"
             },
-            "properties": [
+            "instructions": [
               { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "anthropic-api" },
               {
                 "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
@@ -80,7 +58,7 @@
               "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
               "matches": "^[Hh][Tt][Tt][Pp][Ss]?://(?:[A-Za-z0-9-]+\\.)+[Aa][Zz][Uu][Rr][Ee]\\.(?:[Cc][Oo][Mm]|[Uu][Ss]|[Cc][Nn])(?::[0-9]+)?(?:[/?#]|$)"
             },
-            "properties": [
+            "instructions": [
               { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "foundry" },
               { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.foundry.authentication.type" }, "set": "apiKey" },
               {
@@ -107,7 +85,7 @@
                 "not": true
               }
             ],
-            "properties": [
+            "instructions": [
               { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "custom" },
               { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.authentication.type" }, "set": "apiKey" },
               {
@@ -125,13 +103,13 @@
       },
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "bedrock" },
-        "properties": [
+        "instructions": [
           { "to": { "type": "zeebe:input", "name": "provider.bedrock.model.parameters.promptCaching.enabled" }, "set": "" }
         ]
       },
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "openai" },
-        "properties": [
+        "instructions": [
           { "to": { "type": "zeebe:input", "name": "provider.openai.api.type" }, "set": "completions" },
           { "to": { "type": "zeebe:input", "name": "provider.openai.backend.type" }, "set": "openai-api" },
           { "from": { "type": "zeebe:input", "name": "provider.openai.authentication.apiKey" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.openai.apiKey" } },
@@ -145,7 +123,7 @@
       },
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "azureOpenAi" },
-        "properties": [
+        "instructions": [
           { "to": { "type": "zeebe:input", "name": "provider.openai.api.type" }, "set": "completions" },
           { "to": { "type": "zeebe:input", "name": "provider.openai.backend.type" }, "set": "foundry" },
           { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.type" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.type" }, "copyEmpty": true },
@@ -164,17 +142,7 @@
       },
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "openaiCompatible" },
-        "properties": [
-          {
-            "when": { "binding": { "type": "zeebe:input", "name": "provider.openaiCompatible.headers" }, "isEmpty": false },
-            "to": { "type": "zeebe:property", "name": "migration.authReview" },
-            "set": "pending"
-          },
-          {
-            "when": { "binding": { "type": "zeebe:input", "name": "provider.openaiCompatible.authentication.apiKey" }, "matches": "^(?:=|\\{\\{)" },
-            "to": { "type": "zeebe:property", "name": "migration.authReview" },
-            "set": "pending"
-          },
+        "instructions": [
           { "to": { "type": "zeebe:input", "name": "provider.openai.api.type" }, "set": "completions" },
           { "to": { "type": "zeebe:input", "name": "provider.openai.backend.type" }, "set": "custom" },
           {
@@ -184,7 +152,7 @@
           },
           {
             "when": { "binding": { "type": "zeebe:input", "name": "provider.openaiCompatible.authentication.apiKey" }, "isEmpty": false },
-            "properties": [
+            "instructions": [
               { "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.authentication.type" }, "set": "apiKey" },
               { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.authentication.apiKey" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.authentication.apiKey" } }
             ]
@@ -202,7 +170,7 @@
       },
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "google-vertex-ai" },
-        "properties": [
+        "instructions": [
           { "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.type" }, "set": "google-vertex-ai" },
           { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.authentication.type" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.authentication.type" }, "copyEmpty": true },
           { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.projectId" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.projectId" } },

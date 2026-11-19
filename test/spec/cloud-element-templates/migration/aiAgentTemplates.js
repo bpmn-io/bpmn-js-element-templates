@@ -1,6 +1,4 @@
 // Minimal test templates projected from the pinned definitions linked in TEMPLATE_MIGRATION.md.
-import checks from 'docs/examples/ai-agent-migration-checks.json';
-
 const $schema = 'https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json';
 const appliesTo = [ 'bpmn:SubProcess' ];
 const elementType = { value: 'bpmn:AdHocSubProcess' };
@@ -50,11 +48,8 @@ export const target = {
   name: 'AI Agent Sub-process (v2 test fixture)',
   id: 'io.camunda.connectors.agenticai.ai-agent-subprocess.v2',
   version: 1,
-  groups: checks.groups,
-  validation: checks.validation,
   properties: [
     { type: 'Hidden', value: 'io.camunda.agenticai:aiagent:subprocess:2', binding: { type: 'zeebe:taskDefinition', property: 'type' } },
-    ...checks.properties,
     dropdown(provider, [ 'anthropic', 'bedrock', 'openai', 'google-gemini' ]),
     input(systemPrompt, { value: '="v2 prompt"' }),
     dropdown(anthropicBackend, [ 'anthropic-api', 'foundry', 'custom' ], is(provider, 'anthropic')),

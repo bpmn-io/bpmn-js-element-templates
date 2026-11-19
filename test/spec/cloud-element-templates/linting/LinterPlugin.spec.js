@@ -13,32 +13,7 @@ import zeebeModdle from 'zeebe-bpmn-moddle/resources/zeebe.json';
 
 
 import { expect } from 'chai';
-const authoredValidationTemplate = {
-  $schema: 'https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json',
-  id: 'authored.validation',
-  name: 'Authored validation',
-  appliesTo: [ 'bpmn:Task' ],
-  properties: [
-    { id: 'endpoint', type: 'String', feel: 'optional', binding: { type: 'property', name: 'name' } }
-  ],
-  validation: [
-    {
-      when: [
-        { binding: { type: 'property', name: 'name' }, matches: '^=' },
-        { binding: { type: 'property', name: 'name' }, equals: '=endpoint' }
-      ],
-      property: 'endpoint',
-      message: 'Configure the endpoint before deploying.'
-    }
-  ]
-};
-
 const valid = [
-  {
-    name: 'Authored validation - resolved condition',
-    moddleElement: createProcess('<bpmn:task id="Task_1" name="https://example.com" zeebe:modelerTemplate="authored.validation" />'),
-    config: { templates: [ authoredValidationTemplate ] }
-  },
   {
     name: 'Valid Template',
     moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="constraints.empty" />'),
@@ -92,36 +67,6 @@ const valid = [
 
 
 const invalid = [
-  {
-    name: 'Authored validation - omitted destination is an element-level finding',
-    moddleElement: createProcess('<bpmn:task id="Task_1" name="=endpoint" zeebe:modelerTemplate="authored.validation" />'),
-    config: {
-      templates: [ {
-        ...authoredValidationTemplate,
-        properties: [ { ...authoredValidationTemplate.properties[0], id: undefined } ],
-        validation: [ {
-          when: authoredValidationTemplate.validation[0].when,
-          message: 'Configure the endpoint before deploying.'
-        } ]
-      } ]
-    },
-    report: {
-      id: 'Task_1',
-      message: 'Configure the endpoint before deploying.',
-      name: '=endpoint'
-    }
-  },
-  {
-    name: 'Authored validation - FEEL text is not silently skipped',
-    moddleElement: createProcess('<bpmn:task id="Task_1" name="=endpoint" zeebe:modelerTemplate="authored.validation" />'),
-    config: { templates: [ authoredValidationTemplate ] },
-    report: {
-      id: 'Task_1',
-      message: 'Configure the endpoint before deploying.',
-      propertiesPanel: { entryIds: [ 'custom-entry-authored.validation-0' ] },
-      name: '=endpoint'
-    }
-  },
   {
     name: 'Template Not Found',
     moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="missing-template" />'),

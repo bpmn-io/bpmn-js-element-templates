@@ -137,9 +137,9 @@
     "migratesFrom": [
       {
         "id": "example.rest",
-        "description": "Migration to REST connector is available.",
+        "availabilityMessage": "Migration to REST connector is available.",
         "changes": "- URL is now called endpoint.\n- HTTP methods are lower case.\n- Payload is now called body and requires POST.\n\nSee [REST connector](https://docs.camunda.io/docs/components/connectors/protocol/rest/).",
-        "properties": [
+        "instructions": [
           {
             "from": {
               "type": "zeebe:input",
@@ -178,7 +178,7 @@
       },
       {
         "id": "example.unknown",
-        "properties": [
+        "instructions": [
           {
             "from": {
               "type": "zeebe:input",

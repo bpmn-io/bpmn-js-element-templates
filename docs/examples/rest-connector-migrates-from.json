@@ -2,7 +2,7 @@
   {
     "toVersion": 3,
     "changes": "- Converts HTTP method values to uppercase.\n- Keeps the configured OAuth client authentication method, including an unset value.",
-    "properties": [
+    "instructions": [
       {
         "from": { "type": "zeebe:input", "name": "method" },
         "to": { "type": "zeebe:input", "name": "method" },
@@ -22,7 +22,7 @@
   {
     "toVersion": 6,
     "changes": "- Initializes the new retry backoff to the v6 default (no delay).",
-    "properties": [
+    "instructions": [
       {
         "when": { "binding": { "type": "zeebe:taskHeader", "key": "retryBackoff" }, "isEmpty": true },
         "to": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
@@ -33,7 +33,7 @@
   {
     "toVersion": 13,
     "changes": "- Keeps the result expression unset when the source has none, instead of adding the new example expression.",
-    "properties": [
+    "instructions": [
       {
         "from": { "type": "zeebe:taskHeader", "key": "resultExpression" },
         "to": { "type": "zeebe:taskHeader", "key": "resultExpression" },
@@ -44,7 +44,7 @@
   {
     "toVersion": 15,
     "changes": "- Keeps the existing retry backoff instead of replacing it with the v15 default.",
-    "properties": [
+    "instructions": [
       {
         "from": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
         "to": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
@@ -55,7 +55,7 @@
   {
     "toVersion": 17,
     "changes": "- Maps the enabled Store response option to Document reference.",
-    "properties": [
+    "instructions": [
       {
         "when": { "binding": { "type": "zeebe:input", "name": "storeResponse" }, "matches": "^=?true$" },
         "to": { "type": "zeebe:input", "name": "documentReturnFormat.choice" },

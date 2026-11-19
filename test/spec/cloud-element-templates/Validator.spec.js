@@ -63,47 +63,6 @@ describe('provider/cloud-element-templates - Validator', function() {
   }
 
 
-  describe('authored validation', function() {
-
-    const property = { id: 'endpoint', type: 'String', binding: { type: 'property', name: 'name' } };
-    const rule = { when: { binding: property.binding, matches: '^=' }, message: 'Configure the endpoint.', property: property.id };
-
-    it('should accept cross-field conditions referring to declared bindings', function() {
-      const validator = new Validator(moddle).addAll([ {
-        ...createTemplate('validation', createConfigurationTemplate()),
-        properties: [ property ],
-        validation: [ rule ]
-      } ]);
-
-      expect(errors(validator)).to.be.empty;
-      expect(valid(validator)).to.have.length(1);
-    });
-
-    for (const validation of [
-      {},
-      [ { ...rule, message: '' } ],
-      [ { ...rule, when: [] } ],
-      [ { ...rule, property: 'missing' } ],
-      [ { ...rule, when: { ...rule.when, binding: { type: 'property', name: 'missing' } } } ],
-      [ { ...rule, when: { ...rule.when, matches: '[' } } ],
-      [ { ...rule, when: { binding: property.binding, isEmpty: 'true' } } ],
-      [ { ...rule, when: { ...rule.when, not: 'false' } } ],
-      [ { ...rule, when: { binding: property.binding, equals: 'endpoint', not: true } } ]
-    ]) {
-      it(`should reject invalid validation ${ JSON.stringify(validation) }`, function() {
-        const validator = new Validator(moddle).addAll([ {
-          ...createTemplate('validation', createConfigurationTemplate()),
-          properties: [ property ],
-          validation
-        } ]);
-
-        expect(valid(validator)).to.be.empty;
-        expect(errors(validator)).not.to.be.empty;
-      });
-    }
-  });
-
-
   describe('embedded configuration templates', function() {
 
     it('should accept canonically equivalent repeated definitions', function() {

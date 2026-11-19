@@ -136,10 +136,10 @@ export default class ElementTemplates extends DefaultElementTemplates {
       .filter(template => template.id !== sourceTemplate.id && getMigrationSteps(template, sourceTemplate).length);
   }
 
-  getMigrationDescription(element, newTemplate) {
+  getMigrationAvailabilityMessage(element, newTemplate) {
     const source = this.get(element);
 
-    return source && getMigrationSteps(newTemplate, source)[0]?.description;
+    return source && getMigrationSteps(newTemplate, source)[0]?.availabilityMessage;
   }
 
   /**
