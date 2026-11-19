@@ -1,0 +1,225 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "All property types",
+    "id": "viewer.all-types",
+    "version": 2,
+    "description": "Template covering all custom property types.",
+    "appliesTo": [ "bpmn:ServiceTask" ],
+    "entriesVisible": true,
+    "groups": [
+      { "id": "basic", "label": "Basic", "openByDefault": true },
+      { "id": "advanced", "label": "Advanced" }
+    ],
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "viewer-type",
+        "binding": { "type": "zeebe:taskDefinition:type" }
+      },
+      {
+        "id": "string",
+        "label": "String",
+        "group": "basic",
+        "type": "String",
+        "description": "A description with a <a href=\"https://camunda.com\">link</a>.",
+        "tooltip": "A tooltip with a <a href=\"https://camunda.com\">link</a>.",
+        "binding": { "type": "zeebe:input", "name": "string" }
+      },
+      {
+        "id": "readonly",
+        "label": "Not editable",
+        "group": "basic",
+        "type": "String",
+        "value": "fixed",
+        "editable": false,
+        "binding": { "type": "zeebe:input", "name": "readonly" }
+      },
+      {
+        "id": "feelOptional",
+        "label": "FEEL optional",
+        "group": "basic",
+        "type": "String",
+        "feel": "optional",
+        "binding": { "type": "zeebe:input", "name": "feelOptional" }
+      },
+      {
+        "id": "feelRequired",
+        "label": "FEEL required",
+        "group": "basic",
+        "type": "String",
+        "feel": "required",
+        "binding": { "type": "zeebe:input", "name": "feelRequired" }
+      },
+      {
+        "id": "text",
+        "label": "Text",
+        "group": "basic",
+        "type": "Text",
+        "binding": { "type": "zeebe:input", "name": "text" }
+      },
+      {
+        "id": "feelText",
+        "label": "FEEL text",
+        "group": "basic",
+        "type": "Text",
+        "feel": "optional",
+        "binding": { "type": "zeebe:input", "name": "feelText" }
+      },
+      {
+        "id": "feelTextRequired",
+        "label": "FEEL text required",
+        "group": "basic",
+        "type": "Text",
+        "feel": "required",
+        "binding": { "type": "zeebe:input", "name": "feelTextRequired" }
+      },
+      {
+        "id": "json",
+        "label": "JSON",
+        "group": "basic",
+        "type": "Text",
+        "language": "json",
+        "binding": { "type": "zeebe:input", "name": "json" }
+      },
+      {
+        "id": "number",
+        "label": "Number",
+        "group": "advanced",
+        "type": "Number",
+        "binding": { "type": "zeebe:property", "name": "number" }
+      },
+      {
+        "id": "boolean",
+        "label": "Boolean",
+        "group": "advanced",
+        "type": "Boolean",
+        "binding": { "type": "zeebe:property", "name": "boolean" }
+      },
+      {
+        "id": "dropdown",
+        "label": "Dropdown",
+        "group": "advanced",
+        "type": "Dropdown",
+        "choices": [
+          { "name": "Option A", "value": "a" },
+          { "name": "Option B", "value": "b" }
+        ],
+        "binding": { "type": "zeebe:taskHeader", "key": "dropdown" }
+      },
+      {
+        "id": "configuration",
+        "label": "Configuration",
+        "group": "advanced",
+        "type": "Configuration",
+        "configurationTemplate": "viewer.configuration:1",
+        "binding": { "type": "zeebe:property", "name": "configuration" }
+      },
+      {
+        "id": "ungrouped",
+        "label": "Ungrouped",
+        "type": "String",
+        "binding": { "type": "zeebe:input", "name": "ungrouped" }
+      },
+      {
+        "id": "conditionalShown",
+        "label": "Shown if dropdown is a",
+        "group": "advanced",
+        "type": "String",
+        "binding": { "type": "zeebe:input", "name": "conditionalShown" },
+        "condition": { "property": "dropdown", "equals": "a" }
+      },
+      {
+        "id": "conditionalHidden",
+        "label": "Shown if dropdown is b",
+        "group": "advanced",
+        "type": "String",
+        "binding": { "type": "zeebe:input", "name": "conditionalHidden" },
+        "condition": { "property": "dropdown", "equals": "b" }
+      }
+    ],
+    "configurationTemplates": [
+      {
+        "id": "viewer.configuration:1",
+        "kind": "CREDENTIAL",
+        "name": "Viewer configuration",
+        "version": 1,
+        "properties": []
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "All property types",
+    "id": "viewer.all-types",
+    "version": 1,
+    "appliesTo": [ "bpmn:ServiceTask" ],
+    "properties": [
+      {
+        "label": "String",
+        "type": "String",
+        "binding": { "type": "zeebe:input", "name": "string" }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Entries visible",
+    "id": "viewer.entries-visible",
+    "appliesTo": [ "bpmn:ServiceTask" ],
+    "entriesVisible": {
+      "outputs": true
+    },
+    "properties": [
+      {
+        "label": "String",
+        "type": "String",
+        "binding": { "type": "zeebe:input", "name": "string" }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Entries hidden",
+    "id": "viewer.entries-hidden",
+    "appliesTo": [ "bpmn:ServiceTask" ],
+    "properties": [
+      {
+        "label": "String",
+        "type": "String",
+        "binding": { "type": "zeebe:input", "name": "string" }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Deprecated",
+    "id": "viewer.deprecated",
+    "appliesTo": [ "bpmn:Task" ],
+    "deprecated": true,
+    "properties": []
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Message",
+    "id": "viewer.message",
+    "appliesTo": [ "bpmn:IntermediateCatchEvent" ],
+    "elementType": {
+      "value": "bpmn:IntermediateCatchEvent",
+      "eventDefinition": "bpmn:MessageEventDefinition"
+    },
+    "properties": [
+      {
+        "label": "Message name",
+        "type": "String",
+        "binding": { "type": "bpmn:Message#property", "name": "name" }
+      },
+      {
+        "label": "Correlation key",
+        "type": "String",
+        "feel": "optional",
+        "binding": { "type": "bpmn:Message#zeebe:subscription#property", "name": "correlationKey" }
+      }
+    ]
+  }
+]

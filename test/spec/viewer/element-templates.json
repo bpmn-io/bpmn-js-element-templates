@@ -1,0 +1,117 @@
+[
+  {
+    "name": "All property types",
+    "id": "viewer.all-types",
+    "version": 2,
+    "description": "Template covering all custom property types.",
+    "appliesTo": [ "bpmn:ServiceTask" ],
+    "entriesVisible": true,
+    "groups": [
+      { "id": "basic", "label": "Basic" },
+      { "id": "advanced", "label": "Advanced" }
+    ],
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "external",
+        "binding": { "type": "property", "name": "camunda:type" }
+      },
+      {
+        "label": "String",
+        "group": "basic",
+        "type": "String",
+        "description": "A description with a <a href=\"https://camunda.com\">link</a>.",
+        "binding": { "type": "property", "name": "name" }
+      },
+      {
+        "label": "Not editable",
+        "group": "basic",
+        "type": "String",
+        "value": "fixed",
+        "editable": false,
+        "binding": { "type": "camunda:inputParameter", "name": "readonly" }
+      },
+      {
+        "label": "Text",
+        "group": "basic",
+        "type": "Text",
+        "binding": { "type": "camunda:inputParameter", "name": "text" }
+      },
+      {
+        "label": "Boolean",
+        "group": "advanced",
+        "type": "Boolean",
+        "binding": { "type": "property", "name": "camunda:async" }
+      },
+      {
+        "label": "Dropdown",
+        "group": "advanced",
+        "type": "Dropdown",
+        "choices": [
+          { "name": "Option A", "value": "a" },
+          { "name": "Option B", "value": "b" }
+        ],
+        "binding": { "type": "camunda:property", "name": "dropdown" }
+      },
+      {
+        "label": "Ungrouped",
+        "type": "String",
+        "binding": { "type": "camunda:inputParameter", "name": "ungrouped" }
+      },
+      {
+        "label": "Output",
+        "value": "result",
+        "binding": { "type": "camunda:outputParameter", "source": "${result}" }
+      },
+      {
+        "label": "Error",
+        "value": "${error.expression}",
+        "binding": { "type": "camunda:errorEventDefinition", "errorRef": "error-1" }
+      },
+      {
+        "label": "Virtual input",
+        "value": "virtual",
+        "binding": { "type": "camunda:inputParameter", "name": "virtual" }
+      }
+    ],
+    "scopes": [
+      {
+        "type": "bpmn:Error",
+        "id": "error-1",
+        "properties": [
+          {
+            "label": "Error code",
+            "type": "String",
+            "binding": { "type": "property", "name": "errorCode" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "All property types",
+    "id": "viewer.all-types",
+    "version": 1,
+    "appliesTo": [ "bpmn:ServiceTask" ],
+    "properties": []
+  },
+  {
+    "name": "Entries hidden",
+    "id": "viewer.entries-hidden",
+    "appliesTo": [ "bpmn:ServiceTask" ],
+    "properties": [
+      {
+        "label": "String",
+        "type": "String",
+        "binding": { "type": "property", "name": "name" }
+      }
+    ]
+  },
+  {
+    "name": "Deprecated",
+    "id": "viewer.deprecated",
+    "appliesTo": [ "bpmn:Task" ],
+    "deprecated": true,
+    "properties": []
+  }
+]
