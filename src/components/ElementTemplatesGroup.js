@@ -340,7 +340,7 @@ function MigrationAvailableText({ templateState }) {
 
   const translate = useService('translate');
 
-  if (!availabilityMessage && template.deprecated) {
+  if (template.deprecated && (!availabilityMessage || availabilityMessage === template.deprecated.message)) {
     return <DeprecationWarning template={ template } />;
   }
 

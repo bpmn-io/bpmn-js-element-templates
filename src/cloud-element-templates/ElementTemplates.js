@@ -138,7 +138,7 @@ export default class ElementTemplates extends DefaultElementTemplates {
 
         return steps.length ? [ {
           template,
-          availabilityMessage: steps[0].availabilityMessage,
+          availabilityMessage: steps[0].availabilityMessage || sourceTemplate.deprecated?.message,
           changes: getMigrationChanges(steps)
         } ] : [];
       });

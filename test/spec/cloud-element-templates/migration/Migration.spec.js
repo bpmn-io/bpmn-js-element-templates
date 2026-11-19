@@ -428,7 +428,7 @@ describe('provider/cloud-element-templates - migration', function() {
 
         elementTemplates.set([ legacyTemplate, target ]);
         expect(elementTemplates.getMigrations(element)).to.eql([
-          { template: target, availabilityMessage: undefined, changes: undefined }
+          { template: target, availabilityMessage: legacyTemplate.deprecated.message, changes: undefined }
         ]);
 
         elementTemplates.set([ legacyTemplate, { ...target, migratesFrom: [ { ...change, maxSourceVersion: 0 } ] } ]);

@@ -91,7 +91,7 @@ Each template declares, in `migratesFrom`, how to migrate to it:
 
 ## API
 
-* `elementTemplates.getMigrations(element)` — Change targets as `{ template, availabilityMessage, changes }` entries. The message comes from the first migration step and may be undefined; the UI can fall back to the source template's deprecation message. `changes` combines authored guidance from all applicable steps, in order.
+* `elementTemplates.getMigrations(element)` — Change targets as `{ template, availabilityMessage, changes }` entries. The message comes from the first migration step, falling back to the source template's `deprecated.message`. `changes` combines authored guidance from all applicable steps, in order.
 * `elementTemplates.getChanges(element, template)` — authored `changes` from all applicable steps, in order, including same-template Updates that are not returned by `getMigrations`.
 * `elementTemplates.applyTemplate(element, template)` — apply the migration.
 
