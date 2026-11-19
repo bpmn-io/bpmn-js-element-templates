@@ -47,7 +47,13 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
       elementTemplates.applyTemplate(element, versioned);
       element = modeler.get('elementRegistry').get(element.id);
 
-      expect(elementTemplates.getMigrations(element)).to.eql(version === 13 ? [ migrated ] : []);
+      expect(elementTemplates.getMigrations(element)).to.eql(version === 13 ? [
+        {
+          template: migrated,
+          availabilityMessage: declaration[0].availabilityMessage,
+          changes: declaration[0].changes
+        }
+      ] : []);
     });
   }
 

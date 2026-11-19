@@ -95,7 +95,13 @@ describe('migration - AI Agent Task v1@13 to Task v2@1', function() {
       elementTemplates.applyTemplate(element, versioned);
       element = modeler.get('elementRegistry').get(element.id);
 
-      expect(elementTemplates.getMigrations(element)).to.eql(version === 13 ? [ target ] : []);
+      expect(elementTemplates.getMigrations(element)).to.eql(version === 13 ? [
+        {
+          template: target,
+          availabilityMessage: declaration[0].availabilityMessage,
+          changes: declaration[0].changes
+        }
+      ] : []);
     });
   }
 

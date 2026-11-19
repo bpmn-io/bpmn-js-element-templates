@@ -31,11 +31,23 @@
   },
   {
     "toVersion": 13,
-    "changes": "- Uses the target default when the source has no result expression."
+    "changes": "- Keeps the configured result expression; uses the target default when the source has none.",
+    "instructions": [
+      {
+        "from": { "type": "zeebe:taskHeader", "key": "resultExpression" },
+        "to": { "type": "zeebe:taskHeader", "key": "resultExpression" }
+      }
+    ]
   },
   {
     "toVersion": 15,
-    "changes": "- Uses the target default when no retry backoff is configured."
+    "changes": "- Keeps the configured retry backoff; uses the target default when none is configured.",
+    "instructions": [
+      {
+        "from": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
+        "to": { "type": "zeebe:taskHeader", "key": "retryBackoff" }
+      }
+    ]
   },
   {
     "toVersion": 17,

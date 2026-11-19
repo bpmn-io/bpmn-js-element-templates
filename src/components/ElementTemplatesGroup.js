@@ -448,12 +448,15 @@ function getTemplateState(elementTemplates, element, getTemplateId) {
     return { type: 'UNKNOWN_TEMPLATE', templateId };
   }
 
-  const [ targetTemplate ] = elementTemplates.getMigrations ? elementTemplates.getMigrations(element) : [];
+  const [ migration ] = elementTemplates.getMigrations ? elementTemplates.getMigrations(element) : [];
 
-  if (targetTemplate) {
-    const availabilityMessage = elementTemplates.getMigrationAvailabilityMessage?.(element, targetTemplate);
-
-    return { type: 'MIGRATABLE_TEMPLATE', template, targetTemplate, availabilityMessage };
+  if (migration) {
+    return {
+      type: 'MIGRATABLE_TEMPLATE',
+      template,
+      targetTemplate: migration.template,
+      availabilityMessage: migration.availabilityMessage
+    };
   }
 
   if (template.deprecated) {

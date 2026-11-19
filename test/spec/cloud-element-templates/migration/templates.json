@@ -136,7 +136,8 @@
     ],
     "migratesFrom": [
       {
-        "id": "example.rest",
+        "sourceTemplateId": "example.rest",
+        "toVersion": 1,
         "availabilityMessage": "Migration to REST connector is available.",
         "changes": "- URL is now called endpoint.\n- HTTP methods are lower case.\n- Payload is now called body and requires POST.\n\nSee [REST connector](https://docs.camunda.io/docs/components/connectors/protocol/rest/).",
         "instructions": [
@@ -177,7 +178,8 @@
         ]
       },
       {
-        "id": "example.unknown",
+        "sourceTemplateId": "example.unknown",
+        "toVersion": 1,
         "instructions": [
           {
             "from": {

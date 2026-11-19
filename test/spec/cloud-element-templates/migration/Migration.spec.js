@@ -151,7 +151,7 @@ describe('provider/cloud-element-templates - migration', function() {
       return {
         ...targetTemplate,
         properties: fields,
-        migratesFrom: [ { id: legacyTemplate.id, instructions } ]
+        migratesFrom: [ { sourceTemplateId: legacyTemplate.id, toVersion: targetTemplate.version, instructions } ]
       };
     }
 
@@ -350,17 +350,24 @@ describe('provider/cloud-element-templates - migration', function() {
     ];
 
     it('should run same-ID steps in order without loading intermediate templates and undo once',
-      inject(function(elementRegistry, elementTemplates, commandStack) {
+      inject(function(elementRegistry, elementTemplates, commandStack, eventBus) {
         const target = { ...targetTemplate, id: legacyTemplate.id, version: 4, migratesFrom: steps };
         elementTemplates.set([ legacyTemplate, target ]);
 
         const element = elementRegistry.get('Legacy');
+        let updateEvent;
 
         expect(elementTemplates.getMigrations(element)).to.eql([]);
         expect(elementTemplates.getChanges(element, target)).to.equal('Stage the legacy URL.\n\nUse the staged endpoint.');
 
+        eventBus.on('elementTemplates.update', (_, data) => {
+          updateEvent = data;
+        });
+
         elementTemplates.applyTemplate(element, target);
 
+        expect(updateEvent.changes).to.equal('Stage the legacy URL.\n\nUse the staged endpoint.');
+        expect(elementTemplates.getChanges(element, target)).to.be.undefined;
         expect(getInput(element, 'endpoint')).to.equal('https://custom.io');
         expect(getInput(element, 'intermediate')).to.be.undefined;
         commandStack.undo();
@@ -375,6 +382,7 @@ describe('provider/cloud-element-templates - migration', function() {
           minSourceVersion: 1,
           toVersion: 2,
           availabilityMessage: 'Migrate to the new REST template.',
+          changes: 'Stage the source URL.',
           instructions: [ { from: input('url'), to: intermediate } ]
         };
         const target = { ...targetTemplate, version: 4, migratesFrom: [ ...steps, change ] };
@@ -382,8 +390,14 @@ describe('provider/cloud-element-templates - migration', function() {
 
         const element = elementRegistry.get('Legacy');
 
-        expect(elementTemplates.getMigrations(element)).to.eql([ target ]);
-        expect(elementTemplates.getMigrationAvailabilityMessage(element, target)).to.equal(change.availabilityMessage);
+        expect(elementTemplates.getMigrations(element)).to.eql([
+          {
+            template: target,
+            availabilityMessage: change.availabilityMessage,
+            changes: 'Stage the source URL.\n\nUse the staged endpoint.'
+          }
+        ]);
+        expect(elementTemplates.getChanges(element, target)).to.equal('Stage the source URL.\n\nUse the staged endpoint.');
         expect(elementTemplates.getChanges(element, { ...target, migratesFrom: [
           ...steps, { ...change, minSourceVersion: 2 }
         ] })).to.be.undefined;
@@ -400,7 +414,9 @@ describe('provider/cloud-element-templates - migration', function() {
         const element = elementRegistry.get('Legacy');
 
         elementTemplates.set([ legacyTemplate, target ]);
-        expect(elementTemplates.getMigrations(element)).to.eql([ target ]);
+        expect(elementTemplates.getMigrations(element)).to.eql([
+          { template: target, availabilityMessage: undefined, changes: undefined }
+        ]);
 
         elementTemplates.set([ legacyTemplate, { ...target, migratesFrom: [ { ...change, maxSourceVersion: 0 } ] } ]);
         expect(elementTemplates.getMigrations(element)).to.eql([]);
@@ -444,6 +460,32 @@ describe('provider/cloud-element-templates - migration', function() {
         expect(getHeader(recentElement, 'resultExpression')).to.equal('=response');
       }));
 
+    for (const [ version, key, sourceValue, targetValue ] of [
+      [ 12, 'resultExpression', '=oldResponse', '=response' ],
+      [ 14, 'retryBackoff', 'PT0S', 'PT30S' ]
+    ]) {
+      it(`should retain the configured REST ${ key } from v${ version }`,
+        inject(function(elementRegistry, elementTemplates) {
+          const binding = { type: 'zeebe:taskHeader', key };
+          const property = { label: key, type: 'String', binding, value: sourceValue };
+          const source = { ...legacyTemplate, version, properties: [ property ] };
+          const target = {
+            ...source,
+            version: 18,
+            properties: [ { ...property, value: targetValue } ],
+            migratesFrom: restSteps
+          };
+
+          elementTemplates.set([ source, target ]);
+          const element = elementTemplates.applyTemplate(elementRegistry.get('Legacy'), source);
+          expect(getHeader(element, key)).to.equal(sourceValue);
+
+          elementTemplates.applyTemplate(element, target);
+
+          expect(getHeader(element, key)).to.equal(sourceValue);
+        }));
+    }
+
   });
 
 
@@ -455,7 +497,25 @@ describe('provider/cloud-element-templates - migration', function() {
       const migrations = elementTemplates.getMigrations(elementRegistry.get('Legacy'));
 
       // then
-      expect(migrations).to.eql([ targetTemplate ]);
+      expect(migrations).to.eql([
+        {
+          template: targetTemplate,
+          availabilityMessage: 'Migration to REST connector is available.',
+          changes: targetTemplate.migratesFrom[0].changes
+        }
+      ]);
+    }));
+
+    it('should not offer an unversioned legacy declaration', inject(function(elementRegistry, elementTemplates) {
+      const target = {
+        ...targetTemplate,
+        migratesFrom: [ { id: legacyTemplate.id, changes: 'Legacy change.' } ]
+      };
+      elementTemplates.set([ legacyTemplate, target ]);
+      const element = elementRegistry.get('Legacy');
+
+      expect(elementTemplates.getMigrations(element)).to.be.empty;
+      expect(elementTemplates.getChanges(element, target)).to.be.undefined;
     }));
 
 
@@ -523,10 +583,17 @@ describe('provider/cloud-element-templates - migration', function() {
     }));
 
 
-    it('should migrate', inject(async function(elementRegistry, selection, elementTemplates) {
+    it('should migrate and allow changes to be reviewed beforehand', inject(async function(elementRegistry, selection, elementTemplates, eventBus) {
 
       // given
+      let applyEvent;
+      const sourceElement = elementRegistry.get('Legacy');
+      eventBus.on('elementTemplates.apply', (_, data) => {
+        applyEvent = data;
+      });
       await act(() => selection.select(elementRegistry.get('Legacy')));
+
+      expect(elementTemplates.getChanges(sourceElement, targetTemplate)).to.equal(targetTemplate.migratesFrom[0].changes);
 
       // when
       await clickMenuItem(container, 'Migrate');
@@ -536,6 +603,8 @@ describe('provider/cloud-element-templates - migration', function() {
 
       expect(elementTemplates.get(element)).to.equal(targetTemplate);
       expect(getInput(element, 'endpoint')).to.eql('https://custom.io');
+      expect(applyEvent.changes).to.equal(targetTemplate.migratesFrom[0].changes);
+      expect(elementTemplates.getChanges(element, targetTemplate)).to.be.undefined;
       expect(domQuery('.bio-properties-panel-template-migration-available', container)).not.to.exist;
     }));
 

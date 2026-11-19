@@ -26,9 +26,7 @@ export function getMigrationSteps(template, source) {
     const change = steps.find(step => step.sourceTemplateId === source.id && isEligible(step, version));
 
     if (!change) {
-      const legacy = entries.find(step => !has(step, 'toVersion') && step.id === source.id);
-
-      return legacy ? [ legacy ] : [];
+      return [];
     }
 
     chain.push(change);

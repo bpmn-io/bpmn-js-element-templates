@@ -43,10 +43,6 @@
               {
                 "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
                 "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.anthropic.apiKey" }
-              },
-              {
-                "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.anthropic.endpoint" }
               }
             ]
           },
