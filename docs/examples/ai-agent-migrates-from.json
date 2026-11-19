@@ -5,12 +5,11 @@
     "maxSourceVersion": 13,
     "toVersion": 1,
     "availabilityMessage": "Migrate AI Agent to the v2 Sub-process template.",
-    "changes": "Before deploying:\n- Select and configure a supported v2 provider if the source provider is missing or unsupported.\n- Check the static Anthropic endpoint for its selected backend. Remove the trailing /v1 from the public endpoint, /anthropic/v1 or /v1 from Foundry, or the root /v1 from Custom; these backends construct the messages path. Preserve intentional proxy prefixes.\n- Check OpenAI-compatible authentication: an Authorization header overrides the legacy key. Move Bearer credentials to API key without the prefix and remove that header; keep other schemes as headers with None authentication. For dynamic keys, ensure API key mode receives a non-empty key, or use None for no-key calls.\n- Ensure the v2 worker is available, configure custom overrides if used, and deploy a new process version. Existing instances remain on v1; retain their worker and overrides while needed.\nSee the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/) for details.",
+    "changes": "Before deploying:\n- Select and configure a supported v2 provider if the source provider is missing or unsupported. Values without a source value use target defaults; review them after migration and set any required values manually.\n- The public Anthropic API endpoint and Vertex AI custom endpoint are hidden in the target template and are not migrated; they use the target defaults.\n- For Foundry and Custom Anthropic endpoints, remove the trailing /anthropic/v1 or /v1; these backends construct the messages path. Preserve intentional proxy prefixes.\n- Check OpenAI-compatible authentication: an Authorization header overrides the legacy key. Move Bearer credentials to API key without the prefix and remove that header; keep other schemes as headers with None authentication. For dynamic keys, ensure API key mode receives a non-empty key, or use None for no-key calls.\n- Ensure the v2 worker is available, configure custom overrides if used, and deploy a new process version. Existing instances remain on v1; retain their worker and overrides while needed.\nSee the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/) for details.",
     "instructions": [
       {
         "from": { "type": "zeebe:input", "name": "provider.type" },
         "to": { "type": "zeebe:input", "name": "provider.type" },
-        "copyEmpty": true,
         "values": {
           "azureOpenAi": "openai",
           "openaiCompatible": "openai",
@@ -19,8 +18,7 @@
       },
       {
         "from": { "type": "zeebe:input", "name": "data.systemPrompt.prompt" },
-        "to": { "type": "zeebe:input", "name": "data.systemPrompt.prompt" },
-        "copyEmpty": true
+        "to": { "type": "zeebe:input", "name": "data.systemPrompt.prompt" }
       },
       {
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "anthropic" },
@@ -48,8 +46,7 @@
               },
               {
                 "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.anthropic.endpoint" },
-                "includeHidden": true
+                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.anthropic.endpoint" }
               }
             ]
           },
@@ -115,7 +112,7 @@
           { "from": { "type": "zeebe:input", "name": "provider.openai.authentication.apiKey" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.openai.apiKey" } },
           { "from": { "type": "zeebe:input", "name": "provider.openai.authentication.organizationId" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.openai.organizationId" } },
           { "from": { "type": "zeebe:input", "name": "provider.openai.authentication.projectId" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.openai.projectId" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openai.model.model" }, "to": { "type": "zeebe:input", "name": "provider.openai.model.model" }, "copyEmpty": true },
+          { "from": { "type": "zeebe:input", "name": "provider.openai.model.model" }, "to": { "type": "zeebe:input", "name": "provider.openai.model.model" } },
           { "from": { "type": "zeebe:input", "name": "provider.openai.model.parameters.maxCompletionTokens" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.maxCompletionTokens" } },
           { "from": { "type": "zeebe:input", "name": "provider.openai.model.parameters.temperature" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.temperature" } },
           { "from": { "type": "zeebe:input", "name": "provider.openai.model.parameters.topP" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.topP" } }
@@ -126,7 +123,7 @@
         "instructions": [
           { "to": { "type": "zeebe:input", "name": "provider.openai.api.type" }, "set": "completions" },
           { "to": { "type": "zeebe:input", "name": "provider.openai.backend.type" }, "set": "foundry" },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.type" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.type" }, "copyEmpty": true },
+          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.type" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.type" } },
           { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.endpoint" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.endpoint" } },
           { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.apiKey" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.apiKey" } },
           { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.clientId" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.clientId" } },
@@ -161,7 +158,7 @@
           { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.headers" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.headers" } },
           { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.queryParameters" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.queryParameters" } },
           { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.timeouts.timeout" }, "to": { "type": "zeebe:input", "name": "provider.openai.timeouts.timeout" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.model" }, "to": { "type": "zeebe:input", "name": "provider.openai.model.model" }, "copyEmpty": true },
+          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.model" }, "to": { "type": "zeebe:input", "name": "provider.openai.model.model" } },
           { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.parameters.maxCompletionTokens" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.maxCompletionTokens" } },
           { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.parameters.temperature" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.temperature" } },
           { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.parameters.topP" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.topP" } },
@@ -172,7 +169,7 @@
         "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "google-vertex-ai" },
         "instructions": [
           { "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.type" }, "set": "google-vertex-ai" },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.authentication.type" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.authentication.type" }, "copyEmpty": true },
+          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.authentication.type" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.authentication.type" } },
           { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.projectId" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.projectId" } },
           { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.region" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.region" } },
           { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.authentication.jsonKey" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.authentication.jsonKey" } },
@@ -181,8 +178,7 @@
           { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.parameters.maxOutputTokens" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.parameters.maxTokens" } },
           { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.parameters.temperature" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.parameters.temperature" } },
           { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.parameters.topP" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.parameters.topP" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.parameters.topK" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.parameters.topK" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.endpoint" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.endpoint" }, "includeHidden": true }
+          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.parameters.topK" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.parameters.topK" } }
         ]
       }
     ]

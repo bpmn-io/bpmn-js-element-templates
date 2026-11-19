@@ -1,7 +1,7 @@
 [
   {
     "toVersion": 3,
-    "changes": "- Converts HTTP method values to uppercase.\n- Keeps the configured OAuth client authentication method, including an unset value.",
+    "changes": "- Converts HTTP method values to uppercase.\n- Uses the target default when the OAuth client authentication method is unset.",
     "instructions": [
       {
         "from": { "type": "zeebe:input", "name": "method" },
@@ -14,8 +14,7 @@
           "equals": "oauth-client-credentials-flow"
         },
         "from": { "type": "zeebe:input", "name": "authentication.clientAuthentication" },
-        "to": { "type": "zeebe:input", "name": "authentication.clientAuthentication" },
-        "copyEmpty": true
+        "to": { "type": "zeebe:input", "name": "authentication.clientAuthentication" }
       }
     ]
   },
@@ -32,25 +31,11 @@
   },
   {
     "toVersion": 13,
-    "changes": "- Keeps the result expression unset when the source has none, instead of adding the new example expression.",
-    "instructions": [
-      {
-        "from": { "type": "zeebe:taskHeader", "key": "resultExpression" },
-        "to": { "type": "zeebe:taskHeader", "key": "resultExpression" },
-        "copyEmpty": true
-      }
-    ]
+    "changes": "- Uses the target default when the source has no result expression."
   },
   {
     "toVersion": 15,
-    "changes": "- Keeps the existing retry backoff instead of replacing it with the v15 default.",
-    "instructions": [
-      {
-        "from": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
-        "to": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
-        "copyEmpty": true
-      }
-    ]
+    "changes": "- Uses the target default when no retry backoff is configured."
   },
   {
     "toVersion": 17,

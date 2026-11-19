@@ -74,7 +74,7 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
       expect(read('provider.anthropic.backend.type')).to.equal(backend);
       expect(read(`${ prefix }.${ backend === 'anthropic-api' ? '' : 'authentication.' }apiKey`))
         .to.equal('{{secrets.ANTHROPIC}}');
-      expect(read(`${ prefix }.endpoint`)).to.equal(endpoint);
+      expect(read(`${ prefix }.endpoint`)).to.equal(backend === 'anthropic-api' ? undefined : endpoint);
       if (backend === 'anthropic-api' && endpoint) {
         expect(read('provider.anthropic.backend.custom.endpoint')).to.be.undefined;
       }
@@ -95,7 +95,7 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
       write(oldEndpoint, value);
       write('data.systemPrompt.prompt', '', false);
       migrate();
-      expect(read(newEndpoint)).to.equal(value);
+      expect(read(newEndpoint)).to.be.undefined;
 
       await modeler.importXML((await modeler.saveXML()).xml);
       element = modeler.get('elementRegistry').get(element.id);
@@ -103,7 +103,7 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
       elementTemplates.set([ source, destination, updated ]);
       elementTemplates.applyTemplate(element, updated);
 
-      expect(read(newEndpoint)).to.equal(provider === 'google-vertex-ai' ? undefined : value);
+      expect(read(newEndpoint)).to.be.undefined;
       expect(read('data.systemPrompt.prompt')).to.equal('');
     });
   }
@@ -129,7 +129,7 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
   }
 
 
-  it('should copy the hidden Vertex endpoint and undo and redo it with the migration', async function() {
+  it('should not migrate the hidden Vertex endpoint and undo and redo the migration', async function() {
     write('provider.type', 'google-vertex-ai');
     write('provider.googleVertexAi.authentication.type', 'applicationDefaultCredentials');
     write('provider.googleVertexAi.endpoint', '=vertexEndpoint');
@@ -141,8 +141,8 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
 
     expect(read('provider.googleGemini.backend.type')).to.equal('google-vertex-ai');
     expect(read('provider.googleGemini.model.parameters.maxTokens')).to.equal('=512');
-    expect(read(binding)).to.equal('=vertexEndpoint');
-    expect((await modeler.saveXML()).xml).to.include(`source="=vertexEndpoint" target="${ binding }"`);
+    expect(read(binding)).to.be.undefined;
+    expect((await modeler.saveXML()).xml).not.to.include(`target="${ binding }"`);
 
     const commandStack = modeler.get('commandStack');
 
@@ -153,17 +153,16 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
 
     commandStack.redo();
     expect(elementTemplates.get(element).id).to.equal(target.id);
-    expect(read(binding)).to.equal('=vertexEndpoint');
+    expect(read(binding)).to.be.undefined;
   });
 
-
   for (const [ label, prompt ] of [ [ 'missing', undefined ], [ 'empty', '' ], [ 'configured', '=myPrompt' ] ]) {
-    it(`should keep a ${ label } v1 system prompt instead of applying the v2 default`, function() {
+    it(`should use normal template behavior for a ${ label } v1 system prompt`, function() {
       write('data.systemPrompt.prompt', prompt, prompt === undefined);
 
       migrate();
 
-      expect(read('data.systemPrompt.prompt')).to.equal(prompt ?? '');
+      expect(read('data.systemPrompt.prompt')).to.equal(prompt === undefined ? '="v2 prompt"' : prompt);
     });
   }
 
@@ -228,7 +227,6 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
 
 
   for (const endpoint of [
-    'https://api.anthropic.com/v1',
     'https://resource.services.ai.azure.com/anthropic/v1',
     'https://proxy.example/v1'
   ]) {

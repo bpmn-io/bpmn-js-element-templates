@@ -36,10 +36,10 @@ export default class MigrationBehavior extends CommandInterceptor {
 
       const template = elementTemplates.get(element);
 
-      migratedValues.forEach(({ to, value, includeHidden }) => {
+      migratedValues.forEach(({ to, value }) => {
 
         // previous writes may activate conditional properties
-        const property = findMigrationProperty(applyConditions(element, template).properties, to, includeHidden);
+        const property = findMigrationProperty(applyConditions(element, template).properties, to);
 
         if (property) {
           setPropertyValue(bpmnFactory, commandStack, element, property, value);

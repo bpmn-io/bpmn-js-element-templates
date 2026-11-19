@@ -253,18 +253,20 @@ describe('provider/cloud-element-templates - migration', function() {
         expect(getInput(element, 'endpoint')).to.be.undefined;
       }));
 
-    it('should reset a hidden value to the template default on update',
+    it('should use the target default for a hidden migration destination',
       inject(async function(bpmnjs, elementRegistry, elementTemplates) {
         const fields = targetTemplate.properties.map(property =>
-          property.binding.name === 'endpoint' ? { ...property, type: 'Hidden' } : property
+          property.binding.name === 'endpoint'
+            ? { ...property, type: 'Hidden', value: 'https://target default' }
+            : property
         );
-        const target = targetWith([ { ...copy, includeHidden: true } ], fields);
+        const target = targetWith([ copy ], fields);
         elementTemplates.set([ legacyTemplate, target ]);
         let element = elementRegistry.get('Legacy');
 
         elementTemplates.applyTemplate(element, target);
 
-        expect(getInput(element, 'endpoint')).to.equal('https://custom.io');
+        expect(getInput(element, 'endpoint')).to.equal('https://target default');
 
         await bpmnjs.importXML((await bpmnjs.saveXML()).xml);
         element = elementRegistry.get('Legacy');
@@ -433,7 +435,7 @@ describe('provider/cloud-element-templates - migration', function() {
 
         expect(getInput(oldElement, 'method')).to.equal('POST');
         expect(getHeader(oldElement, 'retryBackoff')).to.equal('PT0S');
-        expect(getHeader(oldElement, 'resultExpression')).to.be.undefined;
+        expect(getHeader(oldElement, 'resultExpression')).to.equal('=response');
 
         const recentElement = elementTemplates.applyTemplate(elementRegistry.get('Unknown'), recent);
         elementTemplates.applyTemplate(recentElement, target);

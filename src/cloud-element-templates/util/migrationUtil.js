@@ -90,7 +90,7 @@ export function resolveMigrationSteps(element, steps) {
 }
 
 function resolveMigrationInstructions(read, instructions) {
-  return instructions.flatMap(({ when, instructions, from, to, set, values, replace, copyEmpty, includeHidden }) => {
+  return instructions.flatMap(({ when, instructions, from, to, set, values, replace }) => {
     if (when && ![].concat(when).every(condition => matchesCondition(read, condition))) {
       return [];
     }
@@ -100,13 +100,13 @@ function resolveMigrationInstructions(read, instructions) {
     }
 
     if (!from) {
-      return [ { to, value: set, includeHidden } ];
+      return [ { to, value: set } ];
     }
 
     let value = read(from);
 
     if (isEmpty(value)) {
-      return copyEmpty ? [ { to, value: '', includeHidden } ] : [];
+      return [];
     }
 
     value = mapValue(value, values);
@@ -123,7 +123,7 @@ function resolveMigrationInstructions(read, instructions) {
       }
     }
 
-    return [ { to, value, includeHidden } ];
+    return [ { to, value } ];
   });
 }
 
@@ -136,17 +136,16 @@ export function prepareMigration(element, source, target) {
 }
 
 /**
- * Find the active destination, allowing an explicit write to a hidden property.
+ * Find the active, editable destination.
  *
  * @param {Array<Object>} properties
  * @param {Object} binding
- * @param {boolean} [includeHidden]
  *
  * @return {Object|undefined}
  */
-export function findMigrationProperty(properties, binding, includeHidden) {
+export function findMigrationProperty(properties, binding) {
   return properties.find(property => {
-    return (includeHidden || property.type !== 'Hidden') && isSameBinding(property.binding, binding);
+    return property.type !== 'Hidden' && isSameBinding(property.binding, binding);
   });
 }
 
