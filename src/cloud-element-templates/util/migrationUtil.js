@@ -11,18 +11,16 @@ import { getPropertyValue } from './propertyUtil';
  * @return {Array<Object>}
  */
 export function getMigrationSteps(template, source) {
-  const entries = template.migratesFrom || [];
   const sourceVersion = source.version ?? 0;
   const targetVersion = template.version ?? 0;
-  const sameId = template.id === source.id;
-  const steps = entries
+  const steps = (template.migratesFrom || [])
     .filter(step => Number.isInteger(step.toVersion) && step.toVersion > 0 && step.toVersion <= targetVersion)
     .sort((a, b) => a.toVersion - b.toVersion);
 
   const chain = [];
   let version = sourceVersion;
 
-  if (!sameId) {
+  if (template.id !== source.id) {
     const change = steps.find(step => step.sourceTemplateId === source.id && isEligible(step, version));
 
     if (!change) {
@@ -128,9 +126,7 @@ export function prepareMigration(element, source, target) {
  * @return {Object|undefined}
  */
 export function findMigrationProperty(properties, binding) {
-  return properties.find(property => {
-    return property.type !== 'Hidden' && isSameBinding(property.binding, binding);
-  });
+  return properties.find(property => property.type !== 'Hidden' && isSameBinding(property.binding, binding));
 }
 
 function matchesCondition(read, condition) {

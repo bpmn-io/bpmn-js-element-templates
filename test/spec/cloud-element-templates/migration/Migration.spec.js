@@ -231,13 +231,12 @@ describe('provider/cloud-element-templates - migration', function() {
 
     for (const [ label, instruction, error ] of failures) {
       it(`should reject ${ label } without changing XML or damaging undo`,
-        inject(async function(bpmnjs, elementRegistry, elementTemplates, commandStack, eventBus) {
+        inject(async function(bpmnjs, elementRegistry, elementTemplates, commandStack) {
           const target = targetWith([ { to: endpoint, set: 'must not be applied' }, instruction ]);
           elementTemplates.set([ legacyTemplate, target ]);
           const element = elementRegistry.get('Legacy');
           const before = (await bpmnjs.saveXML()).xml;
           const canUndo = commandStack.canUndo();
-          eventBus.on('error', () => false);
 
           expect(() => elementTemplates.applyTemplate(element, target)).to.throw(error);
 

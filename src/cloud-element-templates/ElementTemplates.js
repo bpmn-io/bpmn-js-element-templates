@@ -132,25 +132,16 @@ export default class ElementTemplates extends DefaultElementTemplates {
     }
 
     return this.getLatest(element)
-      .filter(template => this.isCompatible(template))
-      .reduce((migrations, template) => {
-        if (template.id === sourceTemplate.id) {
-          return migrations;
-        }
-
+      .filter(template => template.id !== sourceTemplate.id)
+      .flatMap(template => {
         const steps = getMigrationSteps(template, sourceTemplate);
-        const [ firstStep ] = steps;
 
-        if (firstStep) {
-          migrations.push({
-            template,
-            availabilityMessage: firstStep.availabilityMessage,
-            changes: getMigrationChanges(steps)
-          });
-        }
-
-        return migrations;
-      }, []);
+        return steps.length ? [ {
+          template,
+          availabilityMessage: steps[0].availabilityMessage,
+          changes: getMigrationChanges(steps)
+        } ] : [];
+      });
   }
 
   /**
