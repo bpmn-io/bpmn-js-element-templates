@@ -50,25 +50,9 @@ function isEligible(step, version) {
 }
 
 /**
- * Map a value as hinted by a migration.
- *
- * @param {any} value
- * @param {Object} [values]
- *
- * @return {any}
- */
-function mapValue(value, values) {
-  if (values && isString(value) && has(values, value)) {
-    return values[ value ];
-  }
-
-  return value;
-}
-
-/**
  * Resolve instructions against the source before applying the new template.
  */
-export function resolveMigrationSteps(element, steps) {
+function resolveMigrationSteps(element, steps) {
   const staged = new Map();
   const read = binding => {
     const key = bindingKey(binding);
@@ -107,7 +91,9 @@ function resolveMigrationInstructions(read, instructions) {
       return [];
     }
 
-    value = mapValue(value, values);
+    if (values && isString(value) && has(values, value)) {
+      value = values[ value ];
+    }
 
     if (replace) {
       if (!isString(replace.pattern) || !isString(replace.replacement)) {

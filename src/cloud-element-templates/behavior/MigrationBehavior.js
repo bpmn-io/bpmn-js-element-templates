@@ -4,8 +4,7 @@ import { applyConditions } from '../Condition';
 
 import {
   findMigrationProperty,
-  getMigrationSteps,
-  resolveMigrationSteps
+  prepareMigration
 } from '../util/migrationUtil';
 
 import { setPropertyValue } from '../util/propertyUtil';
@@ -21,7 +20,7 @@ export default class MigrationBehavior extends CommandInterceptor {
     super(eventBus);
 
     this.preExecute('propertiesPanel.zeebe.changeTemplate', (context) => {
-      context.migratedValues ??= getMigratedValues(context);
+      context.migratedValues ??= prepareMigration(context.element, context.oldTemplate, context.newTemplate);
     }, true);
 
     this.postExecute('propertiesPanel.zeebe.changeTemplate', (context) => {
@@ -55,18 +54,3 @@ MigrationBehavior.$inject = [
   'commandStack',
   'elementTemplates'
 ];
-
-
-function getMigratedValues(context) {
-  const {
-    element,
-    oldTemplate,
-    newTemplate
-  } = context;
-
-  if (!oldTemplate || !newTemplate) {
-    return [];
-  }
-
-  return resolveMigrationSteps(element, getMigrationSteps(newTemplate, oldTemplate));
-}

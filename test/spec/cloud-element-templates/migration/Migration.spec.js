@@ -79,6 +79,19 @@ describe('provider/cloud-element-templates - migration', function() {
       expect(getInput(element, 'url')).not.to.exist;
     }));
 
+    it('should migrate when the template change command is executed directly', inject(function(elementRegistry, commandStack) {
+      const context = {
+        element: elementRegistry.get('Legacy'),
+        oldTemplate: legacyTemplate,
+        newTemplate: targetTemplate
+      };
+
+      commandStack.execute('propertiesPanel.zeebe.changeTemplate', context);
+
+      expect(getInput(context.element, 'endpoint')).to.equal('https://custom.io');
+      expect(getInput(context.element, 'body')).to.equal('=payload');
+    }));
+
 
     it('should map hinted value', inject(function(elementRegistry, elementTemplates) {
 
@@ -218,12 +231,13 @@ describe('provider/cloud-element-templates - migration', function() {
 
     for (const [ label, instruction, error ] of failures) {
       it(`should reject ${ label } without changing XML or damaging undo`,
-        inject(async function(bpmnjs, elementRegistry, elementTemplates, commandStack) {
+        inject(async function(bpmnjs, elementRegistry, elementTemplates, commandStack, eventBus) {
           const target = targetWith([ { to: endpoint, set: 'must not be applied' }, instruction ]);
           elementTemplates.set([ legacyTemplate, target ]);
           const element = elementRegistry.get('Legacy');
           const before = (await bpmnjs.saveXML()).xml;
           const canUndo = commandStack.canUndo();
+          eventBus.on('error', () => false);
 
           expect(() => elementTemplates.applyTemplate(element, target)).to.throw(error);
 
