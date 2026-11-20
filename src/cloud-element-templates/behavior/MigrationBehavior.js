@@ -3,15 +3,11 @@ import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 import { applyConditions } from '../Condition';
 
 import {
-  findEditableProperty,
-  getMigration,
-  mapValue
+  findMigrationProperty,
+  prepareMigration
 } from '../util/migrationUtil';
 
-import {
-  getPropertyValue,
-  setPropertyValue
-} from '../util/propertyUtil';
+import { setPropertyValue } from '../util/propertyUtil';
 
 
 /**
@@ -24,7 +20,7 @@ export default class MigrationBehavior extends CommandInterceptor {
     super(eventBus);
 
     this.preExecute('propertiesPanel.zeebe.changeTemplate', (context) => {
-      context.migratedValues = getMigratedValues(context);
+      context.migratedValues ??= prepareMigration(context.element, context.oldTemplate, context.newTemplate);
     }, true);
 
     this.postExecute('propertiesPanel.zeebe.changeTemplate', (context) => {
@@ -33,11 +29,16 @@ export default class MigrationBehavior extends CommandInterceptor {
         migratedValues = []
       } = context;
 
-      migratedValues.forEach(({ binding, value }) => {
-        const template = elementTemplates.get(element);
+      if (!migratedValues.length) {
+        return;
+      }
+
+      const template = elementTemplates.get(element);
+
+      migratedValues.forEach(({ to, value }) => {
 
         // previous writes may activate conditional properties
-        const property = findEditableProperty(applyConditions(element, template).properties, binding);
+        const property = findMigrationProperty(applyConditions(element, template).properties, to);
 
         if (property) {
           setPropertyValue(bpmnFactory, commandStack, element, property, value);
@@ -53,28 +54,3 @@ MigrationBehavior.$inject = [
   'commandStack',
   'elementTemplates'
 ];
-
-
-function getMigratedValues(context) {
-  const {
-    element,
-    oldTemplate,
-    newTemplate
-  } = context;
-
-  const migration = oldTemplate && newTemplate && getMigration(newTemplate, oldTemplate.id);
-
-  if (!migration) {
-    return [];
-  }
-
-  return (migration.properties || []).flatMap(({ from, to, values }) => {
-    const value = getPropertyValue(element, { type: 'String', binding: from });
-
-    if (value === undefined || value === '') {
-      return [];
-    }
-
-    return [ { binding: to, value: mapValue(value, values) } ];
-  });
-}

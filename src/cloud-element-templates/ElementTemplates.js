@@ -26,7 +26,7 @@ import { default as DefaultElementTemplates } from '../element-templates/Element
 
 import { isTimerTemplateApplicable } from './util/timerUtil';
 
-import { getMigration } from './util/migrationUtil';
+import { getMigrationSteps, prepareMigration } from './util/migrationUtil';
 
 /**
  * @typedef {import('bpmn-js/lib/model/Types').Element} Element
@@ -118,11 +118,11 @@ export default class ElementTemplates extends DefaultElementTemplates {
   }
 
   /**
-   * Get the templates an element can be migrated to.
+   * Get migration targets with their availability message and authored changes.
    *
    * @param {Element} element
    *
-   * @return {Array<ElementTemplate>}
+   * @return {Array<{ template: ElementTemplate, availabilityMessage: string|undefined, changes: string|undefined }>}
    */
   getMigrations(element) {
     const sourceTemplate = this.get(element);
@@ -131,11 +131,17 @@ export default class ElementTemplates extends DefaultElementTemplates {
       return [];
     }
 
-    const templateId = sourceTemplate.id;
-
     return this.getLatest(element)
-      .filter(template => this.isCompatible(template))
-      .filter(template => getMigration(template, templateId));
+      .filter(template => template.id !== sourceTemplate.id)
+      .flatMap(template => {
+        const steps = getMigrationSteps(template, sourceTemplate);
+
+        return steps.length ? [ {
+          template,
+          availabilityMessage: steps[0].availabilityMessage || sourceTemplate.deprecated?.message,
+          changes: getMigrationChanges(steps)
+        } ] : [];
+      });
   }
 
   /**
@@ -148,11 +154,13 @@ export default class ElementTemplates extends DefaultElementTemplates {
    * @return {string|undefined}
    */
   getChanges(element, newTemplate) {
-    const oldTemplate = this.get(element);
+    const source = this.get(element);
 
-    const migration = oldTemplate && getMigration(newTemplate, oldTemplate.id);
+    if (!source) {
+      return;
+    }
 
-    return migration && migration.changes;
+    return getMigrationChanges(getMigrationSteps(newTemplate, source));
   }
 
   _filterApplicableTemplates(templates, element) {
@@ -251,11 +259,13 @@ export default class ElementTemplates extends DefaultElementTemplates {
    */
   applyTemplate(element, newTemplate, options = {}) {
     const oldTemplate = this.get(element);
+    const changes = oldTemplate && newTemplate && this.getChanges(element, newTemplate);
 
     const context = {
       element,
       newTemplate,
       oldTemplate,
+      migratedValues: prepareMigration(element, oldTemplate, newTemplate),
       options
     };
 
@@ -266,7 +276,8 @@ export default class ElementTemplates extends DefaultElementTemplates {
     this._fire(event, {
       element,
       newTemplate,
-      oldTemplate
+      oldTemplate,
+      ...(changes && { changes })
     });
 
     return context.element;
@@ -296,6 +307,10 @@ export default class ElementTemplates extends DefaultElementTemplates {
 
     return context.element;
   }
+}
+
+function getMigrationChanges(steps) {
+  return steps.map(step => step.changes).filter(Boolean).join('\n\n') || undefined;
 }
 
 ElementTemplates.$inject = [

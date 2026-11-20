@@ -1,0 +1,63 @@
+[
+  {
+    "toVersion": 3,
+    "changes": "- Converts HTTP method values to uppercase.\n- Uses the target default when the OAuth client authentication method is unset.",
+    "instructions": [
+      {
+        "from": { "type": "zeebe:input", "name": "method" },
+        "to": { "type": "zeebe:input", "name": "method" },
+        "values": { "get": "GET", "post": "POST", "patch": "PATCH", "put": "PUT", "delete": "DELETE" }
+      },
+      {
+        "when": {
+          "binding": { "type": "zeebe:input", "name": "authentication.type" },
+          "equals": "oauth-client-credentials-flow"
+        },
+        "from": { "type": "zeebe:input", "name": "authentication.clientAuthentication" },
+        "to": { "type": "zeebe:input", "name": "authentication.clientAuthentication" }
+      }
+    ]
+  },
+  {
+    "toVersion": 6,
+    "changes": "- Initializes the new retry backoff to the v6 default (no delay).",
+    "instructions": [
+      {
+        "when": { "binding": { "type": "zeebe:taskHeader", "key": "retryBackoff" }, "isEmpty": true },
+        "to": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
+        "set": "PT0S"
+      }
+    ]
+  },
+  {
+    "toVersion": 13,
+    "changes": "- Keeps the configured result expression; uses the target default when the source has none.",
+    "instructions": [
+      {
+        "from": { "type": "zeebe:taskHeader", "key": "resultExpression" },
+        "to": { "type": "zeebe:taskHeader", "key": "resultExpression" }
+      }
+    ]
+  },
+  {
+    "toVersion": 15,
+    "changes": "- Keeps the configured retry backoff; uses the target default when none is configured.",
+    "instructions": [
+      {
+        "from": { "type": "zeebe:taskHeader", "key": "retryBackoff" },
+        "to": { "type": "zeebe:taskHeader", "key": "retryBackoff" }
+      }
+    ]
+  },
+  {
+    "toVersion": 17,
+    "changes": "- Maps the enabled Store response option to Document reference.",
+    "instructions": [
+      {
+        "when": { "binding": { "type": "zeebe:input", "name": "storeResponse" }, "matches": "^=?true$" },
+        "to": { "type": "zeebe:input", "name": "documentReturnFormat.choice" },
+        "set": "DOCUMENT"
+      }
+    ]
+  }
+]

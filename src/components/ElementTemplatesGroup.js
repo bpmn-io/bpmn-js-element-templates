@@ -44,7 +44,7 @@ import {
  * @property {'MIGRATABLE_TEMPLATE'} type
  * @property {object} template
  * @property {object} targetTemplate
- * @property {string} [description]
+ * @property {string} [availabilityMessage]
  */
 
 /**
@@ -312,16 +312,7 @@ function MigratableTemplate({ element, templateState }) {
   const { targetTemplate } = templateState;
 
   const translate = useService('translate'),
-        elementTemplates = useService('elementTemplates'),
-        eventBus = useService('eventBus');
-
-  const changes = elementTemplates.getChanges(element, targetTemplate);
-
-  const reviewChanges = () => eventBus.fire('elementTemplates.reviewChanges', {
-    element,
-    newTemplate: targetTemplate,
-    changes
-  });
+        elementTemplates = useService('elementTemplates');
 
   const menuItems = [
     { entry: <MigrationAvailableText templateState={ templateState } /> },
@@ -330,7 +321,6 @@ function MigratableTemplate({ element, templateState }) {
       entry: translate('Migrate'),
       action: () => elementTemplates.applyTemplate(element, targetTemplate)
     },
-    ...(changes ? [ { entry: translate('Review changes'), action: reviewChanges } ] : []),
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
@@ -346,16 +336,16 @@ function MigratableTemplate({ element, templateState }) {
 }
 
 function MigrationAvailableText({ templateState }) {
-  const { template, targetTemplate, description } = templateState;
+  const { template, targetTemplate, availabilityMessage } = templateState;
 
   const translate = useService('translate');
 
-  if (!description && template.deprecated) {
+  if (template.deprecated && (!availabilityMessage || availabilityMessage === template.deprecated.message)) {
     return <DeprecationWarning template={ template } />;
   }
 
   return <div class="bio-properties-panel-template-migration-available-text">
-    { description || translate('Migration to {templateName} is available.', { templateName: targetTemplate.name }) }
+    { availabilityMessage || translate('Migration to {templateName} is available.', { templateName: targetTemplate.name }) }
   </div>;
 }
 
@@ -458,12 +448,15 @@ function getTemplateState(elementTemplates, element, getTemplateId) {
     return { type: 'UNKNOWN_TEMPLATE', templateId };
   }
 
-  const [ targetTemplate ] = elementTemplates.getMigrations ? elementTemplates.getMigrations(element) : [];
+  const [ migration ] = elementTemplates.getMigrations ? elementTemplates.getMigrations(element) : [];
 
-  if (targetTemplate) {
-    const { description } = (targetTemplate.migratesFrom || []).find(migration => migration.id === template.id);
-
-    return { type: 'MIGRATABLE_TEMPLATE', template, targetTemplate, description };
+  if (migration) {
+    return {
+      type: 'MIGRATABLE_TEMPLATE',
+      template,
+      targetTemplate: migration.template,
+      availabilityMessage: migration.availabilityMessage
+    };
   }
 
   if (template.deprecated) {
