@@ -158,15 +158,33 @@ describe('migration - AI Agent Task v1@13 to Task v2@1', function() {
 
 
   it('should select Foundry for an Anthropic endpoint without enabling prompt caching', function() {
-    write('provider.anthropic.endpoint', 'https://resource.services.ai.azure.com/anthropic');
+    write('provider.anthropic.endpoint', 'https://resource.services.ai.azure.com/anthropic/v1');
     write('provider.anthropic.authentication.apiKey', '=apiKey');
 
     migrate();
 
     expect(read('provider.anthropic.backend.type')).to.equal('foundry');
-    expect(read('provider.anthropic.backend.foundry.endpoint')).to.equal('https://resource.services.ai.azure.com/anthropic');
+    expect(read('provider.anthropic.backend.foundry.endpoint')).to.equal('https://resource.services.ai.azure.com');
     expect(read('provider.anthropic.backend.foundry.authentication.apiKey')).to.equal('=apiKey');
     expect(read('provider.anthropic.model.parameters.promptCaching.enabled')).to.be.undefined;
+  });
+
+  it('should keep a non-canonical public Anthropic endpoint on the custom backend', function() {
+    write('provider.anthropic.endpoint', 'https://api.anthropic.com:8443/v1');
+
+    migrate();
+
+    expect(read('provider.anthropic.backend.type')).to.equal('custom');
+    expect(read('provider.anthropic.backend.custom.endpoint')).to.equal('https://api.anthropic.com:8443');
+  });
+
+  it('should remove a literal FEEL endpoint suffix without evaluating it', function() {
+    write('provider.anthropic.endpoint', '=endpoint + "/v1"');
+
+    migrate();
+
+    expect(read('provider.anthropic.backend.type')).to.equal('custom');
+    expect(read('provider.anthropic.backend.custom.endpoint')).to.equal('=endpoint');
   });
 
 

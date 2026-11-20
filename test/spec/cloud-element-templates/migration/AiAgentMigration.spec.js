@@ -60,7 +60,9 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
 
   const anthropicCases = [
     [ 'the public API without an endpoint', undefined, 'anthropic-api', 'anthropic' ],
-    [ 'the public API with an explicit endpoint', 'https://api.anthropic.com', 'anthropic-api', 'anthropic' ],
+    [ 'the public API with its canonical endpoint', 'https://api.anthropic.com', 'anthropic-api', 'anthropic' ],
+    [ 'the public API with an explicit endpoint', 'https://api.anthropic.com/v1', 'anthropic-api', 'anthropic' ],
+    [ 'the public API with a trailing slash', 'https://api.anthropic.com/v1/', 'anthropic-api', 'anthropic' ],
     [ 'Microsoft Foundry', 'https://resource.services.ai.azure.com/anthropic', 'foundry', 'foundry' ],
     [ 'a sovereign Foundry host', 'https://resource.services.ai.AZURE.US', 'foundry', 'foundry' ],
     [ 'a custom endpoint with Azure only in the path', 'https://proxy.example/host.azure.com', 'custom', 'custom' ],
@@ -232,38 +234,45 @@ describe('migration - AI Agent v1@13 to Sub-process v2@1', function() {
   });
 
 
-  for (const endpoint of [
-    'https://resource.services.ai.azure.com/anthropic/v1',
-    'https://proxy.example/v1'
+  for (const [ backend, endpoint, expected ] of [
+    [ 'foundry', 'https://resource.services.ai.azure.com/prefix/anthropic/v1', 'https://resource.services.ai.azure.com/prefix' ],
+    [ 'foundry', 'https://resource.services.ai.azure.com/v1/', 'https://resource.services.ai.azure.com' ],
+    [ 'custom', 'https://proxy.example/prefix/anthropic/v1', 'https://proxy.example/prefix/anthropic' ],
+    [ 'custom', 'https://proxy.example/prefix/v1/other', 'https://proxy.example/prefix/v1/other' ],
+    [ 'custom', 'https://api.anthropic.com:8443/v1', 'https://api.anthropic.com:8443' ],
+    [ 'custom', 'https://api.anthropic.com/v1/other', 'https://api.anthropic.com/v1/other' ]
   ]) {
-    it(`should preserve the endpoint text in ${ endpoint }`, function() {
+    it(`should migrate ${ endpoint } to the ${ backend } base URL`, function() {
       write('provider.anthropic.endpoint', endpoint);
       migrate();
 
-      const destination = elementTemplates.get(element).properties.find(property =>
-        property.binding.name?.endsWith('.endpoint') && read(property.binding.name) === endpoint
-      );
-      expect(destination).to.exist;
-      expect(destination.type).to.equal('String');
+      expect(read('provider.anthropic.backend.type')).to.equal(backend);
+      expect(read(`provider.anthropic.backend.${ backend }.endpoint`)).to.equal(expected);
     });
   }
 
 
-  for (const endpoint of [ '=endpoint', '{{secrets.ENDPOINT}}', 'https://proxy.example/prefix/v1' ]) {
-    it(`should retain an unresolved endpoint without rewriting ${ endpoint }`, async function() {
+  for (const [ endpoint, expected ] of [
+    [ '=endpoint', '=endpoint' ],
+    [ '=endpoint + "/v1"', '=endpoint' ],
+    [ '=endpoint + "/anthropic/v1"', '=endpoint + "/anthropic"' ],
+    [ '{{secrets.ENDPOINT}}/v1', '{{secrets.ENDPOINT}}' ],
+    [ 'https://{{secrets.HOST}}/v1', 'https://{{secrets.HOST}}' ]
+  ]) {
+    it(`should normalize a statically visible suffix without resolving ${ endpoint }`, async function() {
       write('provider.anthropic.endpoint', endpoint);
       migrate();
 
-      expect(read('provider.anthropic.backend.custom.endpoint')).to.equal(endpoint);
+      expect(read('provider.anthropic.backend.custom.endpoint')).to.equal(expected);
 
       await modeler.importXML((await modeler.saveXML()).xml);
       element = modeler.get('elementRegistry').get(element.id);
-      expect(read('provider.anthropic.backend.custom.endpoint')).to.equal(endpoint);
+      expect(read('provider.anthropic.backend.custom.endpoint')).to.equal(expected);
 
       const updated = { ...elementTemplates.get(element), version: 2 };
       elementTemplates.set([ source, elementTemplates.get(element), updated ]);
       elementTemplates.applyTemplate(element, updated);
-      expect(read('provider.anthropic.backend.custom.endpoint')).to.equal(endpoint);
+      expect(read('provider.anthropic.backend.custom.endpoint')).to.equal(expected);
     });
   }
 

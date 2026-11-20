@@ -12,7 +12,7 @@ Both apply directly as one command on the host's existing undo stack.
 Migration transforms stored values. Template builders can use other features for edge cases:
 
 * Invalid or missing values — target property [`constraints`](../src/cloud-element-templates/util/propertyUtil.js#L1222).
-* Other manual work (secrets, FEEL, deployment, connector upgrades) — the `changes` field, which hosts can display.
+* Other manual work (secrets, FEEL, deployment, connector upgrades) — the `changes` field, which hosts can display. Do not list actions already covered by target property constraints.
 
 Migration does not manage the full lifecycle. It does not:
 

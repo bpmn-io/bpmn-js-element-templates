@@ -5,7 +5,7 @@
     "maxSourceVersion": 13,
     "toVersion": 1,
     "availabilityMessage": "Migrate AI Agent to the v2 Task template.",
-    "changes": "Before deploying:\n- Select and configure a supported v2 provider if the source provider is missing or unsupported. Values without a source value use target defaults; review them after migration and set any required values manually.\n- The public Anthropic API endpoint and Vertex AI custom endpoint are hidden in the target template and are not migrated; they use the target defaults.\n- For Foundry and Custom Anthropic endpoints, remove the trailing /anthropic/v1 or /v1; these backends construct the messages path. Preserve intentional proxy prefixes.\n- Check OpenAI-compatible authentication: an Authorization header overrides the legacy key. Move Bearer credentials to API key without the prefix and remove that header; keep other schemes as headers with None authentication. For dynamic keys, ensure API key mode receives a non-empty key, or use None for no-key calls.\n- Ensure the v2 worker is available, configure custom overrides if used, and deploy a new process version. Existing instances remain on v1; retain their worker and overrides while needed.\nSee the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/) for details.",
+    "changes": "- New capabilities include reasoning controls, prompt caching, more model backends and authentication options, and custom chat model providers (Self-Managed/Hybrid).\n- Providers and backends are reorganized: Azure OpenAI and OpenAI-compatible move under OpenAI; Vertex AI moves under Google Gemini.\n- Authentication, supported endpoints, models, prompts, and other shared settings migrate automatically.\n- Make the v2 worker available and deploy a new process version; keep the v1 worker for deployed v1 processes.\n- Run the agent. If it does not work as expected, see the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/).",
     "instructions": [
       {
         "from": { "type": "zeebe:input", "name": "provider.type" },
@@ -36,7 +36,7 @@
           {
             "when": {
               "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-              "matches": "^[Hh][Tt][Tt][Pp][Ss]?://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?::[0-9]+)?(?:[/?#]|$)"
+              "matches": "^[Hh][Tt][Tt][Pp][Ss]://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?:/v1)?/?$"
             },
             "instructions": [
               { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "anthropic-api" },
@@ -56,7 +56,8 @@
               { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.foundry.authentication.type" }, "set": "apiKey" },
               {
                 "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.foundry.endpoint" }
+                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.foundry.endpoint" },
+                "replace": { "pattern": "^(.+?)(?:/anthropic)?/v1/?$", "replacement": "$1" }
               },
               {
                 "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
@@ -69,7 +70,7 @@
               { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "isEmpty": false },
               {
                 "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "matches": "^[Hh][Tt][Tt][Pp][Ss]?://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?::[0-9]+)?(?:[/?#]|$)",
+                "matches": "^[Hh][Tt][Tt][Pp][Ss]://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?:/v1)?/?$",
                 "not": true
               },
               {
@@ -83,7 +84,26 @@
               { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.authentication.type" }, "set": "apiKey" },
               {
                 "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.endpoint" }
+                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.endpoint" },
+                "replace": { "pattern": "/v1/?$", "replacement": "" }
+              },
+              {
+                "when": {
+                  "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
+                  "matches": "\\+\\s*\"/v1\"\\s*$"
+                },
+                "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
+                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.endpoint" },
+                "replace": { "pattern": "\\s*\\+\\s*\"/v1\"\\s*$", "replacement": "" }
+              },
+              {
+                "when": {
+                  "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
+                  "matches": "\\+\\s*\"/anthropic/v1\"\\s*$"
+                },
+                "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
+                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.endpoint" },
+                "replace": { "pattern": "(\\s*\\+\\s*\"/anthropic)/v1(\"\\s*)$", "replacement": "$1$2" }
               },
               {
                 "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
