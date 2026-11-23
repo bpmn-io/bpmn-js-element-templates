@@ -114,5 +114,6 @@ These are illustrative declarations. Tests here cover migration primitives; test
 * `elementTemplates.getMigrations(element)` — Change targets as `{ template, availabilityMessage, changes }` entries. The message comes from the first migration step, falling back to the source template's `deprecated.message`. `changes` combines authored guidance from all applicable steps, in order.
 * `elementTemplates.getChanges(element, template)` — authored `changes` from all applicable steps, in order, including same-template Updates that are not returned by `getMigrations`.
 * `elementTemplates.applyTemplate(element, template)` — apply the migration.
+* `elementTemplates.reviewChanges` event — fired with `{ element, newTemplate, changes }` when the user selects _Review changes_ in the properties panel. The entry is shown only when a migration has `changes`.
 
 The migration list and `getChanges` resolve steps from the element's currently applied template. Hosts can review `changes` before applying; the existing `elementTemplates.apply` and `elementTemplates.update` events also include it when available.

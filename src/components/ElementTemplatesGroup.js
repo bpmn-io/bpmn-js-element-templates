@@ -312,7 +312,16 @@ function MigratableTemplate({ element, templateState }) {
   const { targetTemplate } = templateState;
 
   const translate = useService('translate'),
-        elementTemplates = useService('elementTemplates');
+        elementTemplates = useService('elementTemplates'),
+        eventBus = useService('eventBus');
+
+  const changes = elementTemplates.getChanges(element, targetTemplate);
+
+  const reviewChanges = () => eventBus.fire('elementTemplates.reviewChanges', {
+    element,
+    newTemplate: targetTemplate,
+    changes
+  });
 
   const menuItems = [
     { entry: <MigrationAvailableText templateState={ templateState } /> },
@@ -321,6 +330,7 @@ function MigratableTemplate({ element, templateState }) {
       entry: translate('Migrate'),
       action: () => elementTemplates.applyTemplate(element, targetTemplate)
     },
+    ...(changes ? [ { entry: translate('Review changes'), action: reviewChanges } ] : []),
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];

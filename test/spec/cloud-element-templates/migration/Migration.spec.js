@@ -2,6 +2,8 @@ import TestContainer from 'mocha-test-container-support';
 
 import { expect } from 'chai';
 
+import { spy } from 'sinon';
+
 import { act } from '@testing-library/preact';
 
 import {
@@ -664,6 +666,30 @@ describe('provider/cloud-element-templates - migration', function() {
       const text = domQuery('.bio-properties-panel-template-migration-available-text', button);
 
       expect(text.textContent).to.eql('Migration to REST connector is available.');
+    }));
+
+
+    it('should request changes review', inject(async function(elementRegistry, selection, eventBus) {
+
+      // given
+      const element = elementRegistry.get('Legacy');
+
+      const reviewSpy = spy();
+
+      eventBus.on('elementTemplates.reviewChanges', reviewSpy);
+
+      await act(() => selection.select(element));
+
+      // when
+      await clickMenuItem(container, 'Review changes');
+
+      // then
+      expect(reviewSpy).to.have.been.calledOnce;
+      expect(reviewSpy.getCall(0).args[0]).to.include({
+        element,
+        newTemplate: targetTemplate,
+        changes: targetTemplate.migratesFrom[0].changes
+      });
     }));
 
 
