@@ -11,7 +11,7 @@ Both apply directly as one command on the host's existing undo stack.
 
 Migration transforms stored values. Template builders can use other features for edge cases:
 
-* Invalid or missing values — target property [`constraints`](../src/cloud-element-templates/util/propertyUtil.js#L1222).
+* Invalid or missing values — target property [`constraints`](../src/cloud-element-templates/util/propertyUtil.js).
 * Other manual work (secrets, FEEL, deployment, connector upgrades) — the `changes` field, which hosts can display. Do not list actions already covered by target property constraints.
 
 Migration does not manage the full lifecycle. It does not:
@@ -64,25 +64,25 @@ Each template declares, in `migratesFrom`, how to migrate to it:
 
 ### Fields
 
-| Field | Meaning |
-|---|---|
-| `toVersion` | Required positive integer. Version of the declaring template this step produces. |
-| `sourceTemplateId` | Source template. Defaults to the declaring template (an Update step). |
-| `minSourceVersion`, `maxSourceVersion` | Optional inclusive bounds on the current version. Unversioned counts as `0`. |
-| `availabilityMessage` | User-facing message shown when offering the migration. Falls back to the source's `deprecated.message`. |
-| `changes` | User-facing changelist and next steps. |
-| `instructions` | Ordered instructions. All instructions and conditions read values from before the step, so a step can swap bindings. |
+| Field                                  | Meaning                                                                                                              |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `toVersion`                            | Required positive integer. Version of the declaring template this step produces.                                     |
+| `sourceTemplateId`                     | Source template. Defaults to the declaring template (an Update step).                                                |
+| `minSourceVersion`, `maxSourceVersion` | Optional inclusive bounds on the current version. Unversioned counts as `0`.                                         |
+| `availabilityMessage`                  | User-facing message shown when offering the migration. Falls back to the source's `deprecated.message`.              |
+| `changes`                              | User-facing changelist and next steps.                                                                               |
+| `instructions`                         | Ordered instructions. All instructions and conditions read values from before the step, so a step can swap bindings. |
 
 ### Instruction
 
-| Field | Meaning |
-|---|---|
-| `from`, `to` | Copy a value between bindings. Empty sources are skipped. |
-| `set` | Write a literal to `to` instead of copying. `set: ""` clears a default. |
-| `values` | Remap copied strings, e.g. `{ "GET": "get" }`. |
-| `replace` | `{ pattern, replacement }` regex replace on copied strings, after `values`. FEEL expressions are matched and replaced as stored text. |
-| `when` | Condition(s), all must match: `{ binding, equals }`, `{ binding, isEmpty }`, or `{ binding, matches, not? }`. `isEmpty: true` matches missing and empty values; `false` matches non-empty values. Some getters return an empty string for a missing value, so the two cannot always be distinguished. FEEL is matched as text. |
-| `instructions` | Group instructions under a shared `when`. |
+| Field          | Meaning                                                                                                                                                                                                                                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `from`, `to`   | Copy a value between bindings. Empty sources are skipped.                                                                                                                                                                                                                                                                      |
+| `set`          | Write a literal to `to` instead of copying. `set: ""` clears a default.                                                                                                                                                                                                                                                        |
+| `values`       | Remap copied strings, e.g. `{ "GET": "get" }`.                                                                                                                                                                                                                                                                                 |
+| `replace`      | `{ pattern, replacement }` regex replace on copied strings, after `values`. FEEL expressions are matched and replaced as stored text.                                                                                                                                                                                          |
+| `when`         | Condition(s), all must match: `{ binding, equals }`, `{ binding, isEmpty }`, or `{ binding, matches, not? }`. `isEmpty: true` matches missing and empty values; `false` matches non-empty values. Some getters return an empty string for a missing value, so the two cannot always be distinguished. FEEL is matched as text. |
+| `instructions` | Group instructions under a shared `when`.                                                                                                                                                                                                                                                                                      |
 
 ## Rules
 
