@@ -28,26 +28,38 @@ Migration does not manage the full lifecycle. It does not:
 Each template declares, in `migratesFrom`, how to migrate to it:
 
 ```json
-"migratesFrom": [
-  {
-    "sourceTemplateId": "example.rest",
-    "minSourceVersion": 1,
-    "toVersion": 2,
-    "availabilityMessage": "Migration to REST connector is available.",
-    "changes": "- URL is now called endpoint.\n- HTTP methods are lower case.",
-    "instructions": [
-      {
-        "from": { "type": "zeebe:input", "name": "url" },
-        "to": { "type": "zeebe:input", "name": "endpoint" }
+{
+  "migratesFrom" : [ {
+    "sourceTemplateId" : "example.rest",
+    "minSourceVersion" : 1,
+    "toVersion" : 2,
+    "availabilityMessage" : "Migration to REST connector is available.",
+    "changes" : "- URL is now called endpoint.\n- HTTP methods are lower case.",
+    "instructions" : [ {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "url"
       },
-      {
-        "from": { "type": "zeebe:taskHeader", "key": "method" },
-        "to": { "type": "zeebe:taskHeader", "key": "method" },
-        "values": { "GET": "get", "POST": "post" }
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "endpoint"
       }
-    ]
-  }
-]
+    }, {
+      "from" : {
+        "type" : "zeebe:taskHeader",
+        "key" : "method"
+      },
+      "to" : {
+        "type" : "zeebe:taskHeader",
+        "key" : "method"
+      },
+      "values" : {
+        "GET" : "get",
+        "POST" : "post"
+      }
+    } ]
+  } ]
+}
 ```
 
 ### Fields
@@ -84,6 +96,8 @@ Each template declares, in `migratesFrom`, how to migrate to it:
 * For other fields without a migration write, the usual template update rules determine whether to keep an existing value or use the new default.
 
 ## Examples
+
+These mgiration examples show coverage and the user experience of reviewing migration instructions. They follow  `connectors` repository patterns like Jackson JSON pretty-printing.
 
 * [REST connector](examples/rest-connector-migrates-from.json) — Update steps for REST v2 versions 1–17 to v18. Versions without instructions are no-ops.
 * [AI Agent Sub-process](examples/ai-agent-migrates-from.json) — Change from v1@13 to v2@1.

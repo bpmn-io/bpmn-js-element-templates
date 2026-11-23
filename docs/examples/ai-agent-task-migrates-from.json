@@ -1,202 +1,707 @@
-[
-  {
-    "sourceTemplateId": "io.camunda.connectors.agenticai.aiagent.v1",
-    "minSourceVersion": 13,
-    "maxSourceVersion": 13,
-    "toVersion": 1,
-    "availabilityMessage": "Migrate AI Agent to the v2 Task template.",
-    "changes": "- New capabilities include reasoning controls, prompt caching, more model backends and authentication options, and custom chat model providers (Self-Managed/Hybrid).\n- Providers and backends are reorganized: Azure OpenAI and OpenAI-compatible move under OpenAI; Vertex AI moves under Google Gemini.\n- Authentication, supported endpoints, models, prompts, and other shared settings migrate automatically.\n- Make the v2 worker available and deploy a new process version; keep the v1 worker for deployed v1 processes.\n- Run the agent. If it does not work as expected, see the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/).",
-    "instructions": [
-      {
-        "from": { "type": "zeebe:input", "name": "provider.type" },
-        "to": { "type": "zeebe:input", "name": "provider.type" },
-        "values": {
-          "azureOpenAi": "openai",
-          "openaiCompatible": "openai",
-          "google-vertex-ai": "google-gemini"
+[ {
+  "sourceTemplateId" : "io.camunda.connectors.agenticai.aiagent.v1",
+  "minSourceVersion" : 13,
+  "maxSourceVersion" : 13,
+  "toVersion" : 1,
+  "availabilityMessage" : "Migrate AI Agent to the v2 Task template.",
+  "changes" : "- New capabilities include reasoning controls, prompt caching, more model backends and authentication options, and custom chat model providers (Self-Managed/Hybrid).\n- Providers and backends are reorganized: Azure OpenAI and OpenAI-compatible move under OpenAI; Vertex AI moves under Google Gemini.\n- Authentication, supported endpoints, models, prompts, and other shared settings migrate automatically.\n- Make the v2 worker available and deploy a new process version; keep the v1 worker for deployed v1 processes.\n- Run the agent. If it does not work as expected, see the [upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/).",
+  "instructions" : [ {
+    "from" : {
+      "type" : "zeebe:input",
+      "name" : "provider.type"
+    },
+    "to" : {
+      "type" : "zeebe:input",
+      "name" : "provider.type"
+    },
+    "values" : {
+      "azureOpenAi" : "openai",
+      "openaiCompatible" : "openai",
+      "google-vertex-ai" : "google-gemini"
+    }
+  }, {
+    "from" : {
+      "type" : "zeebe:input",
+      "name" : "data.systemPrompt.prompt"
+    },
+    "to" : {
+      "type" : "zeebe:input",
+      "name" : "data.systemPrompt.prompt"
+    }
+  }, {
+    "when" : {
+      "binding" : {
+        "type" : "zeebe:input",
+        "name" : "provider.type"
+      },
+      "equals" : "anthropic"
+    },
+    "instructions" : [ {
+      "when" : {
+        "binding" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "isEmpty" : true
+      },
+      "instructions" : [ {
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.type"
+        },
+        "set" : "anthropic-api"
+      }, {
+        "from" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.authentication.apiKey"
+        },
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.anthropic.apiKey"
         }
+      } ]
+    }, {
+      "when" : {
+        "binding" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "matches" : "^[Hh][Tt][Tt][Pp][Ss]://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?:/v1)?/?$"
       },
-      {
-        "from": { "type": "zeebe:input", "name": "data.systemPrompt.prompt" },
-        "to": { "type": "zeebe:input", "name": "data.systemPrompt.prompt" }
+      "instructions" : [ {
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.type"
+        },
+        "set" : "anthropic-api"
+      }, {
+        "from" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.authentication.apiKey"
+        },
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.anthropic.apiKey"
+        }
+      } ]
+    }, {
+      "when" : {
+        "binding" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "matches" : "^[Hh][Tt][Tt][Pp][Ss]?://(?:[A-Za-z0-9-]+\\.)+[Aa][Zz][Uu][Rr][Ee]\\.(?:[Cc][Oo][Mm]|[Uu][Ss]|[Cc][Nn])(?::[0-9]+)?(?:[/?#]|$)"
       },
-      {
-        "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "anthropic" },
-        "instructions": [
-          {
-            "when": { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "isEmpty": true },
-            "instructions": [
-              { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "anthropic-api" },
-              {
-                "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.anthropic.apiKey" }
-              }
-            ]
+      "instructions" : [ {
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.type"
+        },
+        "set" : "foundry"
+      }, {
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.foundry.authentication.type"
+        },
+        "set" : "apiKey"
+      }, {
+        "from" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.foundry.endpoint"
+        },
+        "replace" : {
+          "pattern" : "^(.+?)(?:/anthropic)?/v1/?$",
+          "replacement" : "$1"
+        }
+      }, {
+        "from" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.authentication.apiKey"
+        },
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.foundry.authentication.apiKey"
+        }
+      } ]
+    }, {
+      "when" : [ {
+        "binding" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "isEmpty" : false
+      }, {
+        "binding" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "matches" : "^[Hh][Tt][Tt][Pp][Ss]://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?:/v1)?/?$",
+        "not" : true
+      }, {
+        "binding" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "matches" : "^[Hh][Tt][Tt][Pp][Ss]?://(?:[A-Za-z0-9-]+\\.)+[Aa][Zz][Uu][Rr][Ee]\\.(?:[Cc][Oo][Mm]|[Uu][Ss]|[Cc][Nn])(?::[0-9]+)?(?:[/?#]|$)",
+        "not" : true
+      } ],
+      "instructions" : [ {
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.type"
+        },
+        "set" : "custom"
+      }, {
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.custom.authentication.type"
+        },
+        "set" : "apiKey"
+      }, {
+        "from" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.custom.endpoint"
+        },
+        "replace" : {
+          "pattern" : "/v1/?$",
+          "replacement" : ""
+        }
+      }, {
+        "when" : {
+          "binding" : {
+            "type" : "zeebe:input",
+            "name" : "provider.anthropic.endpoint"
           },
-          {
-            "when": {
-              "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-              "matches": "^[Hh][Tt][Tt][Pp][Ss]://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?:/v1)?/?$"
-            },
-            "instructions": [
-              { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "anthropic-api" },
-              {
-                "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.anthropic.apiKey" }
-              }
-            ]
+          "matches" : "\\+\\s*\"/v1\"\\s*$"
+        },
+        "from" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.custom.endpoint"
+        },
+        "replace" : {
+          "pattern" : "\\s*\\+\\s*\"/v1\"\\s*$",
+          "replacement" : ""
+        }
+      }, {
+        "when" : {
+          "binding" : {
+            "type" : "zeebe:input",
+            "name" : "provider.anthropic.endpoint"
           },
-          {
-            "when": {
-              "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-              "matches": "^[Hh][Tt][Tt][Pp][Ss]?://(?:[A-Za-z0-9-]+\\.)+[Aa][Zz][Uu][Rr][Ee]\\.(?:[Cc][Oo][Mm]|[Uu][Ss]|[Cc][Nn])(?::[0-9]+)?(?:[/?#]|$)"
-            },
-            "instructions": [
-              { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "foundry" },
-              { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.foundry.authentication.type" }, "set": "apiKey" },
-              {
-                "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.foundry.endpoint" },
-                "replace": { "pattern": "^(.+?)(?:/anthropic)?/v1/?$", "replacement": "$1" }
-              },
-              {
-                "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.foundry.authentication.apiKey" }
-              }
-            ]
-          },
-          {
-            "when": [
-              { "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" }, "isEmpty": false },
-              {
-                "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "matches": "^[Hh][Tt][Tt][Pp][Ss]://[Aa][Pp][Ii]\\.[Aa][Nn][Tt][Hh][Rr][Oo][Pp][Ii][Cc]\\.[Cc][Oo][Mm](?:/v1)?/?$",
-                "not": true
-              },
-              {
-                "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "matches": "^[Hh][Tt][Tt][Pp][Ss]?://(?:[A-Za-z0-9-]+\\.)+[Aa][Zz][Uu][Rr][Ee]\\.(?:[Cc][Oo][Mm]|[Uu][Ss]|[Cc][Nn])(?::[0-9]+)?(?:[/?#]|$)",
-                "not": true
-              }
-            ],
-            "instructions": [
-              { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.type" }, "set": "custom" },
-              { "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.authentication.type" }, "set": "apiKey" },
-              {
-                "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.endpoint" },
-                "replace": { "pattern": "/v1/?$", "replacement": "" }
-              },
-              {
-                "when": {
-                  "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                  "matches": "\\+\\s*\"/v1\"\\s*$"
-                },
-                "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.endpoint" },
-                "replace": { "pattern": "\\s*\\+\\s*\"/v1\"\\s*$", "replacement": "" }
-              },
-              {
-                "when": {
-                  "binding": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                  "matches": "\\+\\s*\"/anthropic/v1\"\\s*$"
-                },
-                "from": { "type": "zeebe:input", "name": "provider.anthropic.endpoint" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.endpoint" },
-                "replace": { "pattern": "(\\s*\\+\\s*\"/anthropic)/v1(\"\\s*)$", "replacement": "$1$2" }
-              },
-              {
-                "from": { "type": "zeebe:input", "name": "provider.anthropic.authentication.apiKey" },
-                "to": { "type": "zeebe:input", "name": "provider.anthropic.backend.custom.authentication.apiKey" }
-              }
-            ]
-          },
-          { "to": { "type": "zeebe:input", "name": "provider.anthropic.model.parameters.promptCaching.enabled" }, "set": "" }
-        ]
+          "matches" : "\\+\\s*\"/anthropic/v1\"\\s*$"
+        },
+        "from" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.endpoint"
+        },
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.custom.endpoint"
+        },
+        "replace" : {
+          "pattern" : "(\\s*\\+\\s*\"/anthropic)/v1(\"\\s*)$",
+          "replacement" : "$1$2"
+        }
+      }, {
+        "from" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.authentication.apiKey"
+        },
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.anthropic.backend.custom.authentication.apiKey"
+        }
+      } ]
+    }, {
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.anthropic.model.parameters.promptCaching.enabled"
       },
-      {
-        "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "bedrock" },
-        "instructions": [
-          { "to": { "type": "zeebe:input", "name": "provider.bedrock.model.parameters.promptCaching.enabled" }, "set": "" }
-        ]
+      "set" : ""
+    } ]
+  }, {
+    "when" : {
+      "binding" : {
+        "type" : "zeebe:input",
+        "name" : "provider.type"
       },
-      {
-        "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "openai" },
-        "instructions": [
-          { "to": { "type": "zeebe:input", "name": "provider.openai.api.type" }, "set": "completions" },
-          { "to": { "type": "zeebe:input", "name": "provider.openai.backend.type" }, "set": "openai-api" },
-          { "from": { "type": "zeebe:input", "name": "provider.openai.authentication.apiKey" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.openai.apiKey" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openai.authentication.organizationId" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.openai.organizationId" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openai.authentication.projectId" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.openai.projectId" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openai.model.model" }, "to": { "type": "zeebe:input", "name": "provider.openai.model.model" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openai.model.parameters.maxCompletionTokens" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.maxCompletionTokens" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openai.model.parameters.temperature" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.temperature" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openai.model.parameters.topP" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.topP" } }
-        ]
+      "equals" : "bedrock"
+    },
+    "instructions" : [ {
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.bedrock.model.parameters.promptCaching.enabled"
       },
-      {
-        "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "azureOpenAi" },
-        "instructions": [
-          { "to": { "type": "zeebe:input", "name": "provider.openai.api.type" }, "set": "completions" },
-          { "to": { "type": "zeebe:input", "name": "provider.openai.backend.type" }, "set": "foundry" },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.type" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.type" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.endpoint" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.endpoint" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.apiKey" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.apiKey" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.clientId" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.clientId" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.clientSecret" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.clientSecret" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.tenantId" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.tenantId" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.authentication.authorityHost" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.foundry.authentication.authorityHost" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.timeouts.timeout" }, "to": { "type": "zeebe:input", "name": "provider.openai.timeouts.timeout" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.model.deploymentName" }, "to": { "type": "zeebe:input", "name": "provider.openai.model.model" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.model.parameters.maxTokens" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.maxCompletionTokens" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.model.parameters.temperature" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.temperature" } },
-          { "from": { "type": "zeebe:input", "name": "provider.azureOpenAi.model.parameters.topP" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.topP" } }
-        ]
+      "set" : ""
+    } ]
+  }, {
+    "when" : {
+      "binding" : {
+        "type" : "zeebe:input",
+        "name" : "provider.type"
       },
-      {
-        "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "openaiCompatible" },
-        "instructions": [
-          { "to": { "type": "zeebe:input", "name": "provider.openai.api.type" }, "set": "completions" },
-          { "to": { "type": "zeebe:input", "name": "provider.openai.backend.type" }, "set": "custom" },
-          {
-            "when": { "binding": { "type": "zeebe:input", "name": "provider.openaiCompatible.authentication.apiKey" }, "isEmpty": true },
-            "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.authentication.type" },
-            "set": "none"
-          },
-          {
-            "when": { "binding": { "type": "zeebe:input", "name": "provider.openaiCompatible.authentication.apiKey" }, "isEmpty": false },
-            "instructions": [
-              { "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.authentication.type" }, "set": "apiKey" },
-              { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.authentication.apiKey" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.authentication.apiKey" } }
-            ]
-          },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.endpoint" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.endpoint" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.headers" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.headers" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.queryParameters" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.queryParameters" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.timeouts.timeout" }, "to": { "type": "zeebe:input", "name": "provider.openai.timeouts.timeout" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.model" }, "to": { "type": "zeebe:input", "name": "provider.openai.model.model" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.parameters.maxCompletionTokens" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.maxCompletionTokens" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.parameters.temperature" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.temperature" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.parameters.topP" }, "to": { "type": "zeebe:input", "name": "provider.openai.api.completions.topP" } },
-          { "from": { "type": "zeebe:input", "name": "provider.openaiCompatible.model.parameters.customParameters" }, "to": { "type": "zeebe:input", "name": "provider.openai.backend.custom.bodyProperties" } }
-        ]
+      "equals" : "openai"
+    },
+    "instructions" : [ {
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.type"
       },
-      {
-        "when": { "binding": { "type": "zeebe:input", "name": "provider.type" }, "equals": "google-vertex-ai" },
-        "instructions": [
-          { "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.type" }, "set": "google-vertex-ai" },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.authentication.type" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.authentication.type" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.projectId" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.projectId" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.region" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.region" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.authentication.jsonKey" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.backend.googleVertexAi.authentication.jsonKey" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.timeouts.timeout" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.timeouts.timeout" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.model" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.model" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.parameters.maxOutputTokens" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.parameters.maxTokens" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.parameters.temperature" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.parameters.temperature" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.parameters.topP" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.parameters.topP" } },
-          { "from": { "type": "zeebe:input", "name": "provider.googleVertexAi.model.parameters.topK" }, "to": { "type": "zeebe:input", "name": "provider.googleGemini.model.parameters.topK" } }
-        ]
+      "set" : "completions"
+    }, {
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.type"
+      },
+      "set" : "openai-api"
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.authentication.apiKey"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.openai.apiKey"
       }
-    ]
-  }
-]
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.authentication.organizationId"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.openai.organizationId"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.authentication.projectId"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.openai.projectId"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.model.model"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.model.model"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.model.parameters.maxCompletionTokens"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.completions.maxCompletionTokens"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.model.parameters.temperature"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.completions.temperature"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.model.parameters.topP"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.completions.topP"
+      }
+    } ]
+  }, {
+    "when" : {
+      "binding" : {
+        "type" : "zeebe:input",
+        "name" : "provider.type"
+      },
+      "equals" : "azureOpenAi"
+    },
+    "instructions" : [ {
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.type"
+      },
+      "set" : "completions"
+    }, {
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.type"
+      },
+      "set" : "foundry"
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.authentication.type"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.foundry.authentication.type"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.endpoint"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.foundry.endpoint"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.authentication.apiKey"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.foundry.authentication.apiKey"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.authentication.clientId"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.foundry.authentication.clientId"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.authentication.clientSecret"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.foundry.authentication.clientSecret"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.authentication.tenantId"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.foundry.authentication.tenantId"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.authentication.authorityHost"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.foundry.authentication.authorityHost"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.timeouts.timeout"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.timeouts.timeout"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.model.deploymentName"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.model.model"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.model.parameters.maxTokens"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.completions.maxCompletionTokens"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.model.parameters.temperature"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.completions.temperature"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.azureOpenAi.model.parameters.topP"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.completions.topP"
+      }
+    } ]
+  }, {
+    "when" : {
+      "binding" : {
+        "type" : "zeebe:input",
+        "name" : "provider.type"
+      },
+      "equals" : "openaiCompatible"
+    },
+    "instructions" : [ {
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.type"
+      },
+      "set" : "completions"
+    }, {
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.type"
+      },
+      "set" : "custom"
+    }, {
+      "when" : {
+        "binding" : {
+          "type" : "zeebe:input",
+          "name" : "provider.openaiCompatible.authentication.apiKey"
+        },
+        "isEmpty" : true
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.custom.authentication.type"
+      },
+      "set" : "none"
+    }, {
+      "when" : {
+        "binding" : {
+          "type" : "zeebe:input",
+          "name" : "provider.openaiCompatible.authentication.apiKey"
+        },
+        "isEmpty" : false
+      },
+      "instructions" : [ {
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.openai.backend.custom.authentication.type"
+        },
+        "set" : "apiKey"
+      }, {
+        "from" : {
+          "type" : "zeebe:input",
+          "name" : "provider.openaiCompatible.authentication.apiKey"
+        },
+        "to" : {
+          "type" : "zeebe:input",
+          "name" : "provider.openai.backend.custom.authentication.apiKey"
+        }
+      } ]
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openaiCompatible.endpoint"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.custom.endpoint"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openaiCompatible.headers"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.custom.headers"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openaiCompatible.queryParameters"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.custom.queryParameters"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openaiCompatible.timeouts.timeout"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.timeouts.timeout"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openaiCompatible.model.model"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.model.model"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openaiCompatible.model.parameters.maxCompletionTokens"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.completions.maxCompletionTokens"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openaiCompatible.model.parameters.temperature"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.completions.temperature"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openaiCompatible.model.parameters.topP"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.api.completions.topP"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openaiCompatible.model.parameters.customParameters"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.openai.backend.custom.bodyProperties"
+      }
+    } ]
+  }, {
+    "when" : {
+      "binding" : {
+        "type" : "zeebe:input",
+        "name" : "provider.type"
+      },
+      "equals" : "google-vertex-ai"
+    },
+    "instructions" : [ {
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.backend.type"
+      },
+      "set" : "google-vertex-ai"
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.authentication.type"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.backend.googleVertexAi.authentication.type"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.projectId"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.backend.googleVertexAi.projectId"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.region"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.backend.googleVertexAi.region"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.authentication.jsonKey"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.backend.googleVertexAi.authentication.jsonKey"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.timeouts.timeout"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.timeouts.timeout"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.model.model"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.model.model"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.model.parameters.maxOutputTokens"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.model.parameters.maxTokens"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.model.parameters.temperature"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.model.parameters.temperature"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.model.parameters.topP"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.model.parameters.topP"
+      }
+    }, {
+      "from" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleVertexAi.model.parameters.topK"
+      },
+      "to" : {
+        "type" : "zeebe:input",
+        "name" : "provider.googleGemini.model.parameters.topK"
+      }
+    } ]
+  } ]
+} ]
