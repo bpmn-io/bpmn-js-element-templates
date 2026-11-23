@@ -86,22 +86,28 @@ Each template declares, in `migratesFrom`, how to migrate to it:
 
 ## Rules
 
-* For an Update, run eligible same-template steps above the source version and through the target version, in ascending order.
-* For a Change, run the earliest eligible direct step from the current source template and version, at or before the selected target version. Then run the target's Update steps through the selected version; do not run source Update steps.
-* Each step reads the result of the previous step. Intermediate defaults are not applied; versions without Update steps are no-ops.
-* Only the source and target templates need to be loaded.
-* Instructions and steps are optional. The target template can be applied without value migration.
-* Apply writes in order: a controlling value can activate a later destination. Missing or inactive destinations are skipped; ordering does not affect what instructions read within a step.
-* Hidden fields always take the target default; migration does not write them. A hidden value that users must edit is a template design problem.
-* For other fields without a migration write, the usual template update rules determine whether to keep an existing value or use the new default.
+### Select and run steps
+
+* **Update:** Run eligible same-template steps after the source version through the target version, in order. For example, `A@1 → A@3` may run steps for `A@2` and `A@3`.
+* **Change:** Run the earliest eligible direct step that lands at or before the target version, then eligible target Update steps. For example, `A@1 → B@3` may run `A@1 → B@2 → B@3`. It skips Updates to `A`.
+* **Between steps:** Each step reads the previous step's writes. Defaults are not applied between steps; versions without an Update step are skipped.
+* **Within a step:** Instructions read the same pre-step values. Apply writes in order; an earlier write can activate a later destination. Skip writes to missing or inactive destinations.
+
+### Apply the target template
+
+* **Availability:** Only the source and target templates need to be loaded. For example, an `A@1` to `B@2` change does not require `A@2` to be loaded.
+* **Optional migration:** Steps and instructions may be omitted; normal template-update behavior still applies.
+* **Hidden fields:** They take the target default; migration cannot write them. If users need to edit a hidden value, change the target template.
+* **Other fields:** Without a migration write, normal template-update behavior determines whether to keep the existing value or use the target default.
 
 ## Examples
 
-These mgiration examples show coverage and the user experience of reviewing migration instructions. They follow  `connectors` repository patterns like Jackson JSON pretty-printing.
+These migration examples show coverage and the user experience of reviewing migration instructions. They follow `connectors` repository patterns.
 
 * [REST connector](examples/rest-connector-migrates-from.json) — Update steps for REST v2 versions 1–17 to v18. Versions without instructions are no-ops.
 * [AI Agent Sub-process](examples/ai-agent-migrates-from.json) — Change from v1@13 to v2@1.
-* [AI Agent Task](examples/ai-agent-task-migrates-from.json) — Change from v1@13 to v2@1.
+
+These are illustrative declarations. Tests here cover migration primitives; tests of generated connector templates belong in `connectors`.
 
 ## API
 

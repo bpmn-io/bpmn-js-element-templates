@@ -5,7 +5,7 @@
 
 ## 👤 Findings
 
-The local [Sub-process](docs/examples/ai-agent-migrates-from.json) and [Task](docs/examples/ai-agent-task-migrates-from.json) declarations migrate v1@13 to v2@1. The [published c8ctl recipe](https://github.com/camunda/connectors/blob/674790a0e03bcdae2df5f081de15ee9e90fb81b4/connectors/agentic-ai/connector-aiagent/element-templates/agenticai-ai-agent-subprocess.v2.json) targets v2@5 and accepts v1@12 or later; it also differs on Anthropic URL normalization, prompt caching, and custom Vertex endpoints. Findings below describe the local migration.
+The local [Sub-process declaration](docs/examples/ai-agent-migrates-from.json) migrates v1@13 to v2@1. The [published c8ctl recipe](https://github.com/camunda/connectors/blob/674790a0e03bcdae2df5f081de15ee9e90fb81b4/connectors/agentic-ai/connector-aiagent/element-templates/agenticai-ai-agent-subprocess.v2.json) targets v2@5 and accepts v1@12 or later; it also differs on Anthropic URL normalization, prompt caching, and custom Vertex endpoints. Findings below describe the local migration.
 
 The [migration implementation](https://github.com/bpmn-io/bpmn-js-element-templates/pull/324) can map stored values, set literals, and normalize stored text. It does not evaluate FEEL or secrets. Compatible same-binding values and defaults also follow normal template-update behavior ([contract](docs/TEMPLATE_MIGRATION.md)).
 
@@ -19,9 +19,11 @@ The [migration implementation](https://github.com/bpmn-io/bpmn-js-element-templa
 | Azure OpenAI | OpenAI / Microsoft Foundry / Chat Completions | Carries over endpoint, credentials, deployment name as model, timeout, and completion settings. |
 | OpenAI-compatible | OpenAI / Custom / Chat Completions | Carries over endpoint, headers, query parameters, model, timeout, completion settings, and body properties. Selects API-key authentication when the stored key is non-empty; otherwise selects None. |
 | Google Vertex AI | Google Gemini / Vertex AI | Carries over project, region, authentication, model, timeout, and sampling settings. Renames `maxOutputTokens` to `maxTokens`. |
-| Shared and Task settings | Same target element kind | Carries over prompts, memory, limits, events, response settings, and Task tool inputs. The target template changes; the BPMN element kind does not. |
+| Shared settings | AI Agent Sub-process | Carries over prompts, memory, limits, events, and response settings. The target template changes; the BPMN element kind does not. |
 
-For Anthropic and Bedrock, the declarations clear v2@1's default-enabled prompt caching, preserving the legacy behavior. Target `notEmpty` constraints flag missing required endpoints or API keys; no duplicate manual check is needed.
+For Anthropic and Bedrock, the declaration clears v2@1's default-enabled prompt caching, preserving the legacy behavior. Target `notEmpty` constraints flag missing required endpoints or API keys; no duplicate manual check is needed.
+
+Task migration declarations and behavioral tests against generated Task and Sub-process templates belong to [camunda/connectors#10548](https://github.com/camunda/connectors/issues/10548). The remaining local example is illustrative, not proof of generated-template or runtime equivalence.
 
 ### Gaps
 
@@ -44,7 +46,7 @@ Endpoint routing uses stored text, not resolved FEEL or secrets. If the endpoint
 
 - [Pinned v1@13 Sub-process](https://github.com/camunda/connectors/blob/674790a0e03bcdae2df5f081de15ee9e90fb81b4/connectors/agentic-ai/connector-aiagent/element-templates/agenticai-aiagent-job-worker.json), [Task](https://github.com/camunda/connectors/blob/674790a0e03bcdae2df5f081de15ee9e90fb81b4/connectors/agentic-ai/connector-aiagent/element-templates/agenticai-aiagent-outbound-connector.json), and [published v2@5 recipe](https://github.com/camunda/connectors/blob/674790a0e03bcdae2df5f081de15ee9e90fb81b4/connectors/agentic-ai/connector-aiagent/element-templates/agenticai-ai-agent-subprocess.v2.json).
 - Pinned [v2@1 Sub-process](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-subprocess-v2-1.json) and [Task](https://github.com/camunda/modeler-prototypes/blob/69c2733c23645634e3f665bc403f589af621f741/src/templates/ai-agent-task-v2-1.json) templates.
-- Local migration [Sub-process tests](test/spec/cloud-element-templates/migration/AiAgentMigration.spec.js) and [Task tests](test/spec/cloud-element-templates/migration/AiAgentTaskMigration.spec.js).
+- Generic [migration tests](test/spec/cloud-element-templates/migration/Migration.spec.js) cover the engine primitives, not connector-specific outcomes.
 - [AI Agent upgrade guide](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-upgrade/) and [provider documentation](https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/agentic-ai-aiagent-model-providers/).
 
 ## 🤖 Migration facts

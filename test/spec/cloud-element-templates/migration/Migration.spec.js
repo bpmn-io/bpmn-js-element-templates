@@ -36,7 +36,6 @@ import {
 
 import diagramXML from './diagram.bpmn';
 import templates from './templates.json';
-import restSteps from 'docs/examples/rest-connector-migrates-from.json';
 
 const [ legacyTemplate, targetTemplate ] = templates;
 
@@ -228,6 +227,116 @@ describe('provider/cloud-element-templates - migration', function() {
 
       expect(getInput(element, 'endpoint')).to.equal('=payload');
     }));
+
+    for (const [ label, when, selected ] of [
+      [ 'a negated matching pattern', { binding: input('url'), matches: '^https:', not: true }, false ],
+      [ 'a negated non-matching pattern', { binding: input('url'), matches: '^http:', not: true }, true ],
+      [ 'all matching conditions', [
+        { binding: input('url'), matches: '^https:' },
+        { binding: method, equals: 'POST' }
+      ], true ],
+      [ 'one non-matching condition', [
+        { binding: input('url'), matches: '^https:' },
+        { binding: method, equals: 'GET' }
+      ], false ]
+    ]) {
+      it(`should select instructions with ${ label }`,
+        inject(function(elementRegistry, elementTemplates) {
+          const target = targetWith([ { when, to: endpoint, set: 'selected' } ]);
+          elementTemplates.set([ legacyTemplate, target ]);
+          const element = elementRegistry.get('Legacy');
+
+          elementTemplates.applyTemplate(element, target);
+
+          expect(getInput(element, 'endpoint')).to.equal(selected ? 'selected' : 'https://example.com');
+        }));
+    }
+
+    for (const [ label, value ] of [ [ 'missing', undefined ], [ 'empty', '' ], [ 'configured', 'PT1M' ] ]) {
+      it(`should distinguish empty and non-empty conditions for a ${ label } source`,
+        inject(function(elementRegistry, elementTemplates) {
+          const binding = input('timeout');
+          const target = targetWith([
+            { when: { binding, isEmpty: true }, to: endpoint, set: 'empty' },
+            { when: { binding, isEmpty: false }, to: endpoint, set: 'configured' }
+          ]);
+          elementTemplates.set([ legacyTemplate, target ]);
+          const element = elementRegistry.get('Legacy');
+          elementTemplates.setPropertyValue(element, {
+            type: 'String', binding, optional: value === undefined
+          }, value);
+
+          elementTemplates.applyTemplate(element, target);
+
+          expect(getInput(element, 'endpoint')).to.equal(value ? 'configured' : 'empty');
+        }));
+    }
+
+    it('should clear an optional default through undo, redo, and reload',
+      inject(async function(bpmnjs, elementRegistry, elementTemplates, commandStack) {
+        const binding = input('enabled');
+        const target = targetWith([ { to: binding, set: '' } ], [
+          ...targetTemplate.properties,
+          { label: 'Enabled', type: 'Boolean', binding, value: true, optional: true }
+        ]);
+        elementTemplates.set([ legacyTemplate, target ]);
+        let element = elementRegistry.get('Legacy');
+
+        elementTemplates.applyTemplate(element, target);
+
+        expect(getInput(element, 'enabled')).to.be.undefined;
+        commandStack.undo();
+        expect(elementTemplates.get(element)).to.equal(legacyTemplate);
+        commandStack.redo();
+        expect(elementTemplates.get(element)).to.equal(target);
+        expect(getInput(element, 'enabled')).to.be.undefined;
+
+        await bpmnjs.importXML((await bpmnjs.saveXML()).xml);
+        element = elementRegistry.get('Legacy');
+        expect(getInput(element, 'enabled')).to.be.undefined;
+      }));
+
+    it('should swap bindings and evaluate conditions against the same-step source values',
+      inject(function(elementRegistry, elementTemplates) {
+        const timeout = input('timeout');
+        const target = targetWith([
+          { from: input('url'), to: timeout },
+          { from: timeout, to: input('url') },
+          { when: { binding: timeout, equals: 'PT1M' }, from: input('url'), to: endpoint }
+        ], [
+          ...targetTemplate.properties,
+          { label: 'URL', type: 'String', binding: input('url') }
+        ]);
+        elementTemplates.set([ legacyTemplate, target ]);
+        const element = elementRegistry.get('Legacy');
+
+        elementTemplates.applyTemplate(element, target);
+
+        expect(getInput(element, 'timeout')).to.equal('https://custom.io');
+        expect(getInput(element, 'url')).to.equal('PT1M');
+        expect(getInput(element, 'endpoint')).to.equal('https://custom.io');
+      }));
+
+    it('should preserve a copied value that matches the source default',
+      inject(function(elementRegistry, elementTemplates) {
+        const binding = input('timeout');
+        const source = {
+          ...legacyTemplate,
+          properties: [ { label: 'Timeout', type: 'String', binding, value: 'PT1M' } ]
+        };
+        const target = {
+          ...source,
+          version: 2,
+          properties: [ { ...source.properties[0], value: 'PT2M' } ],
+          migratesFrom: [ { toVersion: 2, instructions: [ { from: binding, to: binding } ] } ]
+        };
+        elementTemplates.set([ source, target ]);
+        const element = elementTemplates.applyTemplate(elementRegistry.get('Legacy'), source);
+
+        elementTemplates.applyTemplate(element, target);
+
+        expect(getInput(element, 'timeout')).to.equal('PT1M');
+      }));
 
     for (const [ label, instruction, error ] of failures) {
       it(`should reject ${ label } without changing XML or damaging undo`,
@@ -435,67 +544,29 @@ describe('provider/cloud-element-templates - migration', function() {
         expect(elementTemplates.getMigrations(element)).to.eql([]);
       }));
 
-    it('should apply the REST example for v1 and skip historical rules for v17',
-      inject(function(elementRegistry, elementTemplates) {
-        const method = input('method');
-        const choices = values => values.map(value => ({ name: value, value }));
-        const header = key => ({ type: 'zeebe:taskHeader', key });
-        const retryBackoff = { label: 'Retry backoff', type: 'String', binding: header('retryBackoff'), value: 'PT30S' };
-        const resultExpression = { label: 'Result', type: 'Text', binding: header('resultExpression'), value: '=response' };
-        const source = {
-          ...legacyTemplate,
-          properties: [ { label: 'Method', type: 'Dropdown', binding: method, choices: choices([ 'post' ]) } ]
-        };
-        const target = {
-          ...source,
-          version: 18,
-          migratesFrom: restSteps,
-          properties: [
-            { label: 'Method', type: 'Dropdown', binding: method, choices: choices([ 'GET', 'POST' ]) },
-            retryBackoff,
-            resultExpression
-          ]
-        };
-        const recent = { ...target, version: 17 };
-        elementTemplates.set([ source, recent, target ]);
-
-        const oldElement = elementTemplates.applyTemplate(elementRegistry.get('Legacy'), source);
-        elementTemplates.applyTemplate(oldElement, target);
-
-        expect(getInput(oldElement, 'method')).to.equal('POST');
-        expect(getHeader(oldElement, 'retryBackoff')).to.equal('PT0S');
-        expect(getHeader(oldElement, 'resultExpression')).to.equal('=response');
-
-        const recentElement = elementTemplates.applyTemplate(elementRegistry.get('Unknown'), recent);
-        elementTemplates.applyTemplate(recentElement, target);
-
-        expect(getHeader(recentElement, 'retryBackoff')).to.equal('PT30S');
-        expect(getHeader(recentElement, 'resultExpression')).to.equal('=response');
-      }));
-
-    for (const [ version, key, sourceValue, targetValue ] of [
-      [ 12, 'resultExpression', '=oldResponse', '=response' ],
-      [ 14, 'retryBackoff', 'PT0S', 'PT30S' ]
+    for (const [ version, expectedEndpoint, expectedTimeout ] of [
+      [ 1, 'migrated', 'historical' ],
+      [ 2, 'migrated', 'PT1M' ],
+      [ 4, 'https://example.com', 'PT1M' ]
     ]) {
-      it(`should retain the configured REST ${ key } from v${ version }`,
+      it(`should skip steps at or below source version ${ version }`,
         inject(function(elementRegistry, elementTemplates) {
-          const binding = { type: 'zeebe:taskHeader', key };
-          const property = { label: key, type: 'String', binding, value: sourceValue };
-          const source = { ...legacyTemplate, version, properties: [ property ] };
+          const source = { ...targetTemplate, version, migratesFrom: [] };
           const target = {
             ...source,
-            version: 18,
-            properties: [ { ...property, value: targetValue } ],
-            migratesFrom: restSteps
+            version: 5,
+            migratesFrom: [
+              { toVersion: 2, instructions: [ { to: input('timeout'), set: 'historical' } ] },
+              { toVersion: 4, instructions: [ { to: endpoint, set: 'migrated' } ] }
+            ]
           };
-
           elementTemplates.set([ source, target ]);
           const element = elementTemplates.applyTemplate(elementRegistry.get('Legacy'), source);
-          expect(getHeader(element, key)).to.equal(sourceValue);
 
           elementTemplates.applyTemplate(element, target);
 
-          expect(getHeader(element, key)).to.equal(sourceValue);
+          expect(getInput(element, 'endpoint')).to.equal(expectedEndpoint);
+          expect(getInput(element, 'timeout')).to.equal(expectedTimeout);
         }));
     }
 
