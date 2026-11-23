@@ -28,6 +28,18 @@ export const ZEEBE_TASK_SCHEDULE = 'zeebe:taskSchedule';
 export const ZEEBE_EXECUTION_LISTENER = 'zeebe:executionListener';
 export const ZEEBE_TASK_LISTENER = 'zeebe:taskListener';
 
+export function normalizeBinding(binding) {
+  if (binding.type === ZEEBE_TASK_DEFINITION_TYPE_TYPE) {
+    return {
+      ...binding,
+      type: ZEEBE_TASK_DEFINITION,
+      property: 'type'
+    };
+  }
+
+  return binding;
+}
+
 export const EXTENSION_BINDING_TYPES = [
   MESSAGE_ZEEBE_SUBSCRIPTION_PROPERTY_TYPE,
   ZEBBE_INPUT_TYPE,

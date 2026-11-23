@@ -1,5 +1,6 @@
 import { has, isString } from 'min-dash';
 
+import { normalizeBinding } from './bindingTypes';
 import { getPropertyValue } from './propertyUtil';
 
 /**
@@ -151,14 +152,19 @@ function matchesCondition(read, condition) {
 }
 
 function bindingKey(binding) {
-  return JSON.stringify(Object.keys(binding).sort().map(key => [ key, binding[key] ]));
+  const normalized = normalizeBinding(binding);
+
+  return JSON.stringify(Object.keys(normalized).sort().map(key => [ key, normalized[key] ]));
 }
 
-function isEmpty(value) {
+export function isEmpty(value) {
   return value == null || value === '';
 }
 
-function isSameBinding(a, b) {
+export function isSameBinding(a, b) {
+  a = normalizeBinding(a);
+  b = normalizeBinding(b);
+
   const keys = new Set([ ...Object.keys(a), ...Object.keys(b) ]);
 
   return [ ...keys ].every(key => a[ key ] === b[ key ]);

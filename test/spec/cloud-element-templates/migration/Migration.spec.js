@@ -298,6 +298,62 @@ describe('provider/cloud-element-templates - migration', function() {
         expect(getInput(element, 'enabled')).to.be.undefined;
       }));
 
+    it('should preserve an explicit clear when a migration activates another destination',
+      inject(function(elementRegistry, elementTemplates) {
+        const fields = targetTemplate.properties.map(property =>
+          property.binding.name === 'body' ? { ...property, value: 'default body' } : property
+        );
+        fields.push({
+          label: 'Enabled',
+          type: 'String',
+          binding: input('enabled'),
+          value: 'enabled-default',
+          optional: true
+        });
+        const target = targetWith([
+          { to: input('enabled'), set: '' },
+          { to: method, set: 'post' }
+        ], fields);
+        elementTemplates.set([ legacyTemplate, target ]);
+        const element = elementRegistry.get('Legacy');
+
+        elementTemplates.applyTemplate(element, target);
+
+        expect(getInput(element, 'body')).to.equal('default body');
+        expect(getInput(element, 'enabled')).to.be.undefined;
+      }));
+
+    it('should not let migration overwrite a preset value',
+      inject(function(elementRegistry, elementTemplates) {
+        const fields = targetTemplate.properties.map(property =>
+          property.binding.name === 'timeout' ? { ...property, id: 'timeout' } : property
+        );
+        const source = { ...targetTemplate, version: 1, properties: fields, migratesFrom: [] };
+        const target = {
+          ...source,
+          version: 2,
+          properties: fields.map(property =>
+            property.binding.name === 'timeout' ? { ...property, value: 'PT2M' } : property
+          ),
+          presets: [ { id: 'reset', name: 'Reset', properties: { timeout: 'PT5M' } } ],
+          migratesFrom: [
+            { toVersion: 2, instructions: [ { from: input('timeout'), to: input('timeout') } ] }
+          ]
+        };
+        elementTemplates.set([ legacyTemplate, source, target ]);
+        const element = elementRegistry.get('Legacy');
+
+        elementTemplates.applyTemplate(element, source);
+        elementTemplates.setPropertyValue(element, {
+          type: 'String',
+          binding: input('timeout')
+        }, 'PT1M');
+
+        elementTemplates.applyTemplate(element, target, { presetId: 'reset' });
+
+        expect(getInput(element, 'timeout')).to.equal('PT5M');
+      }));
+
     it('should swap bindings and evaluate conditions against the same-step source values',
       inject(function(elementRegistry, elementTemplates) {
         const timeout = input('timeout');
@@ -544,6 +600,39 @@ describe('provider/cloud-element-templates - migration', function() {
 
         elementTemplates.set([ legacyTemplate, { ...target, migratesFrom: [ { ...change, maxSourceVersion: 0 } ] } ]);
         expect(elementTemplates.getMigrations(element)).to.eql([]);
+      }));
+
+    it('should stage writes across equivalent task-definition bindings',
+      inject(function(elementRegistry, elementTemplates) {
+        const legacyBinding = { type: 'zeebe:taskDefinition:type' };
+        const currentBinding = { type: 'zeebe:taskDefinition', property: 'type' };
+        const fields = targetTemplate.properties.map(property =>
+          property.binding.type === 'zeebe:taskDefinition'
+            ? { ...property, type: 'String' }
+            : property
+        );
+        const target = {
+          ...targetTemplate,
+          version: 3,
+          properties: fields,
+          migratesFrom: [
+            {
+              sourceTemplateId: legacyTemplate.id,
+              toVersion: 2,
+              instructions: [ { to: legacyBinding, set: 'staged task type' } ]
+            },
+            {
+              toVersion: 3,
+              instructions: [ { from: currentBinding, to: input('endpoint') } ]
+            }
+          ]
+        };
+        elementTemplates.set([ legacyTemplate, target ]);
+        const element = elementRegistry.get('Legacy');
+
+        elementTemplates.applyTemplate(element, target);
+
+        expect(getInput(element, 'endpoint')).to.equal('staged task type');
       }));
 
     for (const [ version, expectedEndpoint, expectedTimeout ] of [

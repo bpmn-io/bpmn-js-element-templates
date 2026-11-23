@@ -5,7 +5,7 @@ import {
 import { isObject } from 'min-dash';
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 
-import { ZEEBE_TASK_DEFINITION, ZEEBE_TASK_DEFINITION_TYPE_TYPE } from '../util/bindingTypes';
+import { normalizeBinding } from '../util/bindingTypes';
 
 
 /**
@@ -208,21 +208,6 @@ function areBindingsEqual(binding1, binding2) {
   binding2 = normalizeBinding(binding2);
 
   return equals(binding1, binding2);
-}
-
-/**
- * Convert deprecated binding type to new type.
- */
-function normalizeBinding(binding) {
-  if (binding.type === ZEEBE_TASK_DEFINITION_TYPE_TYPE) {
-    return {
-      ...binding,
-      type: ZEEBE_TASK_DEFINITION,
-      property: 'type'
-    };
-  }
-
-  return binding;
 }
 
 function equals(a, b) {
