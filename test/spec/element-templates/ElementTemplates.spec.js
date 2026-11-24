@@ -284,6 +284,98 @@ describe('provider/element-templates - ElementTemplates', function() {
       }));
 
 
+      it('should retrieve latest incompatible', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '7.13'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.basic', { incompatible: true });
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(3);
+      }));
+
+
+      it('should retrieve all latest incompatible', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '7.13'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest(undefined, { incompatible: true });
+
+        // then
+        // example.engines.test.multiple v2
+        // example.engines.test.basic v3
+        // example.engines.test.broken v1
+        expect(templates).to.have.length(3);
+      }));
+
+
+      it('should hide deprecated incompatible', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '7.13'
+        });
+
+        elementTemplates.set([
+          { id: 'example.deprecated', version: 1, appliesTo: [ 'bpmn:Task' ], properties: [] },
+          {
+            id: 'example.deprecated',
+            version: 2,
+            appliesTo: [ 'bpmn:Task' ],
+            properties: [],
+            engines: { camunda: '^99' },
+            deprecated: true
+          }
+        ]);
+
+        // when
+        const templates = elementTemplates.getLatest('example.deprecated', { incompatible: true });
+
+        // then
+        expect(templates).to.be.empty;
+      }));
+
+
+      it('should retrieve deprecated incompatible', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '7.13'
+        });
+
+        elementTemplates.set([
+          { id: 'example.deprecated', version: 1, appliesTo: [ 'bpmn:Task' ], properties: [] },
+          {
+            id: 'example.deprecated',
+            version: 2,
+            appliesTo: [ 'bpmn:Task' ],
+            properties: [],
+            engines: { camunda: '^99' },
+            deprecated: true
+          }
+        ]);
+
+        // when
+        const templates = elementTemplates.getLatest('example.deprecated', {
+          deprecated: true,
+          incompatible: true
+        });
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(2);
+      }));
+
+
       it('should retrieve fallback (no <engines> meta-data)', inject(function(elementTemplates) {
 
         // given
@@ -587,6 +679,19 @@ describe('provider/element-templates - ElementTemplates', function() {
       // then
       expect(newTemplates).to.have.length(1);
       expect(newTemplates[0].version).to.eql(3);
+    }));
+
+
+    it('should ignore <incompatible>', inject(function(elementTemplates) {
+
+      // when
+      const templates = elementTemplates.getCompatible('example.engines.test.basic', {
+        camunda: '7.13.0'
+      }, { incompatible: true });
+
+      // then
+      expect(templates).to.have.length(1);
+      expect(templates[0].version).to.eql(2);
     }));
 
 
