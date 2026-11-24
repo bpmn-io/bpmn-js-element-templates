@@ -414,6 +414,22 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
       }));
 
 
+      it('should retrieve latest incompatible', inject(function(elementTemplates) {
+
+        // given
+        elementTemplates.setEngines({
+          camunda: '8.5'
+        });
+
+        // when
+        const templates = elementTemplates.getLatest('example.engines.test.basic', { incompatible: true });
+
+        // then
+        expect(templates).to.have.length(1);
+        expect(templates[0].version).to.eql(3);
+      }));
+
+
       it('should retrieve fallback (no <engines> meta-data)', inject(function(elementTemplates) {
 
         // given

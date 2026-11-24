@@ -97,39 +97,75 @@ export function buildTemplatesById(templates, engines) {
 
     const latest = templatesById[id].latest;
 
-    if (isCompatible(template, engines)) {
-      if (!latest || isUndefined(latest.version) || latest.version < version)
-      {
-        templatesById[id].latest = template;
-      }
+    if (isCompatible(template, engines) && isNewer(template, latest)) {
+      templatesById[id].latest = template;
     }
   });
 
   return templatesById;
 }
 
+function isNewer(template, other) {
+  return !other || isUndefined(other.version) || other.version < template.version;
+}
+
 /**
- * Finds the list of templates that match the given criteria within a template index.
+ * Find all versions of the templates with the given id, or applicable to the
+ * given element; of all templates, if none is given.
  *
+ * @overload
  * @param {string|djs.model.Base} [elementOrTemplateId]
  * @param {Object} templatesIndex
- * @param {Object} [options]
- * @param {boolean} [options.latest]
- * @param {boolean} [options.deprecated]
+ *
+ * @return {Array<Object>}
+ */
+
+/**
+ * Find the version of each template to offer to users: the latest one
+ * compatible with the engines the index was built for.
+ *
+ * A deprecated latest version deprecates the template as a whole, so the
+ * template is not found, rather than an older version; `deprecated` includes
+ * it, e.g. to update elements that already use the template. `incompatible`
+ * finds the latest version regardless of compatibility, to read it, not to
+ * apply it.
+ *
+ * @overload
+ * @param {string|djs.model.Base|undefined} elementOrTemplateId
+ * @param {Object} templatesIndex
+ * @param {{ latest: true, deprecated?: boolean, incompatible?: boolean }} options
+ *
+ * @return {Array<Object>}
+ */
+
+/**
+ * @param {string|djs.model.Base} [elementOrTemplateId]
+ * @param {Object} templatesIndex
+ * @param {{ latest?: boolean, deprecated?: boolean, incompatible?: boolean }} [options]
  *
  * @return {Array<Object>}
  */
 export function findTemplates(elementOrTemplateId, templatesIndex, options = {}) {
   const {
     latest: includeLatestOnly,
-    deprecated: includeDeprecated
+    deprecated: includeDeprecated,
+    incompatible: includeIncompatible
   } = options;
 
   const getVersions = (template) => {
-    const { latest, ...versions } = template;
-    return includeLatestOnly ? (
-      !includeDeprecated && (latest && latest.deprecated) ? [] : (latest ? [ latest ] : [])
-    ) : values(versions) ;
+
+    // the index keeps the latest compatible version next to all versions
+    const { latest: latestCompatible, ...versions } = template;
+
+    if (!includeLatestOnly) {
+      return values(versions);
+    }
+
+    const latest = includeIncompatible
+      ? reduce(versions, (newest, template) => isNewer(template, newest) ? template : newest, undefined)
+      : latestCompatible;
+
+    return !includeDeprecated && (latest && latest.deprecated) ? [] : (latest ? [ latest ] : []);
   };
 
   if (isNil(elementOrTemplateId)) {

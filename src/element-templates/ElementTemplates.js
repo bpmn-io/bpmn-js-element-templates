@@ -99,7 +99,7 @@ export default class ElementTemplates {
    * @return {Array<ElementTemplate>}
    */
   getAll(elementOrTemplateId) {
-    return findTemplates(elementOrTemplateId, this._templatesById, { deprecated: true });
+    return findTemplates(elementOrTemplateId, this._templatesById);
   }
 
 
@@ -108,7 +108,10 @@ export default class ElementTemplates {
    * version.
    *
    * @param {String|Element} [elementOrTemplateId]
-   * @param {{ deprecated?: boolean }} [options]
+   * @param {Object} [options]
+   * @param {boolean} [options.deprecated=false] include deprecated versions
+   * @param {boolean} [options.incompatible=false] include versions incompatible
+   * with the configured `engines`
    *
    * @return {Array<ElementTemplate>}
    */
@@ -120,15 +123,35 @@ export default class ElementTemplates {
   }
 
   /**
-   * Get templates compatible with a given engine configuration override.
+   * Get the version of each template to offer to users under the given engine
+   * overrides: the latest compatible one. `deprecated` includes a deprecated
+   * latest version.
    *
+   * @overload
    * @param {string|Element} [elementOrTemplateId]
-   * @param {Object} enginesOverrides
-   * @param {Object} [options]
-   * @param {boolean} [options.deprecated=false]
-   * @param {boolean} [options.latest=true]
+   * @param {Object} [enginesOverrides]
+   * @param { { latest?: true, deprecated?: boolean } } [options]
    *
-   * @returns {Array<ElementTemplate>}
+   * @return {Array<ElementTemplate>}
+   */
+
+  /**
+   * Get all versions of the templates, regardless of compatibility.
+   *
+   * @overload
+   * @param {string|Element|undefined} elementOrTemplateId
+   * @param {Object|undefined} enginesOverrides
+   * @param { { latest: false } } options
+   *
+   * @return {Array<ElementTemplate>}
+   */
+
+  /**
+   * @param {string|Element} [elementOrTemplateId]
+   * @param {Object} [enginesOverrides]
+   * @param { { latest?: boolean, deprecated?: boolean } } [options]
+   *
+   * @return {Array<ElementTemplate>}
    */
   getCompatible(elementOrTemplateId, enginesOverrides = {}, options = {}) {
     const overridenEngines = { ...this._engines, ...enginesOverrides };
@@ -136,7 +159,8 @@ export default class ElementTemplates {
 
     return findTemplates(elementOrTemplateId, templatesById, {
       latest: true,
-      ...options
+      ...options,
+      incompatible: false
     });
   }
 

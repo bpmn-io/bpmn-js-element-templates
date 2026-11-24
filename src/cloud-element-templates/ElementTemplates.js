@@ -82,7 +82,10 @@ export default class ElementTemplates extends DefaultElementTemplates {
    * Get all templates (with given ID or applicable to element) with the latest version.
    *
    * @param {String|djs.model.Base} [elementOrTemplateId]
-   * @param {{ deprecated?: boolean }} [options]
+   * @param {Object} [options]
+   * @param {boolean} [options.deprecated=false] include deprecated versions
+   * @param {boolean} [options.incompatible=false] include versions incompatible
+   * with the configured `engines`
    *
    * @return {Array<ElementTemplate>}
    */
@@ -97,11 +100,33 @@ export default class ElementTemplates extends DefaultElementTemplates {
   }
 
   /**
-   * Get compatible templates for element with optional engine overrides.
+   * Get the version of each template to offer to users under the given engine
+   * overrides: the latest compatible one. `deprecated` includes a deprecated
+   * latest version.
    *
-   * @param {String|djs.model.Base} [elementOrTemplateId]
+   * @overload
+   * @param {string|djs.model.Base} [elementOrTemplateId]
    * @param {Object} [enginesOverrides]
-   * @param {Object} [options]
+   * @param { { latest?: true, deprecated?: boolean } } [options]
+   *
+   * @return {Array<ElementTemplate>}
+   */
+
+  /**
+   * Get all versions of the templates, regardless of compatibility.
+   *
+   * @overload
+   * @param {string|djs.model.Base|undefined} elementOrTemplateId
+   * @param {Object|undefined} enginesOverrides
+   * @param { { latest: false } } options
+   *
+   * @return {Array<ElementTemplate>}
+   */
+
+  /**
+   * @param {string|djs.model.Base} [elementOrTemplateId]
+   * @param {Object} [enginesOverrides]
+   * @param { { latest?: boolean, deprecated?: boolean } } [options]
    *
    * @return {Array<ElementTemplate>}
    */
