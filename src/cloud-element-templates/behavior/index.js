@@ -7,6 +7,7 @@ import { ReferencedElementBehavior } from './ReferencedElementBehavior';
 import { GeneratedValueBehavior } from './GeneratedValueBehavior';
 import { CalledElementBehavior } from './CalledElementBehavior';
 import UserTaskBehavior from './UserTaskBehavior';
+import UpdatePathsBehavior from './UpdatePathsBehavior';
 
 export default {
   __init__: [
@@ -18,7 +19,8 @@ export default {
     'elementTemplatesUpdatePropertiesOrderBehavior',
     'elementTemplatesCalledElementBehavior',
     'elementTemplatesUserTaskBehavior',
-    'elementTemplatesTimerTemplateBehavior'
+    'elementTemplatesTimerTemplateBehavior',
+    'elementTemplatesUpdatePathsBehavior'
   ],
   elementTemplatesReplaceBehavior: [ 'type', ReplaceBehavior ],
   elementTemplatesConditionalBehavior: [ 'type', ConditionalBehavior ],
@@ -28,5 +30,6 @@ export default {
   elementTemplatesUpdatePropertiesOrderBehavior: [ 'type', UpdatePropertiesOrderBehavior ],
   elementTemplatesCalledElementBehavior: [ 'type', CalledElementBehavior ],
   elementTemplatesUserTaskBehavior: [ 'type', UserTaskBehavior ],
-  elementTemplatesTimerTemplateBehavior: [ 'type', TimerTemplateBehavior ]
+  elementTemplatesTimerTemplateBehavior: [ 'type', TimerTemplateBehavior ],
+  elementTemplatesUpdatePathsBehavior: [ 'type', UpdatePathsBehavior ]
 };

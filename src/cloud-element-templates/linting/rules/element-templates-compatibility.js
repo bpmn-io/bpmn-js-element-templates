@@ -24,16 +24,6 @@ export default function({ templates = [] }) {
 
   elementTemplates.set(templates);
 
-  function isUpdateAvailable(template) {
-
-    const latestTemplate = elementTemplates.getLatest(template.id, { deprecated: true })[0];
-
-    if (latestTemplate && latestTemplate !== template) {
-      return true;
-    }
-
-    return false;
-  }
 
   function check(node, reporter) {
 
@@ -57,7 +47,7 @@ export default function({ templates = [] }) {
       Object.keys(incomp).forEach((engine) => {
         reporter.report(
           node.id,
-          getIncompatibilityText(engine, incomp[engine], isUpdateAvailable(template)),
+          getIncompatibilityText(engine, incomp[engine], !!elementTemplates.getUpdate(node)),
           {
             name: node.name
           }

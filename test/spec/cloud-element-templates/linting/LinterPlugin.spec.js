@@ -286,7 +286,22 @@ const outdated = [
     },
     report: {
       id: 'Task_1',
-      message: 'Element has updated template available.'
+      message: 'Element has updated template available.',
+      templateId: 'updatable',
+      templateVersion: 2
+    }
+  },
+  {
+    name: 'Task with template migration available (over newer version)',
+    moddleElement: createProcess('<bpmn:task id="Task_1" zeebe:modelerTemplate="migratable" zeebe:modelerTemplateVersion="1" />'),
+    config: {
+      templates
+    },
+    report: {
+      id: 'Task_1',
+      message: 'Element has template migration available.',
+      templateId: 'migration-target',
+      templateVersion: 1
     }
   }
 ];

@@ -1,0 +1,975 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Source",
+    "id": "example.source",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.source",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "a",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "a"
+        }
+      },
+      {
+        "label": "method",
+        "type": "Dropdown",
+        "value": "GET",
+        "choices": [
+          {
+            "name": "GET",
+            "value": "GET"
+          },
+          {
+            "name": "POST",
+            "value": "POST"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        }
+      },
+      {
+        "label": "payload",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "payload"
+        }
+      },
+      {
+        "label": "apiKey",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "apiKey"
+        }
+      },
+      {
+        "label": "kind",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "kind"
+        }
+      },
+      {
+        "label": "timeout",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      },
+      {
+        "id": "flag",
+        "label": "flag",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "flag"
+        }
+      },
+      {
+        "id": "retry",
+        "label": "retry",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "retry"
+        }
+      },
+      {
+        "id": "count",
+        "label": "count",
+        "type": "Number",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "count"
+        }
+      },
+      {
+        "id": "limit",
+        "label": "limit",
+        "type": "Number",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "limit"
+        }
+      },
+      {
+        "id": "toggle",
+        "label": "toggle",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "toggle"
+        }
+      },
+      {
+        "id": "switch",
+        "label": "switch",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "switch"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Source",
+    "id": "example.source",
+    "version": 2,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.source",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "b",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "b"
+        }
+      },
+      {
+        "label": "method",
+        "type": "Dropdown",
+        "value": "GET",
+        "choices": [
+          {
+            "name": "GET",
+            "value": "GET"
+          },
+          {
+            "name": "POST",
+            "value": "POST"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        }
+      },
+      {
+        "label": "payload",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "payload"
+        }
+      },
+      {
+        "label": "apiKey",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "apiKey"
+        }
+      },
+      {
+        "label": "kind",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "kind"
+        }
+      },
+      {
+        "label": "timeout",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      },
+      {
+        "id": "flag",
+        "label": "flag",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "flag"
+        }
+      },
+      {
+        "id": "retry",
+        "label": "retry",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "retry"
+        }
+      },
+      {
+        "id": "count",
+        "label": "count",
+        "type": "Number",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "count"
+        }
+      },
+      {
+        "id": "limit",
+        "label": "limit",
+        "type": "Number",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "limit"
+        }
+      },
+      {
+        "id": "toggle",
+        "label": "toggle",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "toggle"
+        }
+      },
+      {
+        "id": "switch",
+        "label": "switch",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "switch"
+        }
+      }
+    ],
+    "updatePaths": [
+      {
+        "beforeVersion": 2,
+        "changes": "Source: a is now b.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "a"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "b"
+            }
+          }
+        ]
+      }
+    ],
+    "engines": {
+      "camunda": "^99"
+    },
+    "deprecated": {
+      "message": "Use Target instead."
+    }
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Target",
+    "id": "example.target",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.target",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "x",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "x"
+        }
+      },
+      {
+        "label": "w",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "w"
+        }
+      },
+      {
+        "label": "timeout",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Target",
+    "id": "example.target",
+    "version": 2,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.target",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "c",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "c"
+        }
+      },
+      {
+        "label": "e",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "e"
+        }
+      },
+      {
+        "label": "timeout",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      }
+    ],
+    "updatePaths": [
+      {
+        "beforeVersion": 2,
+        "changes": "Target: x is now c, w is now e.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "x"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "c"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "w"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "e"
+            }
+          }
+        ]
+      },
+      {
+        "templateId": "example.source",
+        "message": "Migrate to Target.",
+        "changes": "Source: b is now c.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "b"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "c"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "to": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "values": {
+              "GET": "get",
+              "POST": "post"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "payload"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "body"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "apiKey"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "authentication.type"
+            },
+            "values": {
+              "*": "apiKey"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "kind"
+            },
+            "to": {
+              "type": "zeebe:taskDefinition",
+              "property": "type"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:property",
+              "name": "flag"
+            },
+            "to": {
+              "type": "zeebe:property",
+              "name": "enabled"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "retry"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "retries"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "count"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "total"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:property",
+              "name": "limit"
+            },
+            "to": {
+              "type": "zeebe:property",
+              "name": "max"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "toggle"
+            },
+            "to": {
+              "type": "zeebe:property",
+              "name": "toggled"
+            },
+            "values": {
+              "=true": true,
+              "=false": false
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:property",
+              "name": "switch"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "switched"
+            },
+            "values": {
+              "true": "=true",
+              "false": "=false"
+            }
+          }
+        ]
+      },
+      {
+        "templateId": "example.other",
+        "message": "Migrate Other to Target.",
+        "changes": "Other: o is now c.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "o"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "c"
+            }
+          }
+        ]
+      },
+      {
+        "templateId": "example.unknown",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "b"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "c"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Target",
+    "id": "example.target",
+    "version": 3,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.target",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "d",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "d"
+        }
+      },
+      {
+        "label": "e",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "e"
+        }
+      },
+      {
+        "label": "method",
+        "type": "Dropdown",
+        "value": "get",
+        "choices": [
+          {
+            "name": "get",
+            "value": "get"
+          },
+          {
+            "name": "post",
+            "value": "post"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        },
+        "id": "method"
+      },
+      {
+        "label": "body",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "body"
+        },
+        "condition": {
+          "property": "method",
+          "equals": "post"
+        }
+      },
+      {
+        "label": "authentication",
+        "type": "Dropdown",
+        "value": "none",
+        "choices": [
+          {
+            "name": "none",
+            "value": "none"
+          },
+          {
+            "name": "apiKey",
+            "value": "apiKey"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:input",
+          "name": "authentication.type"
+        }
+      },
+      {
+        "label": "timeout",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      },
+      {
+        "id": "enabled",
+        "label": "enabled",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "enabled"
+        },
+        "value": true
+      },
+      {
+        "id": "retries",
+        "label": "retries",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "retries"
+        },
+        "value": true
+      },
+      {
+        "id": "total",
+        "label": "total",
+        "type": "Number",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "total"
+        },
+        "value": 1
+      },
+      {
+        "id": "max",
+        "label": "max",
+        "type": "Number",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "max"
+        },
+        "value": 1
+      },
+      {
+        "id": "toggled",
+        "label": "toggled",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:property",
+          "name": "toggled"
+        },
+        "value": true
+      },
+      {
+        "id": "switched",
+        "label": "switched",
+        "type": "Boolean",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "switched"
+        },
+        "value": true
+      }
+    ],
+    "updatePaths": [
+      {
+        "beforeVersion": 2,
+        "changes": "Target: x is now c, w is now e.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "x"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "c"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "w"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "e"
+            }
+          }
+        ]
+      },
+      {
+        "templateId": "example.source",
+        "message": "Migrate to Target.",
+        "changes": "Source: b is now c.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "b"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "c"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "to": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "values": {
+              "GET": "get",
+              "POST": "post"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "payload"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "body"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "apiKey"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "authentication.type"
+            },
+            "values": {
+              "*": "apiKey"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "kind"
+            },
+            "to": {
+              "type": "zeebe:taskDefinition",
+              "property": "type"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:property",
+              "name": "flag"
+            },
+            "to": {
+              "type": "zeebe:property",
+              "name": "enabled"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "retry"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "retries"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "count"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "total"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:property",
+              "name": "limit"
+            },
+            "to": {
+              "type": "zeebe:property",
+              "name": "max"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "toggle"
+            },
+            "to": {
+              "type": "zeebe:property",
+              "name": "toggled"
+            },
+            "values": {
+              "=true": true,
+              "=false": false
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:property",
+              "name": "switch"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "switched"
+            },
+            "values": {
+              "true": "=true",
+              "false": "=false"
+            }
+          }
+        ]
+      },
+      {
+        "templateId": "example.other",
+        "message": "Migrate Other to Target.",
+        "changes": "Other: o is now c.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "o"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "c"
+            }
+          }
+        ]
+      },
+      {
+        "templateId": "example.unknown",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "b"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "c"
+            }
+          }
+        ]
+      },
+      {
+        "beforeVersion": 3,
+        "changes": "Target: c is now d.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "c"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Other",
+    "id": "example.other",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.other",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "o",
+        "type": "String",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "o"
+        }
+      }
+    ]
+  }
+]

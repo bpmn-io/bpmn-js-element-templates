@@ -16,6 +16,9 @@
     </bpmn:task>
     <bpmn:task id="UnknownTemplateTask" zeebe:modelerTemplate="unknown" />
     <bpmn:serviceTask id="ServiceTask" zeebe:modelerTemplate="default" zeebe:modelerTemplateVersion="1" />
+    <bpmn:serviceTask id="LegacyTemplateTask" zeebe:modelerTemplate="example.legacy" zeebe:modelerTemplateVersion="1" />
+    <bpmn:serviceTask id="OtherTemplateTask" zeebe:modelerTemplate="example.other" zeebe:modelerTemplateVersion="1" />
+    <bpmn:serviceTask id="TargetTemplateTask" zeebe:modelerTemplate="example.target" zeebe:modelerTemplateVersion="1" />
     <bpmn:serviceTask id="ConfiguredTask">
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="taskType" retries="5" />
@@ -176,6 +179,15 @@
         <di:waypoint x="850" y="160" />
         <di:waypoint x="896" y="110" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="LegacyTemplateTask_di" bpmnElement="LegacyTemplateTask">
+        <dc:Bounds x="160" y="840" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OtherTemplateTask_di" bpmnElement="OtherTemplateTask">
+        <dc:Bounds x="300" y="840" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TargetTemplateTask_di" bpmnElement="TargetTemplateTask">
+        <dc:Bounds x="440" y="840" width="100" height="80" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
   <bpmndi:BPMNDiagram id="BPMNDiagram_0h3d15h">

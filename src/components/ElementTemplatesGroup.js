@@ -20,7 +20,7 @@ import {
 
 
 /**
- * @typedef {NoTemplate|KnownTemplate|UnknownTemplate|OutdatedTemplate} TemplateState
+ * @typedef {NoTemplate|KnownTemplate|UnknownTemplate|OutdatedTemplate|MigratableTemplate} TemplateState
  */
 
 /**
@@ -39,6 +39,11 @@ import {
  * @property {'OUTDATED_TEMPLATE'} type
  * @property {object} template
  * @property {object} newerTemplate
+ *
+ * @typedef MigratableTemplate
+ * @property {'MIGRATABLE_TEMPLATE'} type
+ * @property {object} template
+ * @property {object} targetTemplate
  */
 
 /**
@@ -151,6 +156,12 @@ function TemplateGroupButtons({ element, getTemplateId }) {
     return <DeprecatedTemplate element={ element } templateState={ templateState } />;
   } else if (templateState.type === 'INCOMPATIBLE_TEMPLATE') {
     return <IncompatibleTemplate element={ element } />;
+  } else if (templateState.type === 'MIGRATABLE_TEMPLATE') {
+    return (
+      <MigratableTemplate
+        element={ element }
+        templateState={ templateState } />
+    );
   } else if (templateState.type === 'OUTDATED_TEMPLATE') {
     return (
       <OutdatedTemplate
@@ -249,15 +260,26 @@ function NotFoundText() {
  * @param {function} updateTemplate
  */
 function OutdatedTemplate({ element, templateState }) {
-  const { newerTemplate, compatible } = templateState;
+  const { template, newerTemplate, compatible } = templateState;
 
   const translate = useService('translate'),
-        elementTemplates = useService('elementTemplates');
+        elementTemplates = useService('elementTemplates'),
+        eventBus = useService('eventBus');
+
+  const details = elementTemplates.getUpdateDetails(element, newerTemplate);
+
+  const reviewChanges = () => eventBus.fire('elementTemplates.reviewChanges', {
+    element,
+    oldTemplate: template,
+    newTemplate: newerTemplate,
+    ...details
+  });
 
   const menuItems = [
     { entry: <UpdateAvailableText newerTemplate={ newerTemplate } compatible={ compatible } /> },
     { separator: true },
     { entry: translate('Update'), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
+    ...(details.changes.length ? [ { entry: translate('Review changes'), action: reviewChanges } ] : []),
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
@@ -294,6 +316,54 @@ function UpdateAvailableText({ newerTemplate, compatible }) {
     );
 
   return <div class="bio-properties-panel-template-update-available-text">{text}</div>;
+}
+
+function MigratableTemplate({ element, templateState }) {
+  const { template, targetTemplate } = templateState;
+
+  const translate = useService('translate'),
+        elementTemplates = useService('elementTemplates'),
+        eventBus = useService('eventBus');
+
+  const details = elementTemplates.getUpdateDetails(element, targetTemplate);
+
+  const reviewChanges = () => eventBus.fire('elementTemplates.reviewChanges', {
+    element,
+    oldTemplate: template,
+    newTemplate: targetTemplate,
+    ...details
+  });
+
+  const menuItems = [
+    { entry: <MigrationAvailableText templateState={ templateState } message={ details.message } /> },
+    { separator: true },
+    {
+      entry: translate('Migrate'),
+      action: () => elementTemplates.applyTemplate(element, targetTemplate)
+    },
+    ...(details.changes.length ? [ { entry: translate('Review changes'), action: reviewChanges } ] : []),
+    { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
+    { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
+  ];
+
+  return (
+    <DropdownButton menuItems={ menuItems } class="bio-properties-panel-template-migration-available">
+      <HeaderButton>
+        <span>{ translate('Migration available') }</span>
+        <ArrowIcon class="bio-properties-panel-arrow-down" />
+      </HeaderButton>
+    </DropdownButton>
+  );
+}
+
+function MigrationAvailableText({ templateState, message }) {
+  const { targetTemplate } = templateState;
+
+  const translate = useService('translate');
+
+  return <div class="bio-properties-panel-template-migration-available-text">
+    { message || translate('Migration to {templateName} is available.', { templateName: targetTemplate.name }) }
+  </div>;
 }
 
 function DeprecatedTemplate({ element, templateState }) {
@@ -395,16 +465,20 @@ function getTemplateState(elementTemplates, element, getTemplateId) {
     return { type: 'UNKNOWN_TEMPLATE', templateId };
   }
 
+  const update = elementTemplates.getUpdate(element);
+
+  if (update?.type === 'migration') {
+    return { type: 'MIGRATABLE_TEMPLATE', template, targetTemplate: update.template };
+  }
+
   if (template.deprecated) {
     return { type: 'DEPRECATED_TEMPLATE', template };
   }
 
   const compatible = elementTemplates.isCompatible(template);
 
-  const latestTemplate = elementTemplates.getLatest(templateId, { deprecated: true })[0];
-
-  if (latestTemplate && latestTemplate !== template) {
-    return { type: 'OUTDATED_TEMPLATE', template, newerTemplate: latestTemplate, compatible };
+  if (update) {
+    return { type: 'OUTDATED_TEMPLATE', template, newerTemplate: update.template, compatible };
   }
 
   if (!compatible) {

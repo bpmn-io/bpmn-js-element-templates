@@ -1,6 +1,10 @@
 import {
-  isObject
+  isArray,
+  isObject,
+  isString
 } from 'min-dash';
+
+import { isAny } from 'bpmn-js/lib/util/ModelUtil';
 
 import {
   getTemplateId,
@@ -26,11 +30,24 @@ import { default as DefaultElementTemplates } from '../element-templates/Element
 
 import { isTimerTemplateApplicable } from './util/timerUtil';
 
+import { getUpdateSteps } from './util/updatePathsUtil';
+
 /**
  * @typedef {import('bpmn-js/lib/model/Types').Element} Element
+ * @typedef {import('./util/updatePathsUtil').UpdateStep} UpdateStep
  */
 
 /**
+ * @typedef {Object} UpdateDetails
+ * @property {string} [message] shown where a migration is offered
+ * @property {Array<Change>} changes authored changes, oldest first
+ *
+ * @typedef {Object} Change
+ * @property {'update'|'migration'} type
+ * @property {ElementTemplate} template latest version of the template declaring the change
+ * @property {number} [version] version the update was introduced in
+ * @property {string} text human readable change
+ *
  * @typedef {Object} ElementTemplateOptions
  * @property {string} [presetId] Preset to apply on top of the template
  */
@@ -52,6 +69,21 @@ export default class ElementTemplates extends DefaultElementTemplates {
 
     this._templateElementFactory = templateElementFactory;
     this._translate = translate;
+
+    this._migrationTargetsById = Object.create(null);
+  }
+
+  /**
+   * Set templates.
+   *
+   * @param {Array<ElementTemplate>} templates
+   */
+  set(templates) {
+
+    // index the templates elements may migrate to, by the id of their template
+    this._migrationTargetsById = buildMigrationTargetsById(templates);
+
+    super.set(templates);
   }
 
   _getTemplateId(element) {
@@ -138,6 +170,83 @@ export default class ElementTemplates extends DefaultElementTemplates {
     }
 
     return templates;
+  }
+
+  /**
+   * Get the update available for an element: a migration to another template,
+   * if declared, or a newer version of its template.
+   *
+   * A migration is offered instead of updates, as it includes them.
+   *
+   * @param {Element} element
+   *
+   * @return { { type: 'update'|'migration', template: ElementTemplate } | null }
+   */
+  getUpdate(element) {
+    const template = this.get(element);
+
+    if (!template) {
+      return null;
+    }
+
+    const migration = (this._migrationTargetsById[ template.id ] || [])
+      .flatMap(id => this.getLatest(id))
+      .find(newTemplate => {
+        return isAny(element, newTemplate.appliesTo) &&
+          this._filterApplicableTemplates([ newTemplate ], element).length &&
+          this._getUpdateSteps(template, newTemplate).length;
+      });
+
+    if (migration) {
+      return { type: 'migration', template: migration };
+    }
+
+    return super.getUpdate(element);
+  }
+
+  /**
+   * Get what changing an element to a given template means, as declared by the
+   * template's update paths. Works for any element and template, and is usually
+   * empty.
+   *
+   * @param {Element} element
+   * @param {ElementTemplate} newTemplate
+   *
+   * @return {UpdateDetails}
+   */
+  getUpdateDetails(element, newTemplate) {
+    const oldTemplate = this.get(element);
+
+    const steps = oldTemplate ? this._getUpdateSteps(oldTemplate, newTemplate) : [];
+
+    const message = steps.map(({ path }) => path.message).find(Boolean);
+
+    const changes = steps.filter(({ path }) => path.changes).map(({ template, path }) => {
+      return path.templateId
+        ? { type: 'migration', template, text: path.changes }
+        : { type: 'update', template, version: path.beforeVersion, text: path.changes };
+    });
+
+    return message ? { message, changes } : { changes };
+  }
+
+  /**
+   * Get the update steps from one template to another. The latest loaded
+   * version of the old template, deprecated or incompatible, declares its
+   * update history.
+   *
+   * @param {ElementTemplate} oldTemplate
+   * @param {ElementTemplate} newTemplate
+   *
+   * @return {Array<UpdateStep>}
+   */
+  _getUpdateSteps(oldTemplate, newTemplate) {
+    const [ latestOldTemplate ] = this.getLatest(oldTemplate.id, {
+      deprecated: true,
+      incompatible: true
+    });
+
+    return getUpdateSteps(newTemplate, oldTemplate, latestOldTemplate);
   }
 
   _filterApplicableTemplates(templates, element) {
@@ -312,4 +421,36 @@ function normalizePropertyValue(value, property) {
   return shouldCastToFeel(property)
     ? toFeelExpression(value, property.type)
     : value;
+}
+
+
+/**
+ * @param {Array<ElementTemplate>} templates
+ *
+ * @return {Record<string, Array<string>>} ids of the templates to migrate to,
+ * by the id of the template to migrate from
+ */
+function buildMigrationTargetsById(templates) {
+  const targetsById = Object.create(null);
+
+  // templates are untrusted input and may have any shape
+  for (const template of templates) {
+    const updatePaths = isObject(template) && isArray(template.updatePaths) ? template.updatePaths : [];
+
+    for (const path of updatePaths) {
+      const templateId = isObject(path) && path.templateId;
+
+      if (!isString(templateId) || templateId === template.id) {
+        continue;
+      }
+
+      const ids = targetsById[ templateId ] = targetsById[ templateId ] || [];
+
+      if (!ids.includes(template.id)) {
+        ids.push(template.id);
+      }
+    }
+  }
+
+  return targetsById;
 }
