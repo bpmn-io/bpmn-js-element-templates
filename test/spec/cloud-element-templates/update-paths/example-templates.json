@@ -1,0 +1,678 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Legacy REST",
+    "id": "example.rest",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.rest",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "URL",
+        "type": "String",
+        "value": "https://example.com",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "url"
+        }
+      },
+      {
+        "label": "Method",
+        "type": "Dropdown",
+        "value": "GET",
+        "choices": [
+          {
+            "name": "GET",
+            "value": "GET"
+          },
+          {
+            "name": "POST",
+            "value": "POST"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        }
+      },
+      {
+        "label": "Timeout",
+        "type": "String",
+        "value": "PT30S",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      },
+      {
+        "label": "Payload",
+        "type": "String",
+        "optional": true,
+        "binding": {
+          "type": "zeebe:input",
+          "name": "payload"
+        }
+      },
+      {
+        "label": "API key",
+        "type": "String",
+        "optional": true,
+        "binding": {
+          "type": "zeebe:input",
+          "name": "apiKey"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "Legacy REST",
+    "id": "example.rest",
+    "version": 2,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.rest",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "URL",
+        "type": "String",
+        "value": "https://example.com",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "url"
+        }
+      },
+      {
+        "label": "Method",
+        "type": "Dropdown",
+        "value": "GET",
+        "choices": [
+          {
+            "name": "GET",
+            "value": "GET"
+          },
+          {
+            "name": "POST",
+            "value": "POST"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        }
+      },
+      {
+        "label": "Timeout",
+        "type": "String",
+        "value": "PT30S",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      },
+      {
+        "label": "Request body",
+        "type": "String",
+        "optional": true,
+        "binding": {
+          "type": "zeebe:input",
+          "name": "requestBody"
+        }
+      },
+      {
+        "label": "API key",
+        "type": "String",
+        "optional": true,
+        "binding": {
+          "type": "zeebe:input",
+          "name": "apiKey"
+        }
+      }
+    ],
+    "deprecated": {
+      "message": "Use REST instead."
+    },
+    "updatePaths": [
+      {
+        "beforeVersion": 2,
+        "changes": "- Payload is now called request body.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "payload"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "requestBody"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "REST",
+    "id": "example.rest.v2",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.rest.v2",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "Endpoint",
+        "type": "String",
+        "value": "https://example.com",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "endpoint"
+        }
+      },
+      {
+        "label": "Method",
+        "type": "Dropdown",
+        "value": "get",
+        "choices": [
+          {
+            "name": "GET",
+            "value": "get"
+          },
+          {
+            "name": "POST",
+            "value": "post"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        },
+        "id": "method"
+      },
+      {
+        "label": "Body",
+        "type": "String",
+        "value": "",
+        "optional": true,
+        "binding": {
+          "type": "zeebe:input",
+          "name": "body"
+        },
+        "condition": {
+          "property": "method",
+          "equals": "post"
+        }
+      },
+      {
+        "id": "authType",
+        "label": "Authentication",
+        "type": "Dropdown",
+        "value": "none",
+        "choices": [
+          {
+            "name": "None",
+            "value": "none"
+          },
+          {
+            "name": "API key",
+            "value": "apiKey"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:input",
+          "name": "authentication.type"
+        }
+      },
+      {
+        "label": "Timeout",
+        "type": "String",
+        "value": "PT30S",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "timeout"
+        }
+      }
+    ],
+    "updatePaths": [
+      {
+        "templateId": "example.rest",
+        "message": "Migration to REST connector is available.",
+        "changes": "- URL is now called endpoint.\n- HTTP methods are lower case.\n- Request body is now called body, and requires POST.\n- An API key enables API key authentication.\n\nSee [REST connector](https://docs.camunda.io/docs/components/connectors/protocol/rest/).",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "url"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "endpoint"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "to": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "values": {
+              "GET": "get",
+              "POST": "post"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "requestBody"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "body"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "apiKey"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "authentication.type"
+            },
+            "values": {
+              "*": "apiKey"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "REST",
+    "id": "example.rest.v2",
+    "version": 2,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.rest.v2",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "Endpoint",
+        "type": "String",
+        "value": "https://example.com",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "endpoint"
+        }
+      },
+      {
+        "label": "Method",
+        "type": "Dropdown",
+        "value": "get",
+        "choices": [
+          {
+            "name": "GET",
+            "value": "get"
+          },
+          {
+            "name": "POST",
+            "value": "post"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        },
+        "id": "method"
+      },
+      {
+        "label": "Body",
+        "type": "String",
+        "value": "",
+        "optional": true,
+        "binding": {
+          "type": "zeebe:input",
+          "name": "body"
+        },
+        "condition": {
+          "property": "method",
+          "equals": "post"
+        }
+      },
+      {
+        "id": "authType",
+        "label": "Authentication",
+        "type": "Dropdown",
+        "value": "none",
+        "choices": [
+          {
+            "name": "None",
+            "value": "none"
+          },
+          {
+            "name": "API key",
+            "value": "apiKey"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:input",
+          "name": "authentication.type"
+        }
+      },
+      {
+        "label": "Request timeout",
+        "type": "String",
+        "value": "PT30S",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "requestTimeout"
+        }
+      }
+    ],
+    "updatePaths": [
+      {
+        "templateId": "example.rest",
+        "message": "Migration to REST connector is available.",
+        "changes": "- URL is now called endpoint.\n- HTTP methods are lower case.\n- Request body is now called body, and requires POST.\n- An API key enables API key authentication.\n\nSee [REST connector](https://docs.camunda.io/docs/components/connectors/protocol/rest/).",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "url"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "endpoint"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "to": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "values": {
+              "GET": "get",
+              "POST": "post"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "requestBody"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "body"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "apiKey"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "authentication.type"
+            },
+            "values": {
+              "*": "apiKey"
+            }
+          }
+        ]
+      },
+      {
+        "beforeVersion": 2,
+        "changes": "- Timeout is now called request timeout.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "timeout"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "requestTimeout"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+    "name": "REST",
+    "id": "example.rest.v2",
+    "version": 3,
+    "appliesTo": [
+      "bpmn:Task"
+    ],
+    "elementType": {
+      "value": "bpmn:ServiceTask"
+    },
+    "properties": [
+      {
+        "type": "Hidden",
+        "value": "example.rest.v2",
+        "binding": {
+          "type": "zeebe:taskDefinition",
+          "property": "type"
+        }
+      },
+      {
+        "label": "Endpoint",
+        "type": "String",
+        "value": "https://example.com",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "endpoint"
+        }
+      },
+      {
+        "label": "Method",
+        "type": "Dropdown",
+        "value": "get",
+        "choices": [
+          {
+            "name": "GET",
+            "value": "get"
+          },
+          {
+            "name": "POST",
+            "value": "post"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:taskHeader",
+          "key": "method"
+        },
+        "id": "method"
+      },
+      {
+        "label": "Body",
+        "type": "String",
+        "value": "",
+        "optional": true,
+        "binding": {
+          "type": "zeebe:input",
+          "name": "body"
+        },
+        "condition": {
+          "property": "method",
+          "equals": "post"
+        }
+      },
+      {
+        "id": "authType",
+        "label": "Authentication",
+        "type": "Dropdown",
+        "value": "none",
+        "choices": [
+          {
+            "name": "None",
+            "value": "none"
+          },
+          {
+            "name": "Bearer token",
+            "value": "bearer"
+          }
+        ],
+        "binding": {
+          "type": "zeebe:input",
+          "name": "authentication.type"
+        }
+      },
+      {
+        "label": "Request timeout",
+        "type": "String",
+        "value": "PT30S",
+        "binding": {
+          "type": "zeebe:input",
+          "name": "requestTimeout"
+        }
+      }
+    ],
+    "updatePaths": [
+      {
+        "templateId": "example.rest",
+        "message": "Migration to REST connector is available.",
+        "changes": "- URL is now called endpoint.\n- HTTP methods are lower case.\n- Request body is now called body, and requires POST.\n- An API key enables API key authentication.\n\nSee [REST connector](https://docs.camunda.io/docs/components/connectors/protocol/rest/).",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "url"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "endpoint"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "to": {
+              "type": "zeebe:taskHeader",
+              "key": "method"
+            },
+            "values": {
+              "GET": "get",
+              "POST": "post"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "requestBody"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "body"
+            }
+          },
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "apiKey"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "authentication.type"
+            },
+            "values": {
+              "*": "apiKey"
+            }
+          }
+        ]
+      },
+      {
+        "beforeVersion": 2,
+        "changes": "- Timeout is now called request timeout.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "timeout"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "requestTimeout"
+            }
+          }
+        ]
+      },
+      {
+        "beforeVersion": 3,
+        "changes": "- API key authentication is now bearer token authentication.",
+        "hints": [
+          {
+            "from": {
+              "type": "zeebe:input",
+              "name": "authentication.type"
+            },
+            "to": {
+              "type": "zeebe:input",
+              "name": "authentication.type"
+            },
+            "values": {
+              "apiKey": "bearer"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
