@@ -754,7 +754,7 @@ function unlinkTemplate(container) {
  * @param {Element} container
  */
 function changeTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent === 'Change to a different template');
+  return clickDropdownItemWhere(container, element => element.textContent === 'Change template');
 }
 
 /**

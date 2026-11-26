@@ -183,7 +183,7 @@ function useChangeMenuItem(element) {
         eventBus = useService('eventBus');
 
   return {
-    entry: translate('Change to a different template'),
+    entry: translate('Change template'),
     action: () => eventBus.fire('elementTemplates.select', { element })
   };
 }
