@@ -263,8 +263,10 @@ function OutdatedTemplate({ element, templateState }) {
         elementTemplates = useService('elementTemplates');
 
   const menuItems = [
-    { entry: <UpdateAvailableText newerTemplate={ newerTemplate } compatible={ compatible } /> },
-    { separator: true },
+    ...(compatible ? [] : [
+      { entry: <UpdateAvailableText newerTemplate={ newerTemplate } /> },
+      { separator: true }
+    ]),
     { entry: translate('Update to version {version}', { version: newerTemplate.version ?? getVersionOrDateFromTemplate(newerTemplate) }), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
     useChangeMenuItem(element),
     { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
@@ -289,18 +291,13 @@ function OutdatedTemplate({ element, templateState }) {
   );
 }
 
-function UpdateAvailableText({ newerTemplate, compatible }) {
+function UpdateAvailableText({ newerTemplate }) {
   const translate = useService('translate');
 
-  const text = compatible
-    ? translate(
-      'A new version of the template is available: {templateVersion}',
-      { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
-    )
-    : translate(
-      'A version of this template is available that supports your environment: {templateVersion}',
-      { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
-    );
+  const text = translate(
+    'A version of this template is available that supports your environment: {templateVersion}',
+    { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
+  );
 
   return <div class="bio-properties-panel-template-update-available-text">{text}</div>;
 }

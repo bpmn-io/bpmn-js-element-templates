@@ -729,6 +729,76 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
     );
 
 
+    it('should NOT show an update notice if the current template is compatible', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const element = elementRegistry.get('Task_4');
+
+        elementTemplates.setEngines({
+          camunda: '8.6'
+        });
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        expect(domQuery('.bio-properties-panel-template-update-available-text', container)).not.to.exist;
+
+        expect(map(domQueryAll('.bio-properties-panel-dropdown-button__menu-item', container), item => item.textContent))
+          .to.eql([
+            'Update to version 3',
+            'Change template',
+            'Unlink and keep properties',
+            'Remove and drop properties'
+          ]);
+      })
+    );
+
+
+    it('should show an update notice if the current template is incompatible', inject(
+      async function(elementRegistry, selection, elementTemplates) {
+
+        // given
+        const element = elementRegistry.get('Task_2');
+
+        const base = templates.find(template => template.id === 'foo' && template.version === 1);
+
+        elementTemplates.set([
+          { ...base, version: 1, engines: { camunda: '8.0' } },
+          { ...base, version: 2, engines: { camunda: '^8.6' } }
+        ]);
+
+        elementTemplates.setEngines({
+          camunda: '8.6'
+        });
+
+        // when
+        await act(() => {
+          selection.select(element);
+        });
+
+        // then
+        const notice = domQuery('.bio-properties-panel-template-update-available-text', container);
+
+        expect(notice).to.exist;
+        expect(notice.textContent).to.contain('supports your environment');
+
+        expect(map(domQueryAll('.bio-properties-panel-dropdown-button__menu-item', container), item => item.textContent))
+          .to.eql([
+            notice.textContent,
+            '', // separator
+            'Update to version 2',
+            'Change template',
+            'Unlink and keep properties',
+            'Remove and drop properties'
+          ]);
+      })
+    );
+
+
     it('should NOT display update button if latest is incompatible', inject(
       async function(elementRegistry, selection, elementTemplates) {
 
