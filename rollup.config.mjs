@@ -55,6 +55,23 @@ export default [
     ],
     external: externalDependencies(),
     plugins: corePlugins()
+  },
+  {
+    input: 'src/check-update.js',
+    output: [
+      {
+        sourcemap: true,
+        format: 'commonjs',
+        file: 'dist/check-update.js'
+      },
+      {
+        sourcemap: true,
+        format: 'esm',
+        file: 'dist/check-update.esm.js'
+      }
+    ],
+    external: externalDependencies(),
+    plugins: corePlugins()
   }
 ];
 

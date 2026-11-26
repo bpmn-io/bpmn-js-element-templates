@@ -153,6 +153,6 @@ export function isSameBinding(a, b) {
   return [ ...keys ].every(key => a[ key ] === b[ key ]);
 }
 
-function getBindingKey(binding) {
+export function getBindingKey(binding) {
   return JSON.stringify(Object.keys(binding).sort().map(key => [ key, binding[ key ] ]));
 }

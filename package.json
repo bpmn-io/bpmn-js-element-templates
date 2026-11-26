@@ -14,6 +14,10 @@
       "import": "./dist/core.esm.js",
       "require": "./dist/core.js"
     },
+    "./check-update": {
+      "import": "./dist/check-update.esm.js",
+      "require": "./dist/check-update.js"
+    },
     "./dist/assets/*.css": "./dist/assets/*.css",
     "./dist/*.js": "./dist/*.js",
     "./package.json": "./package.json"
