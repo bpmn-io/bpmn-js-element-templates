@@ -178,15 +178,22 @@ function SelectEntryTemplate({ element }) {
   );
 }
 
-function AppliedTemplate({ element }) {
+function useChangeMenuItem(element) {
   const translate = useService('translate'),
-        elementTemplates = useService('elementTemplates'),
         eventBus = useService('eventBus');
 
-  const changeTemplate = () => eventBus.fire('elementTemplates.select', { element });
+  return {
+    entry: translate('Change to a different template'),
+    action: () => eventBus.fire('elementTemplates.select', { element })
+  };
+}
+
+function AppliedTemplate({ element }) {
+  const translate = useService('translate'),
+        elementTemplates = useService('elementTemplates');
 
   const menuItems = [
-    { entry: translate('Change to a different template'), action: changeTemplate },
+    useChangeMenuItem(element),
     { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
@@ -214,6 +221,7 @@ function UnknownTemplate({ element }) {
   const menuItems = [
     { entry: <NotFoundText /> },
     { separator: true },
+    useChangeMenuItem(element),
     { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
@@ -258,6 +266,7 @@ function OutdatedTemplate({ element, templateState }) {
     { entry: <UpdateAvailableText newerTemplate={ newerTemplate } compatible={ compatible } /> },
     { separator: true },
     { entry: translate('Update to version {version}', { version: newerTemplate.version ?? getVersionOrDateFromTemplate(newerTemplate) }), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
+    useChangeMenuItem(element),
     { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
@@ -305,6 +314,7 @@ function DeprecatedTemplate({ element, templateState }) {
   const menuItems = [
     { entry: <DeprecationWarning template={ template } /> },
     { separator: true },
+    useChangeMenuItem(element),
     { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
@@ -346,6 +356,7 @@ function IncompatibleTemplate({ element }) {
   const menuItems = [
     { entry: <IncompatibleText /> },
     { separator: true },
+    useChangeMenuItem(element),
     { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
