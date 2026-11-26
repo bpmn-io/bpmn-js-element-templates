@@ -128,11 +128,13 @@
 }
 
 .bio-properties-panel-template-not-found-text,
+.bio-properties-panel-template-update-available-text,
 .bio-properties-panel-template-incompatible-text {
   color: var(--select-template-information-text-color);
 }
 
 .bio-properties-panel-template-not-found-text,
+.bio-properties-panel-template-update-available-text,
 .bio-properties-panel-deprecated-template-text,
 .bio-properties-panel-template-incompatible-text {
   width: 216px;

@@ -33,7 +33,6 @@ import {
   ZeebePropertiesProviderModule as ZeebePropertiesProvider
 } from 'bpmn-js-properties-panel';
 import elementTemplatesModule from 'src/cloud-element-templates';
-import { TemplateMenuActions } from 'src/core';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
@@ -425,32 +424,30 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
 
   describe('template#change', function() {
 
-    [ 1, 3 ].forEach(version => {
-      it(`should emit \`elementTemplates.select\` when change is requested (version ${version})`, inject(
-        async function(elementRegistry, selection, elementTemplates, eventBus) {
+    it('should emit `elementTemplates.select` when change is requested', inject(
+      async function(elementRegistry, selection, elementTemplates, eventBus) {
 
-          // given
-          const task = elementRegistry.get('Task_1');
-          const selectSpy = spy();
+        // given
+        const task = elementRegistry.get('Task_1');
+        const selectSpy = spy();
 
-          eventBus.on('elementTemplates.select', selectSpy);
+        eventBus.on('elementTemplates.select', selectSpy);
 
-          const template = elementTemplates.get('foo', version);
+        const template = elementTemplates.getLatest('foo')[0];
 
-          await act(() => {
-            elementTemplates.applyTemplate(task, template);
-            selection.select(task);
-          });
+        await act(() => {
+          elementTemplates.applyTemplate(task, template);
+          selection.select(task);
+        });
 
-          // when
-          await changeTemplate(container);
+        // when
+        await changeTemplate(container);
 
-          // then
-          expect(selectSpy).to.have.been.calledOnce;
-          expect(selectSpy).to.have.been.calledWithMatch({ element: task });
-        })
-      );
-    });
+        // then
+        expect(selectSpy).to.have.been.calledOnce;
+        expect(selectSpy).to.have.been.calledWithMatch({ element: task });
+      })
+    );
   });
 
 
@@ -539,24 +536,11 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
 
   describe('template#unlink', function() {
 
-    [ 'Deprecated', 'Task_4' ].forEach(id => {
-      it(`should unlink template (${id})`, inject(
-        async function(elementRegistry, selection, elementTemplates) {
-          const task = elementRegistry.get(id);
-          elementTemplates.setEngines({ camunda: '8.0' });
-          await act(() => selection.select(task));
-          await unlinkTemplate(container);
-          expect(elementTemplates.get(task)).not.to.exist;
-        })
-      );
-    });
-
     it('should unlink applied template', inject(
       async function(elementRegistry, selection, elementTemplates) {
 
         // given
         let task = elementRegistry.get('Task_1');
-        await act(() => elementTemplates.applyTemplate(task, elementTemplates.getLatest('foo')[0]));
         await act(() => selection.select(task));
 
         // when
@@ -650,21 +634,12 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
     );
 
 
-    it('should use the version number in the shared update label', inject(
-      async function(elementRegistry, selection, elementTemplates, translate) {
+    it('should update template', inject(
+      async function(elementRegistry, selection, elementTemplates) {
 
         // given
-        elementTemplates.set(templates.map(template => ({ ...template, metadata: { created: 0 } })));
         let task = elementRegistry.get('Task_2');
         await act(() => selection.select(task));
-
-        expect(map(domQueryAll('.bio-properties-panel-dropdown-button__menu-item', container), item => item.textContent))
-          .to.eql([
-            translate(TemplateMenuActions.update.label, { version: '3' }),
-            translate(TemplateMenuActions.change.label),
-            translate(TemplateMenuActions.unlink.label),
-            translate(TemplateMenuActions.remove.label)
-          ]);
 
         // when
         await updateTemplate(container);
@@ -1594,7 +1569,7 @@ function changeTemplate(container) {
  * @param {Element} container
  */
 function updateTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent.startsWith('Update to version '));
+  return clickDropdownItemWhere(container, element => element.textContent === 'Update');
 }
 
 /**

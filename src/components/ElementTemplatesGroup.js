@@ -12,7 +12,9 @@ import {
   useService
 } from 'bpmn-js-properties-panel';
 
-import { TemplateMenuActions } from '../TemplateMenuActions';
+import {
+  getVersionOrDateFromTemplate
+} from '../utils/templateUtil';
 
 { /* Required to break up imports, see https://github.com/babel/babel/issues/15156 */ }
 
@@ -184,8 +186,8 @@ function AppliedTemplate({ element }) {
   const changeTemplate = () => eventBus.fire('elementTemplates.select', { element });
 
   const menuItems = [
-    { entry: translate(TemplateMenuActions.change.label), action: changeTemplate },
-    { entry: translate(TemplateMenuActions.unlink.label), action: () => elementTemplates.unlinkTemplate(element) },
+    { entry: translate('Change to a different template'), action: changeTemplate },
+    { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
 
@@ -202,7 +204,7 @@ function AppliedTemplate({ element }) {
 function RemoveTemplate() {
   const translate = useService('translate');
 
-  return <span class="bio-properties-panel-remove-template">{ translate(TemplateMenuActions.remove.label) }</span>;
+  return <span class="bio-properties-panel-remove-template">{ translate('Remove and drop properties') }</span>;
 }
 
 function UnknownTemplate({ element }) {
@@ -212,7 +214,7 @@ function UnknownTemplate({ element }) {
   const menuItems = [
     { entry: <NotFoundText /> },
     { separator: true },
-    { entry: translate(TemplateMenuActions.unlink.label), action: () => elementTemplates.unlinkTemplate(element) },
+    { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
 
@@ -250,13 +252,13 @@ function OutdatedTemplate({ element, templateState }) {
   const { newerTemplate, compatible } = templateState;
 
   const translate = useService('translate'),
-        elementTemplates = useService('elementTemplates'),
-        eventBus = useService('eventBus');
+        elementTemplates = useService('elementTemplates');
 
   const menuItems = [
-    { entry: translate(TemplateMenuActions.update.label, { version: String(newerTemplate.version ?? translate('latest')) }), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
-    { entry: translate(TemplateMenuActions.change.label), action: () => eventBus.fire('elementTemplates.select', { element }) },
-    { entry: translate(TemplateMenuActions.unlink.label), action: () => elementTemplates.unlinkTemplate(element) },
+    { entry: <UpdateAvailableText newerTemplate={ newerTemplate } compatible={ compatible } /> },
+    { separator: true },
+    { entry: translate('Update'), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
+    { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
 
@@ -278,6 +280,22 @@ function OutdatedTemplate({ element, templateState }) {
   );
 }
 
+function UpdateAvailableText({ newerTemplate, compatible }) {
+  const translate = useService('translate');
+
+  const text = compatible
+    ? translate(
+      'A new version of the template is available: {templateVersion}',
+      { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
+    )
+    : translate(
+      'A version of this template is available that supports your environment: {templateVersion}',
+      { templateVersion: getVersionOrDateFromTemplate(newerTemplate) }
+    );
+
+  return <div class="bio-properties-panel-template-update-available-text">{text}</div>;
+}
+
 function DeprecatedTemplate({ element, templateState }) {
   const { template } = templateState;
 
@@ -287,7 +305,7 @@ function DeprecatedTemplate({ element, templateState }) {
   const menuItems = [
     { entry: <DeprecationWarning template={ template } /> },
     { separator: true },
-    { entry: translate(TemplateMenuActions.unlink.label), action: () => elementTemplates.unlinkTemplate(element) },
+    { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
 
@@ -328,7 +346,7 @@ function IncompatibleTemplate({ element }) {
   const menuItems = [
     { entry: <IncompatibleText /> },
     { separator: true },
-    { entry: translate(TemplateMenuActions.unlink.label), action: () => elementTemplates.unlinkTemplate(element) },
+    { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
 

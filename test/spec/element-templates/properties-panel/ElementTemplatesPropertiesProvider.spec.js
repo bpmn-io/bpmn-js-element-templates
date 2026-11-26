@@ -763,7 +763,7 @@ function changeTemplate(container) {
  * @param {Element} container
  */
 function updateTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent.startsWith('Update to version '));
+  return clickDropdownItemWhere(container, element => element.textContent === 'Update');
 }
 
 /**
