@@ -377,13 +377,26 @@ export function keepsValue(value, oldProperty, newProperty) {
   // keep existing old property if
   // user changed it from the original
   if (oldProperty) {
-    return value !== getDefaultFixedValue(oldProperty);
+    return isUserInput(value, oldProperty);
   }
 
   // moddle schema defaults (e.g. propagateAllParentVariables=true,
   // bindingType="latest") must not be treated as user data
   // cf. https://github.com/camunda/camunda-modeler/issues/6174
   return true;
+}
+
+/**
+ * Check whether a value is user input, i.e. differs from the template's
+ * default.
+ *
+ * @param {any} value
+ * @param {Object} property
+ *
+ * @returns {boolean}
+ */
+export function isUserInput(value, property) {
+  return value !== getDefaultFixedValue(property);
 }
 
 /**

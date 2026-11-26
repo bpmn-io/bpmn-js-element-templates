@@ -2,8 +2,19 @@ import {
   getUpdateSteps,
   applyUpdateSteps,
   getBindingKey,
+  isEditableProperty,
   isSameBinding
 } from './updatePathsUtil';
+
+import {
+  findOldProperty,
+  getDefaultFixedValue,
+  isChoice,
+  isUserInput,
+  keepsValue
+} from './carryOverUtil';
+
+import { isConditionMet } from './conditionUtil';
 
 import { validateProperty } from './validateProperty';
 
@@ -27,8 +38,9 @@ const USER_INPUT = Symbol('user input');
  * may no longer be valid (`invalidate`), or that is interpreted differently, as
  * its FEEL mode or kind of value changes (`reinterpret`).
  *
- * Changes in what a value means to the implementation are not detected: no
- * findings does not mean the update is safe.
+ * Which values are carried over follows the rules the core applies. Changes in
+ * what a value means to the implementation are not detected: no findings does
+ * not mean the update is safe.
  *
  * @param {Object} oldTemplate
  * @param {Object} newTemplate
@@ -46,7 +58,7 @@ export function checkUpdate(oldTemplate, newTemplate) {
     }
 
     const values = property.type === 'Dropdown'
-      ? property.choices.map(choice => choice.value)
+      ? property.choices.map(choice => choice.value).filter(value => isUserInput(value, property))
       : [ USER_INPUT ];
 
     for (const value of values) {
@@ -60,16 +72,26 @@ export function checkUpdate(oldTemplate, newTemplate) {
 function checkValue(value, property, steps, oldTemplate, newTemplate) {
   const { binding, label } = property;
 
+  // moved values are written after the template is changed, so they win
   const moved = applyUpdateSteps(steps, other => isSameBinding(other, binding) ? value : undefined);
 
-  const targets = [
-    { binding, value },
-    ...moved
-  ].flatMap(({ binding, value }) => {
-    return getEditableProperties(newTemplate, binding).map(property => ({ property, value }));
+  const movedKeys = moved.map(({ binding }) => getBindingKey(binding));
+
+  const continued = newTemplate.properties.filter(newProperty => {
+    return !movedKeys.includes(getBindingKey(newProperty.binding)) &&
+      findOldProperty({ properties: [ property ] }, newProperty);
   });
 
-  const kept = targets.filter(({ property, value }) => isValidChoice(property, value));
+  const targets = [
+    ...continued
+      .filter(newProperty => keepsValue(value, property, newProperty))
+      .map(newProperty => ({ property: newProperty, value })),
+    ...moved.flatMap(({ binding, value }) => {
+      return newTemplate.properties
+        .filter(newProperty => isEditableProperty(newProperty, binding))
+        .map(newProperty => ({ property: newProperty, value }));
+    })
+  ];
 
   const name = value === USER_INPUT
     ? getName(property)
@@ -83,16 +105,16 @@ function checkValue(value, property, steps, oldTemplate, newTemplate) {
     message: `${ name } ${ message }`
   });
 
-  if (!kept.length) {
+  if (!targets.length) {
     return [
-      finding('drop', value === USER_INPUT && targets.length
+      finding('drop', value === USER_INPUT && continued.some(newProperty => newProperty.type === 'Dropdown')
         ? 'is not carried over, unless it matches a choice'
         : 'is not carried over')
     ];
   }
 
   // the value is safe if one of the properties keeps it as is
-  const issues = kept.map(({ property: target, value }) => {
+  const issues = targets.map(({ property: target, value }) => {
     return getIssue(property, target, value, oldTemplate, newTemplate);
   });
 
@@ -111,6 +133,10 @@ function getIssue(source, target, value, oldTemplate, newTemplate) {
     return [ 'drop', 'may not be carried over, if its condition is not met' ];
   }
 
+  if (target.type === 'Dropdown' && !isChoice(target, value)) {
+    return [ 'invalidate', value === USER_INPUT ? 'may not be a valid choice' : 'is not a valid choice' ];
+  }
+
   if (value !== USER_INPUT) {
     return validateProperty(value, target) ? [ 'invalidate', 'becomes invalid' ] : null;
   }
@@ -120,20 +146,6 @@ function getIssue(source, target, value, oldTemplate, newTemplate) {
   }
 
   return mayInvalidate(source, target) ? [ 'invalidate', 'may become invalid' ] : null;
-}
-
-function getEditableProperties(template, binding) {
-  return template.properties.filter(property => {
-    return property.type !== 'Hidden' && isSameBinding(property.binding, binding);
-  });
-}
-
-function isValidChoice(property, value) {
-  if (property.type !== 'Dropdown') {
-    return true;
-  }
-
-  return value !== USER_INPUT && property.choices.some(choice => choice.value === value);
 }
 
 /**
@@ -148,32 +160,22 @@ function getConditions(property, template, oldTemplate) {
 
   return JSON.stringify(
     conditions
+      .filter(condition => {
+        return isKnown(condition.property, template, oldTemplate) ||
+          !isConditionMet({ condition }, template.properties, getDefaultFixedValue);
+      })
       .map(({ type, property, ...condition }) => {
         const { binding } = findProperty(template, property) || {};
 
         return { ...condition, binding: binding ? getBindingKey(binding) : property };
       })
-      .filter(condition => {
-        return oldTemplate.properties.some(property => getBindingKey(property.binding) === condition.binding) ||
-          !isMetByDefault(condition, template);
-      })
   );
 }
 
-function isMetByDefault(condition, template) {
-  const property = template.properties.find(property => getBindingKey(property.binding) === condition.binding);
+function isKnown(id, template, oldTemplate) {
+  const property = findProperty(template, id);
 
-  const value = property && property.value;
-
-  if ('isEmpty' in condition) {
-    return condition.isEmpty === (value === undefined || value === '');
-  }
-
-  if ('equals' in condition) {
-    return value === condition.equals;
-  }
-
-  return !!condition.oneOf && condition.oneOf.includes(value);
+  return !property || oldTemplate.properties.some(other => isSameBinding(other.binding, property.binding));
 }
 
 /**
@@ -207,12 +209,12 @@ function getKind(property) {
   return [ 'Boolean', 'Number' ].includes(property.type) ? property.type : 'String';
 }
 
-function findProperty(template, id) {
-  return template.properties.find(property => property.id === id);
-}
-
 function getPattern(pattern) {
   return pattern && (pattern.value || pattern);
+}
+
+function findProperty(template, id) {
+  return template.properties.find(property => property.id === id);
 }
 
 function getName(property) {

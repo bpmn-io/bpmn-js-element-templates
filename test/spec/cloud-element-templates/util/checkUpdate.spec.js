@@ -106,8 +106,8 @@ describe('cloud-element-templates/util - checkUpdate', function() {
         {
           ...methodDropdown,
           choices: [
-            { name: 'GET', value: 'get' },
-            { name: 'POST', value: 'POST' }
+            { name: 'GET', value: 'GET' },
+            { name: 'POST', value: 'post' }
           ]
         }
       ]);
@@ -118,8 +118,58 @@ describe('cloud-element-templates/util - checkUpdate', function() {
           type: 'drop',
           binding: method,
           label: 'Method',
-          value: 'GET',
-          message: 'Method choice <GET> is not carried over'
+          value: 'POST',
+          message: 'Method choice <POST> is not carried over'
+        }
+      ]);
+    });
+
+
+    it('should accept changed default choice', function() {
+
+      // given
+      const oldTemplate = template(1, [ methodDropdown ]);
+
+      const newTemplate = template(2, [
+        {
+          ...methodDropdown,
+          choices: [
+            { name: 'GET', value: 'get' },
+            { name: 'POST', value: 'POST' }
+          ]
+        }
+      ]);
+
+      // then
+      expect(checkUpdate(oldTemplate, newTemplate)).to.be.empty;
+    });
+
+
+    it('should report moved value that is not a choice', function() {
+
+      // given
+      const oldTemplate = template(1, [ methodDropdown ]);
+
+      const newTemplate = template(2, [
+        {
+          ...methodDropdown,
+          choices: [
+            { name: 'GET', value: 'GET' },
+            { name: 'POST', value: 'post' }
+          ]
+        }
+      ], [
+        { beforeVersion: 2, hints: [ { from: method, to: method, values: { POST: 'PUT' } } ] }
+      ]);
+
+      // then
+      expect(checkUpdate(oldTemplate, newTemplate)).to.eql([
+        {
+          type: 'invalidate',
+          binding: method,
+          label: 'Method',
+          value: 'POST',
+          message: 'Method choice <POST> is not a valid choice'
         }
       ]);
     });
@@ -235,13 +285,6 @@ describe('cloud-element-templates/util - checkUpdate', function() {
 
       // then
       expect(checkUpdate(oldTemplate, newTemplate)).to.eql([
-        {
-          type: 'invalidate',
-          binding: method,
-          label: 'Method',
-          value: 'GET',
-          message: 'Method choice <GET> becomes invalid'
-        },
         {
           type: 'invalidate',
           binding: method,
