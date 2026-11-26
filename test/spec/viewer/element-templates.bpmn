@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:serviceTask id="AllTypes" name="All types" camunda:type="external" camunda:async="true" camunda:modelerTemplate="viewer.all-types" camunda:modelerTemplateVersion="2">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="readonly">fixed</camunda:inputParameter>
+          <camunda:inputParameter name="text">text value</camunda:inputParameter>
+          <camunda:inputParameter name="ungrouped">ungrouped value</camunda:inputParameter>
+          <camunda:inputParameter name="virtual">virtual</camunda:inputParameter>
+          <camunda:outputParameter name="${result}">result</camunda:outputParameter>
+        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="dropdown" value="a" />
+        </camunda:properties>
+        <camunda:errorEventDefinition id="ErrorEventDefinition_1" errorRef="Error_error-1" expression="${error.expression}" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="AllTypesEmpty" name="All types, empty" camunda:modelerTemplate="viewer.all-types" camunda:modelerTemplateVersion="2" />
+    <bpmn:serviceTask id="Outdated" name="Outdated" camunda:modelerTemplate="viewer.all-types" camunda:modelerTemplateVersion="1" />
+    <bpmn:serviceTask id="EntriesHidden" name="Entries hidden" camunda:modelerTemplate="viewer.entries-hidden" />
+    <bpmn:serviceTask id="Unknown" name="Unknown template" camunda:modelerTemplate="viewer.does-not-exist" />
+    <bpmn:task id="Deprecated" name="Deprecated" camunda:modelerTemplate="viewer.deprecated" />
+    <bpmn:serviceTask id="NoTemplate" name="No template" />
+  </bpmn:process>
+  <bpmn:error id="Error_error-1" name="error-name" errorCode="error-code" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="AllTypes_di" bpmnElement="AllTypes"><dc:Bounds x="100" y="100" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AllTypesEmpty_di" bpmnElement="AllTypesEmpty"><dc:Bounds x="250" y="100" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Outdated_di" bpmnElement="Outdated"><dc:Bounds x="400" y="100" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EntriesHidden_di" bpmnElement="EntriesHidden"><dc:Bounds x="550" y="100" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Unknown_di" bpmnElement="Unknown"><dc:Bounds x="100" y="250" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Deprecated_di" bpmnElement="Deprecated"><dc:Bounds x="250" y="250" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="NoTemplate_di" bpmnElement="NoTemplate"><dc:Bounds x="400" y="250" width="100" height="80" /></bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

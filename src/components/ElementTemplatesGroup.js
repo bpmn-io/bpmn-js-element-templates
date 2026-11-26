@@ -3,7 +3,8 @@ import {
   CreateIcon,
   DropdownButton,
   HeaderButton,
-  useLayoutState
+  useLayoutState,
+  useReadOnly
 } from '@bpmn-io/properties-panel';
 
 import classnames from 'classnames';
@@ -138,6 +139,13 @@ function SectionToggle({ open }) {
  */
 function TemplateGroupButtons({ element, getTemplateId }) {
   const elementTemplates = useService('elementTemplates');
+
+  const readOnly = useReadOnly();
+
+  // actions modify the diagram
+  if (readOnly) {
+    return null;
+  }
 
   const templateState = getTemplateState(elementTemplates, element, getTemplateId);
 
