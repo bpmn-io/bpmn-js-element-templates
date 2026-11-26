@@ -257,7 +257,7 @@ function OutdatedTemplate({ element, templateState }) {
   const menuItems = [
     { entry: <UpdateAvailableText newerTemplate={ newerTemplate } compatible={ compatible } /> },
     { separator: true },
-    { entry: translate('Update'), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
+    { entry: translate('Update to version {version}', { version: newerTemplate.version ?? getVersionOrDateFromTemplate(newerTemplate) }), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
     { entry: translate('Unlink and keep properties'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];

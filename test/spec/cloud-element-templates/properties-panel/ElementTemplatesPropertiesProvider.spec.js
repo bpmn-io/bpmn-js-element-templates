@@ -574,6 +574,26 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
     );
 
 
+    [ 'Deprecated', 'Task_4' ].forEach(id => {
+
+      it(`should unlink deprecated or incompatible template (${id})`, inject(
+        async function(elementRegistry, selection, elementTemplates) {
+
+          // given
+          const task = elementRegistry.get(id);
+          elementTemplates.setEngines({ camunda: '8.0' });
+          await act(() => selection.select(task));
+
+          // when
+          await unlinkTemplate(container);
+
+          // then
+          expect(elementTemplates.get(task)).not.to.exist;
+        })
+      );
+    });
+
+
     it('should unlink unknown template', inject(
       async function(elementRegistry, selection, elementTemplates) {
 
@@ -1569,7 +1589,7 @@ function changeTemplate(container) {
  * @param {Element} container
  */
 function updateTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent === 'Update');
+  return clickDropdownItemWhere(container, element => element.textContent.startsWith('Update to version '));
 }
 
 /**
