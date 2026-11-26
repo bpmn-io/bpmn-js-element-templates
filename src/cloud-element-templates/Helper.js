@@ -3,7 +3,8 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import { is, isAny } from 'bpmn-js/lib/util/ModelUtil';
 
 import { v4 as uuid } from 'uuid';
-import { shouldCastToFeel, toFeelExpression } from './util/FeelUtil';
+
+import { getDefaultFixedValue } from './util/carryOverUtil';
 
 /**
  * The BPMN 2.0 extension attribute name under
@@ -236,36 +237,7 @@ export function findZeebeSubscription(message) {
   return findExtension(message, 'zeebe:Subscription');
 }
 
-/**
- * Get the default value disregarding generated values.
- */
-export function getDefaultFixedValue(property) {
-  const value = getTemplateValue(property);
-
-  if (
-    shouldCastToFeel(property) || property.feel === 'required'
-  ) {
-    return toFeelExpression(value, property.type);
-  }
-
-  return value;
-}
-
-// a non-optional dropdown falls back to its first choice, like <select>
-function getTemplateValue(property) {
-  const {
-    choices,
-    optional,
-    type,
-    value
-  } = property;
-
-  if (value === undefined && type === 'Dropdown' && !optional && choices?.length) {
-    return choices[ 0 ].value;
-  }
-
-  return value;
-}
+export { getDefaultFixedValue };
 
 export function getDefaultValue(property) {
 
