@@ -10,6 +10,7 @@ const DIST_DIR = path.join(__dirname, '../../dist');
 const EXPORTS = [
   'bpmn-js-element-templates',
   'bpmn-js-element-templates/core',
+  'bpmn-js-element-templates/check-update',
   'bpmn-js-element-templates/dist/assets/element-templates.css',
   'bpmn-js-element-templates/package.json'
 ];

@@ -34,6 +34,19 @@ const modeler = new BpmnModeler({
 
 To set an element template from the properties panel, plug-in an [element template chooser](https://github.com/bpmn-io/element-template-chooser). To review the changes of a template update or migration, plug-in an [element template changelog](https://github.com/bpmn-io/element-template-changelog).
 
+### Checking updates
+
+Check which user input a template change loses, for example in template linting or before you publish a new version:
+
+```javascript
+import { checkUpdate } from 'bpmn-js-element-templates/check-update';
+
+// [ { type: 'drop' | 'invalidate', binding, label?, value?, message } ]
+const findings = checkUpdate(oldTemplate, newTemplate);
+```
+
+The check follows the [update paths](https://github.com/bpmn-io/element-templates/blob/main/docs/LIFE_CYCLE.md#update-paths) declared by the new template. It does not detect changes in what a value means: no findings does not mean an update is safe.
+
 ## Additional resources
 
 * [About element templates](https://github.com/bpmn-io/element-templates)
