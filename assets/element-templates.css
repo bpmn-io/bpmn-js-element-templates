@@ -48,10 +48,6 @@
   position: initial;
 }
 
-.bio-properties-panel-templates-group .bio-properties-panel-dropdown-button__menu {
-  width: max-content;
-}
-
 .bio-properties-panel-templates-group .bio-properties-panel-group-header-button:not(.bio-properties-panel-arrow) {
   padding-right: 6px;
   padding-left: 9px;

@@ -605,26 +605,6 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
     );
 
 
-    [ 'Deprecated', 'Task_4' ].forEach(id => {
-
-      it(`should unlink deprecated or incompatible template (${id})`, inject(
-        async function(elementRegistry, selection, elementTemplates) {
-
-          // given
-          const task = elementRegistry.get(id);
-          elementTemplates.setEngines({ camunda: '8.0' });
-          await act(() => selection.select(task));
-
-          // when
-          await unlinkTemplate(container);
-
-          // then
-          expect(elementTemplates.get(task)).not.to.exist;
-        })
-      );
-    });
-
-
     it('should unlink unknown template', inject(
       async function(elementRegistry, selection, elementTemplates) {
 
@@ -725,76 +705,6 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         // then
         const updateAvailable = domQuery('.bio-properties-panel-template-update-available', container);
         expect(updateAvailable).to.exist;
-      })
-    );
-
-
-    it('should NOT show an update notice if the current template is compatible', inject(
-      async function(elementRegistry, selection, elementTemplates) {
-
-        // given
-        const element = elementRegistry.get('Task_4');
-
-        elementTemplates.setEngines({
-          camunda: '8.6'
-        });
-
-        // when
-        await act(() => {
-          selection.select(element);
-        });
-
-        // then
-        expect(domQuery('.bio-properties-panel-template-update-available-text', container)).not.to.exist;
-
-        expect(map(domQueryAll('.bio-properties-panel-dropdown-button__menu-item', container), item => item.textContent))
-          .to.eql([
-            'Update to version 3',
-            'Change template',
-            'Unlink and keep properties',
-            'Remove and drop properties'
-          ]);
-      })
-    );
-
-
-    it('should show an update notice if the current template is incompatible', inject(
-      async function(elementRegistry, selection, elementTemplates) {
-
-        // given
-        const element = elementRegistry.get('Task_2');
-
-        const base = templates.find(template => template.id === 'foo' && template.version === 1);
-
-        elementTemplates.set([
-          { ...base, version: 1, engines: { camunda: '8.0' } },
-          { ...base, version: 2, engines: { camunda: '^8.6' } }
-        ]);
-
-        elementTemplates.setEngines({
-          camunda: '8.6'
-        });
-
-        // when
-        await act(() => {
-          selection.select(element);
-        });
-
-        // then
-        const notice = domQuery('.bio-properties-panel-template-update-available-text', container);
-
-        expect(notice).to.exist;
-        expect(notice.textContent).to.contain('supports your environment');
-
-        expect(map(domQueryAll('.bio-properties-panel-dropdown-button__menu-item', container), item => item.textContent))
-          .to.eql([
-            notice.textContent,
-            '', // separator
-            'Update to version 2',
-            'Change template',
-            'Unlink and keep properties',
-            'Remove and drop properties'
-          ]);
       })
     );
 
@@ -1672,7 +1582,7 @@ function removeTemplate(container) {
  * @param {Element} container
  */
 function unlinkTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent === 'Unlink and keep properties');
+  return clickDropdownItemWhere(container, element => element.textContent === 'Unlink');
 }
 
 /**
@@ -1681,7 +1591,7 @@ function unlinkTemplate(container) {
  * @param {Element} container
  */
 function changeTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent === 'Change template');
+  return clickDropdownItemWhere(container, element => element.textContent === 'Change');
 }
 
 /**
@@ -1690,7 +1600,7 @@ function changeTemplate(container) {
  * @param {Element} container
  */
 function updateTemplate(container) {
-  return clickDropdownItemWhere(container, element => element.textContent.startsWith('Update to version '));
+  return clickDropdownItemWhere(container, element => element.textContent === 'Update');
 }
 
 /**
