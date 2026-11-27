@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:serviceTask id="Legacy" name="Legacy REST call v1" zeebe:modelerTemplate="example.rest" zeebe:modelerTemplateVersion="1">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.rest" />
+        <zeebe:ioMapping>
+          <zeebe:input source="https://custom.io" target="url" />
+          <zeebe:input source="PT1M" target="timeout" />
+          <zeebe:input source="=payload" target="payload" />
+          <zeebe:input source="{{secrets.API_KEY}}" target="apiKey" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="method" value="POST" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="LegacyV2" name="Legacy REST call v2" zeebe:modelerTemplate="example.rest" zeebe:modelerTemplateVersion="2">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.rest" />
+        <zeebe:ioMapping>
+          <zeebe:input source="https://v2.legacy.io" target="url" />
+          <zeebe:input source="=body" target="requestBody" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="method" value="POST" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Unknown" name="Unknown template" zeebe:modelerTemplate="example.unknown" zeebe:modelerTemplateVersion="3">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.unknown" />
+        <zeebe:ioMapping>
+          <zeebe:input source="https://unknown.io" target="url" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="RestV1" name="REST v1" zeebe:modelerTemplate="example.rest.v2" zeebe:modelerTemplateVersion="1">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.rest.v2" />
+        <zeebe:ioMapping>
+          <zeebe:input source="https://v1.io" target="endpoint" />
+          <zeebe:input source="apiKey" target="authentication.type" />
+          <zeebe:input source="PT2M" target="timeout" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="method" value="get" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="RestV2" name="REST v2" zeebe:modelerTemplate="example.rest.v2" zeebe:modelerTemplateVersion="2">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.rest.v2" />
+        <zeebe:ioMapping>
+          <zeebe:input source="https://v2.io" target="endpoint" />
+          <zeebe:input source="apiKey" target="authentication.type" />
+          <zeebe:input source="PT5M" target="requestTimeout" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="method" value="get" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Current" name="REST v3" zeebe:modelerTemplate="example.rest.v2" zeebe:modelerTemplateVersion="3" />
+    <bpmn:textAnnotation id="Legacy_Note">
+      <bpmn:text>Migration available: review four steps, from Legacy REST v2 through REST v3.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Legacy_Association" sourceRef="Legacy" targetRef="Legacy_Note" />
+    <bpmn:textAnnotation id="LegacyV2_Note">
+      <bpmn:text>Migration available: review three steps; without an API key, authentication stays None.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="LegacyV2_Association" sourceRef="LegacyV2" targetRef="LegacyV2_Note" />
+    <bpmn:textAnnotation id="Unknown_Note">
+      <bpmn:text>Template not loaded: no migration offered.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Unknown_Association" sourceRef="Unknown" targetRef="Unknown_Note" />
+    <bpmn:textAnnotation id="RestV1_Note">
+      <bpmn:text>Update available: review two steps, timeout renamed and API key becomes bearer token.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="RestV1_Association" sourceRef="RestV1" targetRef="RestV1_Note" />
+    <bpmn:textAnnotation id="RestV2_Note">
+      <bpmn:text>Update available: review one step, API key becomes bearer token.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="RestV2_Association" sourceRef="RestV2" targetRef="RestV2_Note" />
+    <bpmn:textAnnotation id="Current_Note">
+      <bpmn:text>Latest version: nothing to update.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Current_Association" sourceRef="Current" targetRef="Current_Note" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="Legacy_di" bpmnElement="Legacy">
+        <dc:Bounds x="160" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Legacy_Note_di" bpmnElement="Legacy_Note">
+        <dc:Bounds x="120" y="30" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Legacy_Association_di" bpmnElement="Legacy_Association">
+        <di:waypoint x="210" y="160" />
+        <di:waypoint x="210" y="110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="LegacyV2_di" bpmnElement="LegacyV2">
+        <dc:Bounds x="380" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LegacyV2_Note_di" bpmnElement="LegacyV2_Note">
+        <dc:Bounds x="340" y="30" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="LegacyV2_Association_di" bpmnElement="LegacyV2_Association">
+        <di:waypoint x="430" y="160" />
+        <di:waypoint x="430" y="110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Unknown_di" bpmnElement="Unknown">
+        <dc:Bounds x="600" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Unknown_Note_di" bpmnElement="Unknown_Note">
+        <dc:Bounds x="560" y="30" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Unknown_Association_di" bpmnElement="Unknown_Association">
+        <di:waypoint x="650" y="160" />
+        <di:waypoint x="650" y="110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="RestV1_di" bpmnElement="RestV1">
+        <dc:Bounds x="160" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RestV1_Note_di" bpmnElement="RestV1_Note">
+        <dc:Bounds x="120" y="310" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="RestV1_Association_di" bpmnElement="RestV1_Association">
+        <di:waypoint x="210" y="440" />
+        <di:waypoint x="210" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="RestV2_di" bpmnElement="RestV2">
+        <dc:Bounds x="380" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RestV2_Note_di" bpmnElement="RestV2_Note">
+        <dc:Bounds x="340" y="310" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="RestV2_Association_di" bpmnElement="RestV2_Association">
+        <di:waypoint x="430" y="440" />
+        <di:waypoint x="430" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Current_di" bpmnElement="Current">
+        <dc:Bounds x="600" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Current_Note_di" bpmnElement="Current_Note">
+        <dc:Bounds x="560" y="310" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Current_Association_di" bpmnElement="Current_Association">
+        <di:waypoint x="650" y="440" />
+        <di:waypoint x="650" y="390" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

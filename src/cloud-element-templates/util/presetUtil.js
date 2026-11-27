@@ -1,5 +1,7 @@
 import { find } from 'min-dash';
 
+import { isEditableProperty } from './updatePathsUtil';
+
 /**
  * Get a preset by ID from a template.
  *
@@ -45,6 +47,41 @@ export function applyPreset(template, presetId) {
       return {
         ...property,
         value: overrides[property.id],
+        _presetValue: true
+      };
+    }
+
+    return property;
+  });
+
+  return {
+    ...template,
+    properties
+  };
+}
+
+/**
+ * Apply values to a template, returning a derived template where the `value`
+ * of each non-Hidden property for a given binding is overridden, like a preset
+ * value.
+ *
+ * @param {ElementTemplate} template
+ * @param {Array<{ binding: Object, value: any }>} [values]
+ *
+ * @returns {ElementTemplate}
+ */
+export function applyValues(template, values) {
+  if (!values || !values.length) {
+    return template;
+  }
+
+  const properties = template.properties.map(property => {
+    const match = values.find(({ binding }) => isEditableProperty(property, binding));
+
+    if (match) {
+      return {
+        ...property,
+        value: match.value,
         _presetValue: true
       };
     }

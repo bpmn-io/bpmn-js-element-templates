@@ -653,6 +653,63 @@ describe('provider/element-templates - ElementTemplates', function() {
   });
 
 
+  describe('getUpdate', function() {
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(templates);
+    }));
+
+
+    it('should return newer version', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('Task_2');
+
+      // when
+      const update = elementTemplates.getUpdate(element);
+
+      // then
+      expect(update).to.eql({ type: 'update', template: templates.find(t => t.id === 'foo' && t.version === 3) });
+    }));
+
+
+    it('should return nothing for element without template', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('Task_3');
+
+      // when
+      const update = elementTemplates.getUpdate(element);
+
+      // then
+      expect(update).to.be.null;
+    }));
+
+  });
+
+
+  describe('getUpdateDetails', function() {
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(templates);
+    }));
+
+
+    it('should return no changes', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const task = elementRegistry.get('Task_2');
+
+      // when
+      const details = elementTemplates.getUpdateDetails(task, elementTemplates.getLatest('foo')[0]);
+
+      // then
+      expect(details).to.eql({ changes: [] });
+    }));
+
+  });
+
+
   describe('getCompatible', function() {
 
     beforeEach(inject(function(elementTemplates) {

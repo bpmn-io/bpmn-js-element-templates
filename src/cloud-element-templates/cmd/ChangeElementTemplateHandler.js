@@ -63,7 +63,7 @@ import {
   createElement,
   getRoot
 } from '../../utils/ElementUtil';
-import { applyPreset } from '../util/presetUtil';
+import { applyPreset, applyValues } from '../util/presetUtil';
 import { removeMessage, removeSignal } from '../util/rootElementUtil';
 import { isExpression, createExpression } from '../util/bpmnExpressionUtil';
 import { createListenerHeaders } from '../util/listenerHeadersUtil';
@@ -124,8 +124,11 @@ export default class ChangeElementTemplateHandler {
       return;
     }
 
-    // resolve preset
-    newTemplate = context.newTemplate = applyPreset(newTemplate, options.presetId);
+    // resolve moved values and preset; the preset, as the user's choice, wins
+    newTemplate = context.newTemplate = applyPreset(
+      applyValues(newTemplate, options._movedValues),
+      options.presetId
+    );
 
     // update properties
     this._updateProperties(element, oldTemplate, newTemplate);

@@ -56,6 +56,7 @@
 
 .bio-properties-panel-applied-template-button .bio-properties-panel-group-header-button,
 .bio-properties-panel-template-update-available .bio-properties-panel-group-header-button,
+.bio-properties-panel-template-migration-available .bio-properties-panel-group-header-button,
 .bio-properties-panel-group-header-button.bio-properties-panel-select-template-button {
   background-color: var(--select-template-background-color);
   color: var(--select-template-label-color);
@@ -64,6 +65,7 @@
 
 .bio-properties-panel-applied-template-button .bio-properties-panel-group-header-button:hover,
 .bio-properties-panel-template-update-available .bio-properties-panel-group-header-button:hover,
+.bio-properties-panel-template-migration-available .bio-properties-panel-group-header-button:hover,
 .bio-properties-panel-group-header-button.bio-properties-panel-select-template-button:hover {
   background-color: var(--select-template-hover-background-color);
 }
@@ -83,6 +85,7 @@
 }
 
 .bio-properties-panel-template-update-available:last-child,
+.bio-properties-panel-template-migration-available:last-child,
 .bio-properties-panel-applied-template-button:last-child,
 .bio-properties-panel-template-not-found:last-child,
 .bio-properties-panel-template-incompatible:last-child {
@@ -125,12 +128,14 @@
 
 .bio-properties-panel-template-not-found-text,
 .bio-properties-panel-template-update-available-text,
+.bio-properties-panel-template-migration-available-text,
 .bio-properties-panel-template-incompatible-text {
   color: var(--select-template-information-text-color);
 }
 
 .bio-properties-panel-template-not-found-text,
 .bio-properties-panel-template-update-available-text,
+.bio-properties-panel-template-migration-available-text,
 .bio-properties-panel-deprecated-template-text,
 .bio-properties-panel-template-incompatible-text {
   width: 216px;

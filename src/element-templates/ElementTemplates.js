@@ -123,6 +123,42 @@ export default class ElementTemplates {
   }
 
   /**
+   * Get the update available for an element: a newer version of its
+   * template, if any.
+   *
+   * @param {Element} element
+   *
+   * @return { { type: 'update'|'migration', template: ElementTemplate } | null }
+   */
+  getUpdate(element) {
+    const template = this.get(element);
+
+    if (!template) {
+      return null;
+    }
+
+    const [ latestTemplate ] = this.getLatest(template.id, { deprecated: true });
+
+    if (!latestTemplate || latestTemplate === template) {
+      return null;
+    }
+
+    return { type: 'update', template: latestTemplate };
+  }
+
+  /**
+   * Get what changing an element to a given template means.
+   *
+   * @param {Element} element
+   * @param {ElementTemplate} newTemplate
+   *
+   * @return { { message?: string, changes: Array<Object> } }
+   */
+  getUpdateDetails(element, newTemplate) {
+    return { changes: [] };
+  }
+
+  /**
    * Get the version of each template to offer to users under the given engine
    * overrides: the latest compatible one. `deprecated` includes a deprecated
    * latest version.

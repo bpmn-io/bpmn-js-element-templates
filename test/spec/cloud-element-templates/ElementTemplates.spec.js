@@ -29,6 +29,7 @@ import integrationXML from './fixtures/integration.bpmn';
 import messageTemplates from './ElementTemplates.message-templates.json';
 import enginesTemplates from './ElementTemplates.engines-templates.json';
 import completionConditionTemplates from './fixtures/completion-condition.json';
+import updatePathTemplates from './fixtures/update-paths.json';
 
 import templates from './fixtures/simple';
 import falsyVersionTemplate from './fixtures/falsy-version';
@@ -576,6 +577,150 @@ describe('provider/cloud-element-templates - ElementTemplates', function() {
         elementTemplates.getLatest(false);
       }).to.throw('argument must be of type {string|djs.model.Base|undefined}');
 
+    }));
+
+  });
+
+
+  describe('getUpdate', function() {
+
+    const targetV2 = updatePathTemplates[ 3 ];
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(updatePathTemplates);
+    }));
+
+
+    it('should return migration', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('LegacyTemplateTask');
+
+      // when
+      const update = elementTemplates.getUpdate(element);
+
+      // then
+      expect(update).to.eql({ type: 'migration', template: targetV2 });
+    }));
+
+
+    it('should return update', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('TargetTemplateTask');
+
+      // when
+      const update = elementTemplates.getUpdate(element);
+
+      // then
+      expect(update).to.eql({ type: 'update', template: targetV2 });
+    }));
+
+
+    it('should return nothing without update', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('OtherTemplateTask');
+
+      // when
+      const update = elementTemplates.getUpdate(element);
+
+      // then
+      expect(update).to.be.null;
+    }));
+
+
+    it('should return nothing for template that is not loaded', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('UnknownTemplateTask');
+
+      // when
+      const update = elementTemplates.getUpdate(element);
+
+      // then
+      expect(update).to.be.null;
+    }));
+
+
+    it('should return nothing for element without template', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('Task_3');
+
+      // when
+      const update = elementTemplates.getUpdate(element);
+
+      // then
+      expect(update).to.be.null;
+    }));
+
+  });
+
+
+  describe('getUpdateDetails', function() {
+
+    const targetV2 = updatePathTemplates[ 3 ];
+
+    beforeEach(inject(function(elementTemplates) {
+      elementTemplates.set(updatePathTemplates);
+    }));
+
+
+    it('should return changes of update', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('TargetTemplateTask');
+
+      // when
+      const details = elementTemplates.getUpdateDetails(element, targetV2);
+
+      // then
+      expect(details).to.eql({
+        changes: [ { type: 'update', template: targetV2, version: 2, text: 'Changed in version 2.' } ]
+      });
+    }));
+
+
+    it('should return message and changes of migration', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('LegacyTemplateTask');
+
+      // when
+      const details = elementTemplates.getUpdateDetails(element, targetV2);
+
+      // then
+      expect(details).to.eql({
+        message: 'Migrate to example.target.',
+        changes: [ { type: 'migration', template: targetV2, text: 'Changed from example.legacy.' } ]
+      });
+    }));
+
+
+    it('should return no changes without update path', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('OtherTemplateTask');
+
+      // when
+      const details = elementTemplates.getUpdateDetails(element, targetV2);
+
+      // then
+      expect(details).to.eql({ changes: [] });
+    }));
+
+
+    it('should return no changes for element without template', inject(function(elementRegistry, elementTemplates) {
+
+      // given
+      const element = elementRegistry.get('Task_3');
+
+      // when
+      const details = elementTemplates.getUpdateDetails(element, targetV2);
+
+      // then
+      expect(details).to.eql({ changes: [] });
     }));
 
   });

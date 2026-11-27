@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.10.0">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:serviceTask id="SourceV1" zeebe:modelerTemplate="example.source" zeebe:modelerTemplateVersion="1">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.source" />
+        <zeebe:ioMapping>
+          <zeebe:input source="A1" target="a" />
+          <zeebe:input source="=payload" target="payload" />
+          <zeebe:input source="{{secrets.KEY}}" target="apiKey" />
+          <zeebe:input source="stray" target="kind" />
+          <zeebe:input source="PT1M" target="timeout" />
+          <zeebe:input source="stray" target="w" />
+          <zeebe:input source="=false" target="retry" />
+          <zeebe:input source="=5" target="count" />
+          <zeebe:input source="=false" target="toggle" />
+        </zeebe:ioMapping>
+        <zeebe:properties>
+          <zeebe:property name="flag" value="false" />
+          <zeebe:property name="limit" value="5" />
+          <zeebe:property name="switch" value="false" />
+        </zeebe:properties>
+        <zeebe:taskHeaders>
+          <zeebe:header key="method" value="POST" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="SourceV2" zeebe:modelerTemplate="example.source" zeebe:modelerTemplateVersion="2">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.source" />
+        <zeebe:ioMapping>
+          <zeebe:input source="B2" target="b" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="method" value="GET" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="TargetV1" zeebe:modelerTemplate="example.target" zeebe:modelerTemplateVersion="1">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.target" />
+        <zeebe:ioMapping>
+          <zeebe:input source="X1" target="x" />
+          <zeebe:input source="W1" target="w" />
+          <zeebe:input source="stray" target="b" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="TargetV2" zeebe:modelerTemplate="example.target" zeebe:modelerTemplateVersion="2">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.target" />
+        <zeebe:ioMapping>
+          <zeebe:input source="C2" target="c" />
+          <zeebe:input source="E2" target="e" />
+          <zeebe:input source="stray" target="x" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="OtherV1" zeebe:modelerTemplate="example.other" zeebe:modelerTemplateVersion="1">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.other" />
+        <zeebe:ioMapping>
+          <zeebe:input source="O1" target="o" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Unknown" zeebe:modelerTemplate="example.unknown" zeebe:modelerTemplateVersion="1">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="example.unknown" />
+        <zeebe:ioMapping>
+          <zeebe:input source="U" target="b" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="SourceV1_di" bpmnElement="SourceV1">
+        <dc:Bounds x="160" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SourceV2_di" bpmnElement="SourceV2">
+        <dc:Bounds x="320" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TargetV1_di" bpmnElement="TargetV1">
+        <dc:Bounds x="480" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TargetV2_di" bpmnElement="TargetV2">
+        <dc:Bounds x="160" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Unknown_di" bpmnElement="Unknown">
+        <dc:Bounds x="320" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OtherV1_di" bpmnElement="OtherV1">
+        <dc:Bounds x="480" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

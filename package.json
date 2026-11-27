@@ -32,6 +32,7 @@
     "start": "cross-env SINGLE_START=cloud-templates npm run dev",
     "start:templates": "cross-env SINGLE_START=templates npm run dev",
     "start:chooser": "cross-env SINGLE_START=chooser npm run dev",
+    "start:update-paths": "cross-env SINGLE_START=update-paths npm run dev",
     "prepare": "run-s bundle"
   },
   "repository": {

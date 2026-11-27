@@ -33,19 +33,21 @@ export default function({ templates = [] }) {
       return;
     }
 
-    const template = elementTemplates.get(node);
+    const update = elementTemplates.getUpdate(node);
 
-    if (!template) {
+    if (!update) {
       return;
     }
 
-    const latestTemplate = elementTemplates.getLatest(template.id, { deprecated: true })[0];
+    const message = update.type === 'migration'
+      ? 'Element has template migration available.'
+      : 'Element has updated template available.';
 
-    if (latestTemplate && latestTemplate !== template) {
-      reporter.report(node.id, 'Element has updated template available.', {
-        name: node.name
-      });
-    }
+    reporter.report(node.id, message, {
+      name: node.name,
+      templateId: update.template.id,
+      templateVersion: update.template.version
+    });
   }
 
   return {

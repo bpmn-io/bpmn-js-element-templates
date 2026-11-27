@@ -93,7 +93,7 @@ export function getPropertyValue(element, property) {
   return rawValue;
 }
 
-function getRawPropertyValue(element, property) {
+export function getRawPropertyValue(element, property) {
   let businessObject = getBusinessObject(element);
 
   const defaultValue = '';
