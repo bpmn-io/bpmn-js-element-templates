@@ -448,6 +448,37 @@ describe('provider/cloud-element-templates - ElementTemplatesPropertiesProvider'
         expect(selectSpy).to.have.been.calledWithMatch({ element: task });
       })
     );
+
+
+    [
+      [ 'outdated', 'Task_2' ],
+      [ 'unknown', 'UnknownTemplateTask' ],
+      [ 'deprecated', 'Deprecated' ],
+      [ 'incompatible', 'Task_4' ]
+    ].forEach(([ state, id ]) => {
+
+      it(`should emit \`elementTemplates.select\` for ${ state } template`, inject(
+        async function(elementRegistry, selection, elementTemplates, eventBus) {
+
+          // given
+          const task = elementRegistry.get(id);
+          const selectSpy = spy();
+
+          eventBus.on('elementTemplates.select', selectSpy);
+
+          elementTemplates.setEngines({ camunda: '8.0' });
+
+          await act(() => selection.select(task));
+
+          // when
+          await changeTemplate(container);
+
+          // then
+          expect(selectSpy).to.have.been.calledOnce;
+          expect(selectSpy).to.have.been.calledWithMatch({ element: task });
+        })
+      );
+    });
   });
 
 

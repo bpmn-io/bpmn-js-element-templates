@@ -207,6 +207,16 @@ function RemoveTemplate() {
   return <span class="bio-properties-panel-remove-template">{ translate('Remove') }</span>;
 }
 
+function useChangeMenuItem(element) {
+  const translate = useService('translate'),
+        eventBus = useService('eventBus');
+
+  return {
+    entry: translate('Change'),
+    action: () => eventBus.fire('elementTemplates.select', { element })
+  };
+}
+
 function UnknownTemplate({ element }) {
   const translate = useService('translate'),
         elementTemplates = useService('elementTemplates');
@@ -214,6 +224,7 @@ function UnknownTemplate({ element }) {
   const menuItems = [
     { entry: <NotFoundText /> },
     { separator: true },
+    useChangeMenuItem(element),
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
@@ -258,6 +269,7 @@ function OutdatedTemplate({ element, templateState }) {
     { entry: <UpdateAvailableText newerTemplate={ newerTemplate } compatible={ compatible } /> },
     { separator: true },
     { entry: translate('Update'), action: () => elementTemplates.applyTemplate(element, newerTemplate) },
+    useChangeMenuItem(element),
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
@@ -305,6 +317,7 @@ function DeprecatedTemplate({ element, templateState }) {
   const menuItems = [
     { entry: <DeprecationWarning template={ template } /> },
     { separator: true },
+    useChangeMenuItem(element),
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
@@ -346,6 +359,7 @@ function IncompatibleTemplate({ element }) {
   const menuItems = [
     { entry: <IncompatibleText /> },
     { separator: true },
+    useChangeMenuItem(element),
     { entry: translate('Unlink'), action: () => elementTemplates.unlinkTemplate(element) },
     { entry: <RemoveTemplate />, action: () => elementTemplates.removeTemplate(element) }
   ];
